@@ -2,7 +2,7 @@
 title: "Transformers & attention"
 subtitle: "The architecture behind every model you call"
 summary: "Trace a request through a transformer, and use prefill, decode and the KV cache to reason about latency, cost and long prompts."
-changeNote: "New: phone-friendly Q·K·V and prefill-versus-decode diagrams, a worked request walk-through, a failure-modes list, and a current Ollama model to try."
+changeNote: "Added a lecture track: 7 core lectures and 3 optional ones covering attention, MLPs, a GPT built in code, tokenization and the KV cache, each checked on YouTube."
 section: foundations
 pillar: math-ml-core
 order: 6
@@ -13,7 +13,7 @@ prerequisites:
   - linear-algebra-for-ai
   - probability-statistics-for-ai
   - neural-networks
-reviewedOn: "2026-10-03"
+reviewedOn: "2026-10-04"
 status: published
 video:
   videoId: "wjZofJX0v4M"
@@ -24,7 +24,71 @@ video:
   watchMinutes: 27
   title: "Transformers, the tech behind LLMs | Chapter 5, Deep Learning"
   channel: "3Blue1Brown"
-  why: "It animates the whole path on a real GPT-style model (tokens, embeddings, attention, and the unembedding back to next-token probabilities), which is exactly the pipeline this lesson builds on. It explains each step at a pace that builds intuition rather than listing components, and it reuses the visual language of the earlier 3Blue1Brown chapters in this pillar. Watch all of it, then chapter 6 (attention in detail, in backups). If you'd rather learn by coding, Karpathy's build-GPT video in the backups covers the same ground in about two hours."
+  why: "It animates the whole path on a real GPT-style model (tokens, embeddings, attention, and the unembedding back to next-token probabilities), which is exactly the pipeline this lesson builds on. It explains each step at a pace that builds intuition rather than listing components, and it reuses the visual language of the earlier 3Blue1Brown chapters in this pillar. Watch all of it, then follow the lecture track: chapters 6 and 7 go inside attention and the MLPs, and Karpathy's build-GPT lecture covers it all in code."
+lectureTrack:
+  - videoId: "LPZh9BOjkQs"
+    year: 2024
+    minutes: 8
+    title: "Large Language Models explained briefly"
+    channel: "3Blue1Brown"
+    covers: "An 8-minute map of the whole system: pretraining, next-word prediction, chatbots and where the transformer sits. Watch it first so every later lecture has a place to land."
+  - videoId: "wjZofJX0v4M"
+    year: 2024
+    minutes: 27
+    title: "Transformers, the tech behind LLMs | Deep Learning Chapter 5"
+    channel: "3Blue1Brown"
+    covers: "The full pipeline on a GPT-style model: tokens, embeddings, attention and MLP blocks, then unembedding and softmax into next-token probabilities."
+  - videoId: "eMlx5fFNoYc"
+    year: 2024
+    minutes: 26
+    title: "Attention in transformers, step-by-step | Deep Learning Chapter 6"
+    channel: "3Blue1Brown"
+    covers: "Queries, keys and values in detail: the score grid, softmax weights, the causal mask, multiple heads and cross-attention. The core of this lesson's Q·K·V diagram."
+  - videoId: "9-Jl0dxWQs8"
+    year: 2024
+    minutes: 23
+    title: "How might LLMs store facts | Deep Learning Chapter 7"
+    channel: "3Blue1Brown"
+    covers: "The other half of each block: what the MLP layers do to each token, how they might hold facts, where most parameters live, and the idea of superposition."
+  - videoId: "bQ5BoolX9Ag"
+    year: 2023
+    minutes: 37
+    title: "Decoder-Only Transformers, ChatGPTs specific Transformer, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "A second, slower angle with the numbers worked by hand: word embeddings, positional encoding, masked self-attention, residual connections and how the next word is picked."
+  - videoId: "kCc8FmEb1nY"
+    year: 2023
+    minutes: 116
+    title: "Let's build GPT: from scratch, in code, spelled out."
+    channel: "Andrej Karpathy"
+    covers: "Builds a small GPT in PyTorch step by step: a bigram baseline, self-attention as weighted averaging, positional encoding, heads, residuals and layer norm. The code behind every diagram."
+  - videoId: "zduSFxRajkE"
+    year: 2024
+    minutes: 134
+    title: "Let's build the GPT Tokenizer"
+    channel: "Andrej Karpathy"
+    covers: "Builds a byte-pair-encoding tokenizer from scratch and shows how many odd model behaviours (spelling, arithmetic, non-English text) trace back to tokenization."
+    optional: true
+  - videoId: "80bIUggRJf4"
+    year: 2023
+    minutes: 9
+    title: "The KV Cache: Memory Usage in Transformers"
+    channel: "Efficient NLP"
+    covers: "How caching earlier tokens' keys and values speeds up generation and why it takes so much GPU memory. The mechanism behind this lesson's decode and prompt-caching sections."
+  - videoId: "o29P0Kpobz0"
+    year: 2023
+    minutes: 11
+    title: "Rotary Positional Embeddings: Combining Absolute and Relative"
+    channel: "Efficient NLP"
+    covers: "Absolute versus relative position signals, and how rotary embeddings (RoPE), used in many current open models, combine the two by rotating query and key vectors."
+    optional: true
+  - videoId: "fKMB5UlVY1E"
+    year: 2024
+    minutes: 77
+    title: "Stanford CS25: V4 I Overview of Transformers"
+    channel: "Stanford Online"
+    covers: "A university overview lecture: the history from earlier NLP models to transformers, how they work, recent trends, open weaknesses and agents. Context for where the field is heading."
+    optional: true
 applyIt: |
   **Prompt caching is KV-cache reuse, and it rewards a stable prefix — so the order of anything
   you send on every call is a caching decision.** An identical prompt prefix has identical
@@ -154,12 +218,6 @@ mcq:
     answer: 1
     explain: "A window that fits isn't a window that's wise: you pay for every input token on every call, attention work grows with length, latency rises, and models often recall facts buried in the middle of huge contexts less reliably. Context in the prompt doesn't train the model, so it can't overfit. Retrieving the few relevant chunks (RAG) is usually cheaper and more accurate."
 backupResources:
-  - label: "Attention in transformers, step-by-step | Chapter 6 (3Blue1Brown)"
-    url: "https://www.youtube.com/watch?v=eMlx5fFNoYc"
-    type: "video · the attention deep-dive — watch next"
-  - label: "Let's build GPT: from scratch, in code (Andrej Karpathy)"
-    url: "https://www.youtube.com/watch?v=kCc8FmEb1nY"
-    type: "video · 2h code-along when you want to go all the way"
   - label: "The Illustrated Transformer (Jay Alammar)"
     url: "https://jalammar.github.io/illustrated-transformer/"
     type: "article · the classic diagram walkthrough"

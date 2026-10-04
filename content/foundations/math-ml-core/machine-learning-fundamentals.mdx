@@ -2,7 +2,7 @@
 title: "Machine learning fundamentals"
 subtitle: "The recipe every model follows (and when NOT to use an LLM)"
 summary: "Follow the recipe every model uses, judge generalization honestly, and know when classical ML beats an LLM for the job."
-changeNote: "New: a churn-prediction worked example, a failure-modes list, and a 10-minute exercise routing four ideas to classical ML or an LLM API."
+changeNote: "Added a lecture track: 10 core lectures and 4 optional ones, from the recipe to boosted trees, each checked on YouTube."
 section: foundations
 pillar: math-ml-core
 order: 4
@@ -12,7 +12,7 @@ taskMinutes: 25
 prerequisites:
   - calculus-for-optimization
   - probability-statistics-for-ai
-reviewedOn: "2026-10-03"
+reviewedOn: "2026-10-04"
 status: published
 video:
   videoId: "Gv9_4yMHFhI"
@@ -22,6 +22,95 @@ video:
   title: "A Gentle Introduction to Machine Learning"
   channel: "StatQuest with Josh Starmer"
   why: "In about thirteen minutes Josh Starmer states the recipe this lesson is built on: fit on training data, judge on testing data, and prefer the model that predicts new data well over the one that fits the old data prettiest. It assumes no maths and avoids framework details that date quickly, so it stays current. Then do Google's Machine Learning Crash Course modules below ('Linear regression', 'Overfitting', 'Classification') for interactive, drag-it-yourself depth; the rest of MLCC maps to later lessons in this pillar."
+lectureTrack:
+  - videoId: "Gv9_4yMHFhI"
+    year: 2018
+    minutes: 13
+    title: "A Gentle Introduction to Machine Learning"
+    channel: "StatQuest with Josh Starmer"
+    covers: "The whole recipe in one pass: fit models on training data, compare them on testing data, and pick the one that predicts new data best."
+  - videoId: "EuBBz3bI-aA"
+    year: 2018
+    minutes: 7
+    title: "Machine Learning Fundamentals: Bias and Variance"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Why a straight line and a squiggly line fail in opposite ways: bias, variance and overfitting, shown on a train/test split."
+  - videoId: "fSytzGwwBVw"
+    year: 2018
+    minutes: 6
+    title: "Machine Learning Fundamentals: Cross Validation"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Rotating which slice of the data is held out (4-fold, 10-fold) to compare methods and tune settings without trusting one lucky split."
+  - videoId: "PaFPbb66DxQ"
+    year: 2017
+    minutes: 9
+    title: "The Main Ideas of Fitting a Line to Data (The Main Ideas of Least Squares and Linear Regression.)"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Least squares: score a line by the sum of squared residuals and pick the one that makes it smallest. Your first loss function."
+  - videoId: "sDv4f4s2SB8"
+    year: 2019
+    minutes: 24
+    title: "Gradient Descent, Step-by-Step"
+    channel: "StatQuest with Josh Starmer"
+    covers: "How a model actually fits: gradient descent walks the intercept and slope downhill on the loss, step by step. The same loop trains neural networks."
+  - videoId: "yIYKR4sgzI8"
+    year: 2018
+    minutes: 9
+    title: "StatQuest: Logistic Regression"
+    channel: "StatQuest with Josh Starmer"
+    covers: "From predicting a number to predicting yes/no: the S-shaped curve that gives a probability, and how it differs from linear regression."
+  - videoId: "Q81RR3yKn30"
+    year: 2018
+    minutes: 20
+    title: "Regularization Part 1: Ridge (L2) Regression"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Regularization as a variance dial: ridge adds a penalty that makes the model less sensitive to the training data, with the strength picked by cross-validation."
+  - videoId: "_L39rN6gz7Y"
+    year: 2021
+    minutes: 18
+    title: "Decision and Classification Trees, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Building a classification tree from scratch: choosing splits with Gini impurity, handling numeric columns, and why a deep tree overfits."
+  - videoId: "J4Wdy0Wc_xQ"
+    year: 2018
+    minutes: 10
+    title: "StatQuest: Random Forests Part 1 - Building, Using and Evaluating"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Many trees on bootstrapped data and random column subsets, voting together: bagging, plus the out-of-bag error as a free held-out check."
+  - videoId: "3CC4N4z3GJc"
+    year: 2019
+    minutes: 16
+    title: "Gradient Boost Part 1 (of 4): Regression Main Ideas"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Gradient boosting, the workhorse for tabular data: small trees added one at a time, each fixing the errors the earlier ones left behind."
+  - videoId: "1waHlpKiNyY"
+    year: 2017
+    minutes: 12
+    title: "Train/Dev/Test Sets (C2W1L01)"
+    channel: "DeepLearningAI"
+    covers: "Andrew Ng on splitting data into train, dev (validation) and test sets, and why the split ratios shrink when you have millions of examples."
+    optional: true
+  - videoId: "C1N_PDHuJ6Q"
+    year: 2017
+    minutes: 6
+    title: "Basic Recipe for Machine Learning (C2W1L03)"
+    channel: "DeepLearningAI"
+    covers: "Andrew Ng's checklist for a bad model: high bias calls for a bigger model or longer training, high variance for more data or regularization."
+    optional: true
+  - videoId: "589nCGeWG1w"
+    year: 2023
+    minutes: 15
+    title: "One-Hot, Label, Target and K-Fold Target Encoding, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Turning category columns (plan type, country) into numbers: one-hot, label and target encoding, and the k-fold version that keeps a row's own label out of its value."
+    optional: true
+  - videoId: "OtD8wVaFm6E"
+    year: 2019
+    minutes: 26
+    title: "XGBoost Part 1 (of 4): Regression"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Inside XGBoost, a boosted-tree library behind many tabular models: similarity scores, gain, and the pruning built into each tree."
+    optional: true
 readAfter:
   - label: "Machine Learning Crash Course — Google (interactive modules + exercises)"
     url: "https://developers.google.com/machine-learning/crash-course"

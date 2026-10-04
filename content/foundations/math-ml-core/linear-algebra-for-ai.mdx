@@ -2,7 +2,7 @@
 title: "Linear algebra for AI"
 subtitle: "Vectors, matrices & why attention is just multiplication"
 summary: "Use vectors, dot products and matrix shapes to explain how embedding search works, how attention scales and why LoRA is cheap."
-changeNote: "New: a worked example, a failure-modes list, a quick search test on a tool you already use, and a task that ranks results on your own data."
+changeNote: "Added a lecture track: 11 core lectures and 3 optional SVD lectures covering the linear algebra AI needs, each checked on YouTube."
 section: foundations
 pillar: math-ml-core
 order: 1
@@ -11,7 +11,7 @@ estMinutes: 20
 taskMinutes: 30
 prerequisites:
   - what-is-an-llm
-reviewedOn: "2026-10-03"
+reviewedOn: "2026-10-04"
 status: published
 video:
   videoId: "fNk_zzaMoSs"
@@ -20,7 +20,95 @@ video:
   minutes: 10
   title: "Vectors | Chapter 1, Essence of linear algebra"
   channel: "3Blue1Brown"
-  why: "3Blue1Brown teaches the geometry (what a vector is as an arrow, what a matrix does to space) rather than the symbol-shuffling most courses open with, and that geometric picture is exactly what embeddings and attention need. Animation makes 'similar meaning = similar direction' visible in a way a textbook page can't. Chapter 1 is ten minutes and anchors the series; the later chapters run about the same length, so you can watch one a day this week."
+  why: "3Blue1Brown teaches the geometry (what a vector is as an arrow, what a matrix does to space) rather than the symbol-shuffling most courses open with, and that geometric picture is exactly what embeddings and attention need. Animation makes 'similar meaning = similar direction' visible in a way a textbook page can't. Chapter 1 is ten minutes and anchors the series; the lecture track below picks the later chapters AI work needs, each about the same length, so you can watch one or two a day."
+lectureTrack:
+  - videoId: "fNk_zzaMoSs"
+    year: 2016
+    minutes: 10
+    title: "Vectors | Chapter 1, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "What a vector is, as an arrow and as a list of numbers: the picture behind every embedding."
+  - videoId: "k7RM-ot2NWY"
+    year: 2016
+    minutes: 10
+    title: "Linear combinations, span, and basis vectors | Chapter 2, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "Scaling and adding vectors, span, linear dependence and basis: the vocabulary for what a space of embeddings can and can't express."
+  - videoId: "kYB8IZa5AuE"
+    year: 2016
+    minutes: 11
+    title: "Linear transformations and matrices | Chapter 3, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "A matrix as a function that moves space, read off from where the basis vectors land. This is the idea behind every weight matrix in a layer."
+  - videoId: "XkY2DOUCWMU"
+    year: 2016
+    minutes: 10
+    title: "Matrix multiplication as composition | Chapter 4, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "Multiplying matrices means applying one transformation after another, which is what stacking layers does, and why the order of a product matters."
+  - videoId: "Ip3X9LOh2dk"
+    year: 2016
+    minutes: 10
+    title: "The determinant | Chapter 6, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "How much a transformation scales area or volume, and what a zero determinant (space squashed flat) means. Needed for the eigenvector chapter."
+  - videoId: "uQhTuRlWMxw"
+    year: 2016
+    minutes: 12
+    title: "Inverse matrices, column space and null space | Chapter 7, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "Inverses, column space, null space and rank seen geometrically. Rank is the idea behind low-rank tricks such as LoRA."
+  - videoId: "v8VSDg_WQlA"
+    year: 2016
+    minutes: 4
+    title: "Nonsquare matrices as transformations between dimensions | Chapter 8, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "A short note on non-square matrices mapping between spaces of different sizes: how to read the matrix shapes in a layer or a projection."
+  - videoId: "LyGKycYT2v0"
+    year: 2016
+    minutes: 14
+    title: "Dot products and duality | Chapter 9, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "Why the dot product formula measures alignment and projection. It is the single operation behind similarity search and attention scores."
+  - videoId: "e9U0QAFbfLI"
+    year: 2023
+    minutes: 10
+    title: "Cosine Similarity, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Cosine similarity worked step by step on short text phrases: the dot product divided by the lengths, the score most semantic search ranks by."
+  - videoId: "P2LTAUO1TdA"
+    year: 2016
+    minutes: 13
+    title: "Change of basis | Chapter 13, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "Translating vectors between coordinate systems. It explains why individual embedding dimensions rarely mean anything on their own."
+  - videoId: "PFDu9oVAE-g"
+    year: 2016
+    minutes: 17
+    title: "Eigenvectors and eigenvalues | Chapter 14, Essence of linear algebra"
+    channel: "3Blue1Brown"
+    covers: "Directions a matrix only stretches, and why an eigenbasis simplifies a transformation. Groundwork for PCA and for the SVD lectures below."
+  - videoId: "gXbThCXjZFM"
+    year: 2020
+    minutes: 7
+    title: "Singular Value Decomposition (SVD): Overview"
+    channel: "Steve Brunton"
+    covers: "What the SVD is and why it is one of the most used tools in data processing: any matrix split into rotations and stretches."
+    optional: true
+  - videoId: "xy3QyyhiuY4"
+    year: 2020
+    minutes: 15
+    title: "Singular Value Decomposition (SVD): Matrix Approximation"
+    channel: "Steve Brunton"
+    covers: "Keeping only the largest singular values gives the best low-rank approximation of a matrix, the same bet LoRA makes about fine-tuning updates."
+    optional: true
+  - videoId: "rYz83XPxiZo"
+    year: 2019
+    minutes: 54
+    title: "6. Singular Value Decomposition (SVD)"
+    channel: "MIT OpenCourseWare"
+    covers: "Gilbert Strang's full MIT 18.065 lecture: the SVD as a sum of rank-one pieces in order of importance. University-level depth for rank and compression."
+    optional: true
 applyIt: |
   **Any "find the most relevant item" feature is one dot product, so read it as vectors, not
   prose.** Take a search or chatbot you already use over a collection: a help-center search, a

@@ -10,6 +10,7 @@ import NotesBox from "./NotesBox";
 import CompleteButton from "./CompleteButton";
 import VideoRecap from "./VideoRecap";
 import InlineMarkdown from "./InlineMarkdown";
+import LectureTrack from "./LectureTrack";
 import { Arrow, BackCell, Cell, TitleBlock } from "./TitleBlock";
 import { reportIssueUrl } from "@/lib/site";
 
@@ -203,6 +204,7 @@ export default function LessonView({
         <Outline
           items={[
             { href: "#resource", label: "Watch" },
+            ...(lesson.lectureTrack?.length ? [{ href: "#lectures", label: "Lectures" }] : []),
             ...(lesson.recap?.length ? [{ href: "#recap", label: "Recap" }] : []),
             ...(lesson.body ? [{ href: "#breakdown", label: "Breakdown" }] : []),
             ...(lesson.applyIt ? [{ href: "#apply", label: "Apply" }] : []),
@@ -220,6 +222,17 @@ export default function LessonView({
         <PrimaryResource video={lesson.video} />
         <ReadAfter items={lesson.readAfter} />
       </Block>
+
+      {/* 2a. Math & ML subjects: the full lecture series, in watching order */}
+      {lesson.lectureTrack && lesson.lectureTrack.length > 0 && (
+        <Block step={step()} title="Lecture track: the full series" id="lectures">
+          <LectureTrack
+            lectures={lesson.lectureTrack}
+            lessonKey={lesson.key}
+            primaryId={lesson.video?.videoId}
+          />
+        </Block>
+      )}
 
       {/* 2b. Gamified recap — replay the video's ideas one card at a time */}
       {lesson.recap && lesson.recap.length > 0 && (

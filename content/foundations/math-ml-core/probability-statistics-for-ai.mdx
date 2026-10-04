@@ -2,7 +2,7 @@
 title: "Probability & statistics for AI"
 subtitle: "Sampling, eval noise & why base rates rule guardrails"
 summary: "Treat model outputs and eval scores as noisy samples, use base rates to judge flags, and tell a real improvement from noise."
-changeNote: "New: a worked example, a failure-modes list, and a short exercise choosing a temperature and reading the noise band around a pass rate."
+changeNote: "Added a lecture track: 12 core lectures and 4 optional ones, from distributions through confidence intervals and testing to Bayes, each checked on YouTube."
 section: foundations
 pillar: math-ml-core
 order: 2
@@ -12,7 +12,7 @@ taskMinutes: 45
 prerequisites:
   - what-is-an-llm
   - linear-algebra-for-ai
-reviewedOn: "2026-10-03"
+reviewedOn: "2026-10-04"
 status: published
 video:
   videoId: "vikkiwjQqfU"
@@ -21,7 +21,108 @@ video:
   minutes: 15
   title: "Population and Estimated Parameters, Clearly Explained!!!"
   channel: "StatQuest with Josh Starmer"
-  why: "This lesson rests on one idea: an eval score is an estimate computed from a limited sample, not the true rate. This StatQuest teaches exactly that split (populations versus the parameters you estimate from them) slowly, with pictures and almost no jargon. It beats a general statistics intro because it targets the precise gap that makes eval scores noisy. Then work the full Statistics Fundamentals playlist (read-after) at your own pace: histograms, distributions and mean/variance first, hypothesis testing when you build your first eval."
+  why: "This lesson rests on one idea: an eval score is an estimate computed from a limited sample, not the true rate. This StatQuest teaches exactly that split (populations versus the parameters you estimate from them) slowly, with pictures and almost no jargon. It beats a general statistics intro because it targets the precise gap that makes eval scores noisy. Then work through the lecture track in order: distributions first, then standard error and confidence intervals, hypothesis testing before you compare two prompts, and Bayes before you trust a guardrail."
+lectureTrack:
+  - videoId: "oI3hZJqXJuc"
+    year: 2017
+    minutes: 5
+    title: "The Main Ideas behind Probability Distributions"
+    channel: "StatQuest with Josh Starmer"
+    covers: "What a probability distribution is and how to read one. The same object an LLM outputs over its vocabulary at every step."
+  - videoId: "rzFX5NWojp0"
+    year: 2017
+    minutes: 5
+    title: "The Normal Distribution, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "The bell curve: how its mean and width describe data. You need it to read noise bands and confidence intervals later in the track."
+  - videoId: "8idr1WZ1A7Q"
+    year: 2020
+    minutes: 13
+    title: "Binomial distributions | Probabilities of probabilities, part 1"
+    channel: "3Blue1Brown"
+    covers: "Pass/fail counts and how unsure you should be about a rate seen from few trials: the exact shape of an eval pass-rate."
+    optional: true
+  - videoId: "vikkiwjQqfU"
+    year: 2019
+    minutes: 15
+    title: "Population and Estimated Parameters, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "The true rate versus the estimate you compute from a sample: the split that makes every eval score a noisy number."
+  - videoId: "SzZ6GpcfoQY"
+    year: 2019
+    minutes: 14
+    title: "Calculating the Mean, Variance and Standard Deviation, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "How to compute mean, variance and standard deviation from a sample, and the common pitfall of dividing by n instead of n − 1."
+  - videoId: "A82brFpdr9g"
+    year: 2017
+    minutes: 3
+    title: "Standard Deviation vs Standard Error, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Spread of the data versus uncertainty of an estimate. Standard error is the number behind the ±1/√n eval band in this lesson."
+  - videoId: "YAlJCEDH2uY"
+    year: 2018
+    minutes: 8
+    title: "The Central Limit Theorem, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Why averages of samples land on a bell curve whatever the data looks like, which is what lets you put a band around a pass rate."
+  - videoId: "Xz0x-8-cgaQ"
+    year: 2021
+    minutes: 9
+    title: "Bootstrapping Main Ideas!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Resampling your own data to see how much an estimate would wobble on a rerun: a simple way to get standard errors for any eval metric."
+  - videoId: "TqOeMYtOc1w"
+    year: 2015
+    minutes: 7
+    title: "Confidence Intervals, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "What a 95% confidence interval means and how to build one with bootstrapping. Report an eval score as a range, not a point."
+  - videoId: "0oc49DyA3hU"
+    year: 2020
+    minutes: 15
+    title: "Hypothesis Testing and The Null Hypothesis, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Rejecting versus failing to reject a hypothesis. The logic behind asking whether prompt B really beats prompt A or the gap is noise."
+  - videoId: "vemZtEM63GY"
+    year: 2020
+    minutes: 11
+    title: "p-values: What they are and how to interpret them"
+    channel: "StatQuest with Josh Starmer"
+    covers: "What a p-value measures, how significance thresholds work, and why a small p-value says nothing about how big an improvement is."
+  - videoId: "Rsc5znwR5FA"
+    year: 2020
+    minutes: 8
+    title: "Statistical Power, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Why small samples miss real effects and how sample size raises power: the reasoning behind choosing how big an eval set must be."
+    optional: true
+  - videoId: "_IgyaD7vOOA"
+    year: 2021
+    minutes: 11
+    title: "Conditional Probabilities, Clearly Explained!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Probability of A given B, worked from a table of counts. The counting method this lesson uses for detector flags."
+  - videoId: "9wCnvr7Xw4E"
+    year: 2021
+    minutes: 14
+    title: "Bayes' Theorem, Clearly Explained!!!!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Deriving Bayes' theorem from conditional probabilities and why it's useful: the rule behind reading any flag in light of the base rate."
+  - videoId: "lG4VkPoG3ko"
+    year: 2020
+    minutes: 21
+    title: "The medical test paradox, and redesigning Bayes' rule"
+    channel: "3Blue1Brown"
+    covers: "Why an accurate test can still give mostly false positives, and Bayes' rule rewritten as odds times a likelihood ratio. Base rates, visually."
+    optional: true
+  - videoId: "P7NE4WF8j-Q"
+    year: 2013
+    minutes: 50
+    title: "Lecture 4: Conditional Probability | Statistics 110"
+    channel: "Harvard University"
+    covers: "A full Harvard lecture on conditional probability, independence and Bayes' rule, for learners who want the rigorous version."
+    optional: true
 readAfter:
   - label: "Statistics Fundamentals (full playlist) — StatQuest"
     url: "https://www.youtube.com/playlist?list=PLblh5JKOoLUK0FLuzwntyYI10UQFUhsY9"
@@ -147,9 +248,6 @@ mcq:
     answer: 2
     explain: "Both numbers are noisy estimates of what may be the same rate, and their difference is noisier still (variances add). At n=100 a 4-point swing is within normal wobble. Pool weeks, grow the sample or chart the rate with a band, and investigate only moves outside it. Ignoring it forever is the opposite mistake: a sustained drop still matters."
 backupResources:
-  - label: "Binomial distributions | Probabilities of probabilities, part 1 (3Blue1Brown)"
-    url: "https://www.youtube.com/watch?v=8idr1WZ1A7Q"
-    type: "video · distributions intuition"
   - label: "Seeing Theory — interactive probability & stats (Brown University)"
     url: "https://seeing-theory.brown.edu/"
     type: "interactive · play with every concept"

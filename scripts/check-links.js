@@ -7,7 +7,8 @@
  *   node scripts/check-links.js            # videos + links, exit 1 on any failure
  *   node scripts/check-links.js --videos   # videos only
  *   node scripts/check-links.js --durations [--write]
- *        print each primary video's length and year; --write stores video.minutes, video.year and video.published
+ *        print each primary and lecture video's length and year; --write stores video.minutes,
+ *        video.year and video.published, and minutes and year on each lectureTrack entry
  *   Any other argument is a lesson path or folder that limits the run (e.g. one lesson file).
  *
  * Sites that block bots (403/429 from a HEAD and a GET) are reported as warnings, not failures.
@@ -79,9 +80,29 @@ async function fetchOnce(url, method) {
   }
 }
 
-async function checkVideo(id) {
-  const s = await fetchStatus(`https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=${id}`, "GET");
-  return s === 200 ? null : `oEmbed ${s}`;
+/** The video is public and embeddable, and (when the lesson names one) on the channel it claims. */
+async function checkVideo(id, channels) {
+  const url = `https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=${id}`;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 20000);
+    try {
+      const r = await fetch(url, { signal: ctrl.signal, headers: { "user-agent": UA } });
+      if (r.status !== 200) return `oEmbed ${r.status}`;
+      const author = String((await r.json()).author_name ?? "").trim();
+      // Letters and digits only, so "Theo - t3.gg" matches "Theo - t3․gg" and a credit in
+      // brackets ("freeCodeCamp.org (Lance Martin)") still names the channel.
+      const bare = (x) => x.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const wrong = [...channels].filter((c) => !bare(c).startsWith(bare(author)) || !bare(author));
+      return wrong.length ? `channel is "${author}", lesson says "${wrong.join('", "')}"` : null;
+    } catch {
+      /* retry */
+    } finally {
+      clearTimeout(t);
+    }
+    await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
+  }
+  return "oEmbed unreachable";
 }
 
 async function checkUrl(url) {
@@ -121,6 +142,28 @@ function setVideoField(raw, key, value) {
     : raw.replace(/(\n  videoId: [^\n]+\n)/, `$1  ${key}: ${value}\n`);
 }
 
+/** Set minutes and year on one lecture (`  - videoId: "ID"`) inside the lectureTrack list. */
+function setLectureFields(raw, id, fields) {
+  const lines = raw.split("\n");
+  const start = lines.findIndex((l) => /^lectureTrack:/.test(l));
+  if (start < 0) return raw;
+  let end = lines.findIndex((l, i) => i > start && /^\S/.test(l));
+  if (end < 0) end = lines.length;
+  const item = lines.findIndex((l, i) => i > start && i < end && new RegExp(`^  - videoId: "?${id}"?\\s*$`).test(l));
+  if (item < 0) return raw;
+  let itemEnd = lines.findIndex((l, i) => i > item && i < end && /^  - /.test(l));
+  if (itemEnd < 0) itemEnd = end;
+  for (const [key, value] of Object.entries(fields)) {
+    const at = lines.findIndex((l, i) => i > item && i < itemEnd && new RegExp(`^    ${key}: `).test(l));
+    if (at >= 0) lines[at] = `    ${key}: ${value}`;
+    else {
+      lines.splice(item + 1, 0, `    ${key}: ${value}`);
+      itemEnd++;
+    }
+  }
+  return lines.join("\n");
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const files = lessons(args.filter((a) => !a.startsWith("--"))).map((file) => ({ file, rel: path.relative(ROOT, file).replace(/\\/g, "/"), raw: fs.readFileSync(file, "utf8") }));
@@ -133,22 +176,40 @@ async function main() {
       const { secs, year, published } = id ? await videoInfo(id) : { secs: null, year: null, published: null };
       const min = secs ? Math.max(1, Math.round(secs / 60)) : null;
       console.log(`${String(min ?? "?").padStart(4)} min  ${year ?? "????"}  ${f.rel}`);
+      const raw = f.raw.replace(/\r\n/g, "\n");
+      let next = raw;
       if (write && min) {
-        const raw = f.raw.replace(/\r\n/g, "\n");
-        let next = setVideoField(raw, "minutes", min);
+        next = setVideoField(next, "minutes", min);
         if (year) next = setVideoField(next, "year", year);
         if (published) next = setVideoField(next, "published", `"${published}"`);
-        if (next !== raw) fs.writeFileSync(f.file, next);
       }
+      for (const l of Array.isArray(f.fm.lectureTrack) ? f.fm.lectureTrack : []) {
+        if (!l?.videoId) continue;
+        const info = await videoInfo(l.videoId);
+        const lm = info.secs ? Math.max(1, Math.round(info.secs / 60)) : null;
+        console.log(`${String(lm ?? "?").padStart(4)} min  ${info.year ?? "????"}    lecture ${l.videoId}  ${l.title ?? ""}`);
+        if (write && lm) next = setLectureFields(next, l.videoId, info.year ? { minutes: lm, year: info.year } : { minutes: lm });
+      }
+      if (write && next !== raw) fs.writeFileSync(f.file, next);
     });
     return;
   }
 
   const videos = new Map(); // id -> [where]
+  const channels = new Map(); // id -> Set of channel names the lessons claim
   const urls = new Map();
   const add = (map, key, where) => map.set(key, [...(map.get(key) || []), where]);
   for (const f of files) {
-    if (f.fm.video?.videoId) add(videos, f.fm.video.videoId, `${f.rel} (primary)`);
+    const claim = (id, channel) => channel && channels.set(id, new Set([...(channels.get(id) || []), channel]));
+    if (f.fm.video?.videoId) {
+      add(videos, f.fm.video.videoId, `${f.rel} (primary)`);
+      claim(f.fm.video.videoId, f.fm.video.channel);
+    }
+    for (const l of Array.isArray(f.fm.lectureTrack) ? f.fm.lectureTrack : []) {
+      if (!l?.videoId) continue;
+      add(videos, l.videoId, `${f.rel} (lecture)`);
+      claim(l.videoId, l.channel);
+    }
     const links = [...(f.fm.readAfter || []), ...(f.fm.backupResources || [])];
     for (const l of links) {
       if (!l?.url) continue;
@@ -161,7 +222,7 @@ async function main() {
   const failures = [];
   const warnings = [];
   await pool([...videos.keys()], 5, async (id) => {
-    const why = await checkVideo(id);
+    const why = await checkVideo(id, channels.get(id) || new Set());
     if (why) failures.push(`VIDEO ${id} ${why} — ${videos.get(id).join(", ")}`);
   });
   if (!args.includes("--videos")) {

@@ -33,12 +33,18 @@ Each group gets its own route through the course, and the site orders the lesson
   self-checks and, in 51 lessons, a scored challenge quiz → your notes. The header splits the
   time into video, reading and task, lists the lessons to do first, and offers a 40-minute
   short path through the long ones.
+- **Full lecture tracks for the maths.** Each Math & ML subject (linear algebra, probability
+  and statistics, calculus, ML fundamentals, neural networks, transformers, evaluation) comes
+  with its whole lecture series in watching order: 95 lectures in all, about 20 hours of core
+  lectures plus optional depth, each playable in place and ticked off as you go.
 
 | Lesson header | Recall recap |
 |---|---|
 | ![A lesson header: title block with level, time split, review date and a short path for learners short on time](docs/screenshots/lesson.png) | ![The video recap: a recall card flipped, with I had it and Not yet buttons](docs/screenshots/recap.png) |
 | **Challenge quiz** | **Search** |
 | ![A challenge quiz question answered, with the explanation shown](docs/screenshots/quiz.png) | ![Search results for a misspelt query, still finding RAG fundamentals first](docs/screenshots/search.png) |
+
+![A lecture track: the probability and statistics series, each lecture with its length, what it covers, a Watch here button and a Mark watched tick](docs/screenshots/lectures.png)
 
 <p>
   <img src="docs/screenshots/mobile-home.png" width="260" alt="The home page on a phone">

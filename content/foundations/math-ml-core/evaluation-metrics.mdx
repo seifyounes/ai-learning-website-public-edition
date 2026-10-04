@@ -2,7 +2,7 @@
 title: "Evaluation metrics"
 subtitle: "Precision, recall, ROC & choosing the number that matches the cost of being wrong"
 summary: "Pick the metric that matches the real cost of a wrong answer, and spot accuracy that hides a useless model."
-changeNote: "New: a spam-filter worked example, a failure-modes list, and a 10-minute test that swaps answer order to see whether an AI judge you use is biased."
+changeNote: "Added a lecture track: 11 core lectures and 3 optional ones, from the confusion matrix to LLM judges and eval sets, each checked on YouTube."
 section: foundations
 pillar: math-ml-core
 order: 7
@@ -12,7 +12,7 @@ taskMinutes: 15
 prerequisites:
   - probability-statistics-for-ai
   - machine-learning-fundamentals
-reviewedOn: "2026-10-03"
+reviewedOn: "2026-10-04"
 status: published
 video:
   videoId: "4jRBRDbJemM"
@@ -21,7 +21,95 @@ video:
   minutes: 16
   title: "ROC and AUC, Clearly Explained!"
   channel: "StatQuest with Josh Starmer"
-  why: "Josh Starmer builds the confusion matrix, the threshold and the ROC curve one step at a time, and shows how sliding the threshold traces the curve, which is the exact skill this lesson needs. It's 16 minutes, light on maths and heavy on pictures, so it works whether or not you've studied statistics. Pair it with his sensitivity/specificity video (backups) for the confusion-matrix vocabulary."
+  why: "Josh Starmer builds the confusion matrix, the threshold and the ROC curve one step at a time, and shows how sliding the threshold traces the curve, which is the exact skill this lesson needs. It's 16 minutes, light on maths and heavy on pictures, so it works whether or not you've studied statistics. The lecture track builds the confusion-matrix vocabulary around it, then carries the same ideas into evaluating LLM apps."
+lectureTrack:
+  - videoId: "Kdsp6soqA7o"
+    year: 2018
+    minutes: 7
+    title: "Machine Learning Fundamentals: The Confusion Matrix"
+    channel: "StatQuest with Josh Starmer"
+    covers: "The four boxes (true and false positives, true and false negatives) laid out for a real classifier. Every metric in this lesson is arithmetic on this table."
+  - videoId: "vP06aMoz4v8"
+    year: 2019
+    minutes: 12
+    title: "Machine Learning Fundamentals: Sensitivity and Specificity"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Reading the confusion matrix as two rates: how many real positives you catch and how many negatives you correctly clear, and how to compare models with them."
+  - videoId: "qWfzIYCvBqo"
+    year: 2021
+    minutes: 5
+    title: "Never Forget Again! // Precision vs Recall with a Clear Example of Precision and Recall"
+    channel: "Kimberly Fessel"
+    covers: "Accuracy, precision and recall on one small picture, a memory trick for the last two, and how moving the decision threshold trades one against the other."
+  - videoId: "4jRBRDbJemM"
+    year: 2019
+    minutes: 16
+    title: "ROC and AUC, Clearly Explained!"
+    channel: "StatQuest with Josh Starmer"
+    covers: "Sliding the threshold traces the ROC curve, and AUC sums it up as one number for comparing models. Ends with when precision beats the false-positive rate."
+  - videoId: "sofffBNhVSo"
+    year: 2017
+    minutes: 7
+    title: "Single Number Evaluation Metric (C3W1L03)"
+    channel: "DeepLearningAI"
+    covers: "Andrew Ng on why a team should agree one number to rank models by, and how F1 folds precision and recall into it so choices between models get fast."
+  - videoId: "BH9mlmdXzzI"
+    year: 2017
+    minutes: 6
+    title: "Satisficing and Optimizing Metrics (C3W1L04)"
+    channel: "DeepLearningAI"
+    covers: "Optimize one metric and set pass/fail limits on the rest, such as speed or false alarms. The habit behind choosing a dashboard number that matches real costs."
+  - videoId: "kDY4TodQwbg"
+    year: 2024
+    minutes: 6
+    title: "What are Large Language Model (LLM) Benchmarks?"
+    channel: "IBM Technology"
+    covers: "What public LLM benchmarks measure, how models are scored on them, and what a leaderboard can and cannot tell you about the model you should use."
+  - videoId: "CnWt0Zarfoc"
+    year: 2026
+    minutes: 39
+    title: "How to evaluate LLMs | the statistics behind Arena's rankings"
+    channel: "Arena AI"
+    covers: "How pairwise human votes become a ranking: static vs live benchmarks, contamination, the Bradley-Terry model and the confidence intervals behind each score."
+    optional: true
+  - videoId: "K8LLVi5Xrh8"
+    year: 2025
+    minutes: 12
+    title: "1. Introduction to LLM evaluations in 10 key ideas"
+    channel: "Evidently AI"
+    covers: "Why testing your own AI app differs from benchmarking a model: manual and automated checks, reference-based and reference-free evals, and test datasets."
+  - videoId: "trfUBIDeI1Y"
+    year: 2025
+    minutes: 6
+    title: "LLM as a Judge: Scaling AI Evaluation Strategies"
+    channel: "IBM Technology"
+    covers: "Using one model to grade another, by direct scoring or pairwise comparison, and the position and verbosity biases you have to control before trusting it."
+  - videoId: "JoAxZsdw_3w"
+    year: 2017
+    minutes: 11
+    title: "Carrying Out Error Analysis (C3W2L01)"
+    channel: "DeepLearningAI"
+    covers: "Andrew Ng's classic method: hand-label a sample of mistakes, count them by cause, and fix the biggest bucket first. The same move works for LLM apps."
+    optional: true
+  - videoId: "e2i6JbU2R-s"
+    year: 2025
+    minutes: 12
+    title: "Error Analysis: The Highest ROI Technique In AI Engineering"
+    channel: "Hamel Husain"
+    covers: "Reading real traces from an LLM app, noting what went wrong and grouping the failures. This is how you find out what your eval set should test."
+  - videoId: "uiza7wp1KrE"
+    year: 2025
+    minutes: 53
+    title: "AI Evaluations Clearly Explained in 50 Minutes (Real Example) | Hamel Husain"
+    channel: "Peter Yang"
+    covers: "A full eval built in a spreadsheet from 100 real traces: pass/fail criteria, why binary labels beat 1–5 scores, and checking a judge's true positive and negative rates."
+  - videoId: "GL0XhAj5LPE"
+    year: 2025
+    minutes: 28
+    title: "LLM Evals: Common Mistakes"
+    channel: "Hamel Husain"
+    covers: "Hamel Husain and Shreya Shankar on the traps: generic metrics, outsourced labels, vague judge prompts, overfitting to your test set, and skipping online tests."
+    optional: true
 applyIt: |
   **Any time you ask an AI to grade or compare work, you're using a biased classifier, so test it
   before you trust its scores.** It might be a chat assistant ranking two drafts of your essay or
@@ -148,9 +236,6 @@ mcq:
     answer: 1
     explain: "pass@k is the probability that at least one of k samples succeeds. Solving 78% of tasks within ten tries shows the capability is there; the 45% first-try rate shows it isn't consistent. That justifies generating several candidates and keeping one that passes a verifier (tests, a checker), trading extra inference cost for reliability. Memorization would inflate both numbers, not open a gap between them. Temperature zero gives one deterministic answer per task, which may shift pass@1 a little but can't make one attempt worth ten."
 backupResources:
-  - label: "Machine Learning Fundamentals: Sensitivity and Specificity (StatQuest)"
-    url: "https://www.youtube.com/watch?v=vP06aMoz4v8"
-    type: "video · the confusion-matrix companion"
   - label: "Google MLCC — Classification: accuracy, precision, recall"
     url: "https://developers.google.com/machine-learning/crash-course/classification"
     type: "docs · interactive threshold widgets"

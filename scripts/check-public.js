@@ -65,6 +65,29 @@ const ALL_SLUGS = new Set();
   }
 })(path.join(ROOT, "content"));
 
+// Where each video is used, so a video has one home: a lesson's primary, or one lecture track.
+const PRIMARY_OF = new Map(); // videoId -> lesson slug
+const TRACK_OF = new Map(); // videoId -> [lesson slugs]
+(function collectVideos(d) {
+  for (const f of fs.readdirSync(d)) {
+    const p = path.join(d, f);
+    if (fs.statSync(p).isDirectory()) collectVideos(p);
+    else if (p.endsWith(".mdx")) {
+      let data;
+      try {
+        data = matter(fs.readFileSync(p, "utf8")).data;
+      } catch {
+        continue;
+      }
+      const slug = f.replace(/\.mdx$/, "");
+      if (data.video?.videoId) PRIMARY_OF.set(data.video.videoId, slug);
+      for (const l of Array.isArray(data.lectureTrack) ? data.lectureTrack : []) {
+        if (l?.videoId) TRACK_OF.set(l.videoId, [...(TRACK_OF.get(l.videoId) || []), slug]);
+      }
+    }
+  }
+})(path.join(ROOT, "content"));
+
 /** Raw slugs in prose: a hyphenated lesson slug that isn't a `→ slug` pointer, a URL or code. */
 function rawSlugs(text) {
   const found = [];
@@ -227,6 +250,38 @@ for (const file of files) {
     if (!Array.isArray(fm.prerequisites)) errors.push({ file: rel, rule: "schema", detail: "prerequisites must be a list of lesson slugs" });
     else for (const s of fm.prerequisites) if (!ALL_SLUGS.has(s)) errors.push({ file: rel, rule: "schema", detail: `prerequisite '${s}' is not a lesson slug` });
   }
+  // Math & ML subjects carry their full lecture series, not one video.
+  const slug = path.basename(file, ".mdx");
+  if (fm.pillar === "math-ml-core") {
+    const t = Array.isArray(fm.lectureTrack) ? fm.lectureTrack : [];
+    if (t.filter((l) => !l?.optional).length < 4 || t.length > 16) {
+      errors.push({ file: rel, rule: "schema", detail: `math lessons need a lectureTrack with at least 4 core lectures and 16 in all (has ${t.length})` });
+    }
+  }
+  if (fm.lectureTrack !== undefined) {
+    if (!Array.isArray(fm.lectureTrack)) errors.push({ file: rel, rule: "schema", detail: "lectureTrack must be a list" });
+    else {
+      const seen = new Set();
+      fm.lectureTrack.forEach((l, i) => {
+        const at = `lectureTrack ${i + 1}`;
+        if (!l || !/^[\w-]{11}$/.test(l.videoId ?? "")) errors.push({ file: rel, rule: "schema", detail: `${at}: videoId must be an 11-character YouTube id` });
+        if (!l?.title || !l?.channel) errors.push({ file: rel, rule: "schema", detail: `${at}: needs title and channel` });
+        if (!(l?.minutes > 0)) errors.push({ file: rel, rule: "schema", detail: `${at}: missing minutes (run check-links.js --durations --write)` });
+        if (typeof l?.covers !== "string" || l.covers.length < 30 || l.covers.length > 220) {
+          errors.push({ file: rel, rule: "schema", detail: `${at}: covers must say in 30–220 characters what the lecture teaches (has ${l?.covers?.length ?? 0})` });
+        }
+        if (l?.optional !== undefined && typeof l.optional !== "boolean") errors.push({ file: rel, rule: "schema", detail: `${at}: optional must be true or false` });
+        if (!l?.videoId) return;
+        if (seen.has(l.videoId)) errors.push({ file: rel, rule: "dup", detail: `${at}: ${l.videoId} is listed twice` });
+        seen.add(l.videoId);
+        const primaryOf = PRIMARY_OF.get(l.videoId);
+        if (primaryOf && primaryOf !== slug) errors.push({ file: rel, rule: "dup", detail: `${at}: ${l.videoId} is the main video of → ${primaryOf}` });
+        const elsewhere = (TRACK_OF.get(l.videoId) || []).filter((s) => s !== slug);
+        if (elsewhere.length) errors.push({ file: rel, rule: "dup", detail: `${at}: ${l.videoId} is also in the lecture track of → ${elsewhere.join(", ")}` });
+      });
+    }
+  }
+
   (fm.mcq || []).forEach((q, i) => {
     const why = guessableMcq(q);
     if (why) errors.push({ file: rel, rule: "mcq", detail: `Q${i + 1}: ${why}` });
@@ -239,6 +294,7 @@ for (const file of files) {
     ["task", fm.task],
     ["video.why", fm.video?.why],
     ["shortPath", fm.shortPath],
+    ...(Array.isArray(fm.lectureTrack) ? fm.lectureTrack : []).map((l, i) => [`lectureTrack ${i + 1}`, l?.covers]),
     ...(fm.recap || []).map((r, i) => [`recap ${i + 1}`, `${r.title} ${r.text}`]),
     ...(fm.selfCheck || []).map((s, i) => [`selfCheck ${i + 1}`, `${s.q} ${s.a}`]),
     ...(fm.mcq || []).map((q, i) => [`mcq ${i + 1}`, `${q.q} ${(q.options || []).join(" ")} ${q.explain || ""}`]),

@@ -49,6 +49,7 @@ function readLessonFile(
     task: fm.task,
     selfCheck: fm.selfCheck ?? [],
     mcq: fm.mcq ?? [],
+    lectureTrack: fm.lectureTrack ?? [],
     backupResources: fm.backupResources ?? [],
     tags: fm.tags ?? [],
     slug,
@@ -169,6 +170,7 @@ export function linkLesson(lesson: Lesson): Lesson {
     recap: lesson.recap?.map((r) => ({ ...r, title: link(r.title, { plain: true }) ?? "", text: link(r.text) ?? "" })),
     // Questions render inside a button, so they name the lesson without linking it.
     selfCheck: lesson.selfCheck?.map((s) => ({ ...s, q: link(s.q, { plain: true }) ?? "", a: link(s.a) ?? "" })),
+    lectureTrack: lesson.lectureTrack?.map((l) => ({ ...l, covers: link(l.covers) ?? "" })),
     mcq: lesson.mcq?.map((q) => ({
       ...q,
       q: link(q.q, { plain: true }) ?? "",

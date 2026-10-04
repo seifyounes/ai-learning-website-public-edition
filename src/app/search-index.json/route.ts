@@ -31,7 +31,13 @@ function plain(markdown: string | undefined): string {
  */
 export function GET() {
   const index = getAllLessons().map((l) => {
-    const full = [plain(l.body), plain(l.applyIt), plain(l.task), ...(l.recap ?? []).map((r) => plain(`${r.title}. ${r.text}`))]
+    const full = [
+      plain(l.body),
+      plain(l.applyIt),
+      plain(l.task),
+      ...(l.recap ?? []).map((r) => plain(`${r.title}. ${r.text}`)),
+      ...(l.lectureTrack ?? []).map((t) => plain(`${t.title}. ${t.covers}`)),
+    ]
       .join(" ")
       .replace(/[*_`]/g, "");
     const text = full.slice(0, SNIPPET_TEXT).replace(/\s\S*$/, "");

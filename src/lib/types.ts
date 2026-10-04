@@ -71,6 +71,20 @@ export interface Resource {
   type?: string;
 }
 
+/** One lecture in a subject's lecture track: a full video series, watched in order. */
+export interface Lecture {
+  videoId: string;
+  title: string;
+  channel: string;
+  /** Length in minutes (written by `scripts/check-links.js --durations --write`). */
+  minutes?: number;
+  year?: number;
+  /** One sentence: what this lecture teaches and why it's in the track. */
+  covers: string;
+  /** Depth for learners who want more; the core track works without it. */
+  optional?: boolean;
+}
+
 /** What the author writes in a lesson's frontmatter. */
 export interface LessonFrontmatter {
   title: string;
@@ -109,6 +123,8 @@ export interface LessonFrontmatter {
   /** Markdown: the hands-on "do this now" task. */
   task?: string;
   selfCheck?: SelfCheckItem[];
+  /** Math & ML subjects: every lecture the subject needs, in watching order. */
+  lectureTrack?: Lecture[];
   /** Challenging AI-connected MCQs — rendered as an interactive quiz block. */
   mcq?: McqItem[];
   backupResources?: Resource[];

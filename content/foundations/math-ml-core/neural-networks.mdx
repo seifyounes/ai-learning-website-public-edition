@@ -2,7 +2,7 @@
 title: "Neural networks"
 subtitle: "Layers, activations & where the GBs and dollars go"
 summary: "Explain what a neural network layer computes, and estimate how much memory and money a model needs to run or fine-tune."
-changeNote: "New: a worked example, a failure-modes list, a 5-minute local-versus-cloud call for your own machine, and a task table that includes a model you want to run."
+changeNote: "Added a lecture track: 8 core lectures and 3 optional ones, from layers and activations to training loops built from scratch, each checked on YouTube."
 section: foundations
 pillar: math-ml-core
 order: 5
@@ -12,7 +12,7 @@ taskMinutes: 20
 prerequisites:
   - linear-algebra-for-ai
   - calculus-for-optimization
-reviewedOn: "2026-10-03"
+reviewedOn: "2026-10-04"
 status: published
 video:
   videoId: "aircAruvnKk"
@@ -22,6 +22,76 @@ video:
   title: "But what is a neural network? | Chapter 1, Deep learning"
   channel: "3Blue1Brown"
   why: "It builds a network visually, neuron by neuron, on real handwritten digits, so 'layers learn features' stops being a slogan and becomes something you can watch. It gives you the picture before any framework code, which is the order this lesson needs, and it opens a free series whose gradient-descent chapter you already watched in the calculus lesson, so the notation carries straight over."
+lectureTrack:
+  - videoId: "aircAruvnKk"
+    year: 2017
+    minutes: 19
+    title: "But what is a neural network? | Deep learning chapter 1"
+    channel: "3Blue1Brown"
+    covers: "Neurons, layers, weights and biases on a digit recognizer: the picture of a network as matrix multiplies plus activations that the rest of the track builds on."
+  - videoId: "rMOdrD61IoU"
+    year: 2017
+    minutes: 10
+    title: "Computing Neural Network Output (C1W3L03)"
+    channel: "DeepLearningAI"
+    covers: "Andrew Ng writes one hidden layer as z = Wx + b, then a = g(z), and stacks the units into matrices: the exact layer formula this lesson uses, in standard notation."
+  - videoId: "Xvg00QnyaIY"
+    year: 2017
+    minutes: 11
+    title: "Activation Functions (C1W3L06)"
+    channel: "DeepLearningAI"
+    covers: "Sigmoid, tanh, ReLU and leaky ReLU compared: what each one does, why ReLU is the usual default for hidden layers, and when sigmoid still belongs at the output."
+  - videoId: "NkOv_k7r6no"
+    year: 2017
+    minutes: 6
+    title: "Why Non-linear Activation Functions (C1W3L07)"
+    channel: "DeepLearningAI"
+    covers: "The algebra behind this lesson's key claim: without a nonlinearity, any stack of layers collapses into one linear function, so depth buys nothing."
+  - videoId: "5dWp1mw_XNk"
+    year: 2017
+    minutes: 11
+    title: "Why Deep Representations? (C1W4L04)"
+    channel: "DeepLearningAI"
+    covers: "Why depth helps: early layers find simple features such as edges, later layers compose them into parts and then whole objects. The intuition behind this lesson's depth section."
+  - videoId: "Ilg3gGewQ5U"
+    year: 2017
+    minutes: 13
+    title: "Backpropagation, intuitively | Deep Learning Chapter 3"
+    channel: "3Blue1Brown"
+    covers: "How one training example nudges every weight and bias, and how those nudges average into a gradient step over mini-batches: the learning half of a network, without the calculus."
+  - videoId: "VMj-3S1tku0"
+    year: 2022
+    minutes: 146
+    title: "The spelled-out intro to neural networks and backpropagation: building micrograd"
+    channel: "Andrej Karpathy"
+    covers: "Build a tiny autograd engine and a small network in plain Python, then train it with a forward pass, loss, backward pass and update. After this, a training loop holds no mystery."
+  - videoId: "PaCmpygFfXo"
+    year: 2022
+    minutes: 118
+    title: "The spelled-out intro to language modeling: building makemore"
+    channel: "Andrej Karpathy"
+    covers: "Move to PyTorch tensors and train a one-layer network to predict the next character, with a negative log-likelihood loss: the training loop at real scale and the first step toward GPT."
+  - videoId: "TCH_1BHY58I"
+    year: 2022
+    minutes: 76
+    title: "Building makemore Part 2: MLP"
+    channel: "Andrej Karpathy"
+    covers: "A multi-layer network with embeddings, plus the everyday craft: mini-batches, finding a learning rate, train/dev/test splits and spotting under- and overfitting."
+    optional: true
+  - videoId: "P6sfmUTpUmc"
+    year: 2022
+    minutes: 116
+    title: "Building makemore Part 3: Activations & Gradients, BatchNorm"
+    channel: "Andrej Karpathy"
+    covers: "Why deep networks are fragile to train: saturated tanh units, dead neurons, initialization scale, the diagnostic plots to check, and how batch normalization fixes much of it."
+    optional: true
+  - videoId: "q8SA3rM6ckI"
+    year: 2022
+    minutes: 115
+    title: "Building makemore Part 4: Becoming a Backprop Ninja"
+    channel: "Andrej Karpathy"
+    covers: "Backpropagate through a whole two-layer network by hand, without autograd. A work-along exercise for anyone who wants gradient flow to feel concrete."
+    optional: true
 applyIt: |
   **Before you download a local model for private, offline or free experimenting, size it in one
   multiply against the machine you actually own.** Weights ≈ parameters × bytes/param: 7B at fp16
@@ -143,7 +213,7 @@ mcq:
 backupResources:
   - label: "Neural networks — full playlist (3Blue1Brown)"
     url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi"
-    type: "course · chapters 2–7 continue the story"
+    type: "course · chapter 3 is in the lecture track; the calculus and transformers lessons use the rest"
   - label: "TensorFlow Playground — train a network in your browser"
     url: "https://playground.tensorflow.org/"
     type: "interactive · watch layers learn live"

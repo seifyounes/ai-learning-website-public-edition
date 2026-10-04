@@ -2,7 +2,7 @@
 title: "Calculus for optimization"
 subtitle: "Gradients, learning rates & what training actually does"
 summary: "Read a loss curve, choose a sensible learning rate, and explain what gradient descent and backprop actually do during training."
-changeNote: "New: a worked example, a failure-modes list, and a 10-minute check of one saved prompt on three inputs it was never tuned on."
+changeNote: "Added a lecture track: 12 core lectures and 4 optional ones from derivatives to backprop and optimizers, each checked on YouTube."
 section: foundations
 pillar: math-ml-core
 order: 3
@@ -11,7 +11,7 @@ estMinutes: 20
 taskMinutes: 15
 prerequisites:
   - linear-algebra-for-ai
-reviewedOn: "2026-10-03"
+reviewedOn: "2026-10-04"
 status: published
 video:
   videoId: "IHZwWFHWa-w"
@@ -20,7 +20,108 @@ video:
   minutes: 21
   title: "Gradient descent, how neural networks learn | Chapter 2, Deep learning"
   channel: "3Blue1Brown"
-  why: "You SEE the loss landscape and the step downhill as animation, so the update rule reads as a picture instead of a formula to memorize. It works on a real digit-recognition network rather than a one-variable toy, which is the bridge this lesson needs between 'slope' and 'training a model'. Chosen over lecture-style course videos for clarity per minute. It's chapter 2 of the Deep Learning series; chapters 3–4 (backpropagation) are the natural follow-up and are linked as backups."
+  why: "You SEE the loss landscape and the step downhill as animation, so the update rule reads as a picture instead of a formula to memorize. It works on a real digit-recognition network rather than a one-variable toy, which is the bridge this lesson needs between 'slope' and 'training a model'. Chosen over lecture-style course videos for clarity per minute. It's chapter 2 of the Deep Learning series. The lecture track below builds the calculus it rests on first, then continues to backprop and the optimizers used on real training runs."
+lectureTrack:
+  - videoId: "9vKqVkMQHKk"
+    year: 2017
+    minutes: 17
+    title: "The paradox of the derivative | Chapter 2, Essence of calculus"
+    channel: "3Blue1Brown"
+    covers: "What a derivative really measures: a tiny change in output divided by the tiny change in input that caused it. The question behind every gradient: if I nudge this weight, how does the loss move?"
+  - videoId: "S0_qX4VJhMQ"
+    year: 2017
+    minutes: 18
+    title: "Derivative formulas through geometry | Chapter 3, Essence of calculus"
+    channel: "3Blue1Brown"
+    covers: "Why the power rule and a few other basic formulas are true, shown with pictures. Enough to differentiate a squared-error loss like the one in the worked example yourself."
+  - videoId: "YG15m2VwSjA"
+    year: 2017
+    minutes: 16
+    title: "Visualizing the chain rule and product rule | Chapter 4, Essence of calculus"
+    channel: "3Blue1Brown"
+    covers: "The chain rule for functions nested inside functions, built from nudges that pass through each layer. Backpropagation is this rule applied over and over."
+  - videoId: "AXqhWeUEtQU"
+    year: 2016
+    minutes: 11
+    title: "Partial derivatives, introduction"
+    channel: "Khan Academy"
+    covers: "Functions of several inputs, and the derivative with respect to one input while the others stay fixed. A model's loss depends on every weight, so this is the step up you need."
+  - videoId: "tIpKfDc295M"
+    year: 2016
+    minutes: 6
+    title: "Gradient"
+    channel: "Khan Academy"
+    covers: "Collecting all the partial derivatives into one vector, the gradient, and computing it for a concrete function. This is the ∇loss in the update rule."
+  - videoId: "_-02ze7tf08"
+    year: 2016
+    minutes: 6
+    title: "Gradient and graphs"
+    channel: "Khan Academy"
+    covers: "What the gradient means on the graph of a function: it points in the direction of steepest ascent, so gradient descent steps the opposite way."
+  - videoId: "TEB2z7ZlRAw"
+    year: 2016
+    minutes: 11
+    title: "Why the gradient is the direction of steepest ascent"
+    channel: "Khan Academy"
+    covers: "Connects the way the gradient is computed to why it points uphill, using directional derivatives and the dot product. For learners who want the reason, not just the picture."
+    optional: true
+  - videoId: "hFvBZf-Jx28"
+    year: 2016
+    minutes: 8
+    title: "Multivariable chain rule intuition"
+    channel: "Khan Academy"
+    covers: "The chain rule when one change flows through several intermediate variables at once, explained with nudges. That is the situation inside a network, where a weight reaches the loss by many paths."
+    optional: true
+  - videoId: "IHZwWFHWa-w"
+    year: 2017
+    minutes: 21
+    title: "Gradient descent, how neural networks learn | Chapter 2, Deep learning"
+    channel: "3Blue1Brown"
+    covers: "The cost function of a real digit-recognition network, and gradient descent as rolling downhill on it. Puts the derivatives and gradients above to work on training."
+  - videoId: "tIeHLnjs5U8"
+    year: 2017
+    minutes: 10
+    title: "Backpropagation calculus | Deep Learning Chapter 4"
+    channel: "3Blue1Brown"
+    covers: "The chain rule written out for a small network, showing how the loss gradient for each weight and bias is assembled layer by layer. If backprop is new, watch chapter 3 (in the backups) first."
+  - videoId: "4qJaSmvhxi8"
+    year: 2017
+    minutes: 11
+    title: "Mini Batch Gradient Descent (C2W2L01)"
+    channel: "DeepLearningAI"
+    covers: "Andrew Ng on splitting the training set into mini-batches, what an epoch is, and why mini-batch steps are noisy but far faster than a full pass over the data per step."
+  - videoId: "lAq96T8FkTw"
+    year: 2017
+    minutes: 6
+    title: "Exponentially Weighted Averages (C2W2L03)"
+    channel: "DeepLearningAI"
+    covers: "The running average that momentum and Adam are built on, shown on a year of daily temperatures. Watch it if the averaging step in the momentum lecture feels unexplained."
+    optional: true
+  - videoId: "k8fTYJPd3_I"
+    year: 2017
+    minutes: 9
+    title: "Gradient Descent With Momentum (C2W2L06)"
+    channel: "DeepLearningAI"
+    covers: "Averaging recent gradients so steps that zigzag across a narrow valley cancel out and steps along it add up. The first fix for slow, oscillating descent."
+  - videoId: "JXQT_vxqwIs"
+    year: 2017
+    minutes: 7
+    title: "Adam Optimization Algorithm (C2W2L08)"
+    channel: "DeepLearningAI"
+    covers: "Adam combines momentum with a per-weight step size (RMSprop) and a bias correction. Covers its usual hyperparameters; Adam and its variants are the usual default in training tools."
+  - videoId: "QzulmoOg2JE"
+    year: 2017
+    minutes: 7
+    title: "Learning Rate Decay (C2W2L09)"
+    channel: "DeepLearningAI"
+    covers: "Shrinking the learning rate as training goes on, so noisy mini-batch steps settle into the minimum instead of wandering around it, with common decay formulas."
+  - videoId: "fODpu1-lNTw"
+    year: 2017
+    minutes: 5
+    title: "The Problem of Local Optima (C2W3L10)"
+    channel: "DeepLearningAI"
+    covers: "Why bad local minima are rarely the problem in high-dimensional networks, and why saddle points and long plateaus are what actually slow training down."
+    optional: true
 applyIt: |
   **The overfitting curve you just learned has a daily analogue: tuning a prompt until it aces
   the few examples you built it around.** Train-loss down, real quality flat, and the fix is the
@@ -136,9 +237,6 @@ backupResources:
   - label: "Backpropagation, intuitively | Chapter 3 (3Blue1Brown)"
     url: "https://www.youtube.com/watch?v=Ilg3gGewQ5U"
     type: "video · the natural next chapter"
-  - label: "Backpropagation calculus | Chapter 4 (3Blue1Brown)"
-    url: "https://www.youtube.com/watch?v=tIeHLnjs5U8"
-    type: "video · the chain-rule details"
 tags:
   - math
   - calculus
