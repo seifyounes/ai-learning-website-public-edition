@@ -1,0 +1,276 @@
+---
+title: "Codex inside Claude Code"
+subtitle: "A second lab as your reviewer"
+summary: "Add OpenAI's Codex to Claude Code as a second-opinion reviewer and delegate, and make its findings actually stop a bad change."
+changeNote: "New: a neutral 4-minute video segment, a 10-minute map of which changes deserve a second lab's review, and Codex-vs-Claude Code claims clearly marked as user reports."
+section: foundations
+pillar: claude-code
+order: 12
+level: advanced
+estMinutes: 17
+taskMinutes: 40
+prerequisites: [skills-and-plugins, hooks-automation, subagents-and-agent-teams]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "v46RSgreLNI"
+  published: "2026-04-01"
+  year: 2026
+  minutes: 7
+  start: 190
+  watchMinutes: 4
+  title: "Codex Plugin for Claude Code"
+  channel: "Nick Babich"
+  why: "A plainly titled walkthrough of the official Codex plugin: add the marketplace, install, sign in with a ChatGPT account, then run /codex:review and /codex:adversarial-review on a small project, including the 'initialize git first' step that trips people up. The earlier pick, a hype-titled install demo ('Make Claude Code 10x Better…'), is in the backups. Install steps change fast, so the official plugin README in Read-after is the source of truth for exact flags."
+  notes:
+    - "The player starts at 3:10; watch to the end (about four minutes)."
+    - "The first three minutes argue Codex is the better reviewer from benchmark scores and token prices. Skip them: those numbers change every few months."
+    - "This lesson makes a different case for Codex: independent blind spots, not a better model."
+readAfter:
+  - label: "Codex plugin for Claude Code — official OpenAI repo & README (source of truth for flags)"
+    url: "https://github.com/openai/codex-plugin-cc"
+    kind: "docs"
+  - label: "What I Found When Claude Reviewed Codex's Work — Todd Orr (redaction discipline)"
+    url: "https://medium.com/@ribrewguy/what-i-found-when-claude-reviewed-codexs-work-5d83a348a2d9"
+    kind: "article"
+  - label: "Claude Code vs Codex: What I Learned After 100+ Hours With Both (2026) — Composio"
+    url: "https://composio.dev/content/claude-code-vs-openai-codex"
+    kind: "article"
+applyIt: |
+  Decide, in ten minutes, where a second lab's review is worth its cost in your own work. List
+  the kinds of change you make most often and mark the ones that **break silently**: no test
+  would notice, and one wrong line reaches real data or real users. In most projects that's
+  authorization rules, database migrations, money or date calculations, and anything that
+  deletes.
+
+  For each one you marked, write the single property a reviewer must challenge, phrased so it
+  can turn out false, e.g. "a user can only read or change records in a workspace they belong
+  to, and the default is deny". That sentence is your focus text for
+  `/codex:adversarial-review`.
+
+  Then set your gate policy in one line: which of those changes get the Stop-hook review gate
+  (and only for how long), and which get a manual `/codex:review` before merge.
+
+  **No Codex access?** Make the same list and name your second reviewer instead: ChatGPT or
+  Gemini given only the diff and the goal, or a GitHub Copilot code review on the pull request.
+
+  Success: a short list of silent-break change types, one falsifiable property for each, and a
+  one-line rule for when the second lab reviews.
+toolkit: |
+  Move cross-provider review from *installed* to *disciplined*:
+
+  - **Make redaction a standing rule.** Add one line to your instruction file (CLAUDE.md,
+    AGENTS.md): "When delegating a review to another model, pass the diff and the spec only,
+    never the author's self-assessment." It applies to every reviewer you use, Codex or not.
+  - **Run the second lab after your own Definition of Done.** Once your tests, lint and build
+    pass, run `/codex:review` on risky diffs before you commit, so a rival-lab model signs off,
+    not just a second Claude that shares Claude's blind spots.
+  - **Arm the Stop-hook gate on autonomous runs, disarm it for interactive work.** Make "on for
+    `/goal` or overnight runs I'll monitor, off the rest of the time" an explicit habit: it can
+    loop and drain usage on both sides.
+  - **Route by lab, not loyalty.** Keep Claude Code as the orchestrator (planning, subagents,
+    hooks) and delegate steady, bounded, cheap passes to Codex via `/codex:rescue --background`:
+    chores and background reviews you don't babysit.
+  - **Review parallel work per worktree.** When several changes are in flight in separate git
+    worktrees, fire `/codex:review` in each so every change gets an independent read before
+    merge.
+recap:
+  - emoji: "🔌"
+    title: "What the plugin adds"
+    text: "Add the marketplace, install the codex plugin, reload — and Claude Code gains a rival-lab model it can summon as reviewer or delegate. You're not learning a new tool; you're adding a new capability inside the loop you already own."
+  - emoji: "🩺"
+    title: "Is the bridge live?"
+    text: "/codex:setup tells you whether the Codex CLI is installed and logged in, offers to run the npm install, and toggles the review gate. Green here means the bridge to the other lab is live."
+  - emoji: "🔎"
+    title: "The plain review"
+    text: "/codex:review points a non-Anthropic model at your uncommitted diff or a base branch, read-only, and hands the findings back verbatim. A second opinion that critiques the code and never touches your files."
+  - emoji: "🥊"
+    title: "The steerable review"
+    text: "Not a stricter lint pass — a steerable challenge to the approach itself: the assumptions, tradeoffs, and failure modes. Aim it with focus text at the decision you're least sure about."
+  - emoji: "🚑"
+    title: "When you're stuck"
+    text: "Stuck, or want a cheaper async pass? Delegate the task to Codex through the rescue subagent — write-capable, background-able, resumable — while Claude Code stays your orchestrator."
+  - emoji: "🔁"
+    title: "Switching labs mid-task"
+    text: "Print a `codex resume <id>` and continue the exact context in Codex's own TUI. The handoff across labs is a bridge, not a wall — pick the work back up wherever it fits."
+  - emoji: "🛡️"
+    title: "Review you can't skip"
+    text: "Flip on the Stop-hook review gate and no turn that edited code can end until a cross-provider review clears it. The runnable check made external and mandatory — powerful, and expensive enough to arm deliberately."
+task: |
+  Run the redaction drill on a real, risky change (about 40 minutes). Install the plugin:
+  `/plugin marketplace add openai/codex-plugin-cc`, `/plugin install codex@openai-codex`,
+  `/reload-plugins`, then `/codex:setup` (let it install and log into the Codex CLI; it needs a
+  ChatGPT plan or an OpenAI API key, and the project must be a git repo).
+
+  Pick or make one change of the kind that breaks silently: an access check, a migration, an
+  endpoint that decides who can see which record (on a starter app, add a small one). Then
+  compare reviews of the same diff, one anchored and one clean:
+
+  ```prompt
+  Here is my change: [paste diff]. I implemented it correctly and all tests pass — please review it.
+  ```
+
+  versus a plain `/codex:review --base main` that sees only the raw git state. Finish with
+  `/codex:adversarial-review` aimed at the property that must hold (e.g. "challenge whether a
+  user can only ever read records of a workspace they belong to, with deny as the default").
+  Read all three before you merge anything. The clean passes, with nothing to defer to, tend to
+  dig harder; that gap is why you strip the narrative before any external review.
+
+  **Free path:** skip the install and run the same drill in fresh ChatGPT or Gemini chats: one
+  with your "it works, tests pass" note attached, one with only the diff and the goal, and one
+  asked to challenge the property.
+
+  Success: the reviews side by side, and one finding a clean review raised that the anchored
+  one missed (or a note that they matched, which is also data).
+selfCheck:
+  - q: "Claude wrote a tricky change and its own diff-only reviewer subagent (a second Claude) passed it. Why still run /codex:review before shipping?"
+    a: "Because two Claudes share the same training, tokenizer, and failure modes, so their errors are correlated — the in-family reviewer confidently misses the exact class of bug the author already has. Codex is a different lab's model with decorrelated blind spots, so it catches structural mistakes Claude can't see by construction. Two samples from one distribution aren't independent evidence; a sample from a different distribution is. (The in-family diff reviewer is still worth running — → subagents-and-agent-teams — this just adds the outside check.)"
+  - q: "You want Codex's review to bite, so you paste Claude's 'implemented correctly, all tests green' summary in to give it context. What's the mistake?"
+    a: "You anchored the reviewer on the author's narrative — now it grades the story, not the code, and hands back a shallow rubber stamp. Redaction discipline is the opposite: strip the self-assessment, give it only the diff and the spec/goal, and the review digs deeper because there's nothing to defer to. That's exactly why the plugin's /codex:review reads raw git state and returns output verbatim — by design it never sees Claude's prose. Context yes; the author's verdict never."
+  - q: "A long, exploratory refactor with big intermediate outputs, vs a steady well-specified fix you'd like reviewed and applied cheaply overnight — which stays in Claude Code, which goes to Codex, and why?"
+    a: "Keep the long exploratory refactor in Claude Code, which practitioners mostly report handles long-session context management and compaction, big outputs, and orchestration (subagents, hooks, teams) well. Delegate the steady, bounded fix to Codex via /codex:rescue --background; many users report it stays consistent across sessions and stretches a plan's limits further on async work you don't babysit. These are user reports, not benchmarks, so check them against your own runs. Orchestrator vs specialist: route by the shape of the job, not by loyalty."
+  - q: "You enable /codex:setup --enable-review-gate for an overnight run and it works — but by morning usage is drained and it looped for an hour on one file. What happened, and what's the guard?"
+    a: "The gate is a Stop hook that fires a Codex review every time Claude tries to end a turn; on a blocking finding it refuses the stop so Claude fixes and retries — a Claude↔Codex round-trip that can loop and burn both providers' limits. Arm it only for high-stakes runs you'll monitor, disable it for interactive work, and lean on the same stop_hook_active / retry-cap guard the hooks lesson covers (→ hooks-automation). Non-optional review is powerful; unbounded is expensive."
+backupResources:
+  - label: "claude-review-loop — Hamel Husain's Stop-hook Codex review loop (DIY wiring)"
+    url: "https://github.com/hamelsmu/claude-review-loop"
+    type: "repo · companion pattern"
+  - label: "My GitHub AI Workflow: Codex + Claude Code — Owain Lewis"
+    url: "https://www.youtube.com/watch?v=zdeZGePZMuE"
+    type: "video · dual-tool workflow"
+  - label: "Make Claude Code 10x Better with Codex Plugin — Nuno Tavares (install demo from 3:22; hype title)"
+    url: "https://www.youtube.com/watch?v=LHKYD0ufObI"
+    type: "video · install walkthrough"
+tags:
+  - claude-code
+  - codex
+  - code-review
+  - cross-provider
+  - redaction
+---
+
+You've built the whole machine: the explore→plan→code→commit loop, the context discipline, a
+harness of hooks and skills, a team of subagents. Every check in that machine still comes from
+one model family, though. This lesson adds a reviewer from outside it: a **rival lab's** model,
+OpenAI's Codex, wired straight into the loop you already own. The official `codex-plugin-cc`
+turns Codex into an on-call reviewer and delegate you summon with a slash command. The skill
+isn't installing it — that's five minutes — it's understanding *why* a second lab's review
+catches what a second Claude can't, and *how* to make its judgment actually bite.
+
+## Where Codex sits (the one-paragraph map)
+
+Codex is Claude Code's **sibling in the agentic-CLI family**: same mental model, different lab.
+That sibling status *is* the point — a tool that thinks like Claude Code but was trained by a
+different company is the ideal second opinion. (The four-family AI-coding-tool landscape is
+covered in → what-is-claude-code.) Any "X beats Y" verdict expires in months; re-check the current
+landscape before you repeat one.
+
+## Wire it in
+
+The plugin is a thin bridge to your *local* Codex CLI — it wraps the `codex` binary, reuses its
+auth and config, and runs on the same checkout. So setup is two installs. First the plugin:
+
+```bash
+/plugin marketplace add openai/codex-plugin-cc
+/plugin install codex@openai-codex
+/reload-plugins
+```
+
+Then the engine it drives — the Codex CLI itself (`npm install -g @openai/codex`, or another
+install option from its README), signed in with a ChatGPT subscription or an OpenAI API key.
+`/codex:setup` checks both: it reports
+whether Codex is installed and authenticated, offers to run the npm install for you, and points you
+to `codex login` if you're not signed in. Run it until it's green and you'll see the `/codex:*`
+commands plus a `codex:codex-rescue` subagent in `/agents`. (Plugin and marketplace *mechanics* are
+→ `skills-and-plugins`; here you're just consuming one someone else packaged.)
+
+## The commands that matter
+
+Four carry the weight:
+
+- **`/codex:review`** — a read-only review of your current git state. It reads your uncommitted diff
+  (or `--base main` for a branch), a non-Anthropic model critiques it, and the findings come back
+  *verbatim* — it never edits your files. Run large ones with `--background`.
+- **`/codex:adversarial-review`** — the steerable sibling. Instead of hunting defects it challenges
+  the *approach*: the assumptions, tradeoffs, and failure modes. It takes focus text, so aim it:
+  `/codex:adversarial-review challenge the retry and caching design`.
+- **`/codex:rescue`** — delegation. Hand a bug or a bounded implementation to Codex through the
+  rescue subagent; it's write-capable, takes `--model`/`--effort`, runs `--background`, and can
+  `--resume` its last thread. Your "let the other lab try" button.
+- **`/codex:transfer`** — moves the entire session across. It prints a `codex resume <session-id>`
+  so you continue the exact context in Codex's own TUI. A bridge, not a wall.
+
+`/codex:status`, `/codex:result`, and `/codex:cancel` manage the background jobs the first three can
+spawn.
+
+## Why a rival lab reviews better than a second Claude
+
+Here's the load-bearing idea. You already run a second reviewer — the diff-only subagent from the
+core loop, a fresh Claude with none of your session's blind spots (→ `subagents-and-agent-teams`).
+That catches a lot. But it shares Claude's **training data, tokenizer, and failure modes**, so its
+errors are *correlated* with the author's. Ask the same model family to check its own work and it
+will confidently miss the same class of bug twice — two samples from one distribution aren't
+independent evidence, they're the same guess drawn twice.
+
+A different lab's model has **decorrelated** blind spots. Where Claude is structurally weak, Codex
+may be strong, and the reverse. That's the entire argument for cross-provider review: you're not
+buying a *better* reviewer, you're buying an *independent* one — the only kind that catches what the
+author can't see by construction. It's the runnable-check habit (→ `core-loop`) pushed to its
+logical end: verify with something that doesn't share your priors.
+
+## Redaction discipline: strip the self-assessment
+
+The single highest-leverage habit in this lesson, and almost nobody does it. When you ask a model
+to review a change, the instinct is to hand it context — including the author's own summary:
+*"I implemented the guardrail correctly; all tests pass."* That one sentence **anchors** the
+reviewer. It now grades the *narrative* instead of the code, nods along, and returns a shallow
+rubber stamp.
+
+Redact it. Give the reviewer the **diff and the spec/goal — nothing else.** No "I fixed it," no
+self-graded test report, no stated confidence. Practitioners who strip the self-assessment (see
+the Todd Orr write-up in Read-after) report **noticeably deeper** reviews, because the model has
+nothing to defer to and has to actually read the code. This is *why* the plugin's `/codex:review` reads raw git state and returns output
+verbatim — by design it never sees Claude's prose. The trap opens the moment *you* frame a
+delegation or paste a summary in "to help." Context, yes; the author's verdict, never.
+
+> 💡 **Try it:** delegate the same diff two ways — once with Claude's "this works, tests green"
+> summary attached, once with only the diff and the goal. Watch the second review surface things the
+> first waved straight through.
+
+## Division of labor: a working split
+
+There's no controlled benchmark that settles who does what, so treat this as a starting split
+drawn from practitioner reports (the Composio write-up in Read-after is one: hundreds of hours
+with both, mostly hands-on impressions rather than tests), and re-check it before you quote it.
+In many users' reports, **Codex** feels steadier across sessions (it picks a repo back up after
+a few days without drifting) and goes further on a plan's usage limits, which suits background
+reviews and rescues you don't babysit. The same reports tend to favor **Claude Code** for *long
+single sessions* (context management and compaction), *big tool outputs*, and *orchestration* —
+subagents, hooks, teams, the harness you spent this pillar learning to run. If that matches what
+you see, the split writes itself: **Claude Code as the orchestrator, Codex as the specialist you
+delegate to.** Keep the loop, the planning, and the coordination in one place; hand the
+second-opinion review and the cheap async pass to the other lab. If your own runs disagree,
+swap the roles. Tool-fluent, not tool-loyal.
+
+## Make it non-optional: the Stop-hook review gate
+
+A review you have to *remember* to run is a review you'll skip under pressure. `/codex:setup
+--enable-review-gate` wires the plugin's **Stop hook**: every time Claude tries to end a turn *after
+making code changes*, a targeted Codex review fires, and on a blocking finding the stop is
+**refused** — Claude has to address it before it can finish. That's the hooks lesson's finish-line
+gate (the mechanics are covered in → hooks-automation) staffed by a cross-provider brain: the runnable check
+made external and mandatory. The cost is real — it's a Claude↔Codex round-trip that can loop and
+drain *both* providers' usage limits — so arm it for high-stakes or overnight runs you'll monitor
+and disable it for interactive work. Hamel Husain's `claude-review-loop` (backup) is the hand-rolled
+version of the same idea when you want to own the wiring.
+
+## Scale it: worktree review fleets
+
+One reviewer is a habit; a fleet is leverage. When several changes are in flight — parallel writers
+each in their own **git worktree** (basics in → subagents-and-agent-teams) — fire a
+`/codex:review` per worktree and every change gets its own independent, non-Anthropic read at once,
+with zero file collisions. The worktree isolates the *write*; the per-worktree Codex pass isolates
+the *review*. Orchestrating many self-directing agents into a standing fleet is its own topic
+(→ `autonomy-at-scale`); the point here is narrower and immediately usable: **parallelism plus
+cross-provider review** is how you keep speed *and* a second lab's eyes on every diff. Not a new
+tool to marry, but a rival lab's judgment wired into the loop you already own.

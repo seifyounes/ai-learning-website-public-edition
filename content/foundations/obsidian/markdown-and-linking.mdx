@@ -1,0 +1,269 @@
+---
+title: "Markdown & linking"
+subtitle: "The graph you both read"
+summary: "Write notes in markdown and connect them with wikilinks, backlinks and embeds, so your notes become a graph you and an AI can follow."
+changeNote: "New: a no-code link pass you vet before adding brackets, a link-or-embed check on a document you keep, a common-failures list and timed watch notes."
+section: foundations
+pillar: obsidian
+order: 3
+level: beginner
+estMinutes: 11
+taskMinutes: 30
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "oIliSPK0uEs"
+  published: "2024-01-06"
+  year: 2024
+  minutes: 4
+  start: 0
+  watchMinutes: 4
+  title: "The Basics of Linking Notes // Obsidian Tutorial 2024"
+  channel: "Hedy Raymond"
+  why: "Three and a half minutes, no padding, and it shows the three things this lesson needs, where most linking tutorials stop at basic links and backlinks. **Linking to a note that doesn't exist yet**, shown in local graph view as dark-grey circles (knowledge gaps you can literally see); **display text** with the pipe; and **embeds** with the `!` prefix: a block, a resized image, a PDF opened at a page. It also names the wikilink-vs-markdown-link choice."
+  notes:
+    - "Watch all of it. Links to notes that don't exist yet: 1:04 to 2:09. Display text: 2:29. Embeds: 2:38 to 3:16. Wikilinks vs markdown links: 0:38."
+    - "She never opens the backlinks panel (she uses local graph for the same job). The lesson body covers it, and the backup video is stronger on backlinks."
+    - "She defers real `aliases` to a future video, so treat her pipe demo (`[[Vonnegut#^great-quote|Curt's quote]]`) as display text only."
+    - "Recorded on macOS: on Windows or Linux, every ⌘ is Ctrl."
+applyIt: |
+  Links and embeds aren't only an Obsidian trick; they're the fix for any copy that drifts out
+  of date. Take one document you already maintain outside the vault (a course study guide, a
+  team wiki page, a project README, an assistant's Project instructions) and find three places
+  where the same fact is written out more than once. For each, decide: **link** (the reader
+  might jump), **embed** (the reader shouldn't have to), or keep the copy, and say why.
+
+  **With a chat assistant (no code):** check your Projects or Gems too. A rule pasted into two
+  of them is the same problem: one will be updated and the other won't.
+
+  Success: three duplicated facts found, each with a link, embed or keep decision and a reason.
+
+  **With a coding agent:** check your README against your rules file (AGENTS.md, or CLAUDE.md /
+  GEMINI.md for those agents) for instructions that say the same thing in two places.
+
+  Success: three duplicates found, and one of them replaced by a pointer to its single home.
+toolkit: |
+  - **Use unlinked mentions as your free link pass.** Open a note's backlinks panel and expand
+    "Unlinked mentions": every place its name appears without brackets, each with a Link button.
+    Five minutes there each week finds links you missed, with no AI involved.
+  - **Give your assistant one hub note.** Keep an index note that links every note a project
+    depends on, and upload it first when you add files to a ChatGPT or Claude Project or a Gemini
+    Gem. Anything the hub doesn't reach is an orphan your assistant will never see.
+  - **Keep shared rules in one note, not three Projects.** If two Projects share a rule (tone,
+    citation style, a client's naming), write it once in a note and paste from there. A link
+    beats a copy for the same reason here as in a vault: one place to update.
+  - **Save a "brackets only" prompt.** Keep it in a note of reusable prompts: "Suggest [[links]]
+    for this note; do not change a single word." Additive edits are reversible; rewording isn't.
+recap:
+  - emoji: "✍️"
+    title: "Markdown in one breath"
+    text: "Plain text with light symbols — `#` headings, `-` lists, `**bold**`, `` `code` `` — that Obsidian renders live as you type."
+  - emoji: "🔗"
+    title: "The one habit"
+    text: "`[[` plus a note name makes a link. That one habit is the whole skill that turns a pile of files into a brain."
+  - emoji: "👥"
+    title: "Who reads a link?"
+    text: "You follow them to navigate. The agent walks them as a graph — that's how it finds every note about a thing, and how it spots the ones nothing points to."
+  - emoji: "↩️"
+    title: "The panel you never maintain"
+    text: "Every note shows a panel of what links to it. Connections are bidirectional and automatic — you never maintain them by hand."
+  - emoji: "👻"
+    title: "A link with no note behind it"
+    text: "Link a note that doesn't exist and Obsidian creates it when you click. In graph view it's a dark-grey circle: a visible gap in what you know."
+  - emoji: "🖼️"
+    title: "The exclamation mark"
+    text: "`![[note]]` pulls a note's content in place; `![[image.png|300]]` resizes an image, `![[paper.pdf#page=4]]` opens a page. Link when they might jump, embed when they shouldn't have to."
+  - emoji: "🏷️"
+    title: "Renaming a link vs a note"
+    text: "`[[Portfolio site|the site]]` renames one link so a sentence reads well. An `aliases` property renames the note everywhere, so any of its names resolves."
+  - emoji: "🧠"
+    title: "Why not just folders?"
+    text: "A file sits in one folder, but an idea belongs to many contexts. Links let a note live everywhere it's relevant; folders can't."
+task: |
+  Start by hand, in Obsidian — you can't audit a link pass you've never done yourself. Open
+  the two notes in `inbox/` from lesson 2 and wrap the real nouns in `[[ ]]`: the tools, people,
+  courses or concepts they mention (`[[React]]`, `[[Linear algebra]]`, `[[Quarterly report]]`,
+  whatever yours are). Link the decision note to the problem note. Then, in order:
+
+  1. Open the problem note and find the **backlinks** panel (right sidebar, or the command
+     palette → "Backlinks: Show backlinks"). The decision note is listed there even though
+     you never edited the problem note. That panel is the graph, seen from the other end.
+  2. Click a link whose note doesn't exist. Obsidian creates it. Write one line in it, save,
+     and open graph view to watch the grey circle go solid.
+  3. Turn one link into an **embed** by adding `!` in front — `![[the other note]]` — and
+     watch its content appear inline.
+
+  Then hand an AI the pass you'd never finish yourself: every note, in both directions. Both
+  routes hold the same three rules. The AI plans before anything changes, it touches your prose
+  nowhere, and new material lands in new files. A link pass should never be something you have
+  to undo.
+
+  **With a chat assistant (no code):**
+
+  - In Obsidian, right-click `inbox/` → **Show in system explorer** (**Reveal in Finder** on a
+    Mac). Drag those notes, and any in `daily/`, into a chat in your Vault Project, then paste:
+
+  ```prompt
+  Read the notes I've uploaded and follow my vault rules. Do not rewrite anything. Give me a
+  linking plan as a table: for each note, the nouns that deserve to be their own [[wikilink]]
+  targets, which of the other notes it should cross-reference, and which targets don't exist
+  yet. Then list each missing target with a one-line description I can paste into a stub.
+  Success: a table I can work through by hand, and no rewritten sentences anywhere.
+  ```
+
+  - Read the whole table first and cross out any row that changes your wording rather than
+    adding brackets. Add the surviving brackets yourself. For each missing target, click its new
+    link (Obsidian creates the note), paste the one-line description plus a link back to the
+    note that asked for it, and drag the new note into `wiki/`.
+  - Add one dated line to `log.md` naming the notes you touched, then open the backlinks panel
+    on one note the plan touched and check that each new link shows up there.
+
+  Success: you found a backlink you never typed, turned a grey circle solid, saw an embed
+  render inline, and added brackets from a plan you vetted without rewording a sentence.
+
+  **With a coding agent:**
+
+  - Open a terminal at the vault root and run this in your agent:
+
+  ```prompt
+  Read every markdown file in inbox/ and daily/. Do not edit anything yet. Propose a linking
+  plan as a table: for each note, the nouns that deserve to be their own [[wikilink]]
+  targets, which existing notes it should cross-reference, and which of those targets don't
+  exist yet. Follow the conventions in vault-rules.md. Wait for my approval. On approval,
+  insert only brackets — do not reword, reorder or summarise a single sentence — and for each
+  missing target create a one-line stub in wiki/ that links back to the note that asked for
+  it. Append one dated line to log.md naming the files you touched. Success: I approve the
+  table before any file changes, and no note loses a sentence.
+  ```
+
+  - Read its plan before approving. If it proposes rewording anything, say no and tell it to
+    insert brackets only.
+  - After it finishes, open one changed note in Obsidian and check that the only difference
+    is brackets (the **File recovery** core plugin keeps earlier snapshots to compare
+    against).
+
+  Success: you found a backlink you never typed, turned a grey circle solid, saw an embed
+  render inline, and approved a link pass that changed brackets and nothing else.
+selfCheck:
+  - q: "You wrote a note about a client invoice that was paid a month late because the purchase-order number was missing. Do you file it under the client, under invoicing, or under this quarter?"
+    a: "Wrong question — that's the folder instinct, and it forces you to pick one and lose the other two. Link it to all three. A note sits in exactly one folder but links to as many notes as it belongs with, which is why the vault's structure lives in the links, not the tree. The folders you do keep (lesson 2's) declare *ownership* — who may write there — not topic."
+  - q: "Your agent is about to run a linking pass over 40 notes. What could it do that's worse than doing nothing?"
+    a: "Reword them. Links are additive — a wrong bracket costs one click to undo — but a pass that 'improves' your sentences while it links quietly destroys the thing a second brain exists to preserve: what *you* thought, in your words, on that day. That's why this lesson's prompt says insert only brackets, and why it plans before it writes."
+  - q: "The same brackets serve two readers. What does each one get out of a link?"
+    a: "You get navigation and backlinks — one click to everywhere a thing was discussed. The agent gets a traversable graph: it can follow [[React]] to every note that mentions it, see which link targets have no page yet (a gap worth filling on the next ingest), and find pages nothing points at. A note with zero links is invisible to both of you — which is exactly what lesson 10's clean-up pass goes looking for."
+  - q: "Mid-note, you mention a course concept you've never written up, and you're tempted to leave it unlinked until the note exists. Good idea?"
+    a: "No: link it now. Obsidian creates the note the moment you click the link, and until then it shows as a dark-grey circle in graph view, a visible map of what you've referenced but never written and a to-do an agent can see. Capture the pointer now, write the note later."
+backupResources:
+  - label: "Obsidian.md Basics | Links and Backlinks — Ross Griffin (strong on the backlinks panel, silent on embeds and aliases)"
+    url: "https://www.youtube.com/watch?v=j2fH1lglbts"
+    type: "video · alternative"
+  - label: "Obsidian Help — formatting & internal links"
+    url: "https://help.obsidian.md"
+    type: "docs · official"
+tags:
+  - obsidian
+  - markdown
+  - linking
+  - backlinks
+---
+
+If you learn one thing in Obsidian, learn this. Notes written in **markdown** are nice;
+notes that **link to each other** are a second brain. Linking is the skill that turns a pile
+of files into a thinking tool.
+
+And in this vault it does double duty. The brackets you type are **navigation for you and a
+graph for the AI** — the structure a coding agent walks when it files a
+new source, decides what an existing page should point at, or hunts for pages nothing
+references, and the trail a chat assistant follows through the notes you upload. Every link is
+both a shortcut and a piece of machine-readable structure. That's why this is the lesson
+everything else stands on.
+
+## Markdown in 30 seconds
+
+Markdown is just plain text with light symbols: `#` for headings, `-` for lists,
+`**bold**`, `> quotes`, and `` `code` ``. It's the same format AI assistants use for their
+replies and instruction files. It's portable, fast, and future-proof — and Obsidian renders it
+live as you type.
+
+> 💡 **Try it:** in any note, type `[[` and the first letters of a note you already have.
+> Pick it from the list, then open the note you linked to and find the backlinks panel. Your
+> link is already listed there, and you never touched that note.
+
+## The real magic: `[[wikilinks]]`
+
+Type `[[` and start a note's name to link to it. That single habit unlocks everything:
+
+- **Backlinks** — open any note and a panel shows *every* note that links to it.
+  Connections are bidirectional and automatic; you never maintain them.
+- **Link to nothing yet** — link to a note that doesn't exist, and Obsidian creates it when
+  you click. In graph view it shows as a dark-grey circle until then, which makes your open
+  questions visible instead of theoretical.
+- **Graph view** — see your whole web of notes as a map. Clusters reveal themes you didn't
+  know you had.
+
+The video also flags a real choice at [00:38]: Obsidian can write `[[Note]]` or standard
+markdown `[Note](Note.md)`. **Stay on wikilinks.** They're shorter, they survive renames,
+and both Obsidian and an agent reading the folder resolve them fine. Markdown links only win
+if you plan to open the same files in an editor that has never heard of Obsidian.
+
+## Two variants you'll need within days
+
+- **Display text** — `[[Portfolio site|the site]]` links to the "Portfolio site" note but
+  shows "the site", so sentences stay readable. This is what the video demonstrates with the
+  pipe. The *actual* alias feature is different: an `aliases` entry at the top of a note gives
+  that note extra names, so `[[Portfolio]]` resolves to "Portfolio site" from anywhere. Aliases have lived
+  in front matter for years; what Obsidian **1.4** (2023) added was the **Properties**
+  editor, the typed UI that surfaces them instead of making you hand-write YAML. You start
+  writing properties in lesson 6 and query them in lesson 7 — for now just hold the
+  distinction: one renames a *link*, the other renames the *note*.
+- **Embeds** — `![[Portfolio site]]` (note the `!`) doesn't just link, it **shows the note's
+  content in place**. It works for headings (`![[Note#Section]]`), for blocks you've tagged
+  with `^an-id`, for images (`![[shot.png|300]]` to resize), and for PDFs
+  (`![[paper.pdf#page=4]]`).
+
+Link when the reader might jump; embed when they shouldn't have to.
+
+## Why this beats folders
+
+A file lives in exactly one folder. An idea belongs to many contexts at once — a client, a
+project, a technique, a date. **Links let a note exist everywhere it's relevant**, which is
+how your brain actually works. Folders organise *storage*; links organise *meaning*.
+
+That's the same split you set up in lesson 2. The seven top-level folders declare who owns
+what. Everything about what a note *means* — and every path between notes — is carried by
+links.
+
+## Why the agent cares more than you do
+
+You can find a note without links; search is fast. The agent's job is different. When it
+ingests a new source it has to answer "what does this connect to?", and the only evidence it
+has is the links already in the vault. So:
+
+- A densely linked note gets **found and updated**. An unlinked one gets quietly duplicated,
+  because nothing pointed the agent at it.
+- Every `[[link]]` to a page that doesn't exist yet is a **to-do the agent can see** — a
+  concept you've referenced but never written up.
+- Missing cross-references are exactly what lesson 10's clean-up pass looks for: orphan
+  pages, and pages that clearly belong together but never point at each other.
+
+**Don't code?** The links pay off the same way when you upload notes to a chat assistant: it
+can only follow connections you made explicit. And Obsidian finds missed links on its own:
+the backlinks panel's **Unlinked mentions** list shows every note that names this one without
+brackets.
+
+## Common failure modes
+
+- **Two notes for the same thing ("JS" and "JavaScript")** → you linked by whatever name came to
+  mind → pick one title and add the other as an `aliases` property.
+- **Links break after you rename a note in your file explorer** → Obsidian updates links
+  automatically only for renames done inside the app → rename and move notes in Obsidian.
+- **Everything gets linked, so links mean nothing** → you bracketed every noun → link things
+  you'd actually want to jump to or collect notes about.
+- **An AI "tidies" your notes while linking** → the prompt didn't forbid rewording → say
+  "insert brackets only" and ask for a plan first, whether it's an agent editing files or a
+  chat assistant handing back a rewritten note.
+
+So the habit to build: whenever you write a noun that is (or could be) its own note — a
+person, project, concept, tool — wrap it in `[[ ]]`. Do that for a week and your vault stops
+being a folder and starts being a graph. Next we make sure ideas actually get *in* there
+every day: capture, daily notes, and the first prompt that drains your inbox for you.

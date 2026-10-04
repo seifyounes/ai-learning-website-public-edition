@@ -1,0 +1,215 @@
+---
+title: "Governance, security & safety"
+summary: "Audit an AI tool your team uses for data, access and accountability gaps, and draft a one-page AI policy people will follow."
+changeNote: "New: a section on AI-specific security risks, a worked audit of a 12-person agency, a common-failures list, and a 10-minute three-control check."
+section: applications
+pillar: ai-in-companies
+order: 5
+level: intermediate
+estMinutes: 14
+taskMinutes: 35
+prerequisites: [automating-a-department, privacy-and-setup]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "CvJStTPykpw"
+  published: "2025-05-01"
+  year: 2025
+  minutes: 27
+  title: "Building Trustworthy AI: Governance, Security & Privacy in the Enterprise | IIA @MIT 2025"
+  channel: "Imagination in Action"
+  why: "A 2025 panel from the Imagination in Action event at MIT covering the three areas this lesson needs (governance, security and privacy) at the level a business decision-maker actually reasons about. It's a discussion between practitioners rather than a pitch for one product. IBM's short explainer on why AI governance matters is in the backups as a quicker primer."
+readAfter:
+  - label: "EU AI Act, Article 50: transparency obligations (full text)"
+    url: "https://artificialintelligenceact.eu/article/50/"
+    kind: "docs"
+applyIt: |
+  **Good governance is built into how a tool is wired, not bolted on afterwards.** Take ten
+  minutes to check one AI tool or workflow your team already uses (or one you're about to build)
+  against the three controls, marking each pass, gap or unknown:
+
+  - **Data:** do API keys stay server-side, out of browsers, apps and shared docs? Does the
+    tool's plan promise no training on your data?
+  - **Access:** can each person reach only the data they need (least privilege), and is there a
+    list of who has access?
+  - **Accountability:** who signs off on output that reaches a customer, a financial record or a
+    legal document?
+
+  ```prompt
+  For [the AI tool, its plan or tier, and what data goes into it], list the exact questions I
+  should ask IT or the vendor to resolve these unknowns: [paste your unknowns]. Don't assume the
+  vendor's terms; list them as things to verify.
+  ```
+
+  Then apply the two moves that make governance stick: kill shadow AI by making the sanctioned
+  path the easy one (an approved, private tool beats a ban), and keep a **named human**
+  accountable for anything customer-, money- or legal-facing. **As an employee**, take the gaps
+  to whoever owns the tool; **as a manager or consultant**, they become the first lines of the
+  policy in **Do this now**.
+
+  Success: three controls marked pass, gap or unknown, with one fix or question per gap.
+toolkit: |
+  - **Write your personal never-paste list into your assistant.** Add "never include credentials,
+    customer PII or confidential contracts in prompts; remind me to redact first" to your custom
+    instructions in ChatGPT, Claude or Gemini, or to the standing instructions of a Project, Gem
+    or Custom GPT you use for work.
+  - **Keep a one-line data-terms record for every AI tool you use for work.** In a notes file or
+    spreadsheet, list each account, its plan, whether it's work-approved, and whether that plan
+    excludes your data from training. Using a personal account for work data is shadow AI, even
+    when it's you.
+  - **Set automations to propose, not publish.** In Zapier, Make or n8n, have AI steps create
+    drafts instead of sending, and add an approval step before anything reaches a customer, a
+    payment or a legal document. AI drafts; you own the send.
+recap:
+  - emoji: "🛡️"
+    title: "Why bother governing at all"
+    text: "Serious AI use brings new risks: leaked data, a hallucinated number in a client report, a decision nobody can explain. Governance keeps the upside without the surprises."
+  - emoji: "🔐"
+    title: "The biggest everyday risk"
+    text: "Staff pasting PII, contracts, credentials or source code into tools that may retain it. The rule: a clear never-paste list plus a sanctioned tool for sensitive work."
+  - emoji: "👤"
+    title: "When the AI is wrong"
+    text: "A named person owns any output that reaches a customer, a financial record or a legal document. Human-in-the-loop is a governance control, not just a quality one."
+  - emoji: "👁️"
+    title: "The third control"
+    text: "Access and oversight: know which tools run, who can use them and what data they touch. You can't govern what you can't see."
+  - emoji: "🕵️"
+    title: "Why bans backfire"
+    text: "Ban AI and people use personal accounts you can't see, where the worst leaks happen. Make the approved, private path the genuinely good one instead."
+  - emoji: "📄"
+    title: "How much is enough"
+    text: "To start: a one-page policy, a sanctioned tool people actually want, and a habit of reviewing what's in use. Learn the EU AI Act and NIST AI RMF as you scale."
+task: |
+  Draft a one-page AI usage policy for a real organization: your team, a client, a student
+  society or volunteer group, or a small business you know well.
+
+  ```prompt
+  Draft a one-page AI usage policy for [the organization — what it does, how many people, what
+  sensitive data it handles]. Base the data rule on two principles: secrets stay server-side
+  (API keys never in browsers, apps, spreadsheets or shared docs) and least privilege (people
+  and tools reach only the data they need). Include: approved tools; a "never paste this into a
+  public model" list (customer PII, contracts, credentials, source code, plus anything specific
+  to this organization, e.g. patient notes or student grades); the named-human-owner rule for
+  any output reaching a customer, financial record, or legal document; and who to ask. Keep it
+  to one page in plain language.
+  Success: a policy a non-technical owner could adopt and enforce as-is.
+  ```
+
+  Share it with one person who would have to follow it and refine from the questions they ask.
+selfCheck:
+  - q: "You discover a teammate pasted a client's contract into their personal AI chat account to summarize it. What do you do now, and what change prevents a repeat?"
+    a: "Now: don't shame them; check that account's data settings, delete the conversation, and follow your policy or client contract on reporting. To prevent a repeat: give people a sanctioned tool that's just as easy for summaries, and put contracts on the never-paste list."
+  - q: "An automation's API key sits in a shared spreadsheet that 30 people can open. What are your first two moves?"
+    a: "First, revoke the key and issue a new one, because anyone could have copied it. Second, store the new key server-side, in the automation platform's credential store or an environment variable, with access limited to the people who need it. Then check the provider's usage logs for misuse."
+  - q: "Who is accountable when AI gets something wrong?"
+    a: "A named human, always. AI can't hold responsibility, so for anything customer-facing, money-touching or legal, a specific person reviews and owns the decision. That's why human-in-the-loop is a governance control, not just a quality one."
+backupResources:
+  - label: "IBM Technology — The Importance of AI Governance (short explainer)"
+    url: "https://www.youtube.com/watch?v=Q020C-Jw0o8"
+    type: "video · primer"
+  - label: "NIST AI Risk Management Framework — free reference"
+    url: "https://www.nist.gov/itl/ai-risk-management-framework"
+    type: "reference · standard"
+tags:
+  - companies
+  - governance
+  - security
+  - privacy
+  - safety
+---
+
+The moment a company starts using AI seriously, it takes on new risks: confidential data leaking
+into someone's personal chatbot, a hallucinated number landing in a client report, a model making
+a decision nobody can explain. **Governance** is how you get the upside of AI without the nasty
+surprises, and for a small business it's far simpler than the enterprise jargon suggests.
+
+## The three things to control
+
+**1. Data.** This is the big one. The default risk is staff pasting confidential information
+(customer PII, contracts, credentials, source code) into tools where it may be retained or used
+for training. Your rule: a clear **"never paste this" list**, plus a sanctioned tool for
+sensitive work (a business tier that excludes your data from training, or a local model). Match
+the tool to the data. Data terms differ between consumer and business plans of the same product,
+so check the plan you're actually on rather than the vendor's homepage.
+
+**2. Accuracy & accountability.** AI is confidently wrong sometimes. So **a named human owns any
+output that reaches a customer, a financial record or a legal document.** The human-in-the-loop
+checkpoint from the automation lesson isn't just a quality measure; it's your core governance
+control. AI assists; a person is responsible.
+
+**3. Access & oversight.** Know which tools are in use, who can use them and what data they
+touch. Give each person and each tool only the access it needs (least privilege). You can't
+govern what you can't see.
+
+## Security risks specific to AI
+
+Two risks catch teams that are new to this. **Leaked keys**: an API key in a shared spreadsheet,
+a browser app or a public repo can be copied and used on your bill. Keep keys server-side and
+scan commits for secrets. **Prompt injection**: when an AI reads outside content (emails, web
+pages, uploaded files) and can take actions, a hidden instruction in that content can steer it.
+Limit what such agents can do, and keep a human approval on anything that sends, pays or deletes
+(→ llm-security-prompt-injection).
+
+## Shadow AI is the real threat
+
+If you *ban* AI, people don't stop; they use their personal accounts where you have zero
+visibility. That's **shadow AI**, and it's where many of the worst leaks happen. The fix is
+counterintuitive: **make the approved path the easy, attractive one.** Give people a sanctioned,
+private tool that's genuinely good, and most of the reason to go around it disappears.
+
+## Keep it proportionate
+
+You don't need an enterprise AI office to start. For most organizations, governance is:
+
+1. A **one-page policy**: approved tools, the never-paste list, the human-approval rule, who to
+   ask.
+2. A **sanctioned, private tool** people actually want to use.
+3. A **habit of reviewing** what's in use as you grow.
+
+Larger frameworks (the **EU AI Act**, the **NIST AI RMF**) are worth knowing as you scale. One
+part of the EU AI Act reaches small organizations too. Its Article 50 transparency rules have
+applied since 2 August 2026 (check for later amendments), according to the published text
+([Article 50](https://artificialintelligenceact.eu/article/50/)). In short, AI systems that talk
+to people must make clear they're AI, and deployers must disclose deepfakes and AI-generated text
+published to inform the public, unless a person reviewed it and holds editorial responsibility.
+EU rules are still being adjusted, so check the current status before relying on dates. Right-size
+the guardrails to the risk: heavier where AI touches money, health or legal decisions; lighter
+for drafting marketing copy.
+
+## Worked example: a quick audit of a 12-person agency
+
+A small marketing agency asks you to "check our AI use." In one afternoon:
+
+1. **Inventory.** You ask everyone what AI tools they use for work. The list: personal ChatGPT
+   and Gemini accounts, an AI note-taker that joins client calls, and an automation that drafts
+   client reports using an API key.
+2. **Data.** Client briefs are going into personal accounts with unknown settings → move to a
+   business plan with training excluded (verify the terms) and add client documents to the
+   never-paste list for personal accounts.
+3. **Keys.** The automation's API key is pasted in a shared spreadsheet → revoke it, issue a new
+   one, and store it in the automation tool's credential store.
+4. **Consent.** The note-taker joins client calls unannounced → announce it at the start of each
+   call and let clients opt out.
+5. **Accountability.** Client reports contain AI-drafted numbers → a named account manager checks
+   every figure against the source before sending.
+6. **Policy.** The fixes become a one-page policy, reviewed again in three months.
+
+> 💡 **Try it:** Open the data or privacy settings of the AI assistant you use most and find out
+> whether your conversations can be used for training on your current plan. Under five minutes,
+> and you'll know whether it's safe for work material.
+
+## Common failure modes
+
+- **The policy exists but nobody follows it** → it's long and full of jargon → cut it to one page
+  of plain rules and walk the team through it.
+- **Leaks continue after a ban** → shadow AI → offer an approved tool that's as easy as the
+  personal one.
+- **A key shows up somewhere public** → secrets kept in docs or code → keep keys server-side and
+  add a secret scanner to commits.
+- **"The vendor doesn't train on our data" turns out to be wrong** → terms assumed, not checked →
+  verify the terms for your exact plan and record them.
+
+## Next
+
+Guardrails in place, one question remains: is any of this actually paying off? Measuring ROI
+closes the loop.

@@ -1,0 +1,226 @@
+---
+title: "Email & funnels"
+summary: "Plan an email funnel from lead magnet to offer, with a clear start trigger, a stop-on-purchase rule and AI drafts you edit before sending."
+changeNote: "New video: a welcome-sequence walkthrough, plus sections on triggers, stop rules and deliverability, and a task that tests your funnel rules."
+section: applications
+pillar: marketing-content
+order: 8
+level: intermediate
+estMinutes: 13
+taskMinutes: 45
+prerequisites: [copywriting-that-converts]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "hSFHPt7rrxg"
+  published: "2025-01-29"
+  year: 2025
+  minutes: 15
+  title: "The Perfect Automated Email Welcome Sequence In 2025"
+  channel: "Alex Cattoni"
+  why: "Alex Cattoni teaches copywriting and email marketing for a living (she also presents the copywriting lesson's video) and isn't selling an email platform, though the video ends by pointing to her paid email course. It zooms in on what people get wrong most: the first emails after signup. Her three-email welcome sequence (acknowledge, include, mobilize) earns trust before the offer, on any platform. The lesson adds what it doesn't cover: triggers, stop rules and deliverability."
+  notes:
+    - "Watch all 15 minutes; triggers, stop rules and deliverability, which it doesn't cover, are in the lesson below."
+    - "GetResponse's whole-funnel overview and Litmus's video on AI for email campaigns are in the backups."
+applyIt: |
+  Decide the three rules of your funnel before you write a single email. For what you promote,
+  write three lines:
+
+  1. **Start trigger:** the event that puts someone into the sequence (a form signup, a tag or a
+     trial start).
+  2. **Stop rule:** the event that takes them out the moment they convert or unsubscribe, and
+     the tool it comes from.
+  3. **One segment:** a behaviour worth splitting on (clicked the pricing link, never opened).
+
+  Then check whether your email platform hears the stop event natively or needs n8n, Zapier or
+  Make to pass it along.
+
+  **If you sell a product:** the stop rule usually listens for a purchase or subscription event
+  from your payment or billing system. **For a client or employer:** map it onto the platform
+  they already use and confirm who approves sends. **For a personal brand:** the conversion is
+  often a reply or a booked call, so the stop rule is "replied" or "booked".
+
+  Success: three written lines, and you know which tool the stop event comes from.
+toolkit: |
+  - **Document the trigger map.** Keep one doc or spreadsheet with the start trigger, each email
+    and its timing, the stop rule and the segments, so the automation isn't tribal knowledge and
+    you can reuse it for the next product or client.
+  - **Make the sequence a saved prompt, Custom GPT or Gem** that drafts from your audience brief
+    and voice samples (→ copywriting-that-converts) and always returns drafts for you to edit. It
+    never sends.
+  - **Keep a human gate before anything goes live.** Leave new sequences in draft or test mode
+    in your email platform until you've read every email on your phone, and add an approval step
+    in n8n, Zapier or Make before an automation activates.
+  - **Reuse PAS for subject lines and the offer email,** so email inherits the customer insight
+    you already wrote down instead of starting cold.
+recap:
+  - emoji: "📬"
+    title: "Why email is different"
+    text: "You own the list. No algorithm sits between you and your subscribers, which is why many marketers rate it their best-returning channel."
+  - emoji: "🧲"
+    title: "The first trade"
+    text: "A lead magnet: something genuinely useful, like a guide, worksheet or mini-tool, in exchange for an email address. AI drafts it fast."
+  - emoji: "👋"
+    title: "Email one"
+    text: "Acknowledge. Arrives soon after signup, delivers what they asked for, shows some personality and gives value with no pitch."
+  - emoji: "🫂"
+    title: "Email two"
+    text: "Include. Share why you do this work and the story behind it, then invite a reply about their biggest challenge."
+  - emoji: "🚀"
+    title: "Email three"
+    text: "Mobilize. Introduce the offer as a friendly next step for readers who are ready; others will buy later, on their own timing."
+  - emoji: "🤝"
+    title: "First impressions"
+    text: "Old relationship rules still work in an inbox: genuine interest, their name, their problems, and the feeling of being heard."
+  - emoji: "⚙️"
+    title: "Who does what"
+    text: "AI drafts the emails and suggests segments; your email platform plus n8n, Zapier or Make delivers, and a stop rule pulls buyers out."
+task: |
+  Draft the 4-email sequence your funnel will send, test it on yourself, then gut-check it with
+  real readers:
+
+  ```prompt
+  Draft a 4-email nurture sequence for [what you promote], for people who just [signed up for
+  the lead magnet / started a trial / downloaded something]. Audience: [who, and what they're
+  struggling with]. Emails: (1) welcome — deliver what they signed up for and say what's coming;
+  (2) a quick early win they can get today; (3) value — one insight or story that changes how
+  they see the problem; (4) the offer — [your real offer and price, or "book a call"] with one
+  clear CTA. Write each in [your voice]: subject line + body, under 150 words, no hype, no
+  invented numbers or testimonials.
+  ```
+
+  Edit each for voice and truth. Then test the flow: if your email platform has a free plan,
+  load the drafts as a sequence in draft or test mode with the trigger and stop rule from Apply
+  it, sign up with your own address, read every email on your phone and fire the stop event once
+  to confirm it pulls you out. No platform yet? Send all four to yourself instead. Finally, ask
+  two or three people from your audience (or the client) which subject line they'd actually
+  open. AI drafts, you decide.
+
+  Success: 4 edited drafts, a test run on your own address, and a note on which subject line
+  real readers picked.
+selfCheck:
+  - q: "A subscriber buys your course on day 3 of your nurture sequence, then gets 'Last chance to buy!' on day 7. What's missing from the funnel, and how do you fix it?"
+    a: "A stop rule. Add an exit condition that removes anyone from the sequence the moment the purchase event arrives (from your payment tool or a tag), and move buyers into an onboarding sequence instead."
+  - q: "After you switch to sending from your own domain, your emails start landing in spam. What do you check first?"
+    a: "Domain authentication: set up SPF, DKIM and DMARC records exactly as your email platform's setup guide says. Then check list hygiene (no bought or stale addresses) and that every email has a working one-click unsubscribe."
+  - q: "Your dashboard shows a 60% open rate, but almost nobody clicks. Do you celebrate?"
+    a: "No. Opens are unreliable because some email apps preload images and register an open on their own. Judge on clicks, replies and conversions; low clicks mean the content or the call to action isn't landing."
+backupResources:
+  - label: "How to Build an Email Funnel That SELLS (Even If You're Just Starting Out) — GetResponse (vendor-made)"
+    url: "https://www.youtube.com/watch?v=gSub6TwOyH4"
+    type: "video · whole funnel"
+  - label: "How to use AI for your email campaigns in 2026 — Litmus"
+    url: "https://www.youtube.com/watch?v=Y4n8mgn6pXM"
+    type: "video · AI layer"
+  - label: "Really Good Emails — email design & copy inspiration"
+    url: "https://reallygoodemails.com"
+    type: "reference"
+tags:
+  - marketing
+  - email
+  - funnels
+  - automation
+---
+
+Social gets attention; **email converts it.** It's the channel you *own*: no algorithm sits
+between you and your list, and if a platform changes its rules tomorrow, your subscribers are
+still yours. That's why so many marketers treat it as their best-returning channel. AI makes
+building a funnel that turns strangers into customers genuinely fast, but the logic behind it
+still has to be right.
+
+## The funnel, simply
+
+A funnel is a path from "just met you" to "bought from you":
+
+1. **Lead magnet:** capture the email with something genuinely useful.
+2. **Welcome + nurture sequence:** a series of emails that deliver value and build trust.
+3. **Offer:** once you've earned attention, the email that asks for the sale.
+
+## A lead magnet worth an email address
+
+The best lead magnets are **specific, quick to use and connected to what you sell**. "My
+newsletter" is weak; "a one-page checklist for preparing your first tax return as a
+freelancer" is strong if you sell bookkeeping. It should give a fast, real win, and the
+natural next step after that win should be your paid offer. AI can draft a checklist, template
+or short guide in minutes; you make sure every item is correct and actually useful.
+
+## The nurture sequence
+
+A common starting shape (adjust to your audience):
+
+- **Email 1, immediately:** deliver the lead magnet and say what's coming.
+- **Email 2, a couple of days later:** a quick win they can get today.
+- **Email 3:** a story or insight that changes how they see the problem.
+- **Email 4:** answer the biggest objection (price, time, "will this work for me?").
+- **Email 5:** the offer, with one clear call to action.
+
+Every email should be useful even if the reader never buys. That's what earns the right to
+ask. The video's three-email welcome (acknowledge, include, mobilize) is a compact version of
+the same arc: start with three, then add the win and objection emails once you see where
+readers drop off.
+
+## Triggers, stops and segments
+
+This is where funnels quietly break. Define three things before you write copy:
+
+- **Start trigger:** what puts someone into the sequence (a form signup, a tag, a trial start).
+- **Stop rule:** what takes them out (they bought, booked, replied or unsubscribed). Without
+  it, buyers get "last chance to buy" emails, which looks careless.
+- **Segments:** split by behaviour, not just demographics. Someone who clicked the pricing
+  link is in a different place from someone who never opened.
+
+Most email platforms handle these natively. Extra logic, such as tagging a lead when a payment
+arrives or notifying you of a hot reply, can be wired with n8n, Zapier or Make.
+
+## Deliverability basics
+
+Great emails in the spam folder convert nobody. The essentials:
+
+- **Authenticate your sending domain** with SPF, DKIM and DMARC records; your platform's setup
+  guide walks you through it. Major inbox providers such as Gmail and Yahoo now expect this
+  from bulk senders, along with easy one-click unsubscribe.
+- **Only email people who opted in.** Never buy lists. Consent rules differ by country, so
+  follow your platform's compliance guidance.
+- **Remove addresses that never engage**, so your sending reputation stays healthy.
+
+## Where AI helps
+
+- **Drafting sequences and subject-line variants** from your audience brief, then you edit.
+- **Personalising** beyond the first name: different examples for different segments.
+- **Reading replies:** paste a batch of replies and ask for recurring questions and
+  objections, which feed your next emails and your copy.
+
+## Worked example: a coach's funnel
+
+A hypothetical career coach offers a free "CV checklist for career changers".
+
+1. **Trigger:** the signup form adds the tag *cv-checklist* and starts the sequence.
+2. **Sequence:** day 0 delivers the checklist; day 2 shows one before-and-after CV line; day 4
+   tells the (anonymised) story of a client's switch; day 6 answers "isn't coaching
+   expensive?"; day 8 offers a discovery call.
+3. **Stop rule:** booking a call (from the scheduling tool, via Zapier) adds the tag *booked*,
+   which removes them from the sequence.
+4. **Segment:** people who clicked the day 4 story get one extra case study.
+5. **Test:** the coach signs up with her own address, reads every email on her phone and books
+   a test call to confirm the stop rule fires.
+
+> 💡 **Try it:** Sign up for the lead magnet of someone in your field and save their first
+> three emails. Label each one: deliver, win, story, objection or offer. Five minutes, and
+> you've reverse-engineered a working sequence.
+
+## Common failure modes
+
+- **Symptom:** buyers keep getting sales emails. **Cause:** no stop rule. **Fix:** an exit on
+  the conversion event.
+- **Symptom:** emails land in spam. **Cause:** an unauthenticated domain or a stale list.
+  **Fix:** SPF, DKIM and DMARC, plus regular list cleaning.
+- **Symptom:** high "opens", few clicks. **Cause:** inflated open tracking and a weak call to
+  action. **Fix:** judge on clicks and replies; one clear CTA per email.
+- **Symptom:** unsubscribes spike after email two. **Cause:** selling before giving value.
+  **Fix:** make the early emails genuinely useful.
+
+## The principle
+
+Email rewards **trust over time**, not a single blast. AI lets a solo operator run
+personalised funnels that used to need a team, and because you own the list, it compounds.
+Last lesson of the track: knowing what's actually working, with analytics.

@@ -1,0 +1,254 @@
+---
+title: "Evals & testing"
+subtitle: "Measuring quality"
+summary: "Build an eval set from real failures, score it with rules, an LLM judge and your own labels, and gate prompt changes on the result."
+changeNote: "New: offline versus online evals, a worked example, a failure-modes list, a 39-minute watch segment, and a build step that checks an AI judge against your own grades."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 8
+level: advanced
+estMinutes: 15
+taskMinutes: 55
+shortPath: "About 45 min: watch 0:00–39:15 and read the breakdown down to Three ways to score. Come back for the rest of the breakdown and the task: the 10-case eval set, then the judge calibration."
+prerequisites: [prompt-as-code, verification-and-grounding]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "SnbGD677_u0"
+  published: "2024-07-22"
+  year: 2024
+  minutes: 154
+  start: 0
+  watchMinutes: 39
+  title: "Instrumenting & Evaluating LLMs"
+  channel: "Hamel Husain"
+  why: "A practitioner workshop led by Hamel Husain, who builds and consults on LLM products, so the approach comes from real product work rather than benchmark metrics: instrument the app, look at real outputs, then build evals around what breaks. Keep Hamel's written evals guide in the backups as the reference. The Arize LLM-as-judge video in the backups is made by Arize, which sells LLM evaluation and observability tools."
+  notes:
+    - "It runs over two and a half hours. Watch from the start to 39:15 (about 39 minutes): evals in the development loop, unit tests for LLMs, LLM-as-judge and its issues, human evaluation, and analysing traces."
+    - "Worth adding: the common-mistakes chapter (from 51:35) and the building-evaluations chapter with its hallucination-check code walkthrough (from 1:03:33)."
+    - "The LangSmith walkthrough (from 39:15) is a product demo by LangChain; the rest is optional."
+applyIt: |
+  Unit tests already guard your deterministic code; an AI feature also needs a scored gate on
+  quality, so a new prompt version has to earn its promotion. Take ten minutes to sketch that
+  gate for one AI feature or prompt you rely on (in your project, at work, or a support-ticket
+  reply drafter):
+
+  - **Rule checks:** what can code check exactly (valid JSON, the right category, a length
+    limit, a required field)?
+  - **Judged checks:** what needs judgment (faithful to the input, right tone, task done), and
+    which model from a *different* company would grade it?
+  - **Promotion rule:** one sentence, e.g. "v(N+1) replaces vN only if it scores higher on the
+    same cases and fails no rule check".
+  - **Spot-check:** how many judge scores you'll read yourself before trusting the rest.
+
+  **If you don't code yet:** do it for a saved prompt, Custom GPT or Gemini Gem you use every
+  week, with "the output I'd actually send" as the bar.
+
+  Success: a four-line gate for one real feature, with a different-family judge named and a promotion rule you could enforce.
+toolkit: |
+  - **Build a tiny eval set for the prompt you use most.** Ten real inputs with what a good output
+    looks like; rerun them before you ship any edit to that prompt, saved skill, Custom GPT or
+    Gemini Gem.
+  - **Get reviews from a different model family.** When one model writes the code or text, have
+    another company's model review it (Codex or GPT reviewing Claude's diff, Claude or Gemini
+    reviewing GPT's draft); a reviewer outside the family isn't marking its own homework.
+  - **Calibrate any AI score against your own read.** AI graders lean toward longer answers, the
+    first option and their own family, so spot-check a handful of scores by hand before you
+    trust a dashboard full of them.
+  - **Gate instruction-file changes on real tasks.** Before a new rule goes into your
+    rules file, AGENTS.md (or CLAUDE.md / GEMINI.md for those agents), run two or three real
+    tasks with and without it. Even ten
+    examples beats zero.
+recap:
+  - emoji: "🎲"
+    title: "\"It looked good when I tried it\""
+    text: "Not a quality strategy: output varies between runs and shifts with every prompt or model change. Evals measure it instead."
+  - emoji: "🧪"
+    title: "What an eval contains"
+    text: "Representative inputs, a definition of a good output for each, and a way to score, so a change shows up as a number."
+  - emoji: "🔗"
+    title: "Before choosing metrics"
+    text: "Read 30–100 real outputs, note each failure, group and count them. Then write evals for the categories that matter."
+  - emoji: "📏"
+    title: "Rules, judges, humans"
+    text: "Rule checks wherever an answer is deterministic, an LLM judge for fuzzy qualities, and human labels to calibrate both. Prefer binary pass/fail criteria."
+  - emoji: "⚖️"
+    title: "What judges favour"
+    text: "Longer answers, the first option shown, and their own model family. Use a different family, a specific rubric, and both orders in comparisons."
+  - emoji: "🔀"
+    title: "Trusting the judge"
+    text: "Label about 30 outputs yourself and check how often the judge agrees. If it often disagrees, fix the rubric before trusting its numbers."
+  - emoji: "🌱"
+    title: "Where new cases come from"
+    text: "Production: sampled traces, user feedback and bug reports. Every real failure becomes an offline case that gates the next change."
+task: |
+  Build the baseline the gate needs: a real eval set for one AI feature, written before you start
+  tuning its prompt. Use a feature from your own project, or a "reply to a support ticket"
+  drafter for a small online shop:
+
+  ```prompt
+  Help me hand-build a 10-case eval set for [feature]: 10 realistic inputs (include 2-3 hard
+  ones, e.g. an angry customer, a missing order number, a request we must refuse), each paired
+  with what a GOOD output looks like for one chosen tone (e.g. warm but brief). Then run this
+  DRAFT prompt [paste it] against all 10 and score each pass/fail against its reference.
+  Report the pass rate and the failure patterns.
+  ```
+
+  Then calibrate a judge against yourself: give the 10 outputs and a 0-3 rubric (faithfulness,
+  tone, task completion) to a model from a different company than the one that wrote them, and
+  count the cases where its verdict disagrees with your pass/fail.
+
+  **No-code path:** keep the 10 cases in a spreadsheet (input, reference, output, pass/fail,
+  judge score), run the draft prompt in any chat assistant, paste each output in, grade it
+  yourself, then paste the outputs and rubric into a second assistant for the judge column.
+
+  Success: you have 10 scored cases, a baseline pass rate to measure the next prompt tweak against, and a count of where the judge disagrees with you.
+selfCheck:
+  - q: "Your new prompt version scores higher with your LLM judge, but users say replies got worse: longer and vaguer. What probably happened, and how do you fix the eval?"
+    a: "The judge's length bias rewarded the longer replies. Switch to binary criteria tied to real failures (\"mentions the order number\", \"under 120 words\"), use a judge from a different model family, and check its verdicts against your own labels."
+  - q: "Your eval set passes at 100% on every version, yet support keeps forwarding bad bot replies. What's wrong with the set, and what do you do this week?"
+    a: "It's too easy or invented, so it doesn't contain the failures users hit. Pull the forwarded replies, categorise the failures, and add them as cases so the next version must fix them."
+  - q: "A teammate proposes scoring the chatbot on \"helpfulness, 1–10\" as the first eval. What would you do first instead?"
+    a: "Error analysis: read a batch of real outputs, note and count the failure types, then write specific pass/fail checks for the most common ones. Generic scales are hard to agree on and may not measure what breaks."
+mcq:
+  - q: "Your LLM judge for tone passes 95% of replies. You label 30 of the same replies yourself and disagree with the judge on 11. What do you do?"
+    options:
+      - "Average your labels with the judge's for a fairer score"
+      - "Sharpen the rubric until the judge mostly matches you"
+      - "Trust the judge, since it graded far more replies"
+      - "Move the judge to a 1–10 scale to capture nuance"
+    answer: 1
+    explain: "Disagreeing on a third of your labels means the rubric doesn't encode what you mean, so sharpen it and recheck before trusting its numbers. Grading more replies doesn't fix a miscalibrated grader, and a 1–10 scale makes agreement harder, not easier."
+  - q: "You rerun the same prompt on your 12-case eval set without changing anything, and the pass rate moves from 9/12 to 7/12. A teammate's prompt tweak scored 10/12 on one run. What do you conclude?"
+    options:
+      - "The tweak is better: 10 beats both earlier runs"
+      - "The eval set is broken and should be rewritten"
+      - "Add more model-written cases to the set first"
+      - "Rerun each case several times and compare rates"
+    answer: 3
+    explain: "Identical runs already swing by two cases, so one 10/12 can't be told apart from noise. Run each case a few times (or at low temperature) and compare pass rates across versions. The set isn't broken; it's small and the output is non-deterministic."
+  - q: "Over two months your team tuned a prompt until it passes 98% of an eval set built from real failures, yet the rate of user complaints hasn't moved. What's the most likely problem?"
+    options:
+      - "The prompt was tuned to the test set itself"
+      - "The judge's length bias inflated the scores"
+      - "98% is too high a bar for a real feature"
+      - "The set is too small to show any change"
+    answer: 0
+    explain: "Months of iterating against the same cases let the prompt fit those cases specifically, so the score stops tracking real quality. Keep a held-out slice you never tune against, and keep adding fresh failures from production. Length bias would need an LLM judge doing the scoring, and nothing here points to one."
+  - q: "Your support-reply drafter must never include a discount code, and must sound calm with angry customers. How do you score these two requirements?"
+    options:
+      - "An LLM judge for both, with one combined rubric"
+      - "Human review of every reply for both criteria"
+      - "A rule check for codes, a judge for calm tone"
+      - "A rule check for both, using a banned-word list"
+    answer: 2
+    explain: "Use code wherever the answer is deterministic: a discount-code pattern can be checked exactly, free and objectively. Calm tone needs judgment, so that's the judge's job, calibrated against your own labels. Reviewing every reply by hand doesn't scale; people label a sample to calibrate the other two."
+backupResources:
+  - label: "LLM as a Judge: Which Model Should You Use? — Arize AI"
+    url: "https://www.youtube.com/watch?v=Y_tKS7WIcyY"
+    type: "video · llm-as-judge"
+  - label: "Your AI Product Needs Evals — Hamel Husain (written guide)"
+    url: "https://hamel.dev/blog/posts/evals/"
+    type: "reference · deep dive"
+tags:
+  - evals
+  - testing
+  - quality
+  - applied-ai
+---
+
+This is the lesson that separates hobby AI features from professional ones. LLM output is
+**non-deterministic**: it varies between runs, and it shifts every time you tweak a prompt or
+switch a model. "I tried it and it looked good" is not a quality strategy. **Evals** are how you
+actually measure quality, and they're the missing half of treating prompts as code
+(→ prompt-as-code): you version prompts *and* you test them.
+
+## What an eval is
+
+An eval is a **test set for your AI feature**: representative inputs, a definition of a good
+output for each, and a way to score. You run a prompt and model against the set and get a
+number, so when you change something you can *see* whether quality went up or down.
+
+## Start by reading outputs, not by picking metrics
+
+The most common beginner mistake is reaching for generic scores ("helpfulness 7.2/10") before
+knowing how the feature actually fails. Practitioners such as Hamel Husain teach the reverse
+order, often called **error analysis**:
+
+1. Run the feature on 30–100 realistic inputs (real logs if you have them).
+2. Read every output and write a one-line note on each failure.
+3. Group the notes into categories ("promises refunds", "ignores the order number", "too
+   long") and count them.
+4. Write evals for the categories that matter most.
+
+Your evals then measure *your* product's real failure modes, not someone else's idea of
+quality. Good sources of cases: production logs, bug reports, hand-written edge cases (empty
+input, angry customer, a request you must refuse) and, carefully, model-generated variations.
+
+## Three ways to score
+
+- **Rule-based or exact checks**: when there's a deterministic answer (a category, a number,
+  valid JSON, "never contains a discount code"). Fast, free, objective. Use them wherever
+  they fit.
+- **LLM-as-judge**: a model scores open-ended qualities (faithful to the source? right tone?
+  answered the question?). Scalable for fuzzy outputs.
+- **Human review**: the gold standard for nuance; expensive, so used to label a sample and
+  calibrate the other two.
+
+Prefer **binary pass/fail with a written criterion** ("passes if every fact in the reply appears
+in the ticket") over 1–10 scales. Binary verdicts are easier for humans and judges to agree on,
+and a pass rate is easy to compare across versions.
+
+## Use LLM-as-judge carefully
+
+Judges are useful but biased: they tend to prefer **longer** answers, the **first** option in a
+side-by-side comparison, and outputs from their **own model family**. Mitigations:
+
+- judge with a model from a *different* family than the one you're testing;
+- give it a specific rubric and ask for a short reason before the verdict;
+- in side-by-side comparisons, run both orders;
+- **validate the judge**: label 30 or so outputs yourself and check how often it agrees with
+  you. If it disagrees often, fix the rubric before you trust its numbers.
+
+An unvalidated judge is just confident noise.
+
+## Offline and online
+
+**Offline evals** run on your fixed set before a change ships; wire them into CI so a prompt
+or model change can't be promoted if the pass rate drops. **Online evals** watch production:
+sampled traces scored by the same judges, user feedback, and spikes in specific failures
+(→ observability-tracing). Every production failure you find becomes a new offline case, so the
+set grows from reality.
+
+## Worked example: gating a support-reply drafter
+
+1. **Collect.** Pull 40 real tickets and generate replies with the current prompt (v1).
+2. **Read and categorise.** You find three failure types: it sometimes promises refunds, it
+   drops the order number, and replies to angry customers sound defensive.
+3. **Write checks.** A rule: the reply must not contain "refund approved". A rule: if the
+   ticket has an order number, the reply mentions it. A judge, from a different model family,
+   for tone: "pass if the reply acknowledges the problem before explaining; fail if it argues."
+4. **Calibrate.** You label 30 replies for tone yourself and compare with the judge. Where
+   it disagrees, you sharpen the rubric's wording until it mostly matches you.
+5. **Baseline and gate.** v1 gets a pass rate on all three checks. You write v2; it fixes the
+   order number but fails more tone cases. It doesn't ship until it beats v1 on all three.
+
+> 💡 **Try it:** Take one answer a chat assistant gave you this week. Paste it into an
+> assistant from a *different* company with: "Grade this pass/fail against this criterion:
+> [one sentence]. Give a one-line reason first." Then grade it yourself. Do you agree?
+
+## Common failure modes
+
+- **Every eval passes, but users still complain** → the set is too easy or invented → add
+  real failures from logs and support tickets.
+- **Scores jump around between identical runs** → non-determinism on small sets → run each
+  case a few times, or at low temperature, and compare pass rates, not single runs.
+- **The judge rewards waffle** → length bias and a vague rubric → binary criteria, a
+  different-family judge, and regular checks against your own labels.
+- **Great eval scores, worse product** → you tuned the prompt to the test set → keep a
+  held-out slice you never tune against.
+
+Tools such as Promptfoo, Braintrust, LangSmith and Langfuse run and track evals, but a
+spreadsheet and a short script are a fine start. Even ten examples beat zero. Next: making
+your feature fast and cheap enough to ship (→ cost-latency-caching).

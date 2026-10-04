@@ -1,0 +1,205 @@
+---
+title: "Validate an idea with AI"
+summary: "Test whether people want your idea before you build it, using interviews, a landing page and community research, with a go threshold set in advance."
+changeNote: "New: a ladder of signal strength, a worked bakery example, a common-failures list, an exercise that ranks your evidence, and a full evidence pass in the task."
+section: applications
+pillar: building-products
+order: 1
+level: intermediate
+estMinutes: 13
+taskMinutes: 45
+prerequisites: [research-workflows]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "TeuZK0m1e1M"
+  published: "2026-05-29"
+  year: 2026
+  minutes: 18
+  title: "How to Validate an App Idea in 2026 (Customer Interviews, Landing Pages & Reddit)"
+  channel: "Newly"
+  why: "Made by Newly, a company that sells an AI app builder, so it is pitched at people who are about to build. The methods it walks through (customer interviews, landing pages, reading Reddit) are tool-neutral, practical and recent, and it covers all three in one sitting instead of staying abstract. A step-by-step framework video is in the backups."
+applyIt: |
+  Rank the evidence you already have for one idea you care about (a product, a side project, a
+  new feature, or a service you'd sell). List every reason you believe in it, then place each on
+  the signal ladder from this lesson: compliment, public complaint, interview about past
+  behaviour, commitment from a stranger, money. Write the riskiest assumption in one sentence and
+  the next rung you could reach this week.
+
+  **If you already have a product:** do this for the next feature, using real usage and user
+  feedback as your evidence. **If it's only an idea:** expect most of your list to sit on the
+  bottom rung; that's the honest starting point.
+
+  Success: your evidence ranked, the riskiest assumption written down, and one next step that
+  costs days, not months.
+toolkit: |
+  - **Save a reusable "validation analyst" prompt.** Store the task's prompt as a saved prompt, a
+    ChatGPT or Claude Project or a Gemini Gem, so every new idea gets the same evidence pass
+    instead of ad-hoc googling.
+  - **Give your idea list an evidence column.** Whether your ideas live in a notes app, a
+    spreadsheet or Notion, add "signal source" and "go/no-go" fields so nothing climbs the
+    priority list on a hunch.
+  - **Hand the research sweep to a research mode.** ChatGPT deep research, Gemini Deep Research,
+    Claude's research mode or Perplexity can trawl communities and reviews in their own window
+    and return only the distilled themes, which keeps your main chat clean.
+  - **Write every verdict down where your assistant can read it.** Put the one-line go/no-go in
+    the Project's files or your idea notes, so a killed idea stays killed and the next chat
+    doesn't re-argue it.
+recap:
+  - emoji: "💸"
+    title: "The cheap-build trap"
+    text: "The classic fatal mistake is building what nobody wants, and AI just made that a weekend's work. Cheap building is exactly why you validate first."
+  - emoji: "❓"
+    title: "What validation must prove"
+    text: "Do people actually have this problem, and will they pay in money or real effort to solve it? Until you have evidence, the idea is only a guess."
+  - emoji: "🎤"
+    title: "Talking to real people"
+    text: "Interview 5–10 people about their problem and what they did about it last time, never about your solution. Past behaviour is evidence; opinions about the future are not."
+  - emoji: "🚪"
+    title: "A button that isn't real yet"
+    text: "A one-page landing site with a signup or pre-order button measures demand from strangers. Set the go threshold before you look at the numbers."
+  - emoji: "💬"
+    title: "Where the evidence hides"
+    text: "Reddit, Discord and niche forums show whether people already complain and hack together workarounds. A pre-sale, money before the product exists, is the strongest signal of all."
+  - emoji: "❤️"
+    title: "What to fall for"
+    text: "Fall for the problem, not your solution, so you kill bad ideas cheaply. AI compresses the research into days; spend the saved time on real evidence, not a prettier guess."
+task: |
+  Run a first validation pass on your idea in one sitting: sweep for free evidence, let an
+  assistant play the skeptic, then talk to one real person.
+
+  1. Spend 15 minutes searching Reddit, forums and app-store reviews of competing tools for
+     people describing the problem in their own words. Copy the best quotes.
+  2. Run the prompt below in ChatGPT, Claude or Gemini, ideally with web search on.
+  3. Ask two of the interview questions to one real person who has the problem today (a message
+     or a 10-minute call is enough), and write down what they said in their own words.
+  4. Write a one-line go / no-go / test-more verdict in your notes. To go further, build the
+     fake-door page in the free tier of a builder such as Carrd, Tally, Lovable or v0.
+
+  ```prompt
+  You are my product validation analyst: a skeptic, not a cheerleader. My idea: [one sentence:
+  the problem and who has it]. Evidence: [paste quotes, competitor reviews, notes, any signups].
+  Cluster it into demand themes, separate "people clearly have this problem" from "I want to
+  build this", and name the riskiest assumption. Then draft 5 open, non-leading interview
+  questions about their problem and how they handle it today, never about my solution, and a
+  fake-door test: a one-line headline, a "Join the waitlist" (or "Pre-order") button, what a
+  click records, and how many signups from how many visitors in one week would mean "build it".
+  Say plainly how small my sample is.
+  ```
+
+  Success: clustered evidence with quotes, five non-leading questions, at least one real answer
+  captured verbatim, and a written verdict with a go threshold for the fake door.
+selfCheck:
+  - q: "Twelve friends tell you your idea is 'great' and they'd 'definitely use it'. Is that a go?"
+    a: "No. Compliments and predictions about future behaviour are weak signals, and friends want to be kind. Ask about the **last time** they had the problem and what they did, then look for a commitment from strangers: a signup, their time, or a deposit."
+  - q: "Your fake-door page gets 400 visitors and 3 signups in a week, against a go threshold you set of 20. What do you do?"
+    a: "Treat it as a no for this framing; don't move the threshold after the fact. Check whether the traffic was really your target audience and whether the headline named the problem, change **one** of those, and rerun once. If it still misses, kill or pivot."
+  - q: "You ask an AI assistant to validate your idea and get back an enthusiastic market-size estimate and a feature list. What's missing?"
+    a: "Evidence from real people. The assistant can research, draft and summarize, but its output is not demand. Make it cite sources and separate evidence from assumptions, then go and collect primary signals yourself."
+  - q: "Why does validation matter MORE in the AI era, not less?"
+    a: "Because AI makes building so fast and cheap that it's easy to build something nobody wants in a weekend. The bottleneck shifts from 'can I build it' to 'should I', so testing demand first saves the most time."
+backupResources:
+  - label: "My Step-by-Step Framework for Validating App Ideas (2026) — Your Average Tech Bro"
+    url: "https://www.youtube.com/watch?v=FkwGBc2codE"
+    type: "video · framework"
+  - label: "Y Combinator — how to talk to users (Startup Library)"
+    url: "https://www.ycombinator.com/library"
+    type: "reference"
+tags:
+  - building-products
+  - validation
+  - mvp
+---
+
+The most expensive mistake in product building is the same in 2026 as ever:
+**building something nobody wants.** AI didn't fix that. It made it *easier* to do,
+because now you can build the wrong thing in a weekend. So before you build, you
+**validate**. Nothing in this lesson needs code: every method works with a browser, a chat
+assistant and a few conversations.
+
+## What validation has to prove
+
+Validation answers three questions, in this order:
+
+1. **Is the problem real and painful?** Not "would this be nice", but "does it cost these
+   people time, money or stress often enough that they already try to fix it?"
+2. **Will they pay for a fix?** In money, or in real effort: switching tools, giving you an
+   hour, handing over their data.
+3. **Can you reach them?** A painful problem among people you have no way to find is still a
+   dead end.
+
+Until you have evidence for all three, your idea is a guess. That's fine. The aim is to turn
+the guess into evidence as cheaply as possible.
+
+## Not all signals are equal
+
+Rank what you collect from weakest to strongest:
+
+- **Compliments and predictions** ("great idea, I'd use that"). Almost worthless: people are
+  polite and bad at forecasting their own behaviour.
+- **Public complaints.** Forum threads, app-store reviews of rivals, Reddit posts asking "how
+  do you deal with…". Real, but you don't know how many people they stand for.
+- **Interviews about past behaviour.** "Tell me about the last time this happened. What did
+  you do? What did it cost you?" Concrete stories beat opinions.
+- **Commitment from strangers.** A waitlist signup from someone you've never met, a booked
+  call, a beta request.
+- **Money.** A pre-order, a deposit, a paid pilot. Someone paying before the product exists
+  is the strongest signal there is.
+
+The interview rule comes from Rob Fitzpatrick's book *The Mom Test*: ask about their life and
+what they already did, never whether they like your idea, because even your mum will say yes.
+
+## Where AI helps, and where it can't
+
+AI is genuinely good at the grunt work. A research mode can sweep forums and reviews and
+cluster complaints into themes. A chat assistant can draft non-leading interview questions,
+spot the leading ones you wrote, build the fake-door page in an hour, and summarize ten
+interview notes into patterns.
+
+What it can't be is the customer. An assistant asked "is this a good idea?" will usually find
+reasons it is. Market-size numbers it produces without links may be invented. So use it to
+**collect and organize evidence**, never as the evidence. Always ask it to quote its sources
+and to mark which claims are assumptions.
+
+## Worked example: an order-tracking idea for small bakeries
+
+Say your idea is a simple tool that turns a small bakery's custom-cake orders (arriving by
+phone, Instagram DMs and WhatsApp) into one weekly prep list.
+
+1. **Write the riskiest assumption.** "Bakery owners lose orders or over-prep often enough to
+   pay to stop it." If that's false, nothing else matters.
+2. **Sweep for free evidence (20 minutes).** Search baking and small-business forums for
+   "missed order" and "order tracking", and read reviews of existing order tools. Paste the
+   best quotes into your assistant and ask it to cluster them.
+3. **Draft five questions with AI**, then cut any that mention your tool. Keep ones like "Walk
+   me through how last Saturday's orders reached you."
+4. **Talk to three to five bakers.** Visit local shops or message them. Write down their exact
+   words.
+5. **Set the fake-door threshold before launching it.** For example: "If 15 of the first 200
+   targeted visitors join the waitlist, build the MVP." The number is your call; deciding it
+   *first* is what keeps you honest.
+6. **Decide.** Go, no-go, or test one more thing. Write it down with the evidence beside it.
+
+> 💡 **Try it:** spend five minutes searching Reddit for "how do you [the task your idea
+> helps with]". Copy three posts where someone describes the problem in their own words. If
+> you can't find any, that is a finding too.
+
+## Common failure modes
+
+- **Everyone loves it, nobody signs up** → you asked about the idea instead of their past
+  behaviour → rewrite your questions around "the last time…" and look for commitments.
+- **The research says the market is huge** → the assistant produced numbers without sources →
+  ask for links and treat anything unlinked as an assumption.
+- **A fake door with no verdict** → no threshold set in advance, so any result feels like a
+  yes → write the go number before you send traffic.
+- **Validation that never ends** → you keep testing to avoid deciding → time-box it to one or
+  two weeks and accept "good enough evidence".
+- **Interviewing the wrong people** → friends and fellow builders instead of the people with
+  the problem → recruit from where the problem is discussed.
+
+## The mindset
+
+Fall in love with the **problem**, not your solution. Validate cheaply, kill bad ideas fast,
+and only pour your (now very fast) building energy into something people have shown they
+want. Once an idea earns a green light, you scope the smallest version that tests it, the MVP
+(→ idea-to-mvp).

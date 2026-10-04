@@ -1,0 +1,221 @@
+---
+title: "Spec-driven development"
+subtitle: "Plan mode as your intent track"
+summary: "Promote an approved plan into a written spec with acceptance criteria, so a coding agent builds against a fixed target instead of drifting."
+changeNote: "New: a quick call on which of your next five items need a spec, and a task that warms up on one vague criterion, then has you write a real spec that can fail."
+section: foundations
+pillar: claude-code
+order: 10
+level: intermediate
+estMinutes: 14
+taskMinutes: 35
+prerequisites: [core-loop, prompting-claude-code]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "AjKFApDdffA"
+  published: "2026-04-07"
+  year: 2026
+  minutes: 28
+  title: "Spec-Driven Development in Claude Code | CampusX"
+  channel: "CampusX"
+  why: "A clear, standalone CampusX explainer that maps spec-driven development onto Claude Code (plan mode, then a durable spec, then building to it), which is this lesson's scope. The deeper conference talk in the backups argues better for why specs matter, but it's made by the Amazon Kiro team and centers their own IDE, so it works less well as a Claude Code how-to. Treat GitHub Spec Kit and the EARS guide in Read-after as the source of truth for the formal mechanics."
+readAfter:
+  - label: "Spec-driven development with AI: get started with a new open-source toolkit — GitHub Blog"
+    url: "https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/"
+    kind: "article"
+  - label: "EARS — Easy Approach to Requirements Syntax (official guide)"
+    url: "https://alistairmavin.com/ears/"
+    kind: "article"
+  - label: "Specs — the requirements / design / tasks structure (Kiro docs)"
+    url: "https://kiro.dev/docs/specs/"
+    kind: "docs"
+applyIt: |
+  Decide where specs earn their keep in your own work. List your next five work items
+  (features, tickets, assignments, reports) and mark each one:
+
+  - **Spec first:** it spans more than one session, other people or agents build on it, or
+    "done" is arguable. Goal, fail-able criteria and plan go in a file before any work starts.
+  - **Plan mode only:** one session, small blast radius; read the plan, approve, build.
+  - **Just do it:** a one-line change you can check by eye.
+
+  Then write your threshold as one line for your rules file (`CLAUDE.md`, or `AGENTS.md` for
+  other agents), e.g. "Spec first for anything that touches more than three files or lasts more
+  than one session", so every session applies it without being told.
+
+  Success: five items marked spec / plan / just do it, and your threshold written as one rule.
+toolkit: |
+  - **Give every repo a home for specs.** Create `docs/specs/` (or use the folder your repo
+    already has) and add a short template: Goal, Acceptance criteria (EARS), Plan. A file that
+    survives compaction and fresh sessions is the whole point.
+  - **Add a `/spec` skill or saved prompt.** Given a plan-mode exploration, it writes
+    `docs/specs/[feature].md` in the three-part shape. One command turns any feature into a
+    gradeable contract; in Cursor or Copilot, the same template works as a saved prompt or
+    prompt file.
+  - **Put "spec-first for non-trivial features" in your instruction file** (CLAUDE.md,
+    AGENTS.md, Cursor rules), so every session and subagent builds to a file, not to a chat
+    message that compaction will eat.
+  - **End long sessions by writing the plan down.** Before you stop or compact, ask the agent to
+    save the current plan and open questions to `docs/specs/`, so tomorrow's session opens from
+    a durable spec instead of scrollback.
+  - **Grade specs with a second model before any code.** Ask Codex (`/codex:adversarial-review`
+    via the Codex plugin), ChatGPT or Gemini to hunt for acceptance criteria that can't fail.
+    It's the cheapest, highest-leverage review you'll run all week.
+recap:
+  - emoji: "🎯"
+    title: "Why prompt-and-hope fails"
+    text: "Prompt-and-hope survives toy problems and drifts on anything real. Three sessions in, nobody can say what 'done' was supposed to mean."
+  - emoji: "📜"
+    title: "What everyone builds to"
+    text: "Write intent to a file before code, and that file — not the chat, not your memory — becomes the thing you, the agent, and any reviewer all build to."
+  - emoji: "🧱"
+    title: "The three parts"
+    text: "Every spec states what you're building and why, the checklist that proves it works, and the files and steps in order. Three parts, always."
+  - emoji: "🗺️"
+    title: "Where the first draft comes from"
+    text: "Explore read-only in plan mode so the spec is grounded in the real code, then promote that plan into the spec instead of letting it evaporate."
+  - emoji: "💾"
+    title: "After a compaction"
+    text: "Chat windows compact; a committed spec doesn't. Re-feed it to a fresh session and the agent is back on contract with zero re-explaining."
+  - emoji: "✅"
+    title: "What makes a criterion count"
+    text: "An acceptance criterion only counts if it's testable — a named trigger and a checkable response, not 'handles it gracefully.' EARS is the habit that enforces it."
+  - emoji: "🔄"
+    title: "When the build proves it wrong"
+    text: "When the build proves the spec wrong, update the spec on purpose. A spec the code has quietly outgrown lies to the next session."
+task: |
+  Write one real spec whose every criterion can fail (about 35 minutes). Warm up by making one
+  vague acceptance criterion fail-able, in any chat assistant or Claude Code:
+
+  ```prompt
+  Rewrite this acceptance criterion in EARS form — a named trigger (WHEN / IF / WHILE) plus a
+  single testable response a verifier can pass or fail. Kill any word that can't fail
+  ("gracefully", "feels fast", "personal"). Return the before and after.
+  Criterion: "the onboarding flow should feel welcoming."
+  ```
+
+  Check the result: does it name a trigger and a response something could actually test? If
+  not, tighten it again. Then take the **next non-trivial feature** on your own project
+  (something that will take more than one session) and have plan mode draft its spec:
+
+  ```prompt
+  Plan mode only — write no code. Explore the code this feature touches ([the feature, e.g.
+  "recurring tasks in a to-do app: the task model, the scheduler, the list screen"]) and write
+  a spec to docs/specs/[feature-name].md with three sections: Goal (what + why), Acceptance
+  criteria (EARS-style, each testable), Plan (files + steps in order). Wait for my approval.
+  ```
+
+  Critique every criterion the way you did in the warm-up, then commit the spec next to the
+  code. **If you don't code yet:** write the three-part spec for a small tool you wish existed,
+  and ask a chat assistant to find the criteria that can't fail.
+
+  Success: a committed (or saved) spec whose criteria each name a trigger and a response a
+  stranger could turn into a test.
+selfCheck:
+  - q: "You've built against a spec for two hours and Claude Code compacts the context mid-session. Why does that barely slow you down if you did SDD right?"
+    a: "Because the spec lives in a committed file, not the conversation. You re-feed the spec file to the fresh context and the agent is instantly back on contract — the compaction wiped the chat, not the intent. Had the plan only ever lived in the chat window, you'd be reconstructing it from memory."
+  - q: "A teammate's spec lists 'the order confirmation email should feel personal' as an acceptance criterion. What's wrong with it, and how do you fix it?"
+    a: "It can't fail — 'feel personal' isn't checkable, so it proves nothing and 'done' stays a vibe. Rewrite it EARS-style with a trigger and a testable response: 'WHEN an order is confirmed, the system SHALL send an email that names the customer and lists every item in the order.' Now a verifier can pass or fail it."
+  - q: "Halfway through implementing, you discover the spec's plan is wrong. Do you just code the right thing and move on?"
+    a: "No — update the spec on purpose first, then build to it. Silently coding past the spec leaves a document that lies to the next session; the spec and the code are never allowed to disagree. The discovery is information to fold back in, not a reason to abandon the contract."
+  - q: "You use plan mode on every feature but never save the plan anywhere. Are you doing spec-driven development?"
+    a: "No — that's disciplined plan-mode use, not SDD. Spec-driven development is the extra move of promoting that ephemeral plan into a durable, committed file that survives resets and that subagents, reviewers, and future sessions all build to. The plan-mode plan is the draft; the spec file is the artifact."
+backupResources:
+  - label: "Spec-Driven Development: Agentic Coding at FAANG Scale and Quality — Al Harris, Amazon Kiro (AI Engineer)"
+    url: "https://www.youtube.com/watch?v=HY_JyxAZsiE"
+    type: "video · why-SDD"
+  - label: "GitHub Spec Kit — the /specify → /plan → /tasks → /implement toolkit"
+    url: "https://github.com/github/spec-kit"
+    type: "toolkit · open source"
+tags:
+  - claude-code
+  - spec-driven
+  - plan-mode
+  - ears
+---
+
+You already drive the loop and know plan mode as a read-only gear you approve before any
+edit (→ core-loop). This lesson is about what you *do* with that plan: promote it into a
+**spec** — the durable statement of intent your whole stack builds against. Everything else
+in the course is a nested stack — prompt ⊂ context ⊂ harness ⊂ loop engineering (the AI
+mental models pillar) — that decides *how well* the agent executes. Spec-driven development
+runs alongside it as the orthogonal track that decides *what* gets executed at all. Get the
+spec right and the stack has a fixed target; skip it and even a flawless harness optimizes
+toward a moving guess.
+
+## The spec is the source of truth, not the chat
+
+"Vibe coding" — prompt, hope, repeat — survives toy problems and collapses on anything real:
+the agent drifts, intent evaporates, and three sessions later nobody can say what "done"
+was. A spec fixes that at the root by writing intent down *before* code and making that
+file — not the chat, not your memory — the thing everyone builds to. The payoff is plain:
+rework collapses once the target stops moving. In Spec Kit's own framing, the spec stops being
+scaffolding you throw away and becomes *executable* — the source that generates the
+implementation.
+
+Three parts, always:
+
+- **Goal** — what you're building and why, in a sentence or two. The *why* is load-bearing:
+  it's what the agent falls back on when the spec goes silent on an edge case.
+- **Acceptance criteria** — the checklist that *proves* it works. Every line must be able to
+  fail (more below).
+- **Plan** — the files and steps, in order — the same plan-mode output, now written to last.
+
+## From plan mode to a durable spec
+
+Plan mode hands you an *ephemeral* plan; SDD's whole move is to make it *durable*. The
+workflow:
+
+1. **Explore in plan mode** so the spec is grounded in the real code, not a guess about it.
+2. **Write the spec to a file** — `docs/specs/<feature>.md` (a placeholder path: use whatever
+   your repo already uses — some teams keep theirs in `docs/plans/<feature>/`), committed. This
+   is the trick. A chat window compacts and resets; a file persists. When context is wiped or
+   you open a fresh session tomorrow, you re-feed the spec and the agent is back on contract in
+   one step — no re-explaining, no drift into a half-remembered version of the plan.
+3. **Implement against it**, ticking acceptance criteria as you go.
+4. **Point every subagent and reviewer at the same file** so parallel work shares one truth.
+
+The plan-mode plan is disposable; the spec file is the artifact. That gap — between someone
+who *uses* plan mode and someone who does spec-driven development — is the whole lesson.
+
+> 💡 **Try it:** In plan mode, end your exploration prompt with the spec baked in:
+
+```prompt
+Don't edit anything. Explore the files this touches, then write a spec to
+docs/specs/<feature>.md with three sections: Goal (what + why), Acceptance
+criteria (EARS-style, each one testable), Plan (files + steps, in order).
+Wait for my approval before writing any code.
+```
+
+## Write acceptance criteria that can fail (EARS)
+
+An acceptance criterion that can't fail is decoration. "Handles errors gracefully" proves
+nothing; `IF the AI API call times out, the system SHALL serve the last cached answer` either
+happens or it doesn't. **EARS** — Easy Approach to Requirements Syntax, built at Rolls-Royce,
+now used by NASA and Airbus — is a five-template discipline for writing exactly that kind of
+line: ubiquitous (`the system SHALL …`), event-driven (`WHEN <trigger>, the system SHALL …`),
+state-driven (`WHILE <state> …`), unwanted (`IF <condition>, THEN …`), and optional
+(`WHERE <feature> …`). You don't need the taxonomy memorized; you need the habit it forces —
+every requirement names a **trigger** and a **testable response**, so "done" becomes a set of
+checks a verifier can run instead of a vibe you eyeball. That's the seam where SDD hands off
+to the runnable-check habit from the core loop.
+
+## Keep the spec and the code in sync
+
+A spec is a contract, and contracts go stale. When the build reveals the spec was wrong — and
+it will; that's information, not failure — **update the spec on purpose** rather than letting
+code and intent silently diverge. A spec the code has quietly outgrown is worse than no spec:
+it lies to the next session and to every subagent you point at it. The rule is one line — the
+spec and the code are never allowed to disagree; whichever is right, you fix the other
+deliberately, in the same commit.
+
+## Tooling: by hand, or a framework
+
+You can run SDD with nothing but a markdown file and a `/spec` skill that drafts one from
+plan-mode exploration. Or formalize it: **GitHub Spec Kit** turns it into slash commands
+(`/specify → /plan → /tasks → /implement`) that Claude Code drives directly, and IDEs like
+**Kiro** bake a three-file structure — `requirements.md`, `design.md`, `tasks.md` — in from
+the ground up. Same idea elsewhere: Cursor has its own plan mode, and Spec Kit also runs with
+GitHub Copilot, Cursor and Gemini CLI. The tool is interchangeable; the discipline isn't. Actually building a feature
+end-to-end from a spec is the capstone's job (→ capstone-build-feature) — here the deliverable is the spec
+itself, critiqued until every criterion can fail.

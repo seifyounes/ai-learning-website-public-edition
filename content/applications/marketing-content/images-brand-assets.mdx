@@ -1,0 +1,205 @@
+---
+title: "Images & brand assets with AI"
+summary: "Build an image recipe and style reference that keep AI visuals consistent with your brand, and know when only a real photo will do."
+changeNote: "New: a guide to matching the tool to the image job, a worked three-image set, a section on honesty, rights and logos, and a real-vs-generated sorting exercise."
+section: applications
+pillar: marketing-content
+order: 7
+level: intermediate
+estMinutes: 13
+taskMinutes: 40
+shortPath: "About 45 min: read the breakdown and do the whole task, the recipe plus a 3-image set. Watch the 50-minute video in a second sitting, then correct your recipe with what it shows."
+prerequisites: [prompting-in-2026]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "2RD3FP5iWJY"
+  published: "2026-03-09"
+  year: 2026
+  minutes: 50
+  title: "5 steps to generate consistent brand images with Midjourney"
+  channel: "How I AI"
+  why: "It tackles the problem that actually matters for brands, consistency across a set of images rather than one lucky render, and works through it step by step on screen. Most AI-image videos show off single images. It's long and uses Midjourney, a paid tool, but the method (prompt with a text model, lock a style reference, reuse a recipe) transfers to ChatGPT, Gemini, Firefly or Ideogram. A full AI brand-design workflow (Midjourney + ChatGPT) is in the backups."
+applyIt: |
+  Before you open an image tool, sort the images you'll need in the next month for what you
+  promote into three piles:
+
+  - **Real photo only:** your actual product, premises, team or customers.
+  - **AI-edited real photo:** a cleaner background, a removed object, an extended crop.
+  - **Fully generated:** mood, scene-setting, concepts and illustrations.
+
+  Then write the one "never" line for your brand (the look it must never have), and for the
+  generated pile note which kind of tool fits, using the tool-matching list in this lesson.
+
+  **For a client or employer:** start from their brand guidelines and confirm who signs off on
+  generated images. The **logo** stays out of the generated pile either way: AI is for concepts,
+  not the final mark.
+
+  Success: every image you need placed in a pile, and one "never" line you'll paste into every
+  recipe.
+toolkit: |
+  - **Write your visual DNA down once, per brand.** Hex codes, mood words, the looks you never
+    use and 1–2 reference images go in a `brand-visuals` doc or in ChatGPT or Claude Project
+    knowledge (a Gem's files in Gemini). Working for several clients? Give each its own file.
+  - **Save the workflow as a saved prompt, Custom GPT or Gem:** draft the prompt with a text
+    model, apply the recipe and style reference, generate, then judge the set for cohesion rather
+    than any single image.
+  - **Keep a reference folder.** Save the 3–5 renders that nailed the look and reuse them as
+    style references (`--sref` in Midjourney, an attached image elsewhere), so consistency
+    compounds instead of resetting.
+  - **Encode the logo rule.** Add "AI explores logo concepts; the final mark is made in a design
+    tool" to your custom instructions, so no chat tries to regenerate your logo.
+recap:
+  - emoji: "🎨"
+    title: "The real skill"
+    text: "One beautiful render is easy. Ten that look like the same brand is the real skill, and the real value."
+  - emoji: "🖊️"
+    title: "Before you generate"
+    text: "Use a text model (ChatGPT, Claude, Gemini) to craft detailed prompts: subject, style, mood, composition, palette."
+  - emoji: "🖼️"
+    title: "Then the image model"
+    text: "Midjourney, ChatGPT, Gemini, Firefly or Ideogram turns the crafted prompt into social graphics, headers and mockups."
+  - emoji: "🔒"
+    title: "Locking the look"
+    text: "A style reference plus a fixed palette and mood words hold one identity across a whole set of images."
+  - emoji: "🧬"
+    title: "Built in, not hoped for"
+    text: "A reusable prompt recipe means every asset starts from the same DNA, so consistency is designed rather than lucky."
+  - emoji: "⚠️"
+    title: "The exception"
+    text: "Logos. Explore concepts with AI but finalize in a real design tool; pure-AI marks look generic and are harder to protect."
+task: |
+  Build a reusable image recipe for what you promote, then prove it with a cohesive 3-image set.
+  No palette yet? Screenshot your website, logo or the client's brand guide and ask the
+  assistant to pull out the hex codes first.
+
+  ```prompt
+  Act as my brand-image prompt engineer. Build a REUSABLE image prompt recipe for [what you
+  promote]. Palette: [3-5 hex codes]. Mood: [3-4 words, e.g. calm, warm, editorial]. The brand
+  never looks like: [e.g. stock-photo smiles, neon gradients]. Make it a fill-in-the-blank
+  template with [subject], [composition] and [mood] slots, an aspect ratio and a style-reference
+  slot (Midjourney's --sref, or "match the attached reference image" for ChatGPT, Gemini,
+  Firefly or Ideogram). Then fill it for a cohesive set of 3: (1) a hero or header image, (2) a
+  social post image about [a topic you're posting this week], (3) a supporting visual for
+  [something you explain often]. Vary only the subject.
+  ```
+
+  Generate the first image in whatever image tool you have (ChatGPT, Gemini, Microsoft Designer
+  and Canva all offer some free generations). If it nails the look, attach it as the style
+  reference for the other two. Put the three side by side; if one looks off, fix the recipe,
+  not just that image, and regenerate.
+
+  Success: three images that look like the same brand, plus a recipe you've corrected at least
+  once and can reuse by swapping only the subject.
+selfCheck:
+  - q: "You generate ten images for a launch campaign. Each looks great alone, but side by side they look like ten different brands. What went wrong, and what do you change?"
+    a: "Each was prompted from scratch, so style drifted. Build one recipe (fixed palette, mood words, medium, aspect ratio), attach the same style reference to every prompt, vary only the subject, and judge the set side by side."
+  - q: "A café owner asks you for 'photos of our pastries' for the menu, and wants to use an image generator to save a photo shoot. What do you advise?"
+    a: "Don't present generated pastries as theirs: customers expect the menu to show what they'll get. Photograph the real pastries (a phone and good daylight are enough) and use AI for editing, backgrounds or illustrative graphics, labelled honestly."
+  - q: "A founder generated a logo in an image tool and wants to print it on everything. What's your concern?"
+    a: "Pure-AI marks tend to look generic, can resemble existing marks, and may be hard to protect legally. Use the AI output as a concept, then have the final mark designed (or redrawn) by a person in a real design tool and checked for conflicts before investing in it."
+backupResources:
+  - label: "How I Design Professional Brands With AI (Midjourney + ChatGPT) — AI Samson"
+    url: "https://www.youtube.com/watch?v=1HfGMXNFbYo"
+    type: "video · brand workflow"
+  - label: "Midjourney — AI image generation"
+    url: "https://www.midjourney.com"
+    type: "tool · reference"
+tags:
+  - marketing
+  - images
+  - branding
+  - midjourney
+---
+
+Visuals carry a brand, and AI image tools now produce striking ones in seconds. The catch
+isn't making *a* good image; it's making a **consistent set** that looks like one brand, and
+using it honestly. That consistency is the real skill.
+
+## Match the tool to the image job
+
+Image models have different strengths, and those strengths shift with each release, so test
+on your own use case. Roughly:
+
+- **Stylised or photographic imagery with a strong look:** Midjourney is the long-standing
+  favourite of designers; Flux-based tools are a popular alternative.
+- **Images with readable text** (a poster, a quote card, a mockup with a headline): ChatGPT's
+  image generation, Gemini and Ideogram have become much better at spelling, but still check
+  every letter.
+- **Editing a real photo** (extend a background, remove an object, change a colour): Photoshop
+  and Firefly, Canva's AI tools, and the editing modes in ChatGPT and Gemini.
+- **When commercial licensing is a worry:** Adobe positions Firefly as trained on licensed and
+  public-domain content. For any tool, read its terms on commercial use before a client job.
+
+## The workflow
+
+1. **Prompt with a text model.** Ask ChatGPT, Claude or Gemini to turn your idea into a
+   detailed image prompt: subject, style, mood, composition, palette. Your prompting skills
+   directly raise image quality.
+2. **Generate with an image model.** Social graphics, headers, mockups, illustrations.
+3. **Refine and pick.** Generate several, choose, then adjust the prompt rather than rolling
+   the dice endlessly.
+
+## The real challenge: consistency
+
+One beautiful image is easy; ten that look like the *same brand* is hard. The fixes:
+
+- **Style references** (Midjourney's `--sref`, or an attached reference image in other tools)
+  to lock a look across images. Most tools can also take a reference image of a product or
+  character to keep it recognisable.
+- A **fixed palette and mood** you reuse word for word.
+- **Reusable prompt recipes**, so every asset starts from the same DNA.
+
+A recipe has slots. A useful set: **subject** | **composition** (close-up, flat lay, wide
+shot) | **medium and style** (soft editorial photo, flat vector illustration) | **lighting** |
+**palette** (hex codes or named colours) | **mood** | **aspect ratio** | **never** (what the
+brand avoids). You change only the subject slot from image to image.
+
+## Worked example: a three-image set
+
+A hypothetical online tea shop wants a header, a social post and a blog image for a new
+autumn blend.
+
+1. **DNA:** palette of deep green, cream and copper; mood "calm, warm, unhurried"; never
+   "bright stock-photo smiles". Medium: soft natural-light still life.
+2. **Recipe:** the assistant turns that into a template with a subject slot, a 16:9 or 4:5
+   ratio, and "match the attached reference" for style.
+3. **First render:** the header (a teapot on a wooden table, steam, autumn leaves) comes out
+   well; it becomes the style reference.
+4. **The set:** the social post (a cup held in two hands) and the blog image (loose leaves in a
+   copper scoop) both use the same recipe and reference.
+5. **Judge side by side:** the blog image is too saturated. The fix goes into the recipe
+   ("muted, low saturation"), not just that one prompt.
+
+The real product photos still come from a phone shoot; the AI images are mood and scene
+setting, which the shop never passes off as product shots.
+
+> 💡 **Try it:** Take a photo or screenshot of something that represents your brand's look and
+> ask an assistant: "Describe this image's style as a reusable prompt: medium, lighting,
+> palette, composition, mood." That's the start of your recipe, in under five minutes.
+
+## Honesty, rights and logos
+
+- **Don't fake reality.** Never present a generated image as a photo of a real product,
+  premises, team or customer. If it's illustrative, it should be obvious or labelled.
+- **Check the terms.** Commercial-use rights differ by tool and plan.
+- **Logos are the exception.** Use AI to **explore logo concepts** fast, but **finalize in a
+  real design tool**. Pure-AI marks tend to look generic, can resemble existing marks, and in
+  some places purely AI-generated work may not get copyright protection, which matters for a
+  mark you want to own.
+
+## Common failure modes
+
+- **Symptom:** a set that looks like five brands. **Cause:** prompting each image from
+  scratch. **Fix:** one recipe and one style reference for the whole set.
+- **Symptom:** garbled text in images. **Cause:** a model weak at typography, or too much text.
+  **Fix:** use a text-strong model, keep text short, or add text afterwards in Canva or a
+  design tool.
+- **Symptom:** the same composition every time. **Cause:** a recipe with no composition slot.
+  **Fix:** vary composition deliberately while the style stays fixed.
+- **Symptom:** a customer complains that the product doesn't look like the picture. **Cause:**
+  generated imagery used as product photos. **Fix:** real photos for real products.
+
+You can now produce on-brand visuals, video, social, copy and SEO content at a pace that used
+to need a team. Two lessons left: nurturing with email and funnels, then measuring it all
+with analytics.

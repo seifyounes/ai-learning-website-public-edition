@@ -1,0 +1,192 @@
+---
+title: "Build an MVP in a weekend"
+summary: "Ship a one-feature MVP to real users in a weekend with an AI builder or coding agent, with safe data handling and a hard time-box."
+changeNote: "New: a no-code route and a code route, a worked weekend sign-up example, a safety check before strangers use your app, and a weekend-plan exercise."
+section: applications
+pillar: building-products
+order: 3
+level: intermediate
+estMinutes: 14
+taskMinutes: 45
+prerequisites: [idea-to-mvp]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "rQtrzBcf_Us"
+  published: "2026-05-18"
+  year: 2026
+  minutes: 12
+  title: "How to Build an MVP in the AI Coding Era"
+  channel: "Dalton + Michael"
+  why: "Dalton Caldwell and Michael Seibel are long-time Y Combinator partners who have advised many early-stage startups, and here they update their MVP advice for AI coding tools, so the speed comes with the discipline. It's judgment rather than a click-by-click build, which is why it pairs well with this lesson's hands-on task. Greg Isenberg's weekend build is in the backups for an indie-hacker angle."
+applyIt: |
+  Turn your half-page MVP spec from the last lesson into a weekend plan before you open any
+  tool. Write four lines, as in the worked example: what the scaffold covers on Friday, what
+  "correct" means for the one core feature on Saturday, the glue check (who can read and change
+  the data), and who gets the link on Sunday. Name those 3–5 people now.
+
+  **If you code:** add a stack line (the smallest that works, with a managed backend such as
+  Supabase or Firebase only if the feature needs accounts or saved data) and one rule for your
+  coding agent: check with you before adding anything that isn't in the spec.
+
+  Success: a four-line plan with a stack line and an agent rule, and 3–5 named users.
+
+  **If you don't code yet:** pick the builder (Lovable, Bolt, v0 or Replit's agent) whose free
+  tier covers your feature, and note whether the feature needs its database for saved data.
+
+  Success: a four-line plan, a chosen builder and 3–5 named users.
+toolkit: |
+  - **Keep a new-project checklist template.** A doc or note with your standard first steps (the
+    one feature, the builder or tool you'll use, where it goes live, who the 3–5 users are, how
+    data is protected), so every weekend build starts the same way.
+  - **Keep a reusable-patterns note so glue is never rebuilt.** Record the login, database and
+    publishing setup that worked last time, and paste it into your builder or assistant at the
+    start of the next build, so it copies a proven setup instead of inventing a new one.
+  - **Put the time-box on your real calendar.** Block the build sessions and the "ship to 3–5
+    users" date before you start; a deadline you can see is what forces ruthless scope.
+
+  **If you use a coding agent:**
+
+  - **Scaffold, then engineer.** Save your new-project steps as a skill or custom command, let a
+    builder (v0, Bolt, Lovable) throw the skeleton, then switch to plan mode with the MVP spec and
+    point AGENTS.md (or CLAUDE.md / GEMINI.md for those agents, or `.cursor/rules`) at your
+    patterns note (→ plan-mode-spec-driven).
+recap:
+  - emoji: "⚡"
+    title: "How long it really takes"
+    text: "In the AI coding era a tight MVP genuinely fits in a weekend. But speed without discipline just reaches the wrong place faster."
+  - emoji: "🪜"
+    title: "The order of moves"
+    text: "Spec first, then a builder throws a running skeleton, then you (or a coding agent) build the one core feature properly against that spec."
+  - emoji: "🔌"
+    title: "What AI does best here"
+    text: "Backend, auth and boilerplate are exactly what AI generates well, so reuse them. Your real job is judgment: scope, quality on the core, and shipping."
+  - emoji: "⏳"
+    title: "The deadline's hidden job"
+    text: "A hard weekend time-box forces ruthless scope, which is the actual skill. A live v1 on Monday teaches more than a prototype you keep polishing."
+  - emoji: "🎯"
+    title: "The speed trap"
+    text: "Fast building tempts you to skip validation: 'it's quick, let's just build it'. Aim the speed at learning, not at your ego."
+  - emoji: "🚀"
+    title: "What 'done' means"
+    text: "The single feature works at a public link, and 3–5 real users have tried it. Done and in front of people beats polished and hidden."
+task: |
+  Ship a tiny, real thing to a public link in under 45 minutes, so the full spec → scaffold →
+  deploy path stops being theory. Pick a deliberately small core feature (yours, or a neutral
+  one such as "paste a list of names → get random, balanced teams") and give a builder or coding
+  agent this brief:
+
+  ```prompt
+  Build a single-page web app that does exactly one thing: [the core feature in one sentence].
+  No accounts, no database, no settings page. Keep the code in one small project I can
+  deploy for free. When it works, give me step-by-step instructions to put it on a public URL.
+  ```
+
+  **No-code path:** paste it into the free tier of Lovable, Bolt or v0 and use its built-in
+  publish button. **Code path:** run it in Claude Code, Cursor, Codex or Copilot, then deploy
+  for free on Vercel, Netlify or GitHub Pages. Send the link to one person and ask them to try
+  it without any explanation from you.
+  Success: a public URL that does the one job, and one note on what that person did or got stuck
+  on.
+selfCheck:
+  - q: "It's Saturday night and the core feature works, but you're tempted to add login 'so it feels real' before showing anyone. What do you do?"
+    a: "Ship without it unless the core feature truly needs accounts. Put the link in front of 3–5 users first; login is a 'Not yet' until their behaviour shows you need it."
+  - q: "Your builder-made MVP stores sign-ups in a database. A friend opens the browser dev tools and can read everyone's emails. What went wrong, and how do you fix it?"
+    a: "The data has no access rules, or a secret key is shipped to the browser. Turn on row-level or per-user access rules in the backend, keep secret keys server-side, and ask the builder or agent to audit who can read each table."
+  - q: "What does 'done' mean for a weekend MVP?"
+    a: "The single core feature works, it's deployed to a public URL (or a test build), and real users can try it. Not feature-complete: learning-ready."
+backupResources:
+  - label: "How to build a SaaS App in a weekend using AI (Steal This) — Greg Isenberg"
+    url: "https://www.youtube.com/watch?v=Sx6k6uctfXE"
+    type: "video · indie hacker"
+  - label: "v0 by Vercel — full-stack AI app builder"
+    url: "https://v0.app"
+    type: "tool · official"
+tags:
+  - building-products
+  - mvp
+  - shipping
+  - ai
+---
+
+Here's the exciting part: in the AI coding era, a tight MVP genuinely fits in a
+**weekend.** Everything from the *Shipping apps* pillar now runs at speed. But speed without
+discipline just gets you to the wrong place faster, so this lesson is as much about what you
+refuse to do as about what you build.
+
+## Two routes, one discipline
+
+You can get to a working MVP whether or not you code. The routes differ; the rules don't.
+
+- **No-code route.** An AI app builder such as Lovable, Bolt, v0 or Replit's agent takes your
+  spec as a prompt, builds the app in the browser and hosts it with a publish button. Many
+  include a database and login, or connect to one. Best when you don't code or the product is
+  simple.
+- **Code route.** A builder (or a starter template) throws a skeleton, and you move into a
+  coding agent (Claude Code, Cursor, Codex, GitHub Copilot) to build the core feature properly
+  in a real repo. Best when the product is core to a business and will grow.
+
+Either way, the spec from the last lesson is your input, and the cut list is the law.
+
+## The fast path
+
+1. **Spec**: your half-page MVP spec.
+2. **Scaffold**: a builder or template turns it into a running skeleton in minutes.
+3. **Engineer the core**: build the one feature properly and test it on real inputs.
+4. **Backend, only if needed**: if the feature needs saved data or accounts, use a managed
+   service (Supabase, Firebase, or the builder's own database) instead of writing your own.
+5. **Deploy**: a public link via Vercel, Netlify or the builder's hosting. Mobile can be a
+   test build instead (→ deploying-and-shipping).
+
+Most of an MVP is glue and boilerplate, exactly what AI generates well. Your job is the
+judgment: scope, quality on the core, and shipping.
+
+## Worked example: a weekly football sign-up
+
+The spec: players tap "I'm in" for this week's five-a-side game; the 11th person goes on a
+waitlist; the organizer sees the list. Not yet: payments, chat, stats, reminders.
+
+- **Friday evening (2 hours).** Paste the spec into a builder. Because the list must persist,
+  ask for a simple database table: game date, player name, timestamp. Get a page that shows
+  the list and an "I'm in" button.
+- **Saturday (half a day).** Make the core feature *correct*: the waitlist kicks in at exactly
+  ten, a player can drop out and the first waitlisted person moves up. Test it with fake names,
+  including the edge cases: two people joining at once, someone joining twice.
+- **Saturday evening.** Check the glue. Who can read the data? Who can delete a name? Lock it
+  down so only the organizer can remove players.
+- **Sunday.** Publish. Send the link to the real group chat for next week's game and watch
+  what happens. Write down where people got confused.
+
+That's a learning-ready MVP. It's not pretty, and it doesn't need to be.
+
+## Check the glue before strangers use it
+
+AI-generated apps work quickly but can ship unsafe defaults. Before you share a link: make
+sure secret API keys are not in front-end code, that database access rules are switched on so
+users only see what they should, and that a form can't be spammed into an expensive bill. Ask
+your builder or coding agent directly: "Who can read and write each table? Are any secrets
+exposed to the browser?"
+
+> 💡 **Try it:** open any app you've built (or a builder's template), and ask its AI chat:
+> "List every place user data is stored and who can read it." If the answer surprises you, fix
+> that before you share the link.
+
+## Common failure modes
+
+- **The weekend ends with half of five features** → scope crept back in → reopen the cut list
+  and finish the one core feature first.
+- **The builder gets stuck in a fix-one-break-another loop** → too many changes per prompt on a
+  growing app → revert to the last working version and ask for one small change at a time.
+- **It works on your laptop but not at the link** → missing environment variables or a local-only
+  setting → deploy early on Friday, not on Sunday night.
+- **Users' data is visible to everyone** → default-open database rules → turn on access rules
+  and re-test logged out.
+- **No one tries it** → you never sent the link → pick the 3–5 people before you start.
+
+## Speed is a weapon. Aim it.
+
+The trap of fast building is using it to *avoid* validation: "it's quick, let's just build
+it." Resist. Keep the discipline from the last two lessons (validated idea, tiny scope) and
+let speed serve **learning**, not ego. A live v1 in front of real people on Monday teaches you
+more than a "perfect" prototype you keep polishing. Once it's live, the natural next move for
+many products is to make it smarter: adding AI features.

@@ -1,0 +1,274 @@
+---
+title: "Backend & database with AI"
+summary: "Set up a backend with a database, sign-in and owner-only access rules, then prove one user can't read another user's data."
+changeNote: "New: a 38-minute watch segment, the reads-and-writes access model, a to-do backend worked example, a failure-modes list, and a task that tries to break your own access rules."
+section: foundations
+pillar: shipping-apps
+order: 5
+level: intermediate
+estMinutes: 15
+taskMinutes: 60
+shortPath: "About 45 min: watch the Tables, RLS and Authentication chapters (from 15:58) and read the breakdown down to Server-side functions. Come back for the rest of the breakdown and the task: the audit, then the two-user attack."
+prerequisites: [idea-to-spec, scaffold-with-ai]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "dU7GwCOgvNY"
+  published: "2023-06-20"
+  year: 2023
+  minutes: 176
+  start: 958
+  watchMinutes: 38
+  title: "Learn Supabase (Firebase Alternative) – Full Tutorial for Beginners"
+  channel: "freeCodeCamp.org"
+  why: "A free, complete Supabase course on freeCodeCamp covering auth, CRUD, realtime, triggers, storage and webhooks. Unlike most short overviews, it also teaches **Row Level Security** and server-side functions (Supabase calls them Edge Functions), the two pieces this lesson is really about. The rest is reference for when your app needs it. Shorter overviews are in the backups."
+  notes:
+    - "Watch the 'Tables', 'RLS (Row Level Security)' and 'Authentication' chapters (from 15:58, about 38 minutes)."
+    - "Add the 'Edge-functions' chapter (from 2:30:04, about 14 minutes) when you write your first function that holds a secret."
+applyIt: |
+  Owner-only reads don't make client writes trustworthy. Spend ten minutes on the write side of
+  your own app: which values could a signed-in user forge about themselves?
+
+  1. **List what a user can write directly from the client:** each table or collection, and the
+     columns in it.
+  2. **Mark anything that should never come from the client:** a score, a streak, a role, a price,
+     a "paid" flag, a timestamp the app relies on.
+  3. **Decide where each one moves:** a server-side function, a database trigger, or a column the
+     client may read but not write.
+
+  **If you have a backend:** ask your coding agent to list client-writable columns from the
+  migration files or schema, then check its list yourself. **If you don't have one yet:** do it for
+  a hypothetical to-do app with a leaderboard of tasks completed.
+  Success: a short list of forgeable values, each with the place it will be computed instead.
+toolkit: |
+  - **Make "keys stay server-side" a global rule.** Add one line to your global instruction
+    file (AGENTS.md, or CLAUDE.md / GEMINI.md for those agents; Cursor rules, Copilot instructions):
+    secret keys live in environment variables or the backend's secret store, and only publishable
+    keys ever reach the browser or app bundle. Every new project then inherits it.
+  - **Connect your agent to the database, carefully.** Use your provider's MCP server (Supabase
+    ships one) or a Postgres MCP server so the agent can read the schema instead of guessing,
+    and start it read-only where the server supports that.
+  - **Design schema and access rules from the spec, before auth.** Keep a prompt that turns a
+    spec (→ idea-to-spec) into tables plus owner-only rules, and run it before any client
+    code exists. Retrofitting access rules is where holes come from.
+  - **Run the advisor after every migration.** Make "check for missing RLS and missing indexes"
+    a standing step in your instruction file (Supabase's security and performance advisors,
+    or a review prompt on the migration diff), so the audit is a habit, not a one-off.
+recap:
+  - emoji: "🧱"
+    title: "Why the demo isn't a product"
+    text: "A pretty frontend is inert until something saves data, signs users in and stores files. The backend turns a demo into a product."
+  - emoji: "🧰"
+    title: "Build it or borrow it?"
+    text: "Borrow it. A backend-as-a-service such as Supabase or Firebase bundles database, auth and storage, so you skip building each hard part."
+  - emoji: "📺"
+    title: "How to watch three hours"
+    text: "You don't. Watch about 40 minutes (tables, Row Level Security, authentication), add the Edge Functions chapter later, and keep the rest as reference."
+  - emoji: "🛡️"
+    title: "The chapter that matters most"
+    text: "Row Level Security: each user can touch only their own rows. It's what keeps a shared database from leaking data across accounts."
+  - emoji: "⚡"
+    title: "Where secret-holding code runs"
+    text: "In server-side functions (Supabase Edge Functions, Firebase Cloud Functions, an API route). An AI feature that calls a model API with a secret key belongs there."
+  - emoji: "🤖"
+    title: "What AI wires for you"
+    text: "From your spec it designs the schema, writes queries and migrations, generates API routes and sets up auth: hours of wiring turned into minutes you review."
+  - emoji: "🔑"
+    title: "The check you never delegate"
+    text: "Keys and credentials live server-side in environment variables, never in the browser or app bundle. AI helps everywhere else; this check is yours."
+task: |
+  Audit your access rules, then try to break them: a hole you can't trigger is a hole you don't
+  trust. Work in a development project (never production). No backend yet? A free Supabase
+  project with one `tasks` table and an owner-only RLS policy is enough.
+
+  1. **Audit.** Run this in your coding agent with access to the schema (migration files, or your
+     database provider's MCP server; Supabase's built-in security advisor catches missing RLS too):
+
+  ```prompt
+  Audit who can read each table (or collection) in my app's backend. For each one, confirm
+  access is limited to the owning user: on Supabase/Postgres, RLS enabled with an owner-only
+  policy; on Firebase, security rules keyed on request.auth.uid; on my own API, an ownership
+  check in every route that touches it. Flag anything open or missing a policy, and write the
+  findings as a dated note in docs/security-audit.md.
+  ```
+
+  2. **Attack.** Create two test users, A and B, each with a few rows, and prove the rules hold:
+
+  ```prompt
+  Prove my access rules block cross-user reads. Signed in as test user A, try to read
+  test user B's rows from [tasks and any stats or summary tables] by querying B's id
+  directly. Run the reads as a normal signed-in user: through the app's client, or on
+  Supabase in ONE SQL transaction that sets the role to authenticated and sets
+  request.jwt.claims to user A's id, then rolls back. Never test as the postgres or
+  service-role user, because those bypass RLS. Report what each attempt returned.
+  ```
+
+  On Firebase, run the same attempts in the Rules Playground or the local emulator. Budget the
+  full time if this is your first backend: creating the project, the table, the policy and two
+  users is most of it.
+  Success: every table is confirmed owner-only or flagged in a dated note, and every cross-user
+  read comes back empty or denied, including on the summary and stats tables.
+selfCheck:
+  - q: "You enable RLS on your `tasks` table and the app immediately shows an empty list for every user. Is something broken?"
+    a: "No, RLS is working: with RLS on and no matching policy, Postgres returns no rows. Add owner-only policies (`using` for reads, `with check` for inserts and updates), then confirm user A sees their own rows and not user B's."
+  - q: "Your leaderboard reads are owner-only, yet a user posts a screenshot with an impossible score. Reads are locked down, so how did they do it?"
+    a: "The client can write the score column directly, so they updated their own row with a forged value. Owner-only rules stop people reading others' data, not lying about their own; compute the score server-side (a function or trigger) and block client writes to it."
+  - q: "A teammate tests your RLS by querying another user's rows in the Supabase SQL editor, gets results, and concludes the policies are broken. What do you check first?"
+    a: "Which role the query ran as. The SQL editor normally runs as a privileged role that bypasses RLS, so re-run it as `authenticated` with user A's JWT claims (or through the app) before judging the policies."
+mcq:
+  - q: "Your app's task list comes back empty with the anon key, so your coding agent switches the client to the service-role key and everything appears. What should you do?"
+    options:
+      - "Keep the service-role key, but obfuscate it inside the bundle"
+      - "Keep it in an `EXPO_PUBLIC_` or `NEXT_PUBLIC_` env variable"
+      - "Go back to the anon key and add owner-only RLS policies"
+      - "Turn off RLS on the tasks table so the anon key can read it"
+    answer: 2
+    explain: "The service-role key bypasses RLS entirely, so shipping it hands every user every row; a public-prefixed variable or obfuscation still puts it in the bundle. The empty list was RLS working with no select policy yet. Disabling RLS makes the table readable by anyone holding the public key."
+  - q: "You're adding a feature that summarises a user's notes with an AI model API. Where should the call to the model live?"
+    options:
+      - "In a server-side function the app calls, holding the key"
+      - "In the client, with the key in an environment variable"
+      - "In the client, with the key loaded from a table at runtime"
+      - "In the client, using a key limited to one cheap model only"
+    answer: 0
+    explain: "Code that holds a secret runs on a server: an Edge Function, a Cloud Function or an API route. Anything the client can read (a bundled variable, a value fetched from your own table) is a key any user can extract. Limiting the key's scope reduces the damage but still lets strangers spend on your account."
+  - q: "Your `tasks` table passes the two-user test. Later your agent adds a `weekly_stats` table that sums each user's completed tasks, and the app shows it on a dashboard. What's true about its access?"
+    options:
+      - "It inherits the tasks table's policies because it references it"
+      - "It's safe because it only stores totals, not the tasks themselves"
+      - "It's safe because only your own server code writes rows to it"
+      - "It needs RLS and owner-only policies of its own, then a retest"
+    answer: 3
+    explain: "Access rules are per table: a new table gets none of the policies on the table it summarises. Without its own RLS, anyone with the public key can read every user's stats, and totals still reveal private behaviour. Who writes the rows doesn't matter; the question is who can read them."
+  - q: "You want your coding agent to design and refine your schema through your database provider's MCP server. Which setup do you choose?"
+    options:
+      - "The production project in read-only mode, so it sees the real schema"
+      - "A development project, in read-only mode where the server allows it"
+      - "A development project with full write access to apply its migrations"
+      - "The production project with write access, reviewing every change"
+    answer: 1
+    explain: "A development project keeps real users' data out of the agent's reach, and read-only stops it changing anything you haven't reviewed. Have it write migration files, read them, then apply them yourself. Read-only on production still exposes real user data to the agent."
+backupResources:
+  - label: "Building a Backend for Your App with Supabase — Akinyemi Bajulaiye"
+    url: "https://www.youtube.com/watch?v=85rdT7Tmenw"
+    type: "video · compact overview"
+  - label: "Supabase Tutorial for Beginners 2026 — Mikey Vibe Coding"
+    url: "https://www.youtube.com/watch?v=hVrSGKGU24g"
+    type: "video · beginner"
+  - label: "Supabase — official documentation"
+    url: "https://supabase.com/docs"
+    type: "docs · official"
+tags:
+  - shipping-apps
+  - backend
+  - database
+  - supabase
+---
+
+A frontend looks nice; a **backend** makes it real: saving data, signing users in, storing
+files. The good news is that you no longer build these from scratch, and AI handles most of
+the wiring. The part it can't own for you is access control, so that's where this lesson
+spends its time.
+
+## Plan your time honestly
+
+This is not a quick lesson. The primary video is a full course of almost three hours, but you
+need only about 40 minutes of it now, and the task asks you to stand up a real backend and
+attack it. Plan for two or three sittings:
+
+1. **First sitting:** read this breakdown, then watch the video's "Tables", "RLS (Row Level
+   Security)" and "Authentication" chapters, from 15:58 to 53:49 (about 38 minutes). The player
+   starts at the right place.
+2. **Second sitting:** do the task: a free project, one table, one policy, two test users.
+   Expect around 45 minutes the first time, longer if you've never written SQL.
+3. **Later, as needed:** the "Edge-functions" chapter (from 2:30:04, about 14 minutes) when you
+   add your first server-side function, and the storage, realtime and trigger chapters when your
+   app needs them.
+
+## Use a backend-as-a-service
+
+Don't hand-roll auth and a database. Pick a platform that bundles them:
+
+- **Supabase**: a Postgres database plus auth, storage and instant APIs. Open source,
+  developer-friendly, and well known to AI tools. A strong default for web apps.
+- **Firebase**: Google's equivalent, with a document database and good realtime and mobile
+  support.
+
+Both give you the hard parts (accounts, permissions, a real database) out of the box. If you
+don't code, most app builders (Lovable, Bolt, Replit) connect to one of these or provide their
+own, and the access rules below still apply to you.
+
+## Where AI does the heavy lifting
+
+From your spec, AI can **design the schema** (tables, relationships, types), **write queries
+and migrations**, **generate API routes** and **set up auth**. With an **MCP** server
+(→ mcp-servers), such as the one Supabase ships or a generic Postgres server, an agent like
+Claude Code, Cursor or Codex can read your real schema instead of guessing at it. Point it at
+a development project, and use read-only mode where the server offers it.
+
+## The access model: reads *and* writes
+
+Every row in a shared database is visible to everyone unless something says otherwise. On
+Supabase, that something is **Row Level Security**. A table in the exposed schema without RLS
+can be read and written by anyone holding the public key that ships inside your app. With RLS
+on, nothing is allowed until a policy allows it:
+
+```sql
+alter table tasks enable row level security;
+
+create policy "owners read their tasks" on tasks
+  for select using ((select auth.uid()) = user_id);
+
+create policy "owners add their own tasks" on tasks
+  for insert with check ((select auth.uid()) = user_id);
+```
+
+`using` filters which existing rows a user can see or change; `with check` validates the rows
+they try to write. On Firebase the same idea is a security rule that compares
+`request.auth.uid` with the document's owner field.
+
+Owner-only isn't the whole story. If users can update their own rows directly, they can also
+*lie* in them: a score, a streak, a role. Anything that must be trustworthy gets computed
+server-side.
+
+## Worked example: a to-do backend in five steps
+
+1. Paste your spec into your agent: "Design tables for users' lists and tasks, with owner-only
+   RLS policies for select, insert, update and delete. Output a migration file; don't apply
+   it."
+2. Read the migration. Every table should have RLS enabled and a policy per operation.
+3. Apply it to a **development** project, never production first.
+4. Create two test users and a few rows for each.
+5. Run the task's attack: as user A, request user B's rows. Empty or denied means it works.
+
+> 💡 **Try it:** If you already have a Supabase project, open its Security Advisor in the
+> dashboard (or ask your agent to run it through the MCP server). It lists tables with RLS
+> disabled. Any hit is your first fix.
+
+## Server-side functions: where secrets live
+
+Some code must run on a server because it holds a secret: calling an AI model API, taking a
+payment, sending email. Supabase calls these Edge Functions; Firebase has Cloud Functions;
+on Vercel or Netlify it can be an ordinary API route. The client calls *your* function; only
+the function knows the key.
+
+## Common failure modes
+
+- **Every user sees everyone's data** → RLS is off, or a policy says `using (true)` → enable
+  RLS with owner-only policies and run the two-user test.
+- **The app goes blank right after you enable RLS** → no `select` policy yet, so Postgres
+  returns nothing → add the policy; the empty list was RLS doing its job.
+- **"Secure" in the SQL editor, leaking in the app** (or the reverse) → you tested as a role
+  that bypasses RLS → test as the `authenticated` role or through the app itself.
+- **A secret key ends up in the frontend** → it was put in a variable the build exposes
+  (`NEXT_PUBLIC_`, `EXPO_PUBLIC_`) → rotate the key, then move the call into a server-side
+  function.
+
+## The one rule you can't skip
+
+Backends hold secrets. So: **keys and credentials live server-side, in environment variables,
+never in the browser or app bundle.** Use proper auth and row-level security so each user only
+touches their own data. AI will help, but *you* own this check.
+
+With data, auth and storage in place, your app can actually *do* things. Next, the platform
+many apps need sooner or later: **mobile**.

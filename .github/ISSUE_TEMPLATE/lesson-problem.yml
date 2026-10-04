@@ -1,0 +1,32 @@
+name: Lesson problem
+description: A mistake, a dead video or link, or something out of date in a lesson.
+title: "Lesson issue: "
+labels: ["content"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Lesson page
+      description: The address of the lesson (or the "Report it on GitHub" link fills it in for you).
+      placeholder: https://…/foundations/mental-models/what-is-an-llm
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem?
+      options:
+        - A fact is wrong
+        - Something is out of date
+        - The video or a link is dead
+        - Something is unclear
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What's wrong, and how do you know?
+      description: A source link helps a lot. Every report is checked against the sources.
+    validations:
+      required: true

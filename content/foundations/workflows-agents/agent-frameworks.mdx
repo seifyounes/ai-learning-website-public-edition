@@ -1,0 +1,234 @@
+---
+title: "The agent frameworks landscape (overview)"
+summary: "Place the main agent frameworks on a map, and tell when a feature needs one versus a single model call or a no-code flow."
+changeNote: "New video: IBM's 2026 framework explainer, plus a note that AutoGen is now legacy, a worked example, and a quick exercise sorting jobs to the right kind of framework."
+section: foundations
+pillar: workflows-agents
+order: 9
+level: advanced
+estMinutes: 15
+taskMinutes: 30
+prerequisites: [intro-to-agents, build-a-practical-agent]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "ZVPlLaehjLk"
+  published: "2026-07-09"
+  year: 2026
+  minutes: 12
+  title: "Agentic AI Frameworks Explained: Workflows, Multi-Agent, & Production"
+  channel: "IBM Technology"
+  why: "A recent (2026) whiteboard explainer from IBM Technology that sorts frameworks by the kind of system you're building rather than by brand: linear workflows, autonomous agents, role-based multi-agent crews, production orchestration and quick prototypes. Picking by system design is the habit this lesson wants, and it outlasts any one framework list. IBM sells AI products, but this is a concept explainer, not a product demo."
+  notes:
+    - "Treat its AutoGen example as legacy: Microsoft has put AutoGen in maintenance mode and points new projects to the Microsoft Agent Framework (see the AutoGen README below)."
+    - "Then read Composio's comparison below for the code-level trade-offs. Composio sells agent tooling, so read it as a practitioner's view, not a neutral benchmark."
+readAfter:
+  - label: "OpenAI Agents SDK vs LangGraph vs AutoGen vs CrewAI — Composio engineering blog"
+    url: "https://composio.dev/content/openai-agents-sdk-vs-langgraph-vs-autogen-vs-crewai"
+    kind: article
+  - label: "AutoGen README — maintenance-mode notice and the Microsoft Agent Framework successor"
+    url: "https://github.com/microsoft/autogen"
+    kind: docs
+applyIt: |
+  Practise the video's habit, sorting by the kind of system rather than the brand, on three AI
+  systems you already know. Ten minutes, no tools.
+
+  1. **Pick three:** an AI feature in an app you use, an automation you built earlier in this
+     pillar, and one idea of your own.
+  2. **Label each one:** single model call, fixed workflow, autonomous agent, or multi-agent crew.
+  3. **Justify anything above "single call"** by naming the one step that forces it there (a
+     loop, a tool choice, memory across turns). If you can't name it, it's over-built.
+
+  **If you code:** add one of your own repo's AI calls to the list. **If you don't code:** "fixed
+  workflow" is what n8n or Make already gives you; "agent" means the model picks the next step.
+  Success: three labels, and every one above "single call" backed by a named step.
+toolkit: |
+  - **Make "check the date" a standing instruction.** Add a line to your ChatGPT, Gemini or Claude
+    custom instructions: for any framework, library or tool, search the current docs before
+    answering from memory. A Microsoft-backed framework went into maintenance mode while
+    tutorials were still teaching it; guides go stale fast.
+  - **Write down your graduation line.** In a notes file for your project, name the wall that would
+    justify a framework (multi-step planning, tool use inside a product, scale). Until you hit it,
+    single model calls and no-code flows in n8n or Make stay the answer.
+  - **Keep a one-page framework map.** A small doc or spreadsheet with one row per framework: what
+    kind of system it suits, who maintains it, and the date you last checked its docs. Update the
+    date whenever you look; a row you haven't checked in six months is a row to distrust.
+  - **Keep a cross-provider habit.** Have a second model from a different vendor review important
+    work now and then. It proves in your own setup that concepts transfer and brands don't.
+
+  **If you use a coding agent:**
+
+  - **Match the SDK to the harness you already know.** If you use Codex or ChatGPT, start with the
+    OpenAI Agents SDK; if you live in Claude Code, the Claude Agent SDK shares its mental model; if
+    you want vendor-neutral control, LangGraph. Your existing subagent, hook and tool habits
+    transfer.
+recap:
+  - emoji: "🗺️"
+    title: "Why learn the map"
+    text: "You don't need a code framework yet, but you should be able to place them. Naming the players is the fast way to feel ready."
+  - emoji: "🧭"
+    title: "Start from the system, not the brand"
+    text: "First ask what you're building: a fixed workflow, an autonomous agent, a crew of role-based agents, a production system or a quick prototype. The answer narrows the field before any brand comes up."
+  - emoji: "🕸️"
+    title: "The control pick"
+    text: "LangGraph, from the LangChain ecosystem, is the pick for stateful, controllable agents with explicit steps, memory, and loops."
+  - emoji: "👥"
+    title: "The team pick"
+    text: "CrewAI orchestrates multiple agents with roles — a beginner-friendly way into multi-agent setups."
+  - emoji: "🛠️"
+    title: "The vendor SDKs"
+    text: "OpenAI's Agents SDK is lightweight and official; the Claude Agent SDK is the harness behind Claude Code, exposed for your own agents."
+  - emoji: "⚰️"
+    title: "A cautionary tale"
+    text: "Microsoft put AutoGen in maintenance mode and points new work to its Agent Framework. Old tutorials still feature AutoGen; treat them as legacy."
+  - emoji: "📅"
+    title: "A habit to keep"
+    text: "Check the date and version on any tutorial you follow, and bet on concepts over brands. Frameworks move faster than the videos about them."
+  - emoji: "🧗"
+    title: "Do you need one?"
+    text: "n8n and Make cover most business automation work. Reach for a code framework only when you hit a real wall — custom logic, scale, or an in-app agent."
+task: |
+  Decide, for one real feature idea, whether it needs a framework, and then look at the one you'd
+  use. Most AI features in real apps start as **a single, well-scoped model call** inside a backend
+  (a serverless function or an API route): "summarise this", "classify that", "write a one-line
+  note from these numbers". You reach for a **framework** only when the AI needs custom multi-step
+  logic, tight control, or has to become a real in-app agent that plans and takes actions.
+
+  1. Pressure-test your idea (no project of your own? use a support chatbot for an online shop):
+
+  ```prompt
+  I want to add this AI feature to [my app, a project, or an internal tool at work]: [describe it
+  in two sentences]. Can it be a single model call with a fixed prompt? If not, which specific
+  step needs a loop, tools, or memory? Only if it truly needs one, which framework fits best
+  (LangGraph, CrewAI, OpenAI Agents SDK, Claude Agent SDK, Microsoft Agent Framework) and why?
+  ```
+
+  2. Finish one sentence: "When I add an AI feature to my project, it stays a single model call
+     until ___." Name the wall (an assistant that plans across steps? tool use inside the
+     product? scale?).
+  3. Open the quick-start page of the framework you'd try first. Note its last-updated date and
+     current version, and find where the model, the tools and the loop live in its first example.
+     **If you code:** run that example. **If you don't code:** "single call" maps to one AI step in
+     n8n or Make, and "framework" usually means "hand this to a developer"; reading the example is
+     enough. The *Applied AI engineering* pillar is where you build agents in code yourself.
+
+  Success: a single-call-or-framework verdict, one finished sentence with a concrete wall, and the
+  date of the framework docs you'd start from.
+selfCheck:
+  - q: "A teammate wants LangGraph plus a CrewAI crew for a feature that turns an uploaded PDF into five summary bullets. What do you say?"
+    a: "That's one model call with a fixed prompt: no loop, no tool choice, no memory. Ship the single call; a framework would add dependencies, latency and debugging for nothing."
+  - q: "You follow a framework tutorial from last year and the imports fail on the current version. What's going on, and what's your move?"
+    a: "The framework changed (or, like AutoGen, moved into maintenance mode). Check the current docs and version, look for a migration guide, and prefer recent official quick-starts over old videos."
+  - q: "When should you move from no-code (n8n) to a code agent framework?"
+    a: "Only when no-code hits a wall — you need custom logic, fine control, large scale, or to embed the agent inside your own application. For most agency automations, n8n/Make is enough."
+  - q: "Your team spent two weeks choosing between CrewAI and LangGraph, and the prototype still calls the wrong tool about half the time in both. Would a third framework fix it? Where should the effort go?"
+    a: "Almost certainly not. Calling the wrong tool is a fundamentals problem (vague tool names and descriptions, an unclear prompt, no eval cases), and it follows you into any framework. Frameworks change fast (AutoGen's move to maintenance mode is the example); model + tools + loop + memory + human oversight transfer across all of them. Fix the tool descriptions, build a small eval set, then pick the framework that fits the system."
+backupResources:
+  - label: "AI Agent Frameworks Explained: OpenAI SDK vs CrewAI vs LangGraph vs AutoGen — S3CloudHub"
+    url: "https://www.youtube.com/watch?v=A6ANpudKNQU"
+    type: "video · quick tour"
+  - label: "LangGraph vs CrewAI vs AutoGen vs LangChain: Comparison 2026 — Raj Punarvasi"
+    url: "https://www.youtube.com/watch?v=VT8yvoW1-3s"
+    type: "video · comparison"
+  - label: "LangChain / LangGraph — official docs"
+    url: "https://langchain.com"
+    type: "docs · reference"
+tags:
+  - agents
+  - frameworks
+  - langgraph
+  - crewai
+  - overview
+---
+
+So far you've built agents with **no-code** (n8n). When you outgrow that, there's a
+world of **code frameworks** for building agents with full control. You don't need
+them yet — but you should know the map, and one important freshness note.
+
+## The current players (2026)
+
+- **LangChain / LangGraph** — one of the most widely used ecosystems. LangGraph is the
+  go-to for **stateful, controllable** agents (explicit steps, memory, loops), modelled as a
+  graph of nodes you define.
+- **CrewAI** — orchestrates **multiple agents** as a "crew" with roles; beginner-
+  friendly for multi-agent setups.
+- **OpenAI Agents SDK** — OpenAI's official, lightweight framework for building
+  agents with tools and handoffs.
+- **Claude Agent SDK** — Anthropic's agent stack: the same harness that powers Claude
+  Code, exposed as an SDK. If you already use Claude Code, this is the framework whose
+  mental model you know.
+- **Microsoft Agent Framework** — Microsoft's unified successor to AutoGen and Semantic Kernel.
+- **⚠️ AutoGen** — Microsoft has put AutoGen in **maintenance mode**: bug fixes and security
+  patches only, no new features, community-managed, with new projects pointed to the Microsoft
+  Agent Framework (the README linked below the video says so). Lots of older tutorials still
+  feature AutoGen; treat those as legacy and don't start new work on it.
+
+You'll also meet Google's Agent Development Kit, LlamaIndex (strong on retrieval-heavy agents)
+and lighter libraries such as PydanticAI. The list will look different in a year; the questions
+below won't.
+
+## What a framework actually gives you
+
+Strip the branding and most frameworks offer the same five things:
+
+1. **The loop** — call the model, run the tool it asked for, feed the result back, repeat.
+2. **Tool plumbing** — turn your functions into tool definitions the model can call.
+3. **State and memory** — keep track of what happened across steps and sessions.
+4. **Orchestration** — handoffs between agents, branches, a human approval pause.
+5. **Tracing** — a record of every step, so you can debug why the agent did what it did.
+
+If your feature needs none of these, you don't need a framework. Anthropic's guide to building
+effective agents makes the same point: start with direct model API calls and add abstraction
+only when it earns its place (→ intro-to-agents links it).
+
+## Worked example: one feature, two designs
+
+Say you want a support assistant inside an online shop.
+
+- **Version 1: "Summarise this customer's last five orders for the support agent."** The data
+  is fetched by your normal code, then one model call writes the summary. No loop, no tool
+  choice. **Single call.** Twenty lines in your backend, easy to test.
+- **Version 2: "Let customers ask anything about their orders and act on it."** Now the model
+  must decide whether to look up an order, check a delivery status or start a return; it may
+  need several lookups in a row, must remember the conversation, and must pause for a human
+  before refunding. That's a loop, tool choice, memory and an approval step. **Framework
+  territory.** LangGraph if you want explicit control over every state, an official SDK if
+  you're committed to one model vendor.
+
+The wall between the two isn't size or ambition. It's the moment **the model, not your code,
+decides what happens next.**
+
+> 💡 **Try it:** Open the quick-start page of one framework and find three things: the last
+> release date, how it defines a tool, and how it caps the number of loop steps. Five minutes,
+> and the "magic" turns into ordinary code.
+
+## The honest truth: you probably don't need one yet
+
+For agency and business automation, **n8n and Make cover most of what you'll do** —
+visually, fast, and reliably. Reach for a code framework only when you hit a real
+wall:
+
+- You need **custom logic** or control no-code can't express.
+- You're operating at **serious scale**.
+- You want to **embed an agent inside your own app** (an AI assistant inside a product
+  you're building) — which is exactly the *Applied AI engineering* pillar (→ build-agent-in-code).
+
+## Common failure modes
+
+- **A framework for a single call** → hundreds of lines and new dependencies for one prompt →
+  reaching for tools before need → ship the direct API call first.
+- **Following a stale tutorial** → imports and class names don't exist → the framework moved on
+  → check the version and date; use the official quick-start.
+- **A multi-agent crew for a one-agent job** → slow, costly, hard to debug → roles were added for
+  their own sake → start with one agent and split only when it clearly struggles.
+- **Can't explain what the agent did** → a wrong answer and no record → tracing was skipped →
+  turn on the framework's tracing or an observability tool from day one (→ observability-tracing).
+- **Locked into one vendor** → switching models means rewriting → model calls are scattered
+  everywhere → put model access behind one function of your own.
+
+## What actually transfers
+
+Frameworks come and go. The **concepts** don't: model + tools + loop + memory + human oversight.
+Master those — which you now have — and you can pick up any framework quickly when a project
+finally needs one. Last lesson: a recipe book of automations worth building for your business
+(→ business-recipes).

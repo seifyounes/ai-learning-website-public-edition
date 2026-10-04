@@ -1,0 +1,286 @@
+---
+title: "The big three compared"
+subtitle: "Route each job to the right assistant"
+summary: "Compare ChatGPT, Claude and Gemini on your own tasks with a quick bake-off, and keep a routing table of which assistant to open for which job."
+changeNote: "Primary replaced with Peter Yang's August 2026 ten-job comparison; recap, watch notes and lanes now match it, and the old video moved to backups."
+section: foundations
+pillar: chat-assistants
+order: 1
+level: beginner
+estMinutes: 16
+taskMinutes: 25
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "nAhQs8Fd_9g"
+  published: "2026-08-26"
+  year: 2026
+  minutes: 27
+  title: "ChatGPT vs Claude vs Grok vs Gemini: The Best AI for 10 Use Cases (August 2026)"
+  channel: "Peter Yang"
+  why: |
+    Peter Yang, who writes a practical AI newsletter and tutorials, runs ChatGPT, Claude, Gemini
+    and Grok through ten everyday jobs in August 2026, giving most rounds the same prompt and
+    showing the outputs live. A different winner per job is the routing idea this lesson is built
+    on, so it beats single-verdict reviews. Weaknesses: the verdicts are one person's taste, mostly
+    on a single test each; he still names an overall winner, Grok is a fourth contender this lesson skips, and he
+    pitches his paid membership.
+  notes:
+    - "The design round (0:32–7:34) is the longest and leans on one assistant's design tools; skim it if you don't design apps or slides."
+    - "Most verdicts rest on a single test he chose, and a few on his impressions alone. Treat the rounds as a demo of the method and confirm any row that matters with your own bake-off."
+    - "Writing goes to ChatGPT here, while a second August 2026 comparison in Backup resources gives Claude the edge on prose. That disagreement is the point of this lesson."
+    - "Model names, plans and prices are an August 2026 snapshot; check current pricing before you pay for anything."
+readAfter:
+  - label: "The best AI chatbots in 2026 — Zapier's hands-on, criteria-based comparison"
+    url: "https://zapier.com/blog/best-ai-chatbot/"
+    kind: article
+  - label: "If you build software: Google AI Studio's structured output (responseSchema) docs"
+    url: "https://ai.google.dev/gemini-api/docs/structured-output"
+    kind: docs
+applyIt: |
+  Stop picking a favorite and route deliberately. Ten minutes: draft your own routing table as a
+  hypothesis, so the bake-offs in the task have rows to confirm.
+
+  ```prompt
+  Help me route AI work across ChatGPT, Claude and Gemini. My work: [one or two sentences]. For
+  each of my 4-5 recurring job classes, give the assistant I should try first, one sentence of
+  why, and a one-line bake-off prompt to confirm it. One table, nothing else.
+  ```
+
+  Mark every row "guess" until a bake-off confirms it, and cross out any reason that's
+  reputation rather than something you could test.
+
+  **If you write or study:** include "outline a long piece", "explain a hard reading" and "quiz me
+  before an exam" as rows. **If you analyze data:** include "clean a messy spreadsheet" and "write
+  a formula". **If you code:** include "debug my code" and "explain an unfamiliar codebase", and
+  mark the rows you'd test in a provider workbench before shipping.
+
+  Success: a routing table with every row marked "guess", and the first row to test chosen.
+toolkit: |
+  - **Write a cross-vendor routing line into your setup.** Your custom instructions or notes
+    probably say *how* you like to work but never which assistant to open for which job. Add one
+    line from your own bake-offs (which you open first for writing, for long documents, for
+    spreadsheets, for image work), and cross-reference tier and effort routing
+    (→ models-and-effort) rather than repeating it.
+  - **Make your bake-offs compound.** Keep a small `routing.md` (or one note in your notes app) where
+    every comparison appends `task × winner × why`. After ten rows you own a routing table no
+    leaderboard can hand you.
+  - **Set up one standing workspace per big job.** A ChatGPT Project or Custom GPT, a Claude
+    Project or a Gemini Gem holding your instructions and reference files means each new chat on
+    that job starts briefed instead of blank.
+  - **Check numbers read from images.** When you send a screenshot, a photo of a receipt or a
+    scanned PDF, add a line to your saved prompt: "list every figure you read, so I can check it
+    against the image." Vision models misread small print confidently, and images cost more
+    tokens than you'd guess.
+recap:
+  - emoji: "🎯"
+    title: "Best for what?"
+    text: "He opens by admitting he used to send almost everything to one assistant. Now he asks
+      which one wins each job, and tests ten jobs to find out."
+  - emoji: "🧪"
+    title: "Same prompt, side by side"
+    text: "Most rounds give the assistants an identical prompt (a recipe-app prototype, an
+      infographic from one article, a planning document) and compare the outputs live: the
+      bake-off this lesson teaches."
+  - emoji: "🧭"
+    title: "Claude: design and hard decisions"
+    text: "Claude wins design (app prototypes, slide decks) and planning: on his planning document
+      it caught a gap the other missed. Its designs have a recognisable default look you have to
+      instruct away."
+  - emoji: "✍️"
+    title: "Writing flipped"
+    text: "Writing and everyday chat go to ChatGPT, reversing his earlier preference for Claude,
+      whose newer prose he finds full of stock phrases. His fix works in any assistant: custom
+      instructions asking for candour, active voice and no filler words."
+  - emoji: "🧰"
+    title: "ChatGPT: the widest toolkit"
+    text: "Voice, image generation, browser use and personal agents go to ChatGPT, mostly for its
+      desktop app rather than the raw model. He gives it coding too, noting an engineer friend
+      disagrees."
+  - emoji: "🎬"
+    title: "Gemini and Grok"
+    text: "Gemini wins video generation and is the simpler app to start with. Grok, which this
+      lesson skips, is a strong contender for app prototypes and personal agents."
+  - emoji: "🏁"
+    title: "An overall pick, with a caveat"
+    text: "He names ChatGPT his overall pick for most people, but the useful part is the table
+      underneath: a different winner per job, and rows that changed within months."
+task: |
+  Build the first two rows of your routing table. Paste the *identical* prompt below into
+  ChatGPT, Claude and Gemini (free tiers are fine), then judge the three outputs, not the logos:
+
+  ```prompt
+  Write 5 one-line taglines (each under 60 characters, no emoji) for [your project, product,
+  portfolio, club or society — one sentence on what it is and who it's for], in a plain, honest
+  voice with no hype. Then add one line per option on why it would win over a skeptical
+  first-time visitor.
+  ```
+
+  No project handy? Use "a free app that helps roommates split rent and bills fairly." Then run a
+  second, different job class through all three. Pick the one closest to your work: paste the same
+  long PDF or article and ask for a five-bullet summary plus the one claim you should
+  double-check; or describe a spreadsheet and ask for the formula that does what you need; or
+  paste a short buggy function and ask what's wrong.
+
+  Score each output on two or three criteria you write *before* reading (accurate? usable as-is?
+  followed the constraints?). Save a one-line verdict per job in a notes file: `task × winner ×
+  why`.
+  Success: you own two sourced rows of a routing table you built, not one you memorized.
+selfCheck:
+  - q: "You have a 60-page report and a spreadsheet of survey results to turn into a presentation
+      by Friday. A friend says 'just use whichever AI is best.' How do you actually choose?"
+    a: "There's no single best, so run a small bake-off on a slice of the real work: the same
+      summary request on the report, and the same analysis request on the spreadsheet, in two or
+      three assistants. Judge against criteria you wrote first (accurate numbers, cites pages,
+      usable chart suggestions) and route each job to its winner. Twenty minutes of testing beats a
+      week with the wrong tool."
+  - q: "You photograph a printed table of figures and ask an assistant to turn it into a
+      spreadsheet. The result looks perfect. What do you check before using it, and what changes
+      if you build this into an app?"
+    a: "Check the numbers against the photo, especially small print and similar-looking digits:
+      vision models misread them confidently. In an app, images are also tokenized and billed like
+      text (cost grows with resolution), so you budget for them and add an automatic check, such as
+      totals that must add up, before trusting the extraction."
+  - q: "Your team wants to standardize on one assistant for everything to keep things simple.
+      What's the risk, and what's a sensible compromise?"
+    a: "The lead changes with each release, so a single bet goes stale, and no one assistant wins
+      every job. A sensible compromise: one default for most work (usually decided by where your
+      files live and what your company has approved), plus a short routing table for the jobs
+      where another assistant clearly wins, re-checked every few months."
+  - q: "If you build software: you're adding a Gemini-powered feature and want to see the exact
+      JSON your backend will receive, and its token cost, before you deploy. Which surface, and
+      why not the Gemini chat app?"
+    a: "Google AI Studio (or the equivalent OpenAI Playground or Anthropic Console). It exposes the
+      system instruction, the `responseSchema`, temperature and per-run token counts against sample
+      inputs, so you see the typed output and the cost your backend will actually get. The chat
+      app returns prose with no schema and no token visibility."
+backupResources:
+  - label: "Model Context Protocol — the open standard behind chat connectors and coding-agent tools"
+    url: "https://modelcontextprotocol.io"
+    type: "docs · protocol"
+  - label: "ChatGPT Plus vs Claude Pro vs Gemini Pro: The Best $20 AI Plan"
+    url: "https://www.youtube.com/watch?v=w21XAsgoQ5o"
+    type: "video · pricing"
+  - label: "ChatGPT vs Claude vs Gemini: Which $20 AI Plan Is Worth It? — Parker Prompts (August 2026, scored by category; its writing verdict differs from the main video's)"
+    url: "https://www.youtube.com/watch?v=ftNYhk3RQ-M"
+    type: "video · by category"
+  - label: "ChatGPT vs Claude vs Gemini in 2026 — BitBiasedAI (the former main video: a short framework talk on matching each assistant to the work, without live tests)"
+    url: "https://www.youtube.com/watch?v=qLBrYzKdZvE"
+    type: "video · framework"
+tags:
+  - chat-assistants
+  - model-routing
+  - ai-studio
+  - mcp
+  - multimodal
+  - vendor-neutral
+---
+
+Most people ask which $20 subscription is "the best". Ask a better question: **which assistant
+do I send this particular job to, and how would I know?** ChatGPT, Claude and Gemini are all
+excellent and all flawed in different places. Treat them as a **dispatch board**, not a
+favorite: keep two or three a click away and send each job to the one that fits. This lesson is
+the routing spine for the whole pillar, whether your jobs are essays, spreadsheets, research or
+code.
+
+## No universal winner — route by job
+
+The one durable fact: **the lead leapfrogs.** Whoever tops a benchmark this quarter gets passed
+next release, so any "best AI" ranking is stale soon after it publishes. Rough lanes, drawn from
+the video's tests and many users' reports rather than measurement, to verify against your own
+tasks rather than memorize:
+
+- **Claude** — careful planning and multi-step reasoning, polished design output such as slides,
+  and strong coding.
+- **ChatGPT** — the broadest tool surface: voice, image generation, browser use, data analysis,
+  custom GPTs, and strong coding too.
+- **Gemini** — deep Google Workspace reach (Docs, Sheets, Gmail, Drive), very large documents and
+  video generation.
+
+Writing is the warning row. In the video, writing goes to ChatGPT, reversing the reviewer's
+earlier preference for Claude; a second comparison from the same month (in Backup resources)
+still gives Claude the edge on prose. Two careful reviewers, one month, opposite verdicts: that is
+why you run your own.
+
+Two related knobs live one level down and are *not* this lesson: which **tier** inside one
+vendor, and how hard it thinks (→ models-and-effort); and which provider to **build an app on**,
+with latency, privacy and region tradeoffs (→ choosing-models-providers). Here the axis is
+simple: which assistant, for which job.
+
+## The bake-off is the only benchmark that counts
+
+Reputation is a weak signal; a side-by-side on **your** kind of work is a strong one. Give all
+three the *same* real task, keep the one that wins **for that job class**, and write the verdict
+down. Do it ten times and you own a routing table no leaderboard can hand you.
+
+> 💡 **Try it:** take one real task you'd do this week anyway: an essay or report outline, a
+> spreadsheet formula you can't quite get right, a tricky bug, a summary of a long article. Paste
+> the identical prompt into all three. Judge the outputs, not the logos. The disagreements are
+> where you learn each assistant's real shape.
+
+## Worked example: a three-way formula bake-off
+
+Say you track club or team expenses in a spreadsheet and need a formula that totals one
+category for one month. You write the criteria first: *works on the first paste, explains itself
+in one line, handles empty cells.* Then you send the same prompt, with five sample rows pasted in,
+to all three.
+
+One returns a formula that works but silently counts blank dates as January. One asks a
+clarifying question about your date format, then gives a correct formula. One gives a correct
+formula plus a version for Google Sheets and one for Excel. You test each on your sample rows,
+which takes two minutes, and record: `spreadsheet formulas × [winner] × asked about date format,
+worked first time`. That row now saves you the decision next time. Note what decided it: not
+which answer *sounded* most confident, but which one survived your test data.
+
+## Everyday workflows, routed
+
+The same routing habit applies across ordinary work:
+
+- **Writing.** Draft in the assistant whose voice you edit least. Then ask a *different* one to
+  critique the draft against your brief: a second model catches what the first glossed over.
+- **Reading and research.** For long PDFs, use an assistant that handles big uploads well and ask
+  it to cite page numbers, so you can check. For current facts, use a search-backed mode
+  (→ research-workflows).
+- **Analysis.** Upload the spreadsheet itself rather than pasting numbers. ChatGPT, Claude and
+  Gemini can all run calculations on uploaded files in some form; ask it to show the steps or the
+  code it ran, and spot-check one number by hand.
+- **Studying.** Ask it to explain a concept at two levels, then quiz you without showing answers.
+  Routing matters less here than the habit of making it test you.
+
+## Features that matter more than the logo
+
+Whichever you pick, three features change daily usefulness more than the model does:
+
+- **Standing workspaces** — ChatGPT Projects and Custom GPTs, Claude Projects, Gemini Gems. Put
+  instructions and reference files in once, and every chat on that job starts briefed.
+- **Connectors** — links to Drive, email, calendars and other tools, increasingly built on **MCP**
+  (the Model Context Protocol), one open standard that chat apps and coding agents share. Connect a
+  source once and the assistant pulls live data instead of you pasting exports. Building your own
+  connections is the → mcp-servers lesson.
+- **Images and files** — all three read screenshots, photos and scans. Under the hood an image is
+  tokenized like text, so it isn't free in an app you build, and vision misreads small text and
+  numbers, so verify any figure it extracts (token mechanics → tokens-and-context).
+
+**If you build software:** chat apps are for feeling out a model. Before you ship a prompt inside
+your own app, test it in the provider's workbench (Google AI Studio, the OpenAI Playground, the
+Anthropic Console), where you can set a schema for structured output and see the token count per
+run. That's where a prompt regression gets caught on your machine instead of in a user's hands.
+
+## Common failure modes
+
+- **You use one assistant for everything and blame "AI" when it struggles** → one tool's weak
+  spot became your weak spot → bake off the jobs that frustrate you most.
+- **You judge by which answer sounds best** → fluent beats correct in a skim → write two or three
+  criteria before reading, and test against real data.
+- **Your routing table is a year old** → the lead has changed since → re-run one bake-off per row
+  every few months, or when a big release lands.
+- **A great answer can't be reproduced next week** → it lived in a one-off chat → save the prompt
+  and the winning setup in a Project, Gem or notes file.
+
+## The habit: a dispatch board, not a favorite
+
+You don't marry a vendor; you keep a **routing table** across all three, measured once per job
+class and re-checked as they leapfrog. Feature tours expire in weeks; routing judgment, standing
+workspaces, connectors and a healthy suspicion of extracted numbers don't. That's the
+vendor-neutral core of this pillar, and it's why "which would you use, and why?" is a question
+you'll answer with evidence instead of a brand.

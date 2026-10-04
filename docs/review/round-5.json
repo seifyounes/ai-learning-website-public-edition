@@ -1,0 +1,89 @@
+{
+  "round": 5,
+  "scores": {
+    "1_content": 9.0,
+    "2_relevance": 9.0,
+    "3_learning_design": 9.0,
+    "4_onboarding": 9.3,
+    "5_navigation": 9.2,
+    "6_interactive": 9.2,
+    "7_visual": 9.0,
+    "8_mobile": 8.8,
+    "9_accessibility": 9.1,
+    "10_trust": 9.3,
+    "11_technical": 9.2
+  },
+  "overall": 9.1,
+  "evidence": {
+    "1_content": "Read in full: what-is-an-llm, hooks-automation, transformers-attention, rag-fundamentals, pricing-ai-work; read source for privacy-and-setup, zapier-make-n8n, obsidian-ai-workflow, video-with-ai, codex-inside-claude-code. The explanations are accurate and current. Examples: hook exit code 2 sends stderr back to the model, and stop_hook_active stops a Stop hook from looping (hooks-automation). The prefill/decode/KV-cache worked example has correct numbers (transformers-attention). Zapier counts tasks, Make counts module runs and n8n counts executions (zapier-make-n8n). The usage-spike maths in pricing-ai-work checks out: ($90-$30)x1.10=$66, and $8,750/12 is about $730. I spot-verified current facts and they hold: NotebookLM was renamed Gemini Notebook in July 2026 (rag-fundamentals), gemma4:e2b exists in the Ollama library, and Karpathy's llm-wiki gist and kepano/obsidian-skills both resolve. Breakdown bodies are about 900 words at the median, with worked examples and failure-mode lists. Nits: a few self-checks still test recall rather than judgment (zapier-make-n8n Q1 'One-line summary of each tool?'). Some 'why this one' blurbs run 150-195 words of timestamps and errata (weekly-review 195, obsidian-ai-workflow 188, ai-inside-obsidian 187).",
+    "2_relevance": "No author-specific content anywhere. A grep of content/ and src/ for personal names, private apps, local paths and TODO/FIXME is clean; the author's name appears only in About and the footer. Apply-it and task blocks branch explicitly ('If you code / If you don't / At work or school'). They use neutral scenarios: a bookshop support bot, a support-inbox automation, an HR policy bot, a Spanish tutor. Each lesson names ChatGPT, Claude and Gemini equivalents. Gap: the 'Upgrade your AI setup' block leans on coding-agent instruction files even where most readers aren't developers. In rag-fundamentals, 4 of 5 toolkit bullets are about AGENTS.md/CLAUDE.md, Cursor globs and Copilot applyTo, and none helps a non-coder who uses a Project or NotebookLM.",
+    "3_learning_design": "Every lesson has a fixed anatomy, a 'Do these first' line on non-entry lessons, and level and time per block (video, read, task). The Applied AI engineering pillar page states its prerequisites ('Basic Python or JavaScript… set a spending limit'). The Math & ML lessons have commit-then-explain MCQs with the correct answer in varied positions (B, D, A, C, B in transformers-attention). Gaps: (a) /path?goal=work lists 'AI inside companies' first for the no-code route, but that track 'builds on' Applied AI engineering (0/17). A no-code professional is scored against a coding pillar, which contradicts the home-page route. (b) The zapier-make-n8n worked example says a no-code marketer should pick Zapier, yet the task tells everyone to try only Make and n8n and leave Zapier for later. (c) 27 of 111 lessons run over 90 minutes. Start Here acknowledges this, but a few (for example the Claude Code capstone, at roughly 5 hours) have no explicit session split.",
+    "4_onboarding": "At 1280px the home page answers what, who and where in one screen. The headline names students, developers and professionals; three CTAs; a 'Free · No sign-up' box with privacy; a 'Pick your route' block with three goal routes. Start Here repeats the routes and adds 'one lesson per sitting / do the task / progress is local'. A first-time visitor knows where to click within seconds.",
+    "5_navigation": "Top nav covers Start Here, Foundations, Applications, Get Hired, Progress, Search and About. The lesson sidebar opens on the current pillar; there is an on-page section jump bar (Watch … Notes), Back to pillar, and Previous/Next lesson. Cross-references written as (→ slug) render as titled links. Search works and syncs to the URL (?q=prompt+caching&level=advanced). It is typo-tolerant ('embedings' finds Embeddings & vector databases), the level filter uses aria-pressed, and the empty state is helpful. Nit: result snippets keep stray spaces from stripped markdown ('Time to first token (TTFT) : how long', 'product code . If').",
+    "6_interactive": "Tested everything on a fresh browser. The recap runs 7 cards with flip and recalled/not-yet, then offers 'Go over the 2 you missed' and remembers 'Last time you recalled 5 of 7'. Self-check reveal and grading reached 'Perfect — 5/5' and saved to ai-learn:quiz:v1. The MCQ (transformers-attention) marks your pick against the correct answer, explains both, and saves the best score. Notes typed with the keyboard persisted across reload. Mark complete turned to 'Completed' (aria-pressed) and persisted. Export produced ai-learning-progress-2026-10-04.json with all 5 keys and a status message. Dashboard XP, rank, badges and per-pillar counts updated, and Get Hired readiness reflects completed lessons. All reliable.",
+    "7_visual": "The 'Computation Pad' look is distinctive and coherent: ruled title blocks, a mono font for numbers, one filled primary button, indigo ink on a grid. Long-form prose is comfortable, and the hierarchy (step boxes 1–9, H2/H3) is obvious. Two things dilute it. First, every lesson puts an editorial changelog ('LAST REVIEW 3 Oct 2026: … dropped a coding-agent tip', '… cut a coding-agent tip', '… Swapped the hype-titled primary video') between the header and the content; it reads as author notes, not learner value. Second, the long 'Why this one' blurbs are walls of timestamps.",
+    "8_mobile": "At 320px none of the 12 tested pages (home, start-here, foundations, a pillar, 3 lessons, search, dashboard, get-hired, path, about) scroll sideways: scrollWidth is 320. The header fits (logo, streak, Menu), the title block reflows to two columns, prompt cards wrap, and the only sub-24px targets are inline text links. The gap: the core ASCII diagrams in transformers-attention (Q·K·V and prefill/decode) are 905px wide inside a 249px scroll box at 320px. A learner on a phone sees about a quarter of the lesson's key figure at a time, and the box has a 'COPY' label as if it were code. Obsidian install-and-vault-setup and para-method have 70-column tree diagrams with the same issue, on a smaller scale.",
+    "9_accessibility": "There is a skip link, labelled landmarks (nav Main, Course contents, On this page, Lesson navigation) and lang=en. Lessons use one H1 and a sequential H2/H3 structure. The search input has a <label>, and the notes textarea has an aria-label. Self-check toggles use aria-expanded, the Menu button has aria-expanded/aria-controls, and the play button is labelled 'Play video: …'. The YouTube iframe has a title, polite live regions exist, keyboard Tab shows a visible :focus-visible outline, and no visible text measured below 4.5:1 contrast. Text is never under 12px and there is a prefers-reduced-motion rule. Nits: the four MCQ options are bare buttons with no group label, and after answering the state is conveyed only by appended text. The wide diagram <pre> blocks have no tabindex or label, so they depend on the browser's automatic keyboard scrolling.",
+    "10_trust": "All 111 primary videos resolve via YouTube oEmbed (HTTP 200), and every author_name matches the credited channel. Each lesson shows the channel, the year and the reason it was chosen. Readings come from original publishers, most often the official docs (for example, the hooks reference is labelled 'source of truth'). About is candid: 'drafted with AI assistance and checked against the sources each lesson links'. It also has a precise 'What a review covers' section, a no-cookies/no-analytics statement, and youtube-nocookie loaded only on play. Videos carry honest caveats: dated UI, paid-product segments in the Milo video flagged with timestamps, and benchmark claims to skip in the Codex video. Hypothetical numbers are labelled as such. Link check: every backup YouTube video passes oEmbed. Of 175 unique non-YouTube reading and backup URLs, none returned 404 or 410. Eleven returned 403 to curl (bot protection on help.openai.com, openai.com, make.com, perplexity.ai, midjourney.com, medium.com and copyhackers.com; these sites are live). Four timed out on the known Cloudflare block (eugeneyan.com, r2d3.us, simonwillison.net, consc.net), so I couldn't verify them.",
+    "11_technical": "Every route returns the right status: lesson, section and pillar pages 200, made-up URLs 404 with a branded 'This page isn't in the course' page. The pages are fast (about 15ms server-side) and the console shows no JS errors (the only 404s are the 404 pages I visited). Each lesson has a unique description, canonical, og/twitter tags and a generated 1200x630 OG card, which renders well. sitemap.xml has 131 URLs, plus robots.txt, icon and apple-icon. The GitHub report link opens a prefilled issue with the page URL. No private leftovers are tracked in git (the CLAUDE.local.md, docs/internal/ and *.local.json files are gitignored). Nits: no og:site_name; /favicon.ico 404s (some crawlers and RSS readers request it directly); the search snippet spacing artefacts noted above."
+  },
+  "fixes": [
+    {
+      "criterion": "8_mobile",
+      "priority": "medium",
+      "issue": "The transformer lesson's key ASCII diagrams (Q·K·V flow, prefill vs decode) are about 905px wide in a 249px scroll box at 320px. The Obsidian folder trees are 70 columns wide. On a phone you can't see a diagram whole.",
+      "where": "/foundations/math-ml-core/transformers-attention; /foundations/obsidian/install-and-vault-setup; /foundations/obsidian/para-method",
+      "fix": "Render diagrams as a figure, not as code. Either (a) add a responsive SVG with an ASCII fallback, or (b) give the prefill/decode diagram a stacked variant below 640px (PREFILL block above DECODE block) and reflow the Q/K/V figure vertically. Drop the 'COPY' label on diagram blocks, give the box a 'scroll to see the full diagram' hint, and add tabindex=0 with aria-label='Diagram: …'."
+    },
+    {
+      "criterion": "7_visual",
+      "priority": "medium",
+      "issue": "Every lesson opens with an author changelog ('LAST REVIEW … dropped a coding-agent tip', '… cut a coding-agent tip', '… made Apply it a five-minute list') between the title block and the content. A learner gets nothing from it, and it reads like internal editing notes.",
+      "where": "All 111 lessons (changeNote frontmatter), e.g. /foundations/mental-models/what-is-an-llm",
+      "fix": "Keep the Reviewed date in the title block. Move the change note into a collapsed 'What changed in the last review' disclosure near the Report link at the bottom. Rewrite the notes in learner terms ('New: a worked example of a cache miss'), not editor terms."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "medium",
+      "issue": "The no-code 'real work in my job' route on /path ranks AI inside companies first, but that track 'builds on' Applied AI engineering (0/17). A non-coder's readiness is measured against a coding pillar, which contradicts the home-page route (1 → 3 → 5 → C).",
+      "where": "/path?goal=work, and the track C foundations mapping in src (applications 'builds on' data)",
+      "fix": "Make 'builds on' goal-aware. For the work and understand goals, compute track C readiness from Mental models + Chat assistants + Workflows & agents, and show Applied AI engineering as 'optional, for builders'."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "low",
+      "issue": "The zapier-make-n8n worked example recommends Zapier for the no-code marketer. The task then tells every learner to try only Make and n8n and leave Zapier for later.",
+      "where": "/foundations/workflows-agents/zapier-make-n8n (task)",
+      "fix": "Have the task pick the two editors that match the learner's situation, using the lesson's own three-person example. For instance: 'no code, low volume: Zapier + Make; builder or AI-heavy: Make + n8n'."
+    },
+    {
+      "criterion": "2_relevance",
+      "priority": "low",
+      "issue": "Some 'Upgrade your AI setup' blocks are almost entirely about coding-agent rules files, even in lessons that non-developers take. In rag-fundamentals, 4 of 5 bullets cover AGENTS.md/CLAUDE.md, Cursor globs and Copilot applyTo.",
+      "where": "/foundations/applied-ai-engineering/rag-fundamentals (toolkit); scan other toolkits for the same pattern",
+      "fix": "Follow the privacy-and-setup pattern: lead with chat-assistant bullets (for example, 'keep each Project's files current; remove superseded documents so they can't be retrieved'), then put the coding-agent bullets under an 'If you use a coding agent' sub-heading."
+    },
+    {
+      "criterion": "1_content",
+      "priority": "low",
+      "issue": "Some self-checks test recall, not judgment ('One-line summary of each tool?'). Eleven 'Why this one' blurbs run 150–195 words, dense with timestamps and errata.",
+      "where": "/foundations/workflows-agents/zapier-make-n8n Q1; obsidian pillar 'why' blurbs (weekly-review, obsidian-ai-workflow, ai-inside-obsidian, essential-plugins), rag-fundamentals, evals-and-testing",
+      "fix": "Replace recall questions with a scenario (for example, 'a 12-step flow at 20k runs a month: which tool's meter hurts least, and why?'). Cap 'why' at about 80 words and move the watch range and errata into a separate 'Watch notes' list with timestamps."
+    },
+    {
+      "criterion": "9_accessibility",
+      "priority": "low",
+      "issue": "MCQ options are four ungrouped buttons. After answering, state is conveyed by appended text, with no grouping semantics or disabled/pressed state.",
+      "where": "src McqQuiz component; e.g. /foundations/math-ml-core/transformers-attention #challenge",
+      "fix": "Wrap each question's options in role='group' with aria-labelledby pointing at the question text. Mark the chosen option aria-pressed='true' (or use a radiogroup), and set aria-disabled on the options once answered."
+    },
+    {
+      "criterion": "11_technical",
+      "priority": "low",
+      "issue": "Search snippets contain spacing artefacts from stripped markdown ('(TTFT) : how', 'product code . If'). There is no og:site_name, and /favicon.ico returns 404.",
+      "where": "/search?q=prompt+caching; search-index builder; root metadata",
+      "fix": "When building the search index, collapse whitespace before punctuation (replace /\\s+([.,:;!?)])/g with '$1'). Add openGraph.siteName = 'AI Learning' to the root metadata, and add an app/favicon.ico (or a rewrite to /icon)."
+    }
+  ],
+  "verdict": "This is an excellent, trustworthy free course. The content is accurate and current to late 2026, the lesson anatomy is consistent and practice-heavy, every one of the 111 videos is verified, and the interactive features all work and persist. It sits at or just above the ship bar on every criterion except mobile. There, the transformer lesson's key diagrams can't be read on a phone; fix that and declutter the per-lesson changelog, and the site is a confident 9+ across the board."
+}

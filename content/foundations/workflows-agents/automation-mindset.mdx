@@ -1,0 +1,215 @@
+---
+title: "The automation mindset"
+summary: "Spot the repetitive, rule-based work in your week, write it as trigger-action sentences, and pick your first automation by the numbers."
+changeNote: "New video: freeCodeCamp's two concept chapters (10 minutes), plus a worked audit of a real week and a quick verdict on what to automate first."
+section: foundations
+pillar: workflows-agents
+order: 1
+level: beginner
+estMinutes: 11
+taskMinutes: 25
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "-leIp449qXA"
+  published: "2026-04-21"
+  year: 2026
+  minutes: 241
+  start: 228
+  watchMinutes: 10
+  title: "Automate Your Life in 4 hours – Agent and Automation Zapier Course"
+  channel: "freeCodeCamp.org"
+  why: "A free freeCodeCamp course (developed by Coding with Estefania) whose opening concept chapters start from an ordinary workday, show how to spot the small repeated chores eating it, define a workflow as a repeatable sequence of steps, and introduce trigger and action. The course is built on Zapier, but these concepts carry over unchanged to Make and n8n. The breakdown adds what the video only touches on: scoring which tasks are worth automating."
+  notes:
+    - "Watch only the two opening concept chapters, 'Welcome to the world of automation' and 'Basic concepts' (from 3:48, about 10 minutes)."
+    - "The rest of the course is an optional Zapier build-along."
+applyIt: |
+  Run the three tests on the chore that annoys you most, and see whether it survives the numbers.
+  Ten minutes.
+
+  1. **Name the chore** you'd most like gone.
+  2. **Test it:** repetitive? rule-based? frequent? Write yes or no for each.
+  3. **Do the sum:** minutes each time × times per year, minus the hours to build and maintain it.
+  4. **Decide:** automate it, automate only the data-gathering half, or add it to your "stays
+     human" list.
+
+  **At work:** handoffs between apps (email → spreadsheet → chat) usually pass. **If you're a
+  student:** deadline reminders and sorting course emails usually pass; grading feedback doesn't.
+  Success: a one-line verdict on that chore, backed by three yes/no answers and one number.
+toolkit: |
+  - **Start an automation backlog in a notes file.** Write down the trigger→action pairs you
+    already rely on (a form that emails a confirmation, a calendar alert before a meeting), then
+    add every chore you caught yourself repeating this week as a "When ___, I ___" line.
+  - **Score candidates in a spreadsheet template.** Columns for the task, minutes each time, times
+    per week, build hours and upkeep hours, plus one formula column for hours saved per year minus
+    build cost. Every new idea gets a number before it gets your weekend.
+  - **Turn the prompt you re-type into a saved assistant.** A custom GPT, a Gemini Gem or a Claude
+    Project with standing instructions is a fixed trigger (you open it) firing fixed steps. Make
+    one for the chore you explain to a chat assistant every week.
+  - **Keep a "stays human" list.** Final client copy, grading decisions, anything you sign your
+    name to: write them down so you don't automate them on an enthusiastic afternoon.
+recap:
+  - emoji: "⚡"
+    title: "The one atom"
+    text: "Every automation is one atom: when X happens, do Y. Learn the atom and every platform stops looking different."
+  - emoji: "🧩"
+    title: "What the tools really are"
+    text: "Zapier, Make, and n8n are just friendly ways to wire the same trigger→action across your apps. The tool is skin; the pattern is the skeleton."
+  - emoji: "🔁"
+    title: "What makes work automatable"
+    text: "A workflow is a sequence of steps you repeat the same way every time. Repeatable is the word that matters: if the steps never change, a tool can run them."
+  - emoji: "🎯"
+    title: "Three tests for a target"
+    text: "Repetitive, rule-based, frequent — that's the target. The time saved compounds every time it fires while you sleep."
+  - emoji: "🧮"
+    title: "Who picks the winner"
+    text: "Time saved × frequency − build cost picks your first automation, not which task annoys you most. Sixty hours saved beats a gut feeling."
+  - emoji: "✋"
+    title: "What to leave alone"
+    text: "Rare one-offs and real decisions cost more to automate than they repay, or the risk is too high. Automate glue, not judgment."
+  - emoji: "🧠"
+    title: "The real skill"
+    text: "Tools are easy; knowing what deserves automating is the value you bring. The mindset comes first, the canvas second."
+task: |
+  List 5 tasks you do repeatedly each week, at work, in your studies or on a side project. A few
+  shapes to look for:
+
+  - A form or sign-up comes in (a contact form, a course registration, a client intake) → log it
+    in a sheet → notify you.
+  - A payment, order or invoice event fires → update a record → send a receipt or a thank-you.
+  - A new issue, ticket or support email arrives → summarise it → post it to your team chat.
+  - Every Monday at 9am → pull last week's numbers → send a short report.
+
+  For each task write the trigger ("when X happens"), the action ("do Y"), an **estimated
+  minutes-saved-per-week** number and a rough build-time guess (an hour? three?). If you want a
+  second opinion on the sorting, hand the list to an assistant (ChatGPT, Gemini, Claude):
+
+  ```prompt
+  Here are tasks I do repeatedly: [list 5-10 tasks, one per line, with roughly how often and how
+  long each takes]. For each, rewrite it as "When [trigger], do [actions]", mark it repetitive /
+  rule-based / frequent (yes or no for each), and estimate hours saved per year minus build time.
+  Rank them, and flag any that need real human judgment and should stay manual.
+  ```
+
+  Then circle the winner **by the numbers** (highest minutes saved for the least build effort),
+  not the one that feels most annoying. That task is your first automation (next lessons).
+  Success: five trigger→action lines with numbers next to them, and one circled winner you can defend with the arithmetic.
+selfCheck:
+  - q: "What's the core model of every automation?"
+    a: "Trigger → action(s): 'when X happens, do Y.' Every platform (Zapier, Make, n8n) is just a friendly way to wire triggers to actions across your apps."
+  - q: "A colleague wants to automate the quarterly board report (about 2 hours, four times a year) before the lead-copying chore (5 minutes, about 15 times a week). What do you tell them?"
+    a: "Run the numbers: the board report is about 8 hours a year and full of judgment, while lead-copying is about 65 hours a year of pure rules. Automate the leads first; at most, automate the data-gathering half of the board report."
+  - q: "You automated invoice filing three months ago, and now files land in the wrong folders without anyone noticing. What did your plan leave out?"
+    a: "Maintenance and visibility. The folder structure or the source changed and nothing alerted you. Budget upkeep time in the ROI sum, name an owner for the flow, and add a failure notification (→ reliability)."
+  - q: "A teammate wants to automate two things next: the yearly renewal of one vendor contract, and the reply to every refund dispute over $500. Which would you automate, and what would you do instead?"
+    a: "Neither, fully. The renewal is a rare one-off, so building the flow costs more than it saves; a calendar reminder and a checklist do the job. Refund disputes are high-stakes judgment calls: automate the prep (pull up the order, draft a reply) and keep a person deciding and sending."
+backupResources:
+  - label: "Automation Basics (What are Triggers & Actions) — Pabbly"
+    url: "https://www.youtube.com/watch?v=8l5EUFzvAi8"
+    type: "video · triggers & actions"
+  - label: "Top 5 Automation Triggers Everyone Should Start With"
+    url: "https://www.youtube.com/watch?v=snv8fT2Utqc"
+    type: "video · triggers"
+  - label: "Zapier — key concepts in Zap workflows (triggers, actions, tasks)"
+    url: "https://help.zapier.com/hc/en-us/articles/8496181725453-Learn-key-concepts-in-Zap-workflows"
+    type: "reference"
+tags:
+  - automation
+  - mindset
+  - triggers-actions
+---
+
+Here's the thing: **you already live inside trigger→action.** You pay in an online shop and a
+receipt lands in your inbox. Someone pushes code and a deploy starts. A meeting is ten minutes
+away and your phone buzzes. Each of those is automation — a trigger fired, actions ran. This
+pillar gives the pattern a name and puts it in your hands for everything else: **"When _this_
+happens, do _that_."**
+
+## Trigger → action
+
+- **Trigger** — the event that starts it: a form submission, a new email, a
+  scheduled time, a new row in a sheet.
+- **Action(s)** — what happens next: send a message, create a record, call an API,
+  update a doc. One trigger can fan out to many actions.
+
+Between the two, most tools let you add **filters** ("only if the amount is over 100") and
+**branches** ("if it's a bug, go left; otherwise go right"). Those are still rules you wrote in
+advance. Zapier, Make, and n8n (→ zapier-make-n8n) are all just visual ways to connect triggers
+to actions across the apps you already use.
+
+## The real skill: what to automate
+
+Tools are easy; judgment is the value. Automate tasks that are:
+
+- **Repetitive** — you do them again and again.
+- **Rule-based** — clear "if this, then that" logic, no real judgment.
+- **Frequent** — the time saved compounds.
+
+And *don't* (yet) automate rare one-offs or genuine judgment calls — the build cost
+outweighs the payoff, or the risk is too high.
+
+The ROI math, worked once so it's real: say summarizing new App Store reviews takes you
+**10 minutes a day** (~70 min/week ≈ **60 hours/year**). Building the automation (review
+feed → AI summary → notification) takes ~3 hours once, plus maybe 3 hours/year of babysitting.
+60 hours saved vs 6 spent — a 10× return, so build it. Counter-example: automating a
+quarterly report that takes 20 minutes (80 min/year) can't repay even one 3-hour build.
+Run **time saved × frequency − build cost** on every candidate; the arithmetic makes the
+decision for you.
+
+## Worked example: auditing one week
+
+Take a hypothetical operations assistant at a small design studio. She lists five things she did
+more than twice last week, then scores each one.
+
+1. **Copying website enquiries into the client sheet.** About 5 minutes each, roughly 15 a week:
+   75 minutes a week, about 65 hours a year. Pure rules (copy these fields into those columns).
+   Build time: about 2 hours. **Clear winner.**
+2. **Renaming and filing supplier invoices.** About 2 minutes each, 20 a week: 40 minutes a
+   week, about 35 hours a year. Rule-based once she writes the naming convention down. **Second.**
+3. **The Friday status email.** 30 minutes a week, about 26 hours a year. The *gathering*
+   (pulling numbers from the tracker) is rules; the *writing* needs a little judgment. **Automate
+   the gathering now,** and add an AI drafting step later (→ ai-in-automations).
+4. **The annual budget review.** A few hours, once a year. Even a quick build can't repay itself,
+   and it's mostly judgment. **Stays manual.**
+5. **Replying to unhappy clients.** Frequent, but every reply is a judgment call with a
+   relationship at stake. **Stays human.** At most, an automation can collect the history so she
+   starts each reply with context.
+
+Notice what happened: the task that annoyed her most (the Friday email) came third, and the
+boring one she barely thought about came first. Also notice item 3. **Partial automation
+counts.** You rarely need to automate a whole job; automating the copy-paste part and keeping
+the thinking part human is often the best deal.
+
+> 💡 **Try it:** Open your sent email and calendar from last week and find three things you did
+> more than twice. Write each as "When ___ happens, I ___." Five minutes, and you have the start
+> of a backlog.
+
+## Hidden costs to count
+
+The formula has a build-cost term, and beginners underestimate it in two ways:
+
+- **Upkeep.** Apps change their fields, passwords and access tokens expire, someone renames a
+  folder. A flow that saves 60 hours a year might need a few hours a year of fixes.
+- **Process debt.** If the manual process is messy (three people do it three ways), automating it
+  just runs the mess faster. Write the steps down first and simplify them; sometimes that alone
+  removes a chunk of the work before you build anything.
+
+## Common failure modes
+
+- **Automating chaos** → the flow breaks on every exception → the process was never agreed on
+  → write the steps on paper and settle the edge cases before you build.
+- **Picking by irritation** → a fun build that saves 20 minutes a year → emotion chose, not
+  numbers → score every candidate with the formula before opening a tool.
+- **Forgetting upkeep** → a flow quietly fails for weeks → no owner, no alert → log each flow's
+  owner and add an error notification (→ reliability).
+- **Automating the judgment too** → an embarrassing auto-reply to a sensitive message → the
+  human step was removed along with the busywork → automate the prep and keep the decision.
+- **Building version three first** → a week spent on branches before anything runs → scope
+  creep → ship the simplest trigger→action, then add branches as real cases appear.
+
+## Why this pillar matters for you
+
+Whatever you do — study, build software, run a team, freelance — you're surrounded by
+repetitive glue work: onboarding, follow-ups, posting, reporting. Each one is a trigger-action
+sentence waiting to be written. Get the mindset now; the next lessons give you the tools, then
+we add AI so your automations can handle judgment too.

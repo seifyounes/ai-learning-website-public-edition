@@ -1,0 +1,246 @@
+---
+title: "Capstone: ship a small AI feature"
+summary: "Ship one small AI feature end to end, with success criteria, an eval set, a fallback, a server-side key and a log of every call."
+changeNote: "New: a worked example, a failure-modes list, a hands-on task that ships all five steps with call logging built in, and a readiness review before real users see it."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 11
+level: advanced
+estMinutes: 60
+taskMinutes: 90
+shortPath: "Two sittings. First, about 45 min: read the breakdown, write the Define step's success criteria and build the first slice (endpoint, prompt template, JSON output). Next time: watch the video, then Eval, Harden, Monitor and deploy."
+prerequisites: [structured-outputs-tools, evals-and-testing, cost-latency-caching]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "Q679gH7oszg"
+  published: "2026-03-13"
+  year: 2026
+  minutes: 55
+  title: "How I Build and Ship Custom AI Solutions for Clients"
+  channel: "Dave Ebbelaar"
+  why: "Dave Ebbelaar walks through how he scopes, builds and ships AI solutions for clients, end to end. The define-build-ship loop he shows is the same whether you build for a client, an employer or your own product, which makes it a good model for this capstone. It's long and framed around his consulting work, so treat it as a process to borrow, not a code-along. If you want a guided build instead, freeCodeCamp's full build-and-deploy course is in the backups."
+applyIt: |
+  Use the five steps as a ten-minute readiness review of an AI feature or automation that
+  already runs: in your project, at work, or a no-code flow you rely on. For each step, write
+  down the evidence that exists today, or "none":
+
+  - **Define:** written success criteria someone could check.
+  - **Eval:** a scored set of test inputs, and its last score.
+  - **Harden:** a fallback you have seen fire at least once; the key kept server-side; a cost cap.
+  - **Deploy:** a switch that turns it off.
+  - **Monitor:** an answer to "what did yesterday's calls cost, and how many hit the fallback?"
+
+  Circle the weakest step and write the one change that would close it. **If you haven't built
+  an AI feature yet:** review an AI feature in a tool your team uses, and list the evidence you'd
+  ask its vendor for before trusting it with real work.
+
+  Success: a five-line evidence list for one real AI feature, with the weakest step named and one fix chosen.
+toolkit: |
+  - **Ship one feature into your own workflow too.** A small automation you'll run daily (an
+    assistant step that drafts a summary of each work session into a notes file, or triages your
+    inbox into a list) is the cheapest capstone to keep alive, because you are its first user.
+  - **Put the five steps in your instruction file.** Add "define success criteria, eval set,
+    fallback, server-side key, trace log" as a shipping checklist to AGENTS.md (or CLAUDE.md /
+    GEMINI.md for those agents), `.cursor/rules` or your Copilot instructions, so your coding
+    agent proposes them unprompted.
+  - **Log every automated LLM call.** Whether it runs in a script, an n8n workflow or a scheduled
+    job, append one row per call (prompt version, tokens, fallback status) to a table or sheet,
+    so "what did yesterday's automations cost?" has an answer (→ observability-tracing).
+  - **Assemble, don't invent.** Save your API call wrapper, prompt template and JSON-schema
+    pattern as a reusable snippet or skill; the next feature starts from those pieces.
+recap:
+  - emoji: "🚢"
+    title: "How big is a capstone?"
+    text: "Not a big app: one small AI feature taken all the way to production, deliberately, with the whole pillar as your checklist."
+  - emoji: "🎯"
+    title: "Before any code"
+    text: "Write the feature's success criteria. Small is good, and you should know exactly what 'working' means before you build."
+  - emoji: "🔧"
+    title: "The minimum core"
+    text: "An API call, prompts as code and structured outputs. Add RAG if it needs your data, and tools or an agent loop only if it must act."
+  - emoji: "🧪"
+    title: "When can you trust it?"
+    text: "When a small, scored eval set says so. Iterate the prompt or model until it clears your bar, not until it looks fine once."
+  - emoji: "🛡️"
+    title: "Before real users touch it"
+    text: "Cost caps, caching, error handling, a deterministic fallback, a human gate for anything risky, and the API key kept server-side."
+  - emoji: "📈"
+    title: "What did yesterday cost?"
+    text: "Shipped includes a trace table with one row per call: prompt version, tokens, latency, fallback status. If you can't answer the question, it isn't monitored."
+  - emoji: "🧩"
+    title: "Demo versus shipped"
+    text: "A demo works once. A shipped feature keeps working, affordably, and tells you when it doesn't."
+task: |
+  Ship one small AI feature end to end, through all five steps, in the repo it belongs in. Good
+  sizes: "draft a reply to a support ticket", "turn a meeting transcript into action items",
+  "tag incoming feedback by theme", "answer FAQs from our docs". Reuse what you built in earlier
+  lessons (the API call script, the prompt template, the eval set) rather than starting blank.
+  Run this in your coding agent (Claude Code, Cursor, Codex, Copilot agent mode):
+
+  ```prompt
+  Help me ship one AI feature end to end: [one sentence describing the feature].
+  Define: write 3-5 success criteria before any code. Build: one server-side endpoint or
+  function with an API call, a versioned prompt template, and strict-JSON schema output.
+  Eval: a 10-case set with known-good outputs and a script that scores them. Harden: cache
+  repeat inputs, skip empty inputs, a deterministic fallback when the model fails or times out,
+  the API key in a server-side secret (never in client code), a per-user or per-day cost cap,
+  and a user-facing switch to turn the feature off that is checked on the call path. Monitor:
+  log one row per call (timestamp, prompt version, model, input and output tokens, latency,
+  guardrail pass/fail, fallback fired; metadata only, never the user's raw text) and write one
+  query for "what did yesterday's calls cost and how many hit the fallback?". Deploy behind a
+  flag, then turn it on. Stop after each step so I can review.
+  ```
+
+  Force one failure (a timeout or invalid output) to prove the fallback fires. **No-code path:**
+  build the same feature in n8n, Make or Zapier with an AI step. Write the success criteria, the
+  10 test inputs and the fallback path before you turn it on, and add a final step that appends
+  the same log fields to a Google Sheet, with a formula that sums yesterday's cost.
+
+  Success: the deployed feature passes its eval set, falls back cleanly when forced to fail, never runs for a user who switched it off, and one query (or formula) returns yesterday's cost and fallback count.
+selfCheck:
+  - q: "Your 'tag incoming feedback' feature handled every message you tried by hand last week. Today a user shows it tagged an angry refund demand as 'praise'. What was missing from your process, and what do you add?"
+    a: "An eval set: trying inputs by hand isn't measurement. Add the failing message and a few similar edge cases (sarcasm, mixed sentiment) to a scored set, fix the prompt, then rerun the *whole* set so the fix doesn't break cases that used to pass."
+  - q: "Your model provider has a two-hour outage, and your feature shows users a spinner and then an error page. Which step of the run did you skip, and what should users have seen?"
+    a: "Harden. Every call needs a timeout and a deterministic fallback, such as hiding the AI button or showing a plain 'summary unavailable' message with the original content. Your trace table should also show the fallback rate jumping, so you hear about the outage before users report it."
+  - q: "Your manager asks whether the feature can go to every user next week. What three pieces of evidence do you bring?"
+    a: "The eval score against the success criteria you wrote first; proof the failure path works (a forced timeout or bad output that fell back cleanly); and cost per call and per day from the trace table, with the cap that stops a runaway bill."
+mcq:
+  - q: "You're asked to ship an AI summary of each client call. Before writing any code, what's the most useful thing to produce?"
+    options:
+      - "A prompt draft tried on two or three real calls"
+      - "Checkable success criteria for a good summary"
+      - "A comparison of which provider's model to use"
+      - "A dashboard design for monitoring the feature"
+    answer: 1
+    explain: "Every later step (the eval set, the fix loop, the go or no-go) measures against the success criteria, so they come first. Trying a prompt on a few calls is the 'it worked when I tried it' trap: without criteria you can't say whether it worked."
+  - q: "Your meeting-to-action-items feature sometimes assigns tasks to people who never spoke in the meeting. What's the strongest response?"
+    options:
+      - "Check owners against the transcript in the eval set"
+      - "Lower the temperature so it stops inventing names"
+      - "Use a larger model, which invents names less often"
+      - "Ask users to correct the owners after each meeting"
+    answer: 0
+    explain: "Turn the criterion into a code check so every eval run measures it, then fix the prompt (owner null when nobody is named) and rerun the whole set. A lower temperature or a bigger model might help, but without the check you can't tell, and leaving the fix to users ships the bug."
+  - q: "A few weeks after you turn the feature on for everyone, the provider slows down and 30% of calls hit your timeout fallback. Users see the plain message, so nobody complains. How should you find out?"
+    options:
+      - "A feedback button on every AI-generated result"
+      - "Rerunning the eval set against production weekly"
+      - "A weekly look at the fallback rate in the trace table"
+      - "Watching the provider's status page for incidents"
+    answer: 2
+    explain: "A good fallback hides the failure from users by design, so only your own logging shows it: one row per call with fallback status makes a jump to 30% obvious. Users rarely report a graceful message, and the eval set scores quality on fixed cases, not live timeouts."
+  - q: "A week after launch, one account has made 40,000 calls, most of them on the same transcript. Which two hardening steps were missing?"
+    options:
+      - "A cheaper model and a shorter prompt template"
+      - "A stricter JSON schema and a lower max_tokens"
+      - "A human approval gate and a feature flag"
+      - "A cache on repeat inputs and a per-user daily cap"
+    answer: 3
+    explain: "Identical inputs should be served from a cache, and a per-user cap stops one heavy user or a retry loop from multiplying calls. A cheaper model or shorter prompt lowers the price of each call, but you still pay 40,000 times."
+backupResources:
+  - label: "Build Your Own AI Agent – Full Course (OpenAI, LangChain, Render Deploy) — freeCodeCamp"
+    url: "https://www.youtube.com/watch?v=MnG0ugK2JAI"
+    type: "video · full build"
+  - label: "Anthropic — building with Claude (developer docs)"
+    url: "https://platform.claude.com/docs"
+    type: "docs · official"
+tags:
+  - capstone
+  - shipping
+  - applied-ai
+  - project
+---
+
+You've learned every piece; now ship one. The capstone isn't about a big app. It's about
+taking **one small AI feature all the way to production**, deliberately, using the whole
+pillar as a checklist. Small is the point: a modest feature that is measured, hardened and
+monitored teaches more, and proves more, than an ambitious demo that only works on a
+good day.
+
+## The end-to-end run
+
+1. **Define.** Pick one feature and write its **success criteria** before any code. Good
+   sizes: "draft a reply to each support ticket", "answer FAQs from our docs", "summarize
+   each client call". Each criterion should be something you can check, not a feeling.
+2. **Build.** The core is an **API call** with **prompts as code** (a versioned template,
+   not a string buried in a handler) and **structured outputs**. Add **RAG and embeddings**
+   if it needs your data (→ rag-fundamentals); add **tools or an agent loop** only if it
+   needs to *act* (→ build-agent-in-code).
+3. **Eval.** Make a small **eval set** and score the feature (→ evals-and-testing).
+   Iterate the prompt or model until it clears the bar you set in step 1.
+4. **Harden.** Add **cost caps and caching**, **timeouts and a deterministic fallback**,
+   and a **human-in-the-loop** gate for anything risky. Keep the **API key server-side**.
+5. **Deploy and monitor, with a mechanism, not vibes.** Ship behind a flag, then turn it on.
+   "Shipped" includes a minimal **trace table**: one row per call with prompt version,
+   input and output tokens, latency, and guardrail or fallback status (a database table, a
+   sheet, or a Langfuse project; → observability-tracing sets this up properly). If you
+   can't answer "what did yesterday's calls cost, and how many hit the fallback?", it
+   isn't monitored.
+
+## Worked example: meeting transcript → action items
+
+Here's one feature run through all five steps, so you can see the level of detail that
+counts as "done".
+
+1. **Define.** Success means: every item has an action and an owner; an owner must be a
+   name that appears in the transcript (no invented people); output is valid JSON; a
+   meeting with no action items returns an empty list; a one-hour transcript finishes in
+   under 15 seconds.
+2. **Build.** One server-side function loads prompt template `v1` from a file, wraps the
+   transcript in a clearly delimited block, and asks for a schema like
+   `{ items: [{ owner, action, due }] }`. The response is validated against that schema
+   before anything else touches it.
+3. **Eval.** Ten transcripts: six ordinary meetings, two with no action items, one where
+   someone says "somebody should look into this", and one very long one. Three checks are
+   code (schema valid, owner appears in the text, empty list where expected); one is your
+   own judgment on whether the items are right. Version 1 scores 7 of 10: it invents an
+   owner for "somebody should", and the long transcript times out.
+4. **Fix and rerun.** Prompt `v2` says "if nobody is named, set owner to null". You cap
+   transcript length and split longer ones into chunks. Rerun the *whole* set: 10 of 10.
+   Now you have evidence, not a hunch.
+5. **Harden.** Cache results by a hash of the transcript; skip empty input; after one
+   retry on a timeout or invalid JSON, fall back to a plain message ("Couldn't extract
+   action items for this meeting") instead of an error; key in a server secret; a per-user
+   daily cap; a feature flag that's checked on the call path.
+6. **Deploy.** Turn the flag on for yourself for a few days, watch the trace table, then
+   turn it on for everyone.
+
+None of those steps is clever. Together they're the difference between "it worked when I
+tried it" and a feature you can defend.
+
+> 💡 **Try it:** Before you build anything, open a blank note and write three success
+> criteria for your feature, each one checkable by code or by a yes/no judgment. If you
+> can't write them in five minutes, the feature isn't defined yet, and that's the most
+> useful thing you'll learn today.
+
+## Common failure modes
+
+- **It worked in the demo and breaks in week one** → it was only ever tried by hand on
+  friendly inputs → build the eval set *before* you show it to anyone, including edge
+  cases.
+- **A provider hiccup shows users an error page** → no timeout or fallback on the call
+  path → add both, and force a failure once to prove the fallback actually fires.
+- **A surprise bill** → no cost cap and no caching, so one heavy user or a retry loop
+  multiplies calls → add a per-user cap, cache repeat inputs, and check cost per call in
+  the trace table.
+- **The key leaks** → the model is called from browser or mobile client code → every model
+  call goes through your server, with the key in a server-side secret.
+- **Nobody knows if it's still good** → no tracing after deploy → log one row per call and
+  look at the fallback rate weekly.
+
+## Why this is the whole pillar
+
+Look at that list: it's every lesson, wired together. API calls, prompts, structured
+outputs, RAG, embeddings, agents, evals, cost control and a provider choice. A shipped
+feature is just these pieces, assembled with judgment.
+
+## Core done: the job-ready extras are next
+
+You can now **build AI yourself**: call models from code, give them your data, let them use
+tools, measure quality, control cost and ship. That's the core. The **Job-ready extras**
+module goes further into what applied-AI interviews tend to probe: fine-tuning judgment
+(→ fine-tuning-fundamentals), LLM system design (→ llm-system-design), observability,
+security and prompt injection, local models, and orchestration frameworks. The capstone
+proves you can build; the extras prove you can reason about the system around it.

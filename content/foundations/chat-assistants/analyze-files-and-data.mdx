@@ -1,0 +1,223 @@
+---
+title: "Analysing files and data"
+subtitle: "Spreadsheets, PDFs and charts with a chat assistant"
+summary: "Upload a spreadsheet or PDF, describe it before you ask, make the assistant inspect it first, and recompute one number before you trust any answer."
+changeNote: "New lesson: upload a spreadsheet or PDF, make the assistant inspect it first, and recompute one number yourself before you trust any answer."
+section: foundations
+pillar: chat-assistants
+order: 5
+level: beginner
+estMinutes: 18
+taskMinutes: 40
+prerequisites: [privacy-and-setup]
+reviewedOn: "2026-10-04"
+status: published
+video:
+  videoId: "0PzmVXPdkuk"
+  published: "2026-07-07"
+  year: 2026
+  minutes: 11
+  title: "I Gave ChatGPT a Messy Excel File. Here's What Happened"
+  channel: "Leila Gharani"
+  why: "Leila Gharani, a long-standing Excel educator, tests ChatGPT on an awkward sales workbook: transactions stored as codes, meanings spread across three lookup sheets, no formulas. She sets ground rules, makes it inspect the file first, asks for check numbers she can verify, cross-checks two business questions against her own model, and ends with a question the file cannot answer. Most tutorials show impressive charts from clean sample data; this one shows how to tell whether the answer is right. The last minute promotes her paid course."
+  notes:
+    - "Watch all 11 minutes; the last minute promotes her paid course, so you can stop when that starts."
+    - "She uses ChatGPT only. The same inspect-first, check-numbers workflow works in Claude and Gemini, and the lesson body covers how each one handles uploaded files."
+readAfter:
+  - label: "Data analysis with ChatGPT — OpenAI Help Center (file types, preparing spreadsheets, limits)"
+    url: "https://help.openai.com/en/articles/8437071-data-analysis-with-chatgpt"
+    kind: docs
+  - label: "Create and edit files with Claude — Claude Help Center (code execution and file uploads)"
+    url: "https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude"
+    kind: docs
+applyIt: |
+  Take a spreadsheet you already work with and run the first two steps of the video's workflow
+  on it: **inspect, then check numbers**. No analysis yet.
+
+  ```prompt
+  Before any analysis: describe this file back to me. What does one row represent? What does each
+  column mean, with units? How do the sheets connect? List anything I should know first: missing
+  values, duplicates, odd dates, totals rows mixed in with data.
+  Then give me 3 check numbers I can verify myself in the spreadsheet (for example a row count,
+  a date range, a column total), and tell me the exact formula I'd use to verify each.
+  If the file can't answer something, say so instead of guessing.
+  ```
+
+  Verify one of the three yourself with the formula it gave you.
+
+  **If you study:** use a dataset from a course, a lab results sheet or your own budget.
+  **At work:** use an export from a tool you use (sales, tickets, survey results), with names and
+  contact details removed first. **Otherwise:** a club membership list without the personal
+  columns, a fitness log, or a reading tracker.
+  Success: the assistant's description matches what you know about the file, and one check number matches your own formula exactly.
+toolkit: |
+  - **Save your "inspect first" prompt.** The guardrails from the video (method first, reconcile
+    totals back to the rows, say when the file can't answer) belong in a saved snippet or a
+    Project's instructions, so every analysis chat starts with them.
+  - **Keep a data dictionary next to files you reuse.** One short note per recurring file: what a
+    row is, what each column means, units, currency, known quirks. Paste it with the file, or keep
+    it in a ChatGPT or Claude Project or a Gemini Gem with the file.
+  - **Keep a scrubbed copy of sensitive sheets.** Same columns and structure, names replaced with
+    IDs, contact details removed, so the copy you upload can't expose anyone (→ privacy-and-setup).
+  - **Ask for the method, keep the method.** When an analysis works, ask for the formula or steps
+    it used and save them in your notes, so next month you can repeat it in the spreadsheet
+    without the assistant.
+recap:
+  - emoji: "🧩"
+    title: "Why this file is hard"
+    text: "The transaction sheet is just codes: product, customer and purchase type all have to be looked up on other sheets, and there are no formulas. The assistant has to join tables and do the maths itself, as you would."
+  - emoji: "🚧"
+    title: "Rules before questions"
+    text: "Leila skips 'analyze this' and sets guardrails: answer in chat, decode codes from the master sheets, explain the method first, reconcile totals back to the rows, and say so when the file can't answer."
+  - emoji: "🔎"
+    title: "Look before you leap"
+    text: "First prompt: inspect the workbook and report which sheets exist, how they connect, and any problems. It found a missing name and a duplicate transaction number before any analysis."
+  - emoji: "🔒"
+    title: "A warning mid-upload"
+    text: "Don't upload what you wouldn't hand to an outsider; anonymise it first, follow your company's AI rules, and check for hidden sheets."
+  - emoji: "✅"
+    title: "Agree on the easy stuff"
+    text: "Ask for three check numbers you can verify yourself (row count, date range, total sales) with the formula for each. If the basics don't match, don't trust the hard answers."
+  - emoji: "📊"
+    title: "Then the real questions"
+    text: "Regional sales and negative-margin products both matched her independent model exactly, and she asked for the margin formula so she could see how it got there."
+  - emoji: "🪤"
+    title: "The question with no answer"
+    text: "She asks which sales rep sold the most, though the file has no sales-rep column. A good run says the workbook can't answer that rather than inventing a name."
+task: |
+  Run the full workflow on a **public dataset**, so there's nothing private at stake. Download
+  one CSV or Excel file: your country's open-data portal, Our World in Data, or a sample dataset
+  from a course. Open it in a spreadsheet first and skim it.
+
+  1. Write a 4–6 line description: what a row is, the key columns and units, the time period,
+     and the question you want answered.
+  2. Upload it to ChatGPT, Claude or Gemini with your description and this prompt:
+
+  ```prompt
+  Rules for this chat: explain your method before each analysis, show the formula or code you
+  used, reconcile any grouped totals back to the row-level data, and if the file can't answer a
+  question, tell me instead of guessing.
+  Step 1: inspect the file and list any data problems. Step 2: give me 3 check numbers I can
+  verify in a spreadsheet, with the formula for each. Wait for my OK before analysing.
+  ```
+
+  3. Verify all three check numbers yourself in the spreadsheet.
+  4. Ask two real questions about the data and one it can't answer (a column that doesn't exist).
+     Recompute one answer yourself with a filter or pivot table.
+  5. Ask for a chart of one answer, with a title that states the finding and labelled axes with
+     units. Then run step 4 in a second assistant and compare the numbers.
+  Success: your three check numbers match, one real answer is recomputed by you and matches, and you've noted how the assistant handled the unanswerable question.
+selfCheck:
+  - q: "Your manager asks for last quarter's average order value. You upload the sales export and the assistant says £42.60. You have five minutes before the meeting. What do you check?"
+    a: "Ask how it computed it (total revenue ÷ number of orders, or the mean of a column?) and whether it filtered to last quarter and removed refunds, test orders and duplicates. Then recompute it yourself: filter the quarter, sum revenue, count orders, divide. If the two match, use it; if not, the difference usually reveals a filtering choice you need to make explicitly."
+  - q: "A colleague uploads 40 scanned invoice PDFs and asks for the total spend per supplier. The totals look plausible but one supplier's figure seems high. What's the likely cause?"
+    a: "Scanned PDFs are images, and assistants don't reliably read exact numbers from them, so a misread digit or a subtotal counted twice is likely. Spot-check that supplier's invoices against the extracted table, and for anything that matters use a text-based or spreadsheet export instead of scans."
+  - q: "You want help analysing a staff spreadsheet with names, salaries and performance ratings. Your company hasn't approved any AI tool. What do you do?"
+    a: "Don't upload it to a consumer account. Ask whether an approved tool exists; if you only need help with the method, upload a scrubbed or synthetic copy with the same columns and fake values, get the formulas or steps, and run them yourself on the real file."
+  - q: "The assistant's chart shows sign-ups doubling in March, and its summary says 'the March email campaign caused the spike.' The file has dates and sign-up counts only. What's wrong?"
+    a: "The file can show that sign-ups rose, not why. The campaign explanation is a guess that sounds like a finding. Keep the chart, delete the causal claim, and if the cause matters, look for evidence such as sign-up source data or a comparison with periods without a campaign."
+backupResources:
+  - label: "ChatGPT for Data Analytics — Full Tutorial — Luke Barousse"
+    url: "https://www.youtube.com/watch?v=8qWtU51lxpM"
+    type: "video · deeper dive"
+  - label: "Upload and analyze files in Gemini Apps — Google Help"
+    url: "https://support.google.com/gemini/answer/14903178?hl=en"
+    type: "docs · official"
+tags:
+  - chat-assistants
+  - data-analysis
+  - spreadsheets
+  - charts
+  - verification
+---
+
+Uploading a spreadsheet and asking a question in plain English is one of the most useful things a
+chat assistant can do for someone who doesn't code: totals by month, the five biggest customers,
+which products lose money, a chart for a slide. It pays off whenever the answer is sitting in a
+file you have but would take an hour of filters and pivot tables to get out. It also fails in a
+particular way: **the wrong number looks exactly like the right one.** This lesson is about getting
+the speed without inheriting that risk.
+
+## What happens when you upload a file
+
+There are two very different ways an assistant can handle your file, and the difference decides
+whether you can trust the numbers:
+
+- **It reads the file as text** and answers from what it sees, as it would with an essay. Fine for
+  "what is this document about?", unreliable for arithmetic over hundreds of rows.
+- **It writes and runs code** in a sandbox, usually Python, which loads the file, filters and
+  totals it, and draws charts. The calculation is then done by a program, and you can ask to see it.
+
+For any question with a number in the answer, you want the second. The big three all offer it, in
+different shapes:
+
+- **ChatGPT**'s data analysis runs Python in a notebook-style environment, can show the code and
+  tables it used, and draws charts, some of them interactive. OpenAI's own help page warns it may
+  not read exact values reliably from scanned or image-based tables.
+- **Claude** runs code in a sandbox too. The setting is currently called code execution and file
+  creation (an earlier version was called the "analysis tool"), and it can also produce Excel
+  files with working formulas.
+- **Gemini** analyses uploaded spreadsheets and CSVs and can chart them, and it also works inside
+  Google Sheets from a side panel. Google has also announced code execution for Gemini Notebook
+  (formerly NotebookLM).
+
+Plans, file-size limits and feature names change often, so check the current docs for whichever
+you use.
+
+## Describe the data before you ask
+
+An assistant sees column headers, not meaning. "Amount" could be pounds or units; "date" could be
+order date or ship date; a final row could be a total that doubles everything. Before your first
+question, tell it **what one row is, what the key columns mean with units, the time period, and
+any quirks you know about**. Then make it describe the file back to you and list problems before
+it analyses anything, as the video does. Clean structure helps too: one header row, one record
+per row, no merged cells or blank rows splitting the data.
+
+## Verify by recomputing one number
+
+The core habit: **pick one number from the answer and recompute it yourself** with a filter, a SUM
+or a pivot table. Start with easy ones (row count, date range, a column total) before you trust
+hard ones. If the easy numbers disagree, stop; something was misread. Also ask "explain the
+formula you used" for any metric: margin, growth, average. Many wrong answers are a reasonable
+formula that isn't the one you meant.
+
+## Charts
+
+Ask for a specific chart: type, what goes on each axis, units, and a title that states the finding
+("Online sales overtook in-store in Q3"), not just "Sales by channel". Check the axis starts at
+zero for bar charts and that the categories add up to the total you verified. A chart is a
+picture of the analysis; it inherits every error in it.
+
+## Worked example: a small shop's year of orders
+
+A shopkeeper uploads a CSV of 2,400 orders and writes: "Each row is one order. Amount is in euros
+including VAT. Status can be paid, refunded or test. Question: which month had the highest paid
+revenue?" The assistant inspects the file and reports 37 test orders and 3 rows with no date. They
+ask for check numbers: row count, first and last date, total paid revenue. They match the
+spreadsheet. The answer comes back as November; the shopkeeper recomputes November's paid total
+with a filter and gets the same figure, then asks for a bar chart of paid revenue by month. Fifteen
+minutes, and every number is one they can defend.
+
+> 💡 **Try it:** upload any spreadsheet and ask only "How many rows of data are there, and what
+> does one row represent?" Compare it with what you know. If it's wrong, every later answer would
+> have been wrong too.
+
+## Common failure modes
+
+- **Totals are slightly off** → a totals row, duplicates or test data were counted → describe the
+  quirks and ask it to reconcile grouped totals back to the rows.
+- **Numbers from a PDF don't match the document** → the table was a scan or a complex layout →
+  use a spreadsheet or text-based export, and spot-check extracted values.
+- **It answers about part of the file** → the file was too large or had several sheets or hidden
+  ones → ask which sheets and rows it used, or split the file.
+- **A confident "why" appears** → the model explained a pattern the data can't explain → keep
+  the finding, drop the cause unless you have evidence (→ verification-and-grounding).
+
+## What not to use it for
+
+Don't upload what you're not allowed to share: customer records, staff data, health or financial
+details about real people, or anything under a confidentiality agreement. Check your
+organization's approved tools, and use a scrubbed copy when you only need the method
+(→ privacy-and-setup). Don't let it make the decision: it can tell you which product lost money,
+not whether to drop it. And for a report you'll repeat every month, take the method out of the
+chat and into the spreadsheet (→ analytics-reporting).

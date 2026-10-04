@@ -1,0 +1,252 @@
+---
+title: "Choosing models & providers (build-time)"
+summary: "Choose between a managed API and a self-hosted open model on quality, privacy, cost and latency, and keep the provider swappable."
+changeNote: "New video: a seven-minute developer guide to choosing an LLM, plus a break-even worked example, a failure-modes list and a quick check that a model swap is a one-line change."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 10
+level: advanced
+estMinutes: 15
+taskMinutes: 40
+prerequisites: [calling-an-llm-api, evals-and-testing, cost-latency-caching]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "pYax2rupKEY"
+  published: "2025-05-14"
+  year: 2025
+  minutes: 7
+  title: "How to Choose Large Language Models: A Developer's Guide to LLMs"
+  channel: "IBM Technology"
+  why: "Cedric Clyburn of IBM Technology walks a developer through picking an LLM for an app: proprietary versus open models, public leaderboards as a starting point on quality and cost, then testing candidates on your own data and task. In about seven minutes it covers the criteria this lesson turns into a decision, with your own test outranking anyone's leaderboard. IBM sells its own Granite models and mentions them, but the method doesn't depend on them."
+  notes:
+    - "For a longer, newer walkthrough of price, speed, context limit and open versus closed weights, watch the GRAPH Courses video first in the backups."
+    - "The BentoML handbook chapter below goes deeper on managed API versus self-hosting. BentoML sells inference infrastructure, so it has a stake in self-hosting, but it's candid that the answer changes with scale."
+readAfter:
+  - label: "Serverless vs. self-hosted LLM inference — BentoML's LLM Inference Handbook"
+    url: "https://bentoml.com/llm/llm-inference-basics/serverless-vs-self-hosted-llm-inference"
+    kind: docs
+applyIt: |
+  Take ten minutes to find out how hard a provider swap would be for you today. The goal is
+  the one-wrapper rule: model name, endpoint and SDK in exactly one place. In a repo that calls
+  a model (or the one you're about to add a model to), ask your coding agent (Claude Code,
+  Cursor, Codex, Copilot agent mode):
+
+  ```prompt
+  List every place this repo imports a model provider's SDK or hardcodes a model name,
+  endpoint or base URL. Group them by file. Don't change anything.
+  ```
+
+  Count the call sites and write one line: the single place a swap *should* touch, and what
+  you'd move there. **If you don't code yet:** take an AI tool your team uses and fill four
+  lines: what data it sends out, what it costs per month at your usage, what you'd switch to if
+  it raised prices, and how hard that switch would be.
+
+  Success: you know how many places a swap would touch today, and you can name the one it should touch.
+toolkit: |
+  - **Write your defaults down.** Add a short "models" section to your instruction file
+    (AGENTS.md, CLAUDE.md, `.cursor/rules`, Copilot instructions): which managed API is your
+    default for features, which cheaper tier handles easy tasks, and when data must stay local.
+    Your coding agent then stops guessing a provider every time it writes a model call.
+  - **Never hardcode a provider into a prompt, script or automation.** Keep the model name in one
+    config value or environment variable, so a swap is a one-line change. Gateways like LiteLLM
+    or OpenRouter give you this across providers.
+  - **Reserve open/local for data that can't leave the machine.** Client files, medical or HR
+    data, anything under an NDA: that's the case where a local model (Ollama, LM Studio) beats
+    the API at personal volumes (→ local-open-models).
+  - **Let your eval set pick, not the marketing.** Save your eval cases as a reusable file and
+    rerun them against any model you're tempted to switch to; scores decide (→ evals-and-testing).
+recap:
+  - emoji: "🍴"
+    title: "The builder's fork"
+    text: "Putting a model in an app is an architecture decision, managed API or self-hosted, that shapes cost, privacy and control for the life of the product."
+  - emoji: "☁️"
+    title: "The sensible default"
+    text: "A managed API: top quality, no infrastructure, pay per token, and your data leaves your servers. It's the right call for most features."
+  - emoji: "🏠"
+    title: "What running it yourself buys"
+    text: "An open model (Qwen, Llama, Gemma, DeepSeek…) on your own hardware keeps data in-house and gives you control, at the price of operating it."
+  - emoji: "📊"
+    title: "Who decides on quality?"
+    text: "Your eval set, not the marketing pages. Run it against two or three candidates and let the scores decide."
+  - emoji: "💰"
+    title: "When the bill flips"
+    text: "Self-hosting is a fixed monthly cost plus engineering time; an API is per token. Only high, steady volume tips it, and only if the open model passes your evals."
+  - emoji: "🔓"
+    title: "A gap that narrowed"
+    text: "Open-weight models have closed much of the quality gap on many tasks, so the fork is now a real decision, not a foregone conclusion."
+  - emoji: "🔌"
+    title: "Surviving next month's price change"
+    text: "Send every call through one wrapper or a gateway like LiteLLM or OpenRouter, so swapping provider is a one-line change instead of a rewrite."
+task: |
+  Let an eval set, not a marketing page, pick the model. Take one AI task from your project or
+  work (summarize a support ticket, extract fields from an invoice, draft a reply) and write 10
+  test inputs with a pass rule for each (or reuse the set from → evals-and-testing). Then run
+  them against TWO candidate models on identical inputs:
+
+  ```prompt
+  Here are 10 test inputs and the pass criteria for each. For each input, produce the output
+  my feature should produce. [paste the inputs + criteria]
+  ```
+
+  **No-code path:** paste the same prompt into two free chat tools (e.g. a fast/cheap tier and a
+  frontier tier in ChatGPT, Claude or Gemini, or two models in Google AI Studio or OpenRouter's
+  playground) and grade each output pass/fail yourself. **If you code:** call both models from a
+  small script and log tokens and latency per call. Put it in a table (passes, rough cost per
+  call from the provider's price page, latency) and declare a winner on quality first, then
+  cost. Write one line on which you'd ship and why.
+
+  Success: a two-model scorecard where the choice is justified by eval scores, not vibes.
+selfCheck:
+  - q: "A clinic-software team wants AI summaries of patient notes. Compliance says the notes can't go to a third-party API; an engineer says open models are 'just worse'. How do you settle it?"
+    a: "Privacy is a hard constraint, so it removes the public API (unless a provider can run the model inside an environment and contract compliance approves). Then let evidence settle quality: run the eval set against two or three open models you could host. If none clears the bar, shrink the feature's scope rather than break the constraint."
+  - q: "Your app calls a model SDK directly in fourteen places, and the provider announces a big price rise next month. What went wrong, and what do you do first?"
+    a: "There's no single wrapper, so a provider swap is a rewrite. First fold every call behind one interface or a gateway with the model name in config, *then* rerun your eval set on cheaper candidates and switch with a config change."
+  - q: "A feature makes about 500 calls a day, and a teammate wants to self-host an open model 'to save money'. What do you ask before agreeing?"
+    a: "Ask for the arithmetic: monthly API spend at that volume (calls × tokens × price) versus a GPU server plus the hours to run it. At low volume the API almost always wins, so unless privacy or offline use forces it, stay on the API and revisit when volume grows."
+mcq:
+  - q: "A new model tops a public leaderboard and costs 30% less than the one your feature uses. A teammate wants to swap it in today. What do you do first?"
+    options:
+      - "Swap it, since a top leaderboard rank means quality"
+      - "Try it by hand on a few real inputs, then swap"
+      - "Wait a month for other teams to report on it"
+      - "Run your own eval set on it and the current model"
+    answer: 3
+    explain: "Leaderboard tasks aren't your task, so only your own eval set, run on both models, shows whether quality holds on your inputs. Trying a few inputs by hand feels like testing but is the 'looked fine once' trap; scores on the same set are evidence."
+  - q: "Your company keeps all data inside its own cloud account and won't let it cross that boundary, but nobody on the team can run GPU servers. Which option fits?"
+    options:
+      - "A frontier model served inside your cloud account"
+      - "Self-hosting an open model on rented GPU servers"
+      - "A local model on each employee's own laptop"
+      - "The provider's public API with training turned off"
+    answer: 0
+    explain: "The big clouds (Amazon Bedrock, Google Vertex AI, Azure) run frontier models inside your own account, so you keep the data boundary without operating GPUs. Self-hosting also meets the boundary but needs the operations work you can't staff, and a public API's training setting doesn't keep the data inside your account."
+  - q: "Your back-of-envelope arithmetic says self-hosting an open model now beats the frontier API at your volume. Before you commit, what check must you not skip?"
+    options:
+      - "Whether self-hosting also cuts your latency"
+      - "Whether a cheap API tier also passes your evals"
+      - "Whether the open model tops a public leaderboard"
+      - "Whether the GPU can handle your average load"
+    answer: 1
+    explain: "If a small, cheap API model passes your evals at a fraction of the flagship's price, the API stays cheaper for much longer, so compare against the cheapest model that passes. Sizing for average load is the other trap: the server must carry your peak and costs money while idle."
+  - q: "Your feature's only provider has a three-hour outage, and the feature is down the whole time. Your calls already go through a gateway. What's the fix?"
+    options:
+      - "Add retries with longer backoff to ride it out"
+      - "Pin the model version so it can't change on you"
+      - "Configure a second provider plus a fixed fallback"
+      - "Move every call onto a self-hosted open model"
+    answer: 2
+    explain: "One provider with no fallback is a single point of failure; with a gateway, a second model or provider is a config change, and a deterministic fallback covers the case where both fail. Retries with backoff ride out brief blips, not a three-hour outage."
+backupResources:
+  - label: "Which LLM Should You Use For Building AI Applications — The GRAPH Courses (20 min: performance, price, speed, context, open vs closed weights)"
+    url: "https://www.youtube.com/watch?v=YwkvZnbE7R8"
+    type: "video · model picking"
+  - label: "API vs Self-Hosted LLMs: Which Should You Choose? — CodeLucky (4-minute overview)"
+    url: "https://www.youtube.com/watch?v=aATp2cjM-qw"
+    type: "video · API vs self-hosted"
+  - label: "Artificial Analysis — provider/model price, speed & quality leaderboard"
+    url: "https://artificialanalysis.ai"
+    type: "tool · live comparison"
+tags:
+  - models
+  - providers
+  - open-source
+  - applied-ai
+---
+
+Back in the *AI mental models* pillar you chose models as a *user* (which chatbot to
+open). This is the *builder's* version: when you put a model inside an app, you make an
+**architecture decision** (managed API or self-hosted) that affects cost, privacy and
+control for the life of the product. Decide it on purpose now, because migrating later is
+far more expensive than choosing well once.
+
+## The fork: API vs self-hosted
+
+- **Managed API** (Anthropic, OpenAI, Google, Mistral and others). Easiest to build on,
+  top-tier quality, no infrastructure to run. You **pay per token**, and your data is sent
+  to the provider. This is the right default for most features.
+- **Open-weight, self-hosted or local** (Qwen, DeepSeek, GLM, Llama, Gemma, Mistral…). You
+  run the model on your own server, a rented GPU or even a laptop. You get **privacy,
+  control and a fixed cost** (no per-token fee) at the price of operating it. Open-weight
+  models have closed much of the quality gap on many tasks, which makes this a genuine
+  option rather than a hobby.
+
+There's a middle ground worth knowing. Hosting providers (Together, Fireworks, Groq,
+OpenRouter and similar) serve open models through an ordinary API, and the big clouds
+(Amazon Bedrock, Google Vertex AI, Azure) run frontier models inside your own cloud
+account. You get open-model prices, or your cloud's data boundaries, without running GPUs.
+
+## Decide on four axes
+
+1. **Quality.** Does the task need a frontier model, or is "good enough" fine? The
+   tiebreaker is **your eval set** (→ evals-and-testing): run it against two or three
+   candidates and let the scores decide, not the marketing pages or a leaderboard.
+2. **Privacy and compliance.** Can this data leave your servers at all? If it can't, the
+   decision is mostly made for you, before you look at cost.
+3. **Cost at scale.** Per-token API versus fixed infrastructure plus engineering time. A
+   self-hosted model costs money every hour it runs, busy or idle, and someone has to
+   patch, monitor and upgrade it. Most side projects and early products sit far below
+   the volume where that pays off.
+4. **Latency and control.** Self-hosting can cut network round trips and lets you pin a
+   model version that never changes under you. An API provider can update or retire a
+   model on its own schedule.
+
+Take them in that order. Privacy is a gate, quality is the first score, cost only matters
+between options that already pass, and latency breaks ties.
+
+## Worked example: break-even on the back of an envelope
+
+Say you're adding a "summarize this support ticket" feature. Each call sends about 1,500
+input tokens and gets back about 200 output tokens, and you expect 20,000 calls a day. The
+prices below are **made-up round numbers** to show the arithmetic, so use real price pages
+when you do this for real.
+
+1. **Monthly tokens.** 20,000 × 1,500 × 30 ≈ 900 million input tokens; 20,000 × 200 × 30 ≈
+   120 million output tokens.
+2. **API cost.** Pretend the API charges $1 per million input tokens and $4 per million
+   output. That's $900 + $480, about **$1,380 a month**.
+3. **Self-hosted cost.** Pretend a rented GPU server that can carry your *peak* load costs
+   $1,500 a month, plus a few hours of engineering time every month. That's already more
+   than the API, before you count the hours.
+4. **Scale it.** At five times the volume the API bill is about $6,900, while one or two
+   servers might still cope. Now self-hosting deserves a serious look, *if* an open model
+   passes your evals.
+5. **Check the cheap tier.** If a small, cheap API model also passes your evals at a tenth
+   of the price, the API stays cheaper for far longer. Quality first, then cost.
+
+The numbers aren't the lesson; the method is. Write the formula down, plug in real prices
+and real traffic, and redo it whenever either changes a lot.
+
+> 💡 **Try it:** Pick a feature you have or want. Estimate tokens per call (a token is
+> roughly three-quarters of an English word) and calls per day, open one provider's price
+> page, and compute the monthly bill on a cheap tier and a frontier tier. Five minutes of
+> arithmetic tells you which side of the fork you're on.
+
+## The rule that saves you: don't lock in
+
+Models and prices change every month. So **route every LLM call through one wrapper.**
+Then switching provider, upgrading a model, or sending easy tasks to a cheap model is a
+one-line change, not a rewrite. The standard implementation is a **routing gateway**,
+such as LiteLLM (open source) or OpenRouter (hosted): one API surface in front of many
+providers, with per-model routing, fallbacks and spend tracking. A single model-client
+module in your own app is the same idea at app scale. Vendor neutrality isn't just a
+principle here; it's good architecture.
+
+## Common failure modes
+
+- **Quality drops the week you switch models** → you picked from a leaderboard, and
+  leaderboard tasks aren't your task → rerun your own eval set on every candidate before
+  any swap.
+- **A provider change takes a week** → model names and SDK calls are scattered through the
+  codebase → put them behind one wrapper or gateway, with the model name in config.
+- **The self-hosted bill beats the API bill** → volume is below break-even and you're
+  paying for idle peak capacity → go back to the API until the arithmetic says otherwise.
+- **Legal blocks the release late** → nobody asked where the data goes → ask the privacy
+  question first, and read the provider's data-retention and training terms.
+- **One outage takes the feature down** → a single provider with no fallback → configure a
+  second model or provider in the gateway, plus a deterministic fallback response.
+
+You now have the full applied-AI toolkit: API calls, prompts as code, structured outputs,
+RAG, embeddings, agents, MCP, evals, cost control and deployment choices. Time to put it
+together and **ship something** (→ capstone-ship-ai-feature).

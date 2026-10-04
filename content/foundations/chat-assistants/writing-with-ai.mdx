@@ -1,0 +1,232 @@
+---
+title: "Writing and editing with AI"
+subtitle: "Draft faster without losing your voice or your thinking"
+summary: "Outline first, edit in passes, teach an assistant your voice from real samples, and keep the thinking, the facts and the credit yours."
+changeNote: "New lesson: outline first, edit in one-dimension passes, build a style guide from your own samples, and keep the argument, the facts and the credit yours."
+section: foundations
+pillar: chat-assistants
+order: 4
+level: beginner
+estMinutes: 22
+taskMinutes: 40
+prerequisites: [prompting-in-2026]
+reviewedOn: "2026-10-04"
+status: published
+video:
+  videoId: "TUfGJY7gRxw"
+  published: "2025-08-26"
+  year: 2025
+  minutes: 15
+  title: "How to Build Your AI Writing System: The FULL Walkthrough"
+  channel: "Tiago Forte"
+  why: "Tiago Forte, author of Building a Second Brain, builds a reusable writing setup: samples of your own writing become a style guide with an example and counter-example per rule, the rules get ranked, the assistant interviews you for your argument before it drafts, and each edit becomes a new rule. Most 'write in your voice' videos stop at pasting one sample; this one shows the feedback loop that improves the voice over time, and he admits it halved his work rather than replacing it."
+  notes:
+    - "He works in Claude's Projects; the same setup fits a ChatGPT Project or a Gemini Gem."
+    - "He lets the assistant draft more than this lesson recommends for coursework, so the body adds outline-first drafting, feedback-only editing and the integrity rules."
+readAfter:
+  - label: "A Student's Guide to Writing with ChatGPT — OpenAI (vendor guide; the habits apply in any assistant)"
+    url: "https://openai.com/chatgpt/use-cases/student-writing-guide/"
+    kind: article
+applyIt: |
+  Take one piece of writing you've already drafted this week and get **feedback without a
+  rewrite**: the assistant diagnoses, you decide and you type the changes.
+
+  ```prompt
+  Here is a draft I wrote: [paste it]. It's for [audience] and its job is to [goal, e.g.
+  "get a yes to a meeting" or "argue that X"]. Do NOT rewrite it. Instead:
+  1. Give me the one-sentence point you think it makes. If that's not my point, the draft is unclear.
+  2. List the 3 biggest problems, most important first: structure, then clarity, then tone.
+  3. For each, quote the sentence and say why it's a problem, without fixing it.
+  4. Mark anything that reads as a factual claim I should be able to source.
+  ```
+
+  Fix the top problem yourself, then paste the new version and ask "did that fix it?"
+
+  **If you study:** use a paragraph from a current assignment and check your course's AI policy
+  first; feedback is allowed far more often than generated text. **At work:** use a report
+  section, a proposal or an email you'd normally send to a colleague for a once-over.
+  **Otherwise:** a cover letter, a club newsletter or a long message you've been putting off.
+  Success: the draft got better and every changed sentence is one you wrote.
+toolkit: |
+  - **Save a voice note in your custom instructions.** Five or six lines on how you write
+    (sentence length, words you never use, how formal you are) in ChatGPT's or Gemini's custom
+    instructions or Claude's profile preferences, so every chat starts closer to you.
+  - **Keep a writing Project or Gem with your samples.** A ChatGPT or Claude Project, or a Gemini
+    Gem, holding 3–5 pieces you're proud of plus your style notes, so drafting and editing happen
+    in one place that already knows your voice.
+  - **Keep two saved prompts: "feedback only" and "edit pass".** One that diagnoses without
+    rewriting, one that edits a single dimension (structure, clarity or tone) and lists every
+    change it made. Paste whichever the moment needs.
+  - **Add a disclosure line to your templates.** For coursework or client work, keep a ready
+    sentence ("AI was used for outline feedback and copy-editing; all arguments and sources are
+    my own") so disclosing is one paste, not a decision.
+recap:
+  - emoji: "📚"
+    title: "Where the voice comes from"
+    text: "Start from your own writing: Tiago used 20 recent essays, and suggests 5 to 10 samples or whatever you have. Pick pieces that sound like you now."
+  - emoji: "📏"
+    title: "Rules you can see"
+    text: "Ask the assistant to turn the samples into a style guide, then make it add an example and a counter-example for every rule. Abstract descriptions don't change the output; concrete ones do."
+  - emoji: "🥇"
+    title: "Too many rules, no order"
+    text: "A long guide gives the assistant no sense of what matters. Have it rank the rules in each section from essential to optional, so the top ones win when they conflict."
+  - emoji: "🎤"
+    title: "Before a single word"
+    text: "Add an implementation guide: the assistant asks you, one question at a time, for your topic, your central point and your angle before it drafts. Without that it writes confidently about nothing in particular."
+  - emoji: "🗂️"
+    title: "A home for the system"
+    text: "Save the style guide into a Project's knowledge, so every new piece starts from it instead of a blank chat."
+  - emoji: "⏳"
+    title: "The honest time saving"
+    text: "His real piece still needed his reading, notes and decisions: roughly half the work, not all of it. The judgement stayed his."
+  - emoji: "🔁"
+    title: "When a line sounds wrong"
+    text: "Don't just fix a cliché by hand. Tell the assistant why it's wrong and have it write a new rule into the guide, so the same mistake is less likely next time."
+task: |
+  Build a small **voice kit** and use it on one real piece, outline first. Use ChatGPT, Claude or
+  Gemini (free tiers are fine).
+
+  1. Collect 3–5 things you've written that sound like you (emails, posts, essays, reports).
+     Remove other people's names and anything confidential.
+  2. Paste them in with this prompt:
+
+  ```prompt
+  These are samples of my writing. Write a one-page style guide of how I write: sentence length,
+  vocabulary, structure, how I open and close, level of formality. For every rule give one
+  example from my samples and one counter-example of what I would never write. Rank the rules
+  in each section from most to least important.
+  ```
+
+  3. Pick a real piece you need to write this week. Write a 5–8 bullet outline **yourself**,
+     then ask the assistant to critique only the outline (missing steps, weak order).
+  4. Write or dictate a rough draft from your outline. Then run three separate passes, each in its
+     own message: structure, then clarity, then tone against the style guide. Ask it to list
+     every change and accept only the ones you agree with.
+  5. Find one sentence that doesn't sound like you, tell the assistant why, and have it add a
+     rule to the guide. Save the guide in a Project, a Gem or your notes.
+  Success: you have a one-page style guide with examples and counter-examples, and a finished piece whose argument came from your outline.
+selfCheck:
+  - q: "A classmate asks an assistant to 'make my essay better', pastes the result in and submits it. The course allows AI for feedback only. What went wrong, and what should they have done?"
+    a: "'Make it better' invites a rewrite, so the submitted words are the assistant's, which breaks the course rule and leaves them unable to defend sentences they didn't write. They should have asked for feedback only (problems quoted and explained, no new text), made the fixes themselves, and disclosed the AI use if the course asks for it."
+  - q: "You ask an assistant to tighten a report and it comes back sounding polished but generic, with phrases like 'in today's fast-paced landscape'. Name the cause and two fixes."
+    a: "It had no picture of your voice, so it fell back on the average of what reports sound like. Fixes: give it 2–3 samples of your writing (or a style guide with counter-examples), and ask for one dimension at a time with a list of changes, instead of an open-ended 'improve this'."
+  - q: "During a clarity pass the assistant adds 'a study found that 70% of managers prefer short emails' to your memo. You never gave it that figure. What do you do?"
+    a: "Treat it as unsourced. Either find the original study and check the number, wording and date, or delete the sentence. An editing pass should never add facts, so tell it: 'Don't add claims, numbers or examples I didn't give you.'"
+  - q: "Your manager asks whether the proposal you sent was written by AI. You outlined and argued it yourself and used an assistant for structure feedback and copy-editing. How do you answer?"
+    a: "Plainly and specifically: you wrote the argument and outline, and used an assistant for feedback on structure and a copy-edit, and you checked every fact. Specific disclosure builds trust; vagueness in either direction ('no' or 'AI wrote it') misleads."
+backupResources:
+  - label: "How Smart Academics Use AI (Without Breaking the Rules) — Andy Stapleton"
+    url: "https://www.youtube.com/watch?v=no0Tt-Ip9AI"
+    type: "video · academic integrity"
+  - label: "I Trained AI to Write Like Me — Tiago Forte (part 1 of the same series)"
+    url: "https://www.youtube.com/watch?v=vlc_enCxaJE"
+    type: "video · voice"
+tags:
+  - chat-assistants
+  - writing
+  - editing
+  - voice
+  - academic-integrity
+---
+
+Writing is where most people first use a chat assistant, and where most people use it worst:
+"write me an email about X" produces something fluent, generic and slightly off. The skill in this
+lesson is the reverse. **You keep the thinking (the point, the argument, the facts) and hand the
+assistant the friction**: critiquing an outline, catching unclear sentences, matching a tone. It
+pays off on anything you write repeatedly or anything that matters: reports, proposals, cover
+letters, essays, long emails.
+
+## Outline first, then draft
+
+The most useful prompt in writing comes before any prose: **write the outline yourself**, five to
+eight bullets with your point and the order you'll make it in, then ask the assistant to critique
+it. "What's missing? What would a sceptical reader object to? Which bullet is doing two jobs?"
+This is where AI saves the most time, because a structural problem found in an outline costs one
+minute to fix and a structural problem found in a finished draft costs an hour.
+
+Then draft from your outline, typed or dictated, rough is fine. If you let the assistant write the
+first draft from a one-line request, it has to invent the argument, and you end up editing its
+thinking instead of yours.
+
+## Edit in passes, one dimension at a time
+
+"Improve this" asks for everything at once, so you get a rewrite you can't evaluate. Separate passes
+work better:
+
+1. **Structure:** does each paragraph do one job, in the right order? Ask for a reverse outline:
+   one line per paragraph saying what it does.
+2. **Clarity:** which sentences would a newcomer misread? Ask it to quote them and say why.
+3. **Tone:** does it sound like you, and right for this reader? This pass needs your voice
+   (next section).
+
+Ask for a **list of changes** with each pass, and accept them one at a time.
+
+## Teach it your voice with examples
+
+Descriptions like "friendly but professional" barely move the output. **Examples do.** Paste two
+to five samples of your own writing and ask the assistant to describe how you write, with an
+example and a counter-example for each rule, which is the method in the video. Save the result in
+a Project or Gem so you don't rebuild it every time, and add a rule whenever you catch a sentence
+that doesn't sound like you. This is the general prompting principle of showing rather than
+telling (→ prompting-in-2026), applied to style.
+
+## Feedback versus rewrite
+
+Decide which you want before you ask, and say it in the prompt:
+
+- **Feedback** ("diagnose, don't rewrite; quote the problem and explain it") keeps every word
+  yours. It's the right default for coursework, anything you'll be assessed on, and anything you
+  want to get better at writing.
+- **Rewrite** ("rewrite this paragraph for a non-expert, then list what you changed") is fine for
+  low-stakes text where you only need the result, such as a routine notice or a first pass at a
+  product description, as long as you read it all and stand behind it.
+
+## How the three assistants handle it
+
+All three take samples, follow style notes and keep them in a reusable space: **Projects** in
+ChatGPT and Claude, **Gems** in Gemini. The differences are in the editing surface. ChatGPT and
+Gemini each have a **Canvas** side panel where you can edit a document alongside the chat and ask
+for changes to a selected passage. Claude offers saved writing **styles** you can build from your
+samples, and Gemini also sits inside Google Docs and Gmail for in-place help. These features move
+quickly, so check the current docs before you build a habit around one. On tone, people often find
+the three differ in their defaults, so if your first choice keeps sounding wrong after you've
+given it samples, try the same prompt in another (→ big-three-compared).
+
+> 💡 **Try it:** paste a paragraph you wrote and ask "Give me a reverse outline: one line per
+> sentence saying what it does. Don't change anything." Any sentence whose line says "repeats" or
+> "unclear" is your first edit.
+
+## Worked example: a project update email
+
+Say you need to tell a team that a deadline is moving.
+
+1. **Your outline:** what's moving and to when; why, in one sentence; what it changes for each
+   person; what you need from them by Friday.
+2. **Critique:** the assistant points out that readers will ask whether the budget changes too.
+   You add a bullet.
+3. **Your draft**, written fast from the outline.
+4. **Clarity pass:** it flags "pushed to the right" as jargon and a sentence with two dates in it.
+5. **Tone pass** against your style notes: it suggests cutting the apology from three sentences to
+   one. You agree with two of its four changes.
+
+Ten minutes, and the email says what you meant, in your words.
+
+## Common failure modes
+
+- **Everything sounds like a brochure** → no voice samples, open-ended request → give samples and
+  ask for one pass at a time.
+- **Your point quietly changes** → the rewrite optimised for smoothness → ask for feedback only,
+  then compare your one-sentence point with its summary.
+- **A statistic appears that you never wrote** → the model filled a gap with something plausible →
+  ban new claims in edit passes, and check or delete every added fact (→ verification-and-grounding).
+- **You can't explain a sentence when asked** → you accepted a rewrite unread → accept changes one
+  at a time, and only ones you could defend.
+
+## What not to hand over
+
+Three things stay yours. **The argument:** if the assistant decides what you think, the writing
+can't help you think. **The integrity call:** students, follow your course's AI rules exactly;
+they vary from banned to required-with-disclosure, and when unsure, ask. Never submit text you
+couldn't explain line by line, and disclose AI use where it's expected. At work, check whether
+clients or your employer have a policy too. **The facts:** anything the assistant adds is a claim
+to check, not a source. And keep confidential drafts out of consumer accounts (→ privacy-and-setup).

@@ -1,0 +1,192 @@
+---
+title: "Pricing & monetization"
+summary: "Price a product on the value it delivers, protect your margin from heavy AI usage, and design tiers customers understand at a glance."
+changeNote: "New: a guide to pricing models, a worked AI-cost example, ways to get paid without building billing, and a task that designs tiers under an AI cost ceiling."
+section: applications
+pillar: building-products
+order: 6
+level: intermediate
+estMinutes: 13
+taskMinutes: 40
+prerequisites: [tokens-and-context, add-ai-features]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "4XtFqrF246I"
+  published: "2025-12-13"
+  year: 2025
+  minutes: 8
+  title: "SaaS Pricing Strategies in 2026"
+  channel: "Codelevate"
+  why: "Made by Codelevate, a software agency that builds SaaS products for founders, so it reflects the pricing questions their clients bring. It's short and framed for current AI products, including how per-use AI costs strain the classic flat-subscription model, which most older pricing talks don't cover. An AI-SaaS monetization video is in the backups for concrete examples."
+applyIt: |
+  Test whether you can say why your price is your price. For a product you sell, plan to sell
+  or only imagine charging for (or a tool you pay for), list the two or three alternatives your
+  customer uses today (another tool, a spreadsheet, a freelancer, doing nothing) and what each
+  costs them in money and time. Then write the one-sentence value reason for your price and read
+  it to one person who'd buy.
+
+  **If you have users:** use what they actually switched from. **If it's still an idea:** label
+  each cost as an assumption and check it against two competitors' public pricing pages.
+
+  Success: one value sentence a buyer understood, with the alternatives' costs written beside it.
+toolkit: |
+  - **Keep a pricing rationale doc.** Write your price points and the one-sentence value reason
+    behind each into a doc or a ChatGPT or Claude Project's files, so every pricing conversation
+    with your assistant starts from your decision instead of re-deriving it.
+  - **Make the cost check a rule for every AI feature.** Add "estimate per-user AI cost and
+    compare it with the price" to your feature checklist template or custom instructions, so
+    margin is proven, not assumed (→ add-ai-features).
+  - **Give free side projects a monetization line.** One line in each project's notes ("if this
+    were paid, the tiers would be…") forces the value question before you over-build a free
+    thing.
+  - **Save a pricing-page critic prompt.** Store a reusable prompt, Custom GPT or Gem that reviews
+    any pricing page for anchoring, tier clarity and heavy-user risk, and run it on yours and on
+    competitors' pages.
+recap:
+  - emoji: "💰"
+    title: "Hobby or business?"
+    text: "A product that makes no money is a hobby, and price is the highest-leverage number you set. Get it roughly right and everything else gets easier."
+  - emoji: "💎"
+    title: "Where the number comes from"
+    text: "Charge for the outcome you deliver, not what it costs you to run. If your tool saves a client thousands, cost-plus pricing leaves most of that on the table."
+  - emoji: "🪜"
+    title: "Why offer three options"
+    text: "Good / better / best lets customers self-select and anchors the price. The middle tier quietly does most of the selling."
+  - emoji: "🔥"
+    title: "AI's twist on old maths"
+    text: "Unlike classic software, a heavy user burns real per-token money every time. Flat 'unlimited' pricing can quietly destroy your margins."
+  - emoji: "🛡️"
+    title: "Keeping the margin"
+    text: "Use usage-based tiers or credits, cap the generous plans, and lean on cheaper models plus caching. That's how the AI cost stays under the revenue."
+  - emoji: "📈"
+    title: "The cheap-price temptation"
+    text: "Low prices signal low value, attract the churniest customers and starve you of cash to improve. It's far easier to discount from a high price than to raise a low one."
+task: |
+  Design good/better/best pricing for your product, or a neutral example such as an AI
+  meeting-notes app for small teams, with the AI cost checked tier by tier. Run this in ChatGPT,
+  Claude or Gemini:
+
+  ```prompt
+  Design a good/better/best pricing page for [product: one-line description + who it's for].
+  Give three tiers: a lean entry tier, a middle tier deliberately built to be the one most
+  buyers pick (the anchor), and a premium tier for power users or teams. For each: name, price,
+  what's included, and a one-line value justification (the outcome it's worth, not what it
+  costs to run). The AI feature(s): [what they do, and roughly how often a typical and a heavy
+  user would trigger them]. For each tier, estimate the monthly AI cost of a typical and a heavy
+  user, set a per-user AI cost ceiling, show how the tier caps or meters usage, and say where
+  caching or skipping the model would cut cost. Label every number as an assumption.
+  ```
+
+  Check the per-call cost against your model provider's current pricing page. Then open the real
+  pricing page of one similar product and write down one thing it does that your draft doesn't
+  (an anchor, a usage limit, an annual discount).
+
+  Success: a three-tier draft where no tier loses money on a heavy user, a per-user AI cost
+  ceiling in real numbers, and one improvement borrowed from a real pricing page.
+selfCheck:
+  - q: "Your AI writing tool charges a flat monthly price for 'unlimited' generations. Revenue is growing but your model bill is growing faster. What's likely happening, and what do you change?"
+    a: "A small group of heavy users costs more than they pay. Look at cost per user, then add a usage cap or credits with an upgrade path, cache repeated work, and route simple requests to a cheaper model."
+  - q: "You priced your scheduling tool at $3/month 'to get users'. Signups are fine but customers churn and demand a lot of support. What went wrong?"
+    a: "The low price attracted the most price-sensitive buyers and signalled low value, while leaving no margin for support. Re-anchor on the value delivered (time saved, no-shows avoided), raise the price for new customers, and test it."
+  - q: "What should price be based on?"
+    a: "The **value** to the customer (the outcome it delivers), not your costs. Your costs set the floor, not the price."
+backupResources:
+  - label: "How I Built An AI SaaS In 2026 (3 Monetization Methods) — Mr. AI CASH"
+    url: "https://www.youtube.com/watch?v=btwzPbb77w0"
+    type: "video · examples"
+  - label: "Stripe — billing & pricing models (docs)"
+    url: "https://stripe.com/docs/billing"
+    type: "docs · reference"
+tags:
+  - building-products
+  - pricing
+  - monetization
+  - saas
+---
+
+A product that doesn't make money is a hobby. **Pricing** is where a product becomes a
+business, and it's the highest-leverage number you'll set. Get it roughly right and
+everything gets easier. None of this needs code: you can sell with a payment link and a
+spreadsheet long before you build billing.
+
+## Price on value, not cost
+
+The biggest mistake is pricing from *your* costs ("it costs me $2, I'll charge $5").
+Instead, price from the **value to the customer**: if your tool saves a small agency ten
+hours a month, the question is what those hours are worth to *them*. Your costs set a floor
+you must stay above. They don't set the price.
+
+A practical way in: list the two or three alternatives your customer uses today (another
+tool, a spreadsheet, a freelancer, doing nothing) and what each costs them in money and time.
+Your price should sit comfortably below the value you add and make sense next to those
+alternatives.
+
+## Choose a model
+
+- **Flat subscription**: one price, simple to sell. Risky when usage costs vary a lot.
+- **Tiers (good / better / best)**: an entry tier, a middle tier most buyers pick, a premium
+  tier for teams or power users. The middle option does much of the selling.
+- **Per seat**: price per user. Fits team tools.
+- **Usage-based or credits**: pay for what you use. Fits AI-heavy products.
+- **Hybrid**: a base subscription that includes an allowance, plus paid top-ups. Common for AI
+  products because it keeps the price simple while protecting margin.
+- **One-time**: templates, courses, small tools. Simple, but no recurring revenue.
+
+Then decide how people try it: a **free trial** (time-limited), a **free tier**
+(feature-limited, forever), or **no free option** with a refund policy. A free tier costs you
+real money if it includes AI calls, so cap it.
+
+## The AI twist: variable costs
+
+AI features cost you **per token**, so unlike classic software, **a heavy user costs you real
+money every time they use it.** Flat "unlimited" pricing can quietly destroy your margins. You
+need to know your cost per user before you set a price.
+
+## Worked example: a meeting-notes app
+
+All numbers here are illustrative assumptions; plug in current prices from your model
+provider's pricing page.
+
+1. **Price the action.** Summarizing one meeting uses roughly a transcript's worth of input
+   tokens plus a short output. Say that works out to about 3 cents with the model you've
+   chosen.
+2. **Model a typical user.** 20 meetings a month → about 60 cents of AI cost.
+3. **Model a heavy user.** 120 meetings a month → about $3.60. Still fine under, say, a $15
+   plan.
+4. **Add the risky feature.** "Ask anything across all your meetings" re-reads lots of text
+   per question. Say 10 cents a question; a heavy user asking 400 questions → $40. Now that
+   user costs more than they pay.
+5. **Fix the design, not just the price.** Include a monthly question allowance in each tier,
+   sell top-ups, cache answers to repeated questions, and use a cheaper model for simple
+   lookups (→ cost-latency-caching).
+6. **Write the ceiling down:** "AI cost per user must stay under X% of the plan price." The
+   percentage is your decision; having one is the point.
+
+## Getting paid without building billing
+
+**If you don't code,** you can still charge from day one. Stripe Payment Links, Gumroad, Lemon
+Squeezy and Paddle let you sell a subscription or product from a link. Merchant-of-record
+services (such as Paddle and Lemon Squeezy) also handle sales tax for you. Apps sold through
+the Apple and Google stores pay the store a commission, so include it in your maths.
+
+> 💡 **Try it:** open the pricing pages of two products you use. For each, write one line:
+> what's the anchor tier, and how do they limit heavy users? You'll start seeing the same
+> handful of patterns everywhere.
+
+## Common failure modes
+
+- **Margins shrink as you grow** → flat unlimited plan on a variable-cost feature → add
+  allowances, credits or caps.
+- **Lots of signups, almost no revenue** → a generous free tier with no reason to upgrade →
+  move one valuable limit (volume, seats, a key feature) behind the paid tier.
+- **Nobody picks the top tier, everyone picks the bottom** → tiers differ in features nobody
+  values → rebuild them around usage or outcomes buyers care about.
+- **You can't explain the price** → it came from costs or a guess → write the one-sentence
+  value reason, and test it on a real buyer.
+
+## Don't underprice
+
+Low prices signal low value, attract the churniest customers and starve you of the cash to
+improve. It's far easier to **discount from a high price** than to raise a low one. With a
+product that's built and priced, the last step is getting it in front of people: the launch.

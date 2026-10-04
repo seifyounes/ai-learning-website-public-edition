@@ -1,0 +1,315 @@
+---
+title: "Models & effort"
+subtitle: "Route the right brain to the job"
+summary: "Choose which model and how much thinking each job deserves, test the choice once, and stop paying flagship prices for routine work."
+changeNote: "New: a worked routing table for one week of real work, each tier matched to the fast and thinking modes in chat apps, and a common-failures list."
+section: foundations
+pillar: mental-models
+order: 4
+level: beginner
+estMinutes: 14
+taskMinutes: 30
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "pePAAGfh-IU"
+  published: "2024-02-09"
+  year: 2024
+  minutes: 8
+  title: "How to Pick the Right AI Foundation Model"
+  channel: "IBM Technology"
+  why: "Eight minutes on a selection framework rather than a ranking: match a model's size, cost, capability and deployment to the task in front of you. Rankings and prices go stale within months; a framework doesn't, which is why this beats the many 'best model right now' videos. It's made by IBM, which sells its own models and AI platform, but the framework itself is vendor-neutral."
+  notes:
+    - "It predates the second dial, reasoning effort (thinking modes and effort settings), so this lesson adds it."
+    - "Afterwards, run the framework live on the Artificial Analysis dashboard below, with today's models and prices."
+readAfter:
+  - label: "Artificial Analysis — live model comparison: quality, price, latency"
+    url: "https://artificialanalysis.ai/models"
+    kind: interactive
+  - label: "Claude Code — Model configuration (/model, effort levels)"
+    url: "https://code.claude.com/docs/en/model-config"
+    kind: docs
+  - label: "Anthropic — Extended thinking (the thinking-budget knob)"
+    url: "https://platform.claude.com/docs/en/build-with-claude/extended-thinking"
+    kind: docs
+applyIt: |
+  Your own work has task classes with wildly different difficulty — a rename is nothing like a
+  tricky data migration, a tidy-up email nothing like a contract review. Write the routing table
+  once, by hand, so you stop re-deciding every session. Ten minutes: list four or five task
+  classes you actually do, and give each a default tier (fast / middle / deep, using the models
+  you have) and an effort level (low → high), with a one-line why. Bias to the cheapest brain
+  that clears the bar; keep the deep tier and high effort for the riskiest rows.
+
+  **If you code:** include renames and copy tweaks, building a UI component from a design, a
+  database migration, and the riskiest logic in your project (money, permissions, exact numeric
+  rules). Save it as a "Model routing" section in your rules file (AGENTS.md, or CLAUDE.md /
+  GEMINI.md).
+
+  Success: a saved table where every task class you do maps to a (tier, effort) pair.
+
+  **If you don't code:** include "rewrite an email", "summarize a 40-page report", "analyze a
+  spreadsheet" and "plan a project", choosing between each app's fast and thinking modes, and
+  save it in your custom instructions or a notes file.
+
+  Success: a saved table, with the row you'll test in the task marked.
+toolkit: |
+  - **Pin your routing table where you'll see it.** Save the table from Apply it in your notes app,
+    or as the first lines of a Project or Gem you use daily: "rewrites and short emails → fast mode;
+    long reports → standard; anything with numbers or traps → thinking mode." Deciding once beats
+    re-deciding every chat.
+  - **Switch down before routine work.** Short, bounded jobs (reformat a list, tidy an email,
+    summarize notes) don't need the flagship. In ChatGPT, Claude or Gemini pick the fast model or
+    switch thinking off before you start, and switch it back on only for the hard row.
+  - **Route bulk passes cheap, judgment calls deep.** Repetitive sweeps (cleaning 200 spreadsheet
+    rows, tagging feedback, fixing formatting) go to the fast tier; a hard "is this plan still
+    right?" call earns the deep one. If you use an automation tool such as Zapier, Make or n8n,
+    set the cheap model in the template's AI step by default.
+  - **Treat fallback as a feature.** Plans and usage limits can drop you to a smaller model
+    mid-day; if most of your work is routed to the fast tier anyway, a fallback is a non-event.
+
+  **If you use a coding agent:**
+
+  - **Write the routing default into the instruction file.** One line in AGENTS.md, CLAUDE.md or
+    your Cursor or Copilot rules fixes accidental over-reach, e.g. *middle tier at medium effort by
+    default; deep tier + high effort only for architecture or cross-file refactors*, and switch
+    per session (`/model`, `/effort` in Claude Code, the model picker elsewhere).
+recap:
+  - emoji: "🎯"
+    title: "The first question to ask"
+    text: "There's no single best model — only the best one for the job in front of you. IBM's
+      first move is to describe the task's needs before you ever name a model."
+  - emoji: "🎛️"
+    title: "What to score models on"
+    text: "Score candidates on capability, cost, latency, context length, modality, and
+      deployment (open vs closed, on-prem vs API) — not on hype or a single headline score."
+  - emoji: "🐟"
+    title: "The flagship temptation"
+    text: "A smaller, well-fitted model can beat a flagship on your specific task, faster and
+      far cheaper. Reach for the giant only when the small one visibly fails."
+  - emoji: "📊"
+    title: "What leaderboards are for"
+    text: "Public leaderboards narrow the field; they don't decide it. The verdict is how a
+      model does on your own data and your own task."
+  - emoji: "🔓"
+    title: "Open weights or closed API?"
+    text: "Open-weights buy you control, privacy, and near-zero marginal cost; closed APIs buy
+      convenience and peak capability. Pick the side the task actually needs."
+  - emoji: "💰"
+    title: "The constraints people forget"
+    text: "Price-per-call and latency aren't afterthoughts — at volume they dominate the
+      decision. The cheapest model that clears your bar usually wins."
+  - emoji: "🔁"
+    title: "How long a pick lasts"
+    text: "The right pick drifts as models and prices shift monthly. The framework is durable;
+      the specific answer has a short shelf life, so revisit it."
+task: |
+  Stop guessing one routing decision and measure it. Take one real, bounded task from your own work
+  and run it **four ways** — fast tier vs deep tier, each at **low vs high effort**.
+
+  **If you code:** pick a function in your repo that has tests:
+
+  ```prompt
+  Refactor [function] in [file] for readability only — no behavior change. Keep every guard,
+  edge-case check and special case, or explicitly justify removing it. When done, run
+  [the test command] and report green or red.
+  ```
+
+  Run it four times, each in a fresh session, using your agent's model picker and reasoning
+  setting (in Claude Code, `/model` and `/effort`; in Codex, `/model` sets both; in Cursor and
+  Copilot, the model picker). Read each diff for
+  silently deleted checks: a guard that no test covers can vanish while every test stays green, so
+  green alone won't save you.
+
+  **If you don't code:** run one hard writing or analysis task (e.g. "find the three weakest
+  arguments in this proposal and explain why") four ways: the fast and the thinking model of your
+  assistant, each with and without extended thinking or a "think hard" instruction where the app
+  offers it.
+
+  Bar = tests stay green (or your written rubric passes) AND the result is genuinely better AND
+  nothing important was silently dropped. Keep the **cheapest cell that passes** as the route for
+  that whole class.
+  Success: four runs scored against one fixed bar, and the cheapest passing (tier, effort) recorded.
+selfCheck:
+  - q: "You're adding a feature that auto-tags every new support ticket with a category, on
+      every ticket, at scale. Which tier and effort — and why?"
+    a: "The fast, cheap tier (Claude Haiku, or a 'mini' or 'flash' model from OpenAI or Google)
+      at low effort. Tagging is a short, well-bounded classification firing at high volume, so you
+      optimize for price and latency; deep tiers and high effort are for the rare hard reasoning,
+      not per-event work."
+  - q: "A colleague says 'just always use the most powerful model with thinking on, for every
+      email, summary and reformat, so quality is never the problem.' What's wrong with that as a
+      default?"
+    a: "They wait many seconds and burn through their usage limit (or many times the price, on a
+      paid API) for work the fast mode clears instantly, and on simple jobs extra thinking can even
+      overcomplicate the answer. The right default is the smallest model at the lowest effort that
+      clears the bar, switching up only when the output visibly falls short."
+  - q: "A classmate's prompt for a thinking model opens with 'Let's think step by step' and they
+      swear by it. Their answers on a hard logic problem are still shallow. What do you suggest?"
+    a: "On reasoning models the phrase is mostly redundant, since they reason by default. The real
+      lever is the effort or thinking setting (a thinking mode in the app, `/effort` in Claude Code,
+      a thinking budget in the API), so raise that for the hard problem. The phrase still helps on
+      the cheapest non-reasoning models, where step-by-step isn't built in."
+  - q: "Your team has argued for a week about whether the meeting-summary feature needs the
+      expensive model. How do you settle it instead of debating?"
+    a: "Run the same 10–20 real meetings at two (tier, effort) points, score each output against a
+      concrete bar (a rubric, a checklist, or an LLM-judge you've spot-checked), and take the
+      cheapest pair that passes. Then hard-code that route for the whole task class instead of
+      re-deciding per call."
+mcq:
+  - q: "A prompt that summarized your weekly reports well for months starts producing worse summaries right after your provider updates the model. What do you do first?"
+    options:
+      - "Move it to the deepest tier at max effort to be safe"
+      - "Rewrite the whole prompt from scratch for the new model"
+      - "Re-run your saved test examples on the new version"
+      - "Wait a few weeks for the provider to fix the update"
+    answer: 2
+    explain: "Your route was tested on the old version, so re-running a small fixed set of real examples shows what actually changed and what the cheapest fix is. Jumping to the flagship at max effort spends money on a guess, and a rewrite before you know what broke may fix the wrong thing."
+  - q: "A ten-line task: check whether a discount formula in your pricing sheet can ever produce a negative price. It's short, so you send it to the fast tier at low effort. What's the flaw?"
+    options:
+      - "A wrong answer is costly, so it needs a deeper route"
+      - "Fast models can't read spreadsheet formulas at all"
+      - "Short tasks always need high effort to be precise"
+      - "None: short inputs are exactly what fast tiers are for"
+    answer: 0
+    explain: "Route by the cost of a mistake, not the length of the input: one missed edge case in pricing logic is expensive, which makes it a deep-tier, high-effort row. Short, low-risk work goes fast and cheap, but this task is short and high-risk."
+  - q: "You set effort to maximum for drafting short social media posts. They now take much longer and read as oddly convoluted. What do you change?"
+    options:
+      - "Switch to a bigger model at the same maximum effort"
+      - "Add 'keep it simple' and leave the effort at maximum"
+      - "Nothing: slower answers are the more thorough ones"
+      - "Lower the effort until the posts stop getting better"
+    answer: 3
+    explain: "On a simple task, extra reasoning can overthink the answer as well as slow it down, so drop the effort to the lowest level that still clears your bar. A bigger model at the same setting keeps the overthinking and raises the bill."
+  - q: "A newly released model tops a popular public leaderboard. Your team wants to move all its AI work to it tomorrow. What's the right step?"
+    options:
+      - "Switch now: leaderboard rank reflects real-world quality"
+      - "Run a sample of your own tasks on it before deciding"
+      - "Switch only if it's also the cheapest model available"
+      - "Ignore it and stay with the model the team already knows"
+    answer: 1
+    explain: "Leaderboards narrow the field; the verdict is how a model does on your own data and tasks, against your bar and budget. Ignoring new models is the opposite mistake, because the right pick drifts as models and prices change."
+backupResources:
+  - label: "LMArena (Chatbot Arena) — live, crowd-ranked model leaderboard"
+    url: "https://lmarena.ai"
+    type: "tool · live ranking"
+  - label: "Claude Code — Manage costs effectively"
+    url: "https://code.claude.com/docs/en/costs"
+    type: "docs · cost"
+tags:
+  - models
+  - model-selection
+  - reasoning-effort
+  - cost
+  - vendor-neutral
+---
+
+You don't have one AI — you have a dispatch board. The same job costs pennies or dollars,
+and lands in a second or a minute, depending on which brain you route it to and how hard you
+make it think. Picking well is two dials, not one lookup: **which model** and **how much effort**.
+
+## Two dials, not one "best model"
+
+The beginner move is to hunt for the single best model and send everything to it. Dead end.
+There's a best model *per task*, and the real control surface is two knobs: **tier** (which
+brain) and **effort** (how hard it thinks). Provider is a third, slower-moving knob.
+
+The universal waste is routing every task to the flagship at maximum effort. Deep models cost
+many times more and run noticeably slower — pure loss on work a small model clears instantly.
+
+## Dial 1 — tier: the smallest brain that clears your bar
+
+Every provider ships a range, and the names change often enough that you should learn the
+*shape*, not the version numbers:
+
+- **Fast and cheap:** Claude's Haiku, OpenAI's "mini" models, Google's Gemini Flash family.
+- **Capable middle:** Claude's Sonnet, the standard GPT model in ChatGPT, Gemini Pro on everyday
+  settings.
+- **Deep and pricey:** Claude's Opus, the thinking or "pro" modes in ChatGPT and Gemini.
+
+The question is never "what's the best model" — it's "what's the **cheapest one that clears MY
+quality bar**," escalating only when a tier visibly fails.
+
+Route by the shape of the work: tag 1,000 support tickets or knock out short rewrites → fast
+tier. Draft a real report or a page of product copy → the middle. Untangle tricky business
+logic, a hard proof or a contract with traps in it → deep tier. In the chat apps you choose with
+the model picker or a "thinking" toggle. In Claude Code you switch per session with `/model`
+(Cursor, Codex and Copilot have their own pickers), and what your plan defaults to, and when it
+falls back to a smaller model under heavy use, varies by plan, so check rather than assume.
+
+- `/model sonnet`: middle tier, for the routine majority.
+- `/model opus`: deep tier, for the hard minority.
+
+The per-million pricing and the size of the tier spread are token mechanics →
+**tokens-and-context**. Here you only need the decision: cheaper tiers are far cheaper and
+faster, so default low and earn your way up.
+
+## Dial 2 — effort: reasoning is a knob, not a magic phrase
+
+This is where the old "think step by step" trick goes to retire. It used to be a real
+unlock — force a model to reason out loud and it got sharper. Today's frontier models reason
+**by default** (Claude's extended thinking, ChatGPT's and Gemini's thinking modes). You no longer
+summon reasoning with a phrase — you **tune how much of it you pay for**.
+
+The lever is the **effort or thinking budget**. Claude Code exposes it as `/effort`
+(`low → medium → high → xhigh → max`); the APIs expose it as an effort or thinking-budget
+setting; the chat apps as a thinking toggle or mode. More effort means more internal reasoning
+spent before the answer — better on hard, multi-step logic, but slower and pricier. Match it to
+difficulty: rename a variable or fix a typo → low; trace a nasty bug or plan a data migration →
+high. Anthropic's own docs warn that the top setting can show diminishing returns and overthink,
+so test before you make it a habit.
+
+- `/effort low`: a rename, a one-liner, a lookup.
+- `/effort high`: multi-step work, where one wrong step ruins it.
+
+The one place the old magic phrase still earns its keep: the cheapest **non-reasoning** models,
+where step-by-step thinking isn't built in and "reason first, then answer" still nudges quality up.
+
+> 💡 **Try it:** run the same hard task twice: once with thinking off (or `/effort low`) and once
+> with it on (or `/effort high`). Watch whether the extra thinking changed the *answer* — or just
+> the *wait* and the *bill*. If it didn't move the answer, that task class doesn't need the effort.
+> Now you know its route.
+
+## Worked example: routing one week of work
+
+A marketing analyst lists her recurring jobs and routes each once:
+
+| Job | Tier × effort | Why |
+| --- | --- | --- |
+| Rewrite 30 product blurbs to a new length | fast × low | short, repetitive, easy to check |
+| Summarize a 40-page industry report | middle × low | long input, but no hard reasoning |
+| Find the flaw in a pricing spreadsheet's logic | deep × high | one wrong step ruins it |
+| Draft the quarterly narrative for leadership | middle × medium | quality matters; she edits anyway |
+
+She tests the riskiest row both ways once, sees the fast model miss the spreadsheet error,
+and keeps the deep route for that class only. Everything else stays cheap. The table took
+twenty minutes and ends the daily "which model?" dithering.
+
+## The provider knob — a name-check, not a lesson
+
+Providers are the third dial, and at this level knowing the names is enough: **Anthropic**
+(Claude), **OpenAI** (GPT, ChatGPT), **Google** (Gemini), and **open-weights** families such
+as DeepSeek, Qwen and Llama when you need to run a model yourself. Which assistant wins which
+everyday job → **big-three-compared**; committing to a provider for an API build (latency,
+privacy, region tradeoffs) → **choosing-models-providers**; per-vendor chat features → the
+[Chat assistants](/foundations/chat-assistants) pillar.
+
+## Common failure modes
+
+- **Bills or waits balloon on simple work** → everything goes to the flagship at max effort →
+  default to the middle tier, escalate on evidence.
+- **The cheap model quietly drops a detail** → a task with hidden difficulty was routed by its
+  length, not its risk → route by how costly a mistake is, and read the output for omissions.
+- **"The new model is worse" after an update** → your route was tested on an old version →
+  re-run your small test set whenever the model under you changes.
+- **Max effort makes answers slower and stranger** → overthinking on a simple task → drop the
+  effort until quality stops improving.
+
+## The habit: match brain to job
+
+Every task is a routing decision on two-plus dials — tier × effort (× provider). Default to
+the **smallest brain at the lowest effort** that clears your bar, and escalate only on
+evidence. Cost-vs-quality isn't a vibe: it's the cheapest `(tier, effort)` pair that passes a
+concrete check. Measure it once per task class, write the route down, move on. It's the same
+discipline as the harness sensors and loops later in the pillar — set a bar, take the cheapest
+thing that clears it, escalate on failure. People who fight their AI reach for one brain and one
+effort for everything. You'll route.

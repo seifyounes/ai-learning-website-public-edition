@@ -1,0 +1,244 @@
+---
+title: "Subagents & Agent Teams"
+subtitle: "Your parallel workforce"
+summary: "Decide which work to hand to subagents or an agent team, and set them up so parallel workers keep your main context clean."
+changeNote: "New: a 10-minute plan that splits your week's tasks into fan-out reading and one-writer edits, and a task that maps the part of your codebase you know least."
+section: foundations
+pillar: claude-code
+order: 7
+level: intermediate
+estMinutes: 14
+taskMinutes: 25
+prerequisites: [core-loop, claude-md-and-memory]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "-GyX21BL1Nw"
+  published: "2026-02-01"
+  year: 2026
+  minutes: 20
+  title: "Turn Claude Code into Your Full Engineering Team"
+  channel: "Cole Medin"
+  why: "Cole Medin frames the feature set the way this lesson does: run Claude Code like an engineering team, with a lead that delegates, specialists that each hold their own clean context, and parallelism only where the work is independent. Feature-tour videos show how to create an agent; this one also teaches when not to (delegate research and review, isolate anything that writes), which is the judgment that matters."
+  notes:
+    - "It's an early-2026 walkthrough, so treat the official subagents and agent-teams docs in Read-after as the source of truth for exact flags."
+    - "To drill the /agents file mechanics, use the Tim Warner video in the backups."
+readAfter:
+  - label: "Create custom subagents — official Claude Code docs"
+    url: "https://code.claude.com/docs/en/sub-agents"
+    kind: "docs"
+  - label: "Orchestrate teams of Claude Code sessions (Agent Teams) — official docs"
+    url: "https://code.claude.com/docs/en/agent-teams"
+    kind: "docs"
+applyIt: |
+  Plan your next week's work with the one-writer rule. List five tasks coming up (in a repo,
+  coursework or your job) and split each into its reading and its writing:
+
+  - **Fan out:** research, mapping an unfamiliar area, reviewing a diff, checking docs against
+    code. Each can go to a subagent with its own window that returns only a summary.
+  - **Keep in one hand:** every edit to a given file or document. Two agents writing the same
+    file overwrite each other silently.
+  - **Team-worthy?** Mark any task where the workers would genuinely need to talk to each
+    other. Most won't, and subagents cost far less.
+
+  Then name the one specialist you'd otherwise re-describe most often (a diff reviewer, a test
+  writer, a docs checker). That's your first `.claude/agents/` file.
+
+  **If you don't code yet:** the same split works in a chat assistant: run each big reading job
+  in its own chat and bring back only the summary.
+
+  Success: five tasks split into fan-out and one-writer parts, and one specialist named.
+toolkit: |
+  - **Bank your specialists in `.claude/agents/`.** Any role you keep re-describing becomes a
+    checked-in file: a `diff-reviewer` that reads only the current diff for correctness bugs, a
+    `test-writer` that adds tests for a named function, a `docs-checker` that verifies a README
+    against the code. Commit them to the repo so every session (and teammate) reuses them.
+    GitHub Copilot's custom agents follow the same file-per-specialist idea.
+  - **Hold the one-writer rule.** When you fan out, give agents reading, research and review;
+    keep every write to a given file in a single session. Write that rule into your
+    `CLAUDE.md` (or `AGENTS.md`) so delegated agents inherit it.
+  - **Route by cost.** Point read-heavy Explore passes and mechanical chores at a small, cheap
+    model via the agent's `model` field (Haiku); save the top tier for planning and review that
+    actually needs it (the tier × effort call is covered in → models-and-effort).
+  - **Isolate parallel writes with worktrees.** When two agents genuinely must edit at once,
+    give each an `isolation: worktree` agent or a manual `git worktree`, so a parallel run
+    can't trample your checkout. Cursor's parallel agents use the same idea.
+  - **Try one real Agent Team, then judge it.** Set `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to
+    `1` in your user `settings.json` and run a cross-cutting review (one teammate on security,
+    one on performance, one adversarial) where they message each other and a lead synthesizes.
+    Then decide honestly whether the coordination beat three separate subagents for the tokens
+    it cost.
+recap:
+  - emoji: "🧑‍💼"
+    title: "The solo ceiling"
+    text: "A single Claude Code session has one context window and one train of attention. Treat it as a solo dev and your ceiling is whatever that one worker can hold in its head at once."
+  - emoji: "🪟"
+    title: "Where a subagent does its reading"
+    text: "Each subagent runs in its own context window. It does the heavy reading there and hands you back a summary, so your main thread never fills with the logs and file dumps you'll never reread."
+  - emoji: "🗂️"
+    title: "A reusable specialist"
+    text: "A .claude/agents/ file — name, description, tools, model, system prompt — is a reusable specialist. Claude reads the description to decide when to delegate, so you stop re-explaining the role every time."
+  - emoji: "🔬"
+    title: "What to hand off, what to keep"
+    text: "The team wins on research, review, and verification — parallel, throwaway-context work. Hand two agents the same file to edit and they collide; fan out on exploration, converge on one writer."
+  - emoji: "🪆"
+    title: "Can a subagent delegate?"
+    text: "A subagent can spawn its own subagents up to five levels deep, so a big investigation splits into sub-investigations and still returns just one clean summary to you at the top."
+  - emoji: "👥"
+    title: "When agents must talk"
+    text: "Agent Teams (experimental) run multiple full sessions that share a task list and message each other, with one lead synthesizing — for work where the agents need to talk, not just report back."
+  - emoji: "🌳"
+    title: "Two writers, one file"
+    text: "When agents must touch files at the same time, git worktrees hand each its own checkout so nobody overwrites anybody. Isolation is the thing that makes parallelism safe instead of destructive."
+task: |
+  Create your first custom subagent on a real repo (yours, or any open-source project you
+  clone; about 25 minutes). Add `.claude/agents/diff-reviewer.md` with a `description` like
+  "reviews the current diff for correctness bugs and returns a short summary" and a tight
+  system prompt in the body. Then fan out on the part of the codebase you understand least:
+
+  ```prompt
+  I have two independent questions about this repo. Spawn one Explore subagent per question
+  so they run in parallel, each returning a short summary — edit nothing:
+  1) [a question about the area you know least, e.g. "how the reporting module reads the
+  database: which tables, and how data flows between them"]
+  2) [a question about another, e.g. "where configuration and environment variables are read"]
+  ```
+
+  Make a small change in that area, then have the diff-reviewer look at only the diff and check
+  it against what the map found. Watch the answers come back as summaries without flooding your
+  main context — and resist the reflex to ask three agents to *write* three files at once. Say
+  why out loud.
+
+  Success: two parallel summaries and one diff review, plus a `.claude/agents/` file you'll
+  reuse.
+selfCheck:
+  - q: "You want a feature built across three files, fast. Do you spawn three subagents to each write one file in parallel?"
+    a: "No. Parallel writers can't see each other's edits or your working tree, so they silently overwrite one another — subagents are for reading, not writing. Fan them out on research (map the three files) and converge the implementation on one session. If you genuinely need parallel writers, give each an isolated git worktree so they can't clobber one another."
+  - q: "Your main session is about to read a 40-file subsystem to answer one question. Why hand that to a subagent instead of reading it yourself?"
+    a: "The subagent reads in its own context window and returns only the summary, so those 40 files never land in your main thread and drag its quality down. You keep a clean window and pay for the reading once, in a throwaway context. (Why a full window degrades output is token economics — that theory is the Context engineering lesson, → context-engineering.)"
+  - q: "You want three agents to review a pull request (security, performance, test coverage) and challenge each other's findings before one combined verdict. Subagents or an Agent Team?"
+    a: "An Agent Team, because the workers must talk to each other. A subagent only reports back to whoever spawned it and never talks to other subagents. A teammate is a full independent session that shares a task list and messages other teammates directly, with a lead synthesizing. Reach for a team when the workers need to coordinate — challenge each other's findings, own different layers of one feature — not merely return a result. It's experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) and burns far more tokens, so default to subagents."
+  - q: "A reviewer subagent needs to verify ten findings independently. Can it spawn its own subagents, and is there a ceiling?"
+    a: "Yes — a subagent can spawn nested subagents (a verifier per finding), and only its final summary returns to you. The ceiling is five levels below the main conversation: a subagent at depth five gets no delegation tool and can't spawn further. The limit is fixed and not configurable, which is what stops a runaway tree."
+backupResources:
+  - label: "How to Use Subagents in Claude Code — Tim Warner"
+    url: "https://www.youtube.com/watch?v=dk0kn2evY38"
+    type: "video · /agents mechanics"
+  - label: "How we built our multi-agent research system — Anthropic Engineering"
+    url: "https://www.anthropic.com/engineering/multi-agent-research-system"
+    type: "article · engineering"
+  - label: "Run parallel sessions with Git worktrees — official docs"
+    url: "https://code.claude.com/docs/en/worktrees"
+    type: "docs · official"
+tags:
+  - claude-code
+  - subagents
+  - agent-teams
+  - parallelism
+  - worktrees
+---
+
+A single Claude Code session is one worker with one context window and one train of
+attention. Treat it that way and your ceiling is whatever that one worker can hold.
+**Subagents and Agent Teams turn the solo worker into a team** — a lead that plans and
+delegates, specialists that each think in their own clean context, and parallelism
+wherever the work is genuinely independent. The skill isn't spawning agents; it's knowing
+*what* to hand off and what to keep in one hand.
+
+## One worker, one window
+
+Two problems push you to delegate. **Context bloat:** reading a large subsystem fills your
+main window with logs and file dumps you'll never reference again, and quality sags as it
+fills. **Serial bottlenecks:** independent tasks queued one behind another burn time that
+parallel workers would reclaim. A subagent solves both — it runs in its **own isolated
+context window**, does the heavy reading there, and returns only a summary to yours. Your
+main thread stays clean, and the throwaway reading is paid for once, out of sight. (*Why* a
+loaded window degrades output is token economics — → **context-engineering**.)
+
+## Custom agents live in `.claude/agents/`
+
+Define a reusable specialist as a markdown file in **`.claude/agents/`** (project, checked
+into the repo so the team shares it) or **`~/.claude/agents/`** (user, every project). The
+YAML frontmatter sets its **`name`**, a **`description`** — the field Claude reads to decide
+when to delegate, so write it like a job posting — an optional **`tools`** allowlist, and a
+**`model`** (route cheap, mechanical work to Haiku to control cost). The markdown body
+becomes its system prompt. Claude Code also ships built-in **Explore** and **Plan** agents
+you already use: Explore is the read-only codebase-mapper the core loop leans on. The
+**`/agents`** command lists what you have; in current versions it points you to edit the
+files directly or ask Claude to scaffold one. (Same idea elsewhere: GitHub Copilot's custom
+agents are also markdown files checked into the repo, and Cursor and OpenAI's Codex can run
+several agents in parallel, each in its own worktree or cloud sandbox.)
+
+## Delegate research and review — not implementation
+
+This is the discipline the whole lesson turns on. Subagents are excellent at **read-heavy,
+parallel, throwaway-context** work: exploration, research, code review, verification. They
+are *bad* at parallel implementation, for one concrete reason — a subagent can't see your
+working tree or another agent's edits, so two agents writing the same files silently
+overwrite each other. Anthropic's own guidance is blunt: **start with research and review,
+and avoid file conflicts by giving each agent different files.** So fan *out* on questions
+and converge *in* on a single writer. A second, independent reviewer that sees only the diff
+— a fresh context with none of your blind spots — is one of the highest-value delegations
+there is: it's the runnable-check habit from the core loop, staffed by a second brain.
+
+> 💡 **Try it:** hand three unrelated questions to three subagents at once:
+
+```prompt
+I have three independent questions. Spawn one subagent per question so they
+run in parallel, and report each answer back as a short summary — don't edit
+anything:
+1) where errors are logged and how they're formatted
+2) which files read environment variables or config
+3) where session state lives in the auth flow
+```
+
+## Nested subagents (up to five levels)
+
+A subagent can spawn its *own* subagents. Reach for it when a delegated job splits further —
+a reviewer that dispatches a verifier per finding, say — so all the intermediate output
+stays buried and only the top-level summary reaches you. Depth is counted from your main
+conversation, and the ceiling is **five levels**: a subagent at depth five gets no delegation
+tool and can't spawn further. The limit is **fixed and not configurable**, which is the
+point — it stops a runaway tree from forking forever while you keep the clean summary at the
+top.
+
+## Agent Teams — peers that coordinate (experimental)
+
+Subagents report back to whoever spawned them and never talk to each other. **Agent Teams**
+(shipped experimental in early 2026) remove that wall: multiple full Claude Code sessions run
+as a team, each with its own context window, sharing a **task list** and messaging each other
+directly through a mailbox. One session is the **team lead** — it assigns work and
+synthesizes results — while teammates claim tasks and can challenge each other's findings.
+It's **off by default**; enable it by setting `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to `1`
+in your `settings.json` env block, then describe the team in plain language:
+
+```prompt
+Spawn three teammates to review PR #142: one on security, one on performance,
+one on test coverage. Have them share findings, then synthesize.
+```
+
+The same discipline scales up — teams shine on parallel review, competing-hypothesis
+debugging, and cross-layer features where each teammate owns *different* files. They cost far
+more tokens (each teammate is a whole session), there are no nested teams, and the lead is
+fixed for the session — so reach for a team only when the workers genuinely need to
+coordinate, not merely return a result. Orchestrating *many* of these into self-directing
+fleets is a bigger topic — → **autonomy-at-scale**; driving them with a second model is
+→ **codex-inside-claude-code**.
+
+## Worktrees: the safety rail for parallel writes
+
+When agents *must* edit in parallel, isolation stops the collisions. A **git worktree** is a
+second checkout of the same repo on its own branch, so each agent works in its own copy and
+nobody overwrites anybody. Claude Code gives you two on-ramps: set **`isolation: worktree`**
+on a subagent definition (it gets a temporary worktree, auto-cleaned if it makes no changes),
+or create worktrees by hand for parallel sessions and teammates. This is the primitive under
+every safe parallel-write setup — learn it here as the basics; the fleet-scale version lives
+in the two lessons linked above.
+
+## When one session wins
+
+Delegation buys parallelism and clean context at the cost of orchestration and tokens. For a
+quick, sequential, one-file change, a single session is simply faster — no hand-off, no
+summary round-trip. Reach for the team when the work is **large, parallelizable, or
+context-heavy**, and even then hold the rule: **delegate the reading, keep the writing in one
+hand** — unless you've given each writer its own worktree.

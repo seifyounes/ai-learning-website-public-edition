@@ -1,0 +1,103 @@
+{
+  "round": 7,
+  "scores": {
+    "1_content": 9,
+    "2_relevance": 9,
+    "3_learning_design": 8.5,
+    "4_onboarding": 9,
+    "5_navigation": 9,
+    "6_interactive": 9,
+    "7_visual": 9,
+    "8_mobile": 8.5,
+    "9_accessibility": 9,
+    "10_trust": 9.5,
+    "11_technical": 9
+  },
+  "overall": 8.95,
+  "evidence": {
+    "1_content": "Read in full (rendered or source): what-is-an-llm, claude-md-and-memory, transformers-attention, big-three-compared, rag-fundamentals, zapier-make-n8n, para-method, pricing-ai-work, video-with-ai, plus the body of codex-inside-claude-code. Accurate and current: the July 2026 NotebookLM -> Gemini Notebook rename is reflected (checked against Google's announcement); the Claude Code memory stack (managed/user/project/nested, @-imports, path-scoped .claude/rules, auto memory's 200-line/25 KB index, /init non-destructive) matches the docs; transformers-attention explains prefill vs decode, the KV cache and prompt caching with a worked 4,000-token request and a correct causal-mask MCQ; rag-fundamentals covers long-context-vs-RAG, agentic retrieval and recall@k vs groundedness; pricing-ai-work has a usage-spike table with correct arithmetic. Every breakdown has a worked example and a failure-modes list. Only small currency nits: zapier-make-n8n describes Make's meter as 'module runs/units' (Make now bills in credits); video-with-ai's primary is a tool round-up with no note that such round-ups are often affiliate-funded.",
+    "2_relevance": "Apply-it, toolkit and task blocks branch for 'if you build software / at work or school / if you don't code yet' and use neutral examples (online bookshop policy, study-group name, club expense formula, Spanish tutor, small-shop support inbox). Grep of content/ and src/ for private names, local paths, TODO/TBD markers and private apps found nothing beyond the honest author credit (About, footer); scripts/check-public.js passes 0 errors and its 17 warnings are all generic (Flutter/Dart, Supabase Edge Functions, Play's 12-tester rule, DECISIONS.md/MEMORY.md as files). Pillar 2 (13 lessons) is Claude-Code-specific by design and the About page says why; it names Cursor/Codex/Copilot equivalents throughout (e.g. AGENTS.md, .cursor/rules, .instructions.md applyTo). Get Hired is developer-only but is labelled as such.",
+    "3_learning_design": "Each lesson: video + 'why this one' + watch notes, a recall-then-flip recap (scored, 'go over the 2 you missed'), breakdown, apply-it with a success criterion, setup upgrade, a 15-45 min task with copyable prompts, scenario self-checks, and in Math & ML core a 5-item commit-then-explain MCQ whose distractors are plausible. Prerequisites are shown ('You need:' line in transformers-attention, frontmatter prerequisites in rag-fundamentals and pricing-ai-work), prev/next and in-text cross-links are consistent. Gap: the Applications track pages contradict the routes. /applications/ai-in-companies says 'Get comfortable with these first' and lists Applied AI engineering (17 dev lessons) and Workflows & agents, while the home page's no-code route and /path?goal=understand treat Applied AI engineering as optional ('Optional for your goal… skip those or come back later'). A professional who lands on the track page is told to do a developer pillar first. Self-checks outside Math & ML are reveal-and-self-grade only.",
+    "4_onboarding": "Home (http://localhost:3200/) states what it is, who it is for (students, developers, non-coding professionals), that it's free/no sign-up/vendor-neutral, and offers three goal routes plus a Start Here CTA, all above or just below the fold. /start-here repeats the routes and the full course map; /about explains lesson anatomy, video selection, AI-assisted writing and data handling. Small nit: 'Get hired' is the second hero CTA for every visitor although it is an Applied-AI-Engineer roadmap.",
+    "5_navigation": "Desktop lesson pages have a sticky pillar/lesson sidebar and in-page section links; mobile has 'Jump to a section'. Every lesson has back-to-pillar, previous/next lesson, 'Continue → next lesson' on home and dashboard. Search filters live, syncs ?q= and ?level= to the URL, shows snippets, level filter works (q=agent: 76 -> 16 for advanced), good empty state for nonsense queries. 404 page keeps the nav. Nits: the same page is 'Progress' in the nav, 'View dashboard' on the home CTA and /dashboard in the URL; pillar/track pages list lesson titles without per-lesson time or level.",
+    "6_interactive": "Tested: recap flip/I had it/Not yet through 7 cards with a 5/7 summary and 'go over the 2 you missed'; self-check reveal with got-it/missed-it; MCQ commit-then-explain (scored 4/5, best score persisted to ai-learn:mcq:v1); note typed, saved with timestamp and restored after reload; Mark complete -> Completed persisted after reload and updated home/dashboard/path readiness; Get Hired checklist ticks persist and move the readiness score; Path goal buttons reorder tracks and set ?goal=; Export progress produces a versioned JSON (intercepted, not downloaded) containing progress, notes, recap and quiz data; import and erase exist. Nit: stored state appears ~1 s after load (button shows 'Mark complete' then flips to 'Completed').",
+    "7_visual": "The 'computation pad' look (ruled grid paper, ink-blue print labels, title-block header cells, mono numerals) is distinctive and consistent across home, lesson, dashboard, get-hired and 404. Prose is set at a comfortable measure with clear H2/H3 hierarchy; numbered section boxes make the lesson anatomy obvious. No text under 12px found on the lesson page sampled. Minor: route 'chips' on home are small and dense; the home 'Done' cell renders '1 1%' which is ambiguous.",
+    "8_mobile": "Rendered all 133 sitemap pages plus /dashboard and the 404 in 320px frames: zero horizontal overflow (code blocks scroll inside their pre). Mobile menu opens as a labelled dialog, Escape closes it and returns focus. Tap targets are generous (buttons >= 40px) except the 'Reviewed' date link (95x20). Gaps: (1) the self-check rows keep question and REVEAL side by side, so at 320px the bold question gets a 152px column (2-3 words per line, ~180px-tall rows) and 207px at 375px, on every lesson; (2) the header (logo + streak + Menu) needs ~314px, so it overflows on 280px fold phones or narrow desktop windows with a classic scrollbar (seen at a 279px pane).",
+    "9_accessibility": "Skip link, lang=en, one H1 then H2 per block and H3 inside breakdowns, global :focus-visible outline (seen on nav tabs via keyboard), prefers-reduced-motion zeroes transitions/animations, aria-pressed on filters/goals/complete, aria-expanded on collapsibles and menu, Play button labelled 'Play video: <title>', MCQ results labelled '(your pick)/(correct answer)' in text not colour alone. No text/background pairs below 4.5:1 on the lesson page sampled. Nits: home 'Done' cell is '1<span>1%</span>' and is read as '11%'; the logo link's accessible name is 'AIAI Learning'; the Reviewed-date link is a 20px-high target.",
+    "10_trust": "All 254 YouTube IDs in content resolve via oEmbed, and every primary video's claimed channel matches its oEmbed author_name. 'Why this one' texts are candid (flags clickbait titles, a small channel, a creator presenting his own framework, 2023 model names). About states the writing was drafted with AI assistance and checked against sources, what a 'Reviewed' date covers and why most lessons share 3 Oct 2026, no accounts/cookies/analytics, youtube-nocookie only on click, and a weekly link check that really exists (.github/workflows/check.yml, cron Monday). Author credited; per-lesson 'Report it on GitHub' with a prefilled issue (repo not live yet, as briefed). Small gaps: one backup resource has no creator ('The BEST Way To Price Your Freelance Consulting In 2026' in pricing-ai-work); tool-round-up primaries carry no affiliate caveat.",
+    "11_technical": "curl over every sitemap URL: all 200 in <1 s; made-up URLs return a real 404 with a helpful page. Per-page titles, descriptions, canonical, og/twitter tags and a per-lesson generated 1200x630 og:image (200 image/png); robots.txt and sitemap wired (localhost as briefed). Thumbnails load from hqdefault; no leftovers from a private build in tracked files (.gitignore excludes CLAUDE.local.md, docs/internal, *.local.json). Nits: og:image:alt is the generic 'An AI Learning lesson' on every lesson; no structured data (Course/LearningResource JSON-LD); client state hydrates ~1 s after paint."
+  },
+  "fixes": [
+    {
+      "criterion": "3_learning_design",
+      "priority": "high",
+      "issue": "Track pages list every related Foundations pillar under 'Get comfortable with these first', including Applied AI engineering (17 developer lessons), which contradicts the home no-code route and /path, where those pillars are optional for non-coders.",
+      "where": "'Builds on these foundations' block on /applications/ai-in-companies (lists Applied AI engineering + Workflows) and /applications/agency-freelance (lists six pillars incl. Claude Code and Applied AI engineering); /applications/marketing-content lists Workflows, which /path?goal=understand marks optional",
+      "fix": "Split the block into 'Needed first' and 'Optional / used in a few lessons' (the same data /path already uses), or reword the heading to 'Related foundations' and mark which lessons in the track need each optional pillar."
+    },
+    {
+      "criterion": "8_mobile",
+      "priority": "medium",
+      "issue": "Self-check rows put the question and the REVEAL label side by side, squeezing the bold question into ~152px at 320px and ~207px at 375px on every lesson.",
+      "where": "Self-check block on every lesson, e.g. /foundations/math-ml-core/transformers-attention#quiz",
+      "fix": "Below ~480px stack REVEAL under the question (flex-col) or reduce it to a small trailing chevron/icon with the text in aria-label, so the question uses the full card width."
+    },
+    {
+      "criterion": "8_mobile",
+      "priority": "low",
+      "issue": "Header row (logo + 'AI Learning' + streak + Menu) needs ~314px and overflows on 280px fold phones or narrow windows with a classic scrollbar.",
+      "where": "Site header, all pages",
+      "fix": "Below 340px hide the 'AI Learning' wordmark (keep the AI mark) or move the streak into the menu, and give the header row min-w-0/flex-wrap."
+    },
+    {
+      "criterion": "9_accessibility",
+      "priority": "medium",
+      "issue": "Home title-block 'Done' cell renders as '1' followed by a span '1%', which screen readers read as '11%' and sighted users read as ambiguous.",
+      "where": "/ (title block, 'Done' cell)",
+      "fix": "Render '1 / 111' with a visible separator before the percentage ('1 / 111 · 1%') or add an aria-label such as '1 of 111 lessons done, 1 percent'."
+    },
+    {
+      "criterion": "9_accessibility",
+      "priority": "low",
+      "issue": "Logo link's accessible name is 'AIAI Learning'; the Reviewed-date link in lesson headers is only 20px tall.",
+      "where": "Site header logo; lesson header 'Reviewed' cell",
+      "fix": "aria-hidden the decorative 'AI' mark (or aria-label='AI Learning, home'); pad the date link to at least 24px (ideally 44px) tap height."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "low",
+      "issue": "Outside Math & ML core, self-checks are reveal-and-self-grade only, so learners in the most popular pillars never get an objective check.",
+      "where": "e.g. /foundations/mental-models/*, /foundations/chat-assistants/*",
+      "fix": "Add 2-3 commit-then-explain MCQs (the existing McqQuiz component) to the Mental models and Applied AI engineering lessons first."
+    },
+    {
+      "criterion": "5_navigation",
+      "priority": "low",
+      "issue": "One page has three names ('Progress' in nav, 'View dashboard' CTA, /dashboard URL); pillar and track pages list lessons without time or level, so planning a sitting means opening each lesson.",
+      "where": "Header nav, home hero, /foundations/<pillar>, /applications/<track>",
+      "fix": "Use 'Progress' everywhere (CTA 'View your progress'); add level and minutes beneath each lesson title on pillar/track lists."
+    },
+    {
+      "criterion": "1_content",
+      "priority": "low",
+      "issue": "Small currency/framing nits: Make's metering is described as module runs/'units' though Make now bills in credits; video-with-ai's tool round-up primary has no caveat that such round-ups are often affiliate-funded.",
+      "where": "/foundations/workflows-agents/zapier-make-n8n ('How they charge'); /applications/marketing-content/video-with-ai (why/notes)",
+      "fix": "Say 'Make counts credits (roughly one per module run)'; add a watch note: 'Round-up creators often earn affiliate commission; judge the workflow, not the picks.'"
+    },
+    {
+      "criterion": "10_trust",
+      "priority": "low",
+      "issue": "One backup resource has no creator credit.",
+      "where": "/applications/agency-freelance/pricing-ai-work, backup 'The BEST Way To Price Your Freelance Consulting In 2026'",
+      "fix": "Add the channel name to the label, as every other backup does."
+    },
+    {
+      "criterion": "11_technical",
+      "priority": "low",
+      "issue": "Every lesson's og:image:alt is the generic 'An AI Learning lesson'; no structured data.",
+      "where": "src/app/[section]/[pillar]/[slug] metadata",
+      "fix": "Set og:image:alt to '<lesson title> · <pillar>' and add LearningResource/Course JSON-LD (name, description, educationalLevel, timeRequired, dateModified)."
+    }
+  ],
+  "verdict": "A genuinely strong, honest course: lessons are accurate and current to autumn 2026, every video is live and correctly credited, the practice blocks work for students, developers and non-coders, and the interactive pieces all behave. It misses a clean sweep on two things: Applications track pages tell non-coders to do the developer pillar first, contradicting the routes, and the self-check rows are cramped at phone widths. Fix those (and the '1 1%' reading) and every criterion clears 9."
+}

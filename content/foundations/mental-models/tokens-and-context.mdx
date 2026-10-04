@@ -1,0 +1,285 @@
+---
+title: "Tokens, context windows & why they matter"
+summary: "Estimate how big a prompt really is, see why long chats and stuffed documents get worse answers, and know which part of an AI bill you can cut."
+changeNote: "New: real tokenizer splits you can check yourself, a common-failures list, a chat-app fix for long chats, and a task that budgets a prompt from a measured count."
+section: foundations
+pillar: mental-models
+order: 2
+level: beginner
+estMinutes: 15
+taskMinutes: 25
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "nKSk_TiR8YA"
+  published: "2025-09-19"
+  year: 2025
+  minutes: 11
+  title: "Most devs don't understand how LLM tokens work"
+  channel: "Matt Pocock"
+  why: "Eleven minutes, and the tokenizing happens live on screen rather than on a slide: Matt Pocock (the educator behind Total TypeScript and AI Hero) shows why models see chunks instead of words, then follows that through to context limits and cost. Most token explainers stop at the definition; this one connects it to the two things you'll actually feel. The title says 'devs', but nothing in it requires code. Afterwards, Google's docs below are the working reference, including how to get an exact count."
+readAfter:
+  - label: "Understand and count tokens — Google AI for Developers"
+    url: "https://ai.google.dev/gemini-api/docs/tokens"
+    kind: docs
+applyIt: |
+  Any prompt you run over and over — the prompt behind an AI feature, a support bot, a report you
+  generate every week — is a context budget paid on every call. Four levers from this lesson decide
+  that bill:
+
+  - **Pack only what the call needs.** The instructions, the user's data and any retrieved
+    documents all count toward the window *and* the per-call bill, multiplied by every user and
+    every run.
+  - **Don't call when you don't have to.** Cache the answer for inputs you've already seen, and
+    skip the model entirely when a plain rule already knows the answer (an empty cart, a week with
+    nothing to summarize). You don't pay for tokens you don't send.
+  - **Bound the output.** A structured-output schema or a hard length limit isn't only for clean
+    JSON: it caps the *output* tokens, which are usually the pricier direction of the bill.
+  - **Mind the middle.** Put the rule that matters most at the top or the very end, not buried
+    mid-prompt, or it can quietly stop being followed.
+
+  Pick one prompt you reuse and spend five minutes on it: for each lever, write one line saying
+  whether it applies and what you'd change. Mark the lever that would save the most.
+
+  **If you code:** use the prompt behind an AI feature you've built or plan to build.
+
+  Success: four one-line verdicts, with the biggest saving marked.
+
+  **If you don't code yet:** use a prompt you paste into ChatGPT, Claude or Gemini every week (a
+  report, a summary, an email template) and count "calls" as the times you run it.
+
+  Success: four one-line verdicts, and your hardest rule moved to the top or end of that prompt.
+toolkit: |
+  - **Treat custom instructions and saved memories as a standing context tax.** Whatever you put in
+    ChatGPT, Claude or Gemini custom instructions or memory rides along on every chat and spends
+    window before your question starts. Read them once a month and cut any line that no longer
+    changes an answer.
+  - **Put the hard rule first or last in every saved prompt.** Lost-in-the-middle means the rule
+    you care about most ("never invent figures", "under 200 words") belongs at the very top or
+    the very end of a saved prompt snippet, Project instruction or Gem, never buried in the middle.
+  - **Prune the files in your Projects and Gems.** Reference files in a ChatGPT or Claude Project,
+    a Gemini Gem or a Custom GPT get searched or loaded on every chat. Remove old drafts and
+    superseded versions so the model reads the live document, not last term's.
+  - **Count before you reuse a long prompt.** Paste it into a token counter (OpenAI's tokenizer page,
+    or Google AI Studio's counter) and note the number in your prompt notes file. A measured number
+    turns "it feels long" into a decision about what to cut.
+recap:
+  - emoji: "🔤"
+    title: "What the model actually reads"
+    text: "The model never sees your letters or words — a tokenizer first carves the text into tokens, and tokens are all it ever reads."
+  - emoji: "✂️"
+    title: "Common words vs rare ones"
+    text: "Common words become one token; rare or long ones shatter into pieces (\"tokenization\" → token·ization), and spaces and punctuation count too."
+  - emoji: "🍓"
+    title: "The strawberry puzzle"
+    text: "\"Strawberry\" arrives as about 3 chunks (str · aw · berry), not 10 letters, so letter-level questions trip the model up. Wrong unit, not low IQ."
+  - emoji: "📏"
+    title: "A rule of thumb for size"
+    text: "Rule of thumb: 1,000 tokens ≈ 750 English words. Now you can eyeball how big any prompt really is before you send it."
+  - emoji: "🪟"
+    title: "Who shares the window?"
+    text: "Input, system prompt, files, history and the reply all draw on one finite token budget — overflow pushes the oldest context off the desk."
+  - emoji: "💸"
+    title: "How the bill is counted"
+    text: "Every call bills for input and output, both directions. Because tokenizing is deterministic, you can price a prompt before you ever send it."
+task: |
+  Take the prompt from Apply it (or any prompt you run often), measure it with **a real
+  counter** so the number is measured rather than a rule-of-thumb estimate, then budget it.
+
+  **No-code path:** paste the full prompt (instructions + one sample input) into the OpenAI
+  [tokenizer](https://platform.openai.com/tokenizer), or into Google AI Studio, which shows a
+  token count as you type. Each provider tokenizes a little differently, so use the counter
+  that matches the model you'd run.
+
+  **If you code:** have your coding assistant (Claude Code, Cursor, Codex, Copilot) write a
+  throwaway counter:
+
+  ```prompt
+  Write a throwaway script that sends the prompt below to my provider's token-counting endpoint
+  (for example Gemini's countTokens or Anthropic's token-counting API, same model I'd deploy) and
+  prints the exact input token count. Read the API key from a .env file; never hard-code it.
+  [paste the prompt]
+  ```
+
+  Then budget it with any assistant:
+
+  ```prompt
+  Here is a prompt I run repeatedly: [paste the instructions + one real example input]. Its
+  exact input size is [N] tokens. Split it into (a) the static instruction part that's identical
+  on every call and (b) the per-call payload. Then flag: (1) text that belongs in a cached
+  prefix, (2) the 3 heaviest lines that aren't load-bearing, (3) any important rule sitting in
+  the middle that should move to the top or end. Don't rewrite the prompt yet.
+  ```
+
+  Write down three numbers: the exact input token count, the window headroom left against the
+  model's context limit, and — using the model's published price and a realistic number of
+  calls — what cutting the flagged lines (and caching the static part, where your provider
+  offers it) would save per 1,000 calls.
+  Success: three measured numbers written down (count, headroom, per-1,000 savings) — not estimates.
+selfCheck:
+  - q: "An AI feature you're building sends ~1,400 input tokens and gets ~200 back, on a 1M-token window. Are you near the limit — and where's the real cost?"
+    a: "Nowhere near the window (~1,600 of 1,000,000). The window isn't your constraint here — cost is. You pay for all ~1,600 tokens on every single call, so across 100k calls the input dominates the bill. Optimise the invoice, not the window."
+  - q: "You add a 'never invent numbers' rule to the exact middle of a long prompt and the model keeps ignoring it. Likely cause and fix?"
+    a: "Lost-in-the-middle — models attend best to the start and end. Move the rule to the top or the very end (or make it a short system instruction) so it lands in the high-attention zone."
+  - q: "Two prompts share the same input cost, but one asks for a 50-word answer and the other for 500 words. Which is cheaper, and why?"
+    a: "The 50-word one. You pay per token in both directions and output is usually the pricier side, so a shorter reply directly cuts the bill. Bounding output — with a length limit or a structured-output schema — is a cost lever, not just a formatting one."
+  - q: "A teammate says 'the window is huge, just paste the whole 40-page doc in.' Why might the answer still get worse?"
+    a: "More context isn't more intelligence: the relevant lines get diluted and can land in the ignored middle, so quality can drop even with headroom to spare. Feed the relevant slice; how to curate it is the next big lesson (→ context-engineering)."
+mcq:
+  - q: "You ask an assistant for ten English words with exactly seven letters each. Three of them have six or eight. What's the most likely reason?"
+    options:
+      - "Its training data had too few word games in it"
+      - "It reads chunks of text, not individual letters"
+      - "It dropped details to keep its reply short and cheap"
+      - "Your request landed in the middle of its context"
+    answer: 1
+    explain: "The tokenizer hands the model chunks, so letter counts aren't something it sees directly: it's the wrong unit, not a lack of practice. Lost in the middle is about long contexts, and a one-line request is nowhere near that."
+  - q: "Two hours into one chat planning a group trip, the assistant starts ignoring the budget limit you set in your first message. What's the best move?"
+    options:
+      - "Repeat the budget limit more firmly in the same chat"
+      - "Move to a model with a much bigger context window"
+      - "Paste the whole conversation so far back in once more"
+      - "Open a new chat with a short brief, the limit first"
+    answer: 3
+    explain: "Early turns have scrolled out or been summarized and attention is spread thin, so a fresh chat with a short brief puts the rule back where the model attends best. A bigger window doesn't fix it, because quality degrades long before the window is full, and re-pasting only adds noise to the same crowded window."
+  - q: "You run a prompt in English, then the same prompt translated into Arabic. The Arabic version uses noticeably more tokens. Why?"
+    options:
+      - "The tokenizer splits non-English text into more pieces"
+      - "The model translates it into English before answering"
+      - "Providers send non-English prompts to a larger model"
+      - "Arabic sentences carry more meaning, so they cost more"
+    answer: 0
+    explain: "Tokenizers were trained mostly on English, so other languages fragment into more, smaller chunks and the same idea costs more tokens. The count is measured on the text you send, so it reflects how the tokenizer splits it, not anything the model does afterwards."
+  - q: "Your team wants to send each of 5,000 customers an AI-written weekly summary, and your manager wants the yearly cost before saying yes. How do you get a number you can stand behind?"
+    options:
+      - "Ask the model how many tokens your prompt really contains"
+      - "Run it for a month, then read the provider's bill"
+      - "Count a real call with a token counter, then scale"
+      - "Estimate from the word count of the instructions"
+    answer: 2
+    explain: "Tokenizing is deterministic, so a real counter gives the exact input size of a typical call; multiply by the real volume and add the expected output, usually the pricier direction. Estimating from the instructions alone misses the per-call data and the reply, and running it first means discovering the bill instead of predicting it."
+backupResources:
+  - label: "How LLMs Work - Tokens, Context Windows, and API Costs Explained"
+    url: "https://www.youtube.com/watch?v=SWE0LV0xnZ4"
+    type: "video · the same trio, explained"
+  - label: "OpenAI Tokenizer — see tokenization live (interactive)"
+    url: "https://platform.openai.com/tokenizer"
+    type: "tool · interactive"
+  - label: "Here's why LLMs are sometimes dumb (context limits)"
+    url: "https://www.youtube.com/watch?v=0ATtrgKFfnw"
+    type: "video · context limits"
+tags:
+  - tokens
+  - context-window
+  - cost
+  - fundamentals
+---
+
+Two ideas explain half your future "why did the model do that?" moments:
+**tokens** and the **context window**. They're not trivia — they're the physical
+limits every model works inside, and they quietly set both what the model can
+attend to and what you pay.
+
+## Tokens: the unit the model actually sees
+
+A model never reads your letters or your words. It reads **tokens** — the chunks a
+*tokenizer* carves your text into before anything else happens. Common words are
+usually one token; rare or long ones shatter into pieces, and every space and
+punctuation mark counts too.
+
+```diagram
+"the"
+  -> the
+     (1 token)
+"tokenization"
+  -> token · ization
+     (2 tokens, 1 word)
+"strawberry"
+  -> str · aw · berry
+     (3 tokens, not 10
+      letters)
+
+1,000 tokens ≈ 750 words
+```
+
+(Splits from OpenAI's GPT-4 tokenizer. Every model family has its own tokenizer, so the exact
+pieces differ, but they're always chunks of the text itself, never "meaning units".)
+
+This is why a model fumbles "how many r's in strawberry?" — it never saw ten
+letters, it saw three chunks. Not stupidity; the wrong unit. It's also why
+non-English text and code often cost *more* tokens per idea: the tokenizer was
+trained mostly on English prose, so everything else fragments harder.
+
+Keep the rule of thumb in your head — **1,000 tokens ≈ 750 words** — and remember
+that *everything* is counted in tokens: your prompt, the system prompt, tool
+definitions, files you attach, the conversation so far, and the model's own reply.
+
+> 💡 **Try it:** paste a paragraph of your own writing into the
+> [OpenAI tokenizer](https://platform.openai.com/tokenizer) and watch it split. The gap between "words I wrote" and "tokens
+> it became" is the intuition this whole lesson rests on.
+
+## The context window: the model's working memory
+
+The **context window** is the maximum number of tokens a model can consider at
+once — and the part people miss: it's **shared between your input and its output.**
+Think of it as desk space. The system prompt, your instructions, every attached
+file, the whole back-and-forth, *and* the room left for the answer all sit on the
+same desk. Pile on too much and things slide off the edges.
+
+Modern windows are big (100K to 1M tokens) but neither infinite nor free. Two
+consequences you'll feel constantly:
+
+- **It "forgets."** In a long session, the earliest turns scroll out of the window
+  (or get summarized away by the app). That's not the model going dumb — it literally
+  can't see them anymore. In a chat app the fix is starting a fresh chat with a short
+  summary; coding agents add tools like `/clear` and compaction
+  (→ **context-engineering**).
+- **It degrades before it's full.** As the window fills, attention spreads thin and
+  recall gets flaky well before the hard limit — sometimes called *context rot*.
+  Headroom on the counter is not the same as headroom in quality.
+
+## Lost in the middle
+
+Here's the sharpest, least-obvious mechanic: models attend best to the **start**
+and the **end** of a long context and reliably **overlook the middle**. Put a
+critical instruction halfway down a wall of text and it may as well not be there.
+So lead with what matters, and if a rule is load-bearing, place it up top or at the
+very end — never buried mid-scroll.
+
+## You pay per token — in both directions
+
+On any API you're billed **per token, input and output** — and output tokens are
+usually the pricier side. A single call feels like nothing; multiply by 1,000 users
+or 100,000 runs and the token count *is* your invoice. Two levers fall straight out
+of this:
+
+- **Trim the input.** Shorter, sharper prompts aren't just cleaner — at scale
+  they're money.
+- **Don't call at all when you don't have to,** and **bound the output** so the
+  expensive direction stays small.
+
+Because tokenization is deterministic, you can **count the tokens before you send**
+and know the bill in advance instead of discovering it on a dashboard. (Which model
+*tier* is worth paying for at a given volume is a separate call →
+**models-and-effort**.)
+
+## Common failure modes
+
+- **A long chat gets vaguer and starts ignoring early instructions** → the early turns
+  have scrolled out or been summarized, and attention is spread thin → start a fresh
+  chat with a five-line brief of what matters, instead of repeating yourself in the old one.
+- **A rule in the middle of a long prompt keeps getting broken** → lost in the middle →
+  move it to the top or the very end, and keep it short.
+- **You paste a whole report "so it has everything" and the answer gets worse** → the
+  relevant lines are diluted by pages of noise → paste the sections that matter, or ask
+  it to quote the parts it used.
+- **A prompt that costs nothing in testing gets expensive in use** → you priced one
+  call, not thousands, and forgot output tokens → count tokens, multiply by real volume,
+  and cap the output length.
+
+## From limits to strategy
+
+Everything above is the *physics* — tokens, a shared window, an attention curve, a
+per-token meter. The engineering discipline built on top of it — deciding what
+actually earns a spot on the desk and what to leave off — is **context
+engineering**, later in this pillar. → covered in **context-engineering**.

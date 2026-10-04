@@ -1,0 +1,223 @@
+---
+title: "Meetings, email and long documents"
+subtitle: "Summaries, action items and replies you can trust"
+summary: "Turn transcripts into decisions, owners and dates, draft replies in your tone, and question long documents with answers you can trace to the source."
+changeNote: "New lesson: turn meeting transcripts into decisions, owners and dates, draft replies in your tone, and question long documents with answers you can trace."
+section: foundations
+pillar: chat-assistants
+order: 6
+level: beginner
+estMinutes: 15
+taskMinutes: 35
+prerequisites: [verification-and-grounding]
+reviewedOn: "2026-10-04"
+status: published
+video:
+  videoId: "uSVBfyHBiDU"
+  published: "2026-05-11"
+  year: 2026
+  minutes: 8
+  title: "How to Use Google NotebookLM (Full Tutorial)"
+  channel: "Kevin Stratvert"
+  why: "Kevin Stratvert, a former Microsoft product manager who teaches everyday software, builds a notebook: a PDF plan, meeting notes from Drive, a website and a video as sources, questions across all of them, and a click on each numbered citation to jump to the exact passage behind an answer. That citation click is the habit this lesson is built on, shown on a realistic mix of work documents. Longer courses dwell on audio and video overviews; this one gets to sources, questions and citations first."
+  notes:
+    - "Recorded in May 2026, before Google renamed NotebookLM to Gemini Notebook in July; Google describes it as the same tool, with existing notebooks untouched."
+    - "Meeting summaries and email replies aren't in the video; the lesson body covers both."
+readAfter:
+  - label: "Learn about Gemini Notebook (formerly NotebookLM) — Google Help"
+    url: "https://support.google.com/gemininotebook/answer/16164461?hl=en"
+    kind: docs
+  - label: "NotebookLM is now Gemini Notebook — Google's announcement (July 2026)"
+    url: "https://blog.google/innovation-and-ai/products/gemini-notebook/notebooklm-gemini-notebook/"
+    kind: article
+applyIt: |
+  Pick one long document you genuinely need to understand this week and question it with
+  **answers you can trace**: a source-grounded tool (Gemini Notebook, or a ChatGPT or Claude
+  Project with the file uploaded) and a check on every answer you'll act on.
+
+  ```prompt
+  Answer only from the uploaded document. For each answer, quote the sentence it rests on and
+  say where it is (section or page). If the document doesn't say, reply "Not in the document."
+  1. [the question you actually need answered]
+  2. What conditions, exceptions or deadlines apply to that?
+  3. [a question you suspect the document doesn't cover]
+  ```
+
+  Open the quoted passage for question 1 and read the paragraph around it.
+
+  **If you study:** a module handbook, an assessment brief or a long reading. **At work:** a
+  policy, a tender, a product spec or a long report, in an approved tool if it's confidential.
+  **Otherwise:** a lease you've already signed, an insurance policy or an appliance warranty.
+  Success: question 1's quote says what the answer claims, and question 3 got "Not in the document" instead of a guess.
+toolkit: |
+  - **Save a meeting-summary template.** Decisions, action items (owner, due date, quote), open
+    questions, and "caveats and disagreements" as fixed headings in a saved prompt or a Project's
+    instructions, so every summary has the same shape and caveats have a place to land.
+  - **Keep a tone sample for replies.** Three short emails you've sent that sound like you, saved
+    in your notes or a ChatGPT or Claude Project or a Gemini Gem, to paste whenever you ask for a
+    draft reply.
+  - **Give each big body of documents its own notebook or Project.** One per course, client or
+    project, holding only the sources that belong there, so answers can't drift into other
+    material and citations point somewhere you can check.
+  - **Add a recording line to your meeting invites.** One sentence ("I'd like to record and
+    transcribe this for notes; say if you'd prefer not") in your calendar template, so asking for
+    consent is automatic.
+recap:
+  - emoji: "📒"
+    title: "One project, one container"
+    text: "A notebook is a workspace for one topic, such as a product launch, a research project or a set of meeting notes. Name it for the job."
+  - emoji: "📥"
+    title: "What it reads from"
+    text: "Sources can be PDFs, Drive files such as meeting notes, websites and YouTube videos, plus a web search for more. Preview what a search finds and import only what's relevant."
+  - emoji: "🔢"
+    title: "The numbers in the answer"
+    text: "Ask a question across all sources and each claim gets a numbered citation. Click it and the source opens with the exact passage highlighted."
+  - emoji: "🧭"
+    title: "Questions that span files"
+    text: "'What are the biggest risks mentioned across all the sources?' pulls one answer from several documents, with each part traceable to where it came from."
+  - emoji: "📝"
+    title: "Keep what's useful"
+    text: "Save a good answer as a note, add your own notes, and turn a note into a source so later answers can use it."
+  - emoji: "🎯"
+    title: "Fewer sources, sharper output"
+    text: "Untick sources before generating a mind map or an audio overview, so the output covers only the documents you chose."
+  - emoji: "⚠️"
+    title: "Kevin's closing caution"
+    text: "Share notebooks with specific people and permissions, and verify important outputs before you use them for work or research."
+task: |
+  Turn one meeting into a trustworthy summary and a follow-up email. Use a transcript of a meeting
+  you were in (with everyone's agreement to record), or a public one: many city council, school
+  board or university meetings are on YouTube, where **Show transcript** lets you copy the text.
+
+  1. Paste the transcript into ChatGPT, Claude or Gemini with this prompt:
+
+  ```prompt
+  Summarise this meeting under four headings:
+  1. Decisions: each with a short quote from the transcript that shows it was decided.
+  2. Action items: task, owner, due date. Write "no owner named" or "no date given" rather than guessing.
+  3. Open questions.
+  4. Caveats and disagreements: every condition ("if", "unless", "pending"), objection or
+     uncertainty anyone raised, with who raised it.
+  ```
+
+  2. Check it: find two of the decision quotes in the transcript, and read one stretch from the
+     middle of the meeting yourself to see whether anything is missing from section 4.
+  3. Ask for a follow-up email to attendees in your tone (paste 2–3 short emails you've written
+     as samples). It may only state what's in the summary, and conditions must stay conditions.
+  4. Edit the draft until you'd send it under your name.
+  Success: every decision has a quote you found in the transcript, no "if" became a "will", and the follow-up email contains no commitment the meeting didn't make.
+selfCheck:
+  - q: "An AI summary of your team meeting says 'The team agreed to launch on 1 March.' In the transcript, the project lead said 'we can launch on 1 March if legal signs off by mid-February.' Why did this happen, and what do you do before the summary goes out?"
+    a: "Summaries compress, and conditions are the first words to go, so a conditional plan became a decision. Restore the condition in the summary, add it to a caveats section with who is responsible and by when (legal sign-off by mid-February), and ask for quotes behind every decision so dropped 'if's are visible next time."
+  - q: "You're joining a call with a client and your meeting app offers to record and transcribe it with an AI notetaker. What do you do first?"
+    a: "Ask at the start, before recording: say what's being recorded, why and who will see the notes, and stop if anyone objects. Recording laws differ by country and region, and some require everyone's consent; your company and the client may also have policies, especially for confidential topics."
+  - q: "You ask a source-grounded notebook about your company's leave policy and it says staff can carry over ten days. You're about to plan your year around it. What's your check?"
+    a: "Click the citation and read the whole paragraph, not just the highlighted line: look for conditions (manager approval, a deadline to use carried-over days, part-time rules) and check the document's date. If there's no citation, or the passage says something different, ask HR before planning on it."
+  - q: "A customer emails angrily about a late delivery. You ask an assistant for a reply in your tone, and the draft promises a full refund and delivery by Friday. What's wrong with sending it?"
+    a: "The assistant invented commitments you never gave it, and once sent they're your company's promises. Tell it exactly what you can offer, ask for a draft that promises nothing else, and read every sentence that commits you to something before sending."
+backupResources:
+  - label: "How to Use Gemini in Gmail (Full Tutorial) — Kevin Stratvert"
+    url: "https://www.youtube.com/watch?v=RrHSIC7Sey8"
+    type: "video · email"
+  - label: "How to Use Gmail for Help Me Write, AI Summaries & Build Custom Gems — Google Workspace (vendor-made)"
+    url: "https://www.youtube.com/watch?v=qtO940hejdE"
+    type: "video · official"
+tags:
+  - chat-assistants
+  - meetings
+  - email
+  - summaries
+  - gemini-notebook
+---
+
+Meetings, inboxes and long documents are where knowledge work quietly drowns. An assistant can
+turn an hour-long transcript into decisions and action items, draft the reply you've been putting
+off, and answer questions about an eighty-page policy in seconds. That pays off every week. It
+also carries one specific risk: **a summary reads as complete even when it isn't**, and the parts
+it drops are often the ones that matter. This lesson gives you the speed and a way to check it.
+
+## From transcript to decisions, owners and dates
+
+A useful meeting summary isn't a shorter version of the meeting; it's a different document. Ask for
+fixed headings: **decisions, action items (task, owner, due date), open questions, and caveats and
+disagreements.** Two instructions make it trustworthy:
+
+- **Quote the evidence.** Each decision gets a short quote from the transcript, so you can find it.
+- **Don't fill gaps.** "No owner named" and "no date given" are correct answers. A guessed owner
+  is how someone gets assigned work they never agreed to.
+
+Transcripts have their own errors: misheard names, speakers mixed up, crosstalk lost. Check the
+owner names especially.
+
+## Why summaries drop caveats, and how to check
+
+Summarising means deciding what to cut, and models tend to cut **hedges**: "if", "probably",
+"pending", "one person disagreed". A tentative plan reads as a decision, and a lone objection
+disappears. Long transcripts make it worse, because material in the middle of a long input gets
+less attention than the start and end (→ tokens-and-context).
+
+The checks are quick: ask for a **caveats and disagreements** section by name; ask for quotes
+behind every decision; read one stretch from the middle of the meeting yourself; and send the
+summary to attendees as a draft ("correct anything I've got wrong") rather than as the record.
+
+## Replies in your tone
+
+For email, give the assistant three things: **the thread, what you want the reply to do** in one or
+two lines ("decline politely, offer next month instead"), and **two or three emails you've written**
+as tone samples. Then read the draft for commitments. Assistants fill gaps with plausible promises
+such as refunds, deadlines and apologies that admit fault, and once you hit send, they're yours.
+Never let a tool send email unread.
+
+## Long documents: answers you can trace
+
+For a long document, use a **source-grounded** setup: the assistant answers only from files you
+supply and shows where each answer came from. Gemini Notebook (formerly NotebookLM) is built
+around this, with clickable citations, as the video shows. A ChatGPT or Claude Project with the file
+uploaded works similarly if you ask it to quote the passage behind each answer. Ask for conditions
+and exceptions explicitly, and include a question you suspect the document doesn't answer: a good
+setup says so instead of inventing a plausible rule (→ verification-and-grounding).
+
+## How the three differ
+
+**Gemini** is woven into Google's apps: it summarises threads and drafts replies in Gmail, works
+in Docs, and Google Meet can take notes on some plans. **ChatGPT** and **Claude** work best with what
+you paste or upload, inside Projects, and both can connect to email and drive accounts on some
+plans. Zoom, Meet and Microsoft Teams also offer built-in AI notes. Features and plans change
+often, so check the current docs, and remember that connecting your inbox lets the assistant read
+all of it (→ privacy-and-setup).
+
+> 💡 **Try it:** take a summary you've already received from any AI notetaker and search the
+> transcript for "if", "unless" and "depends". Check whether each condition survived into the
+> summary.
+
+## Worked example: a 40-minute project meeting
+
+A team lead pastes the transcript and asks for the four headings. The summary lists three
+decisions; the quote for one of them turns out to be someone *proposing* it, so it moves to open
+questions. One action item has "no date given", and the lead adds a date in the follow-up rather
+than inventing one. The caveats section catches "only if the budget is approved", which the
+first, unstructured summary had dropped. The follow-up email goes out as a draft for corrections,
+and one attendee fixes an owner name the transcript had misheard.
+
+## Common failure modes
+
+- **A condition became a decision** → hedges compressed away → require a caveats section and
+  quotes per decision.
+- **The wrong person owns a task** → transcription mixed up speakers, or the model guessed →
+  allow "no owner named" and confirm owners with attendees.
+- **A reply promises something you can't deliver** → the model filled your silence → state what you
+  can offer and check every commitment.
+- **A document answer is right but incomplete** → the exception was elsewhere in the text → ask for
+  conditions explicitly and read the cited paragraph.
+
+## Consent, and what to keep out
+
+**Record only with consent.** Say at the start what's recorded, why and who sees the notes; stop if
+anyone objects. Laws differ by country and region, and some require every participant's consent,
+so check yours and your organization's policy. Don't add an AI notetaker to someone else's
+meeting without the host's agreement. Treat transcripts as records: store them carefully and
+delete what you don't need.
+
+Some things shouldn't go to an assistant at all, or need an approved tool: HR, medical and legal
+conversations, and anything under a confidentiality agreement. And a summary is never a substitute
+for reading a contract or policy before you sign it or enforce it.

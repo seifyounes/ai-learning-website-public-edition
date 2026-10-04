@@ -1,0 +1,316 @@
+---
+title: "Essential plugins (Bases, Templater & Dataview)"
+summary: "Use Bases, Templater and Dataview to stamp properties on your notes and turn them into live tables, and know when a question needs an AI instead."
+changeNote: "New: a property plan for your own note type, a no-code way to build a base with a chat assistant, a tighter read and a 13-minute watch range."
+section: foundations
+pillar: obsidian
+order: 7
+level: intermediate
+estMinutes: 15
+taskMinutes: 40
+prerequisites: [zettelkasten-evergreen]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "nWUQbK8KlOo"
+  published: "2025-06-06"
+  year: 2025
+  minutes: 28
+  start: 229
+  watchMinutes: 13
+  title: "NEW Obsidian Bases Core Plugin 📝 Full Overview + Practical Use Cases"
+  channel: "Wanderloots"
+  why: "A full walkthrough of Bases, the core plugin (Obsidian 1.9, 2025) that now does the job most people used Dataview for. Dataview tutorials teach a query language; this shows why you mostly don't need one now. He builds the same table twice, clicking properties into a base versus hand-typing Dataview syntax that fails on the first try, which makes the whole argument in ninety seconds. His comparison chapter lands where this lesson does: Dataview keeps complex queries and JavaScript, and a base covers most needs."
+  notes:
+    - "It runs 27.7 minutes. Watch 3:49 to 14:26 (a base, properties, filters, views, embedding) and 23:16 to 25:22 (Bases vs Dataview & Notion), about 13 minutes. The player starts at 3:49."
+    - "The build-it-twice contrast, base versus Dataview, is at 7:39."
+    - "Skip the intro and early-access install steps (obsolete now that Bases is public), the formulas chapter (useful later) and the roadmap."
+    - "Recorded during the 1.9 beta, so read the errata before trusting anything about view types. A Dataview tutorial is in the backups for when you need it."
+readAfter:
+  - label: "Obsidian Help — Introduction to Bases (official)"
+    url: "https://obsidian.md/help/bases"
+    kind: docs
+  - label: "Obsidian Help — Bases functions reference (for formulas)"
+    url: "https://obsidian.md/help/bases/functions"
+    kind: docs
+applyIt: |
+  Templates feed views, so the decision that matters comes before you install anything: which
+  properties your most common note carries. Pick the note type you write most often. **If you
+  study:** a lecture note or a problem-set log. **If you code:** a decision record or a bug log.
+  **At work:** a meeting note or a client-call note.
+
+  On paper, write its `type` and the two or three properties you'd filter by (`type: decision`,
+  `area:`, `date:`, or `type: lecture`, `course:`, `week:`). Then write two questions about
+  those notes: one a base could answer ("every decision in billing, newest first") and one only
+  an AI could ("which of my decisions now contradict each other?").
+
+  **With a chat assistant (no code):** paste your two questions and ask "Which of these could a
+  filter over properties answer, and why?" Argue with the answer until you agree on the line.
+
+  Success: one note type with its properties chosen, and a filter question and a synthesis
+  question you can tell apart.
+
+  **With a coding agent:** ask it to list the property names already used across your vault,
+  editing nothing, and check your chosen names match them (`topic`, not `topics`).
+
+  Success: properties chosen that match the spelling already in your vault, and no file changed.
+toolkit: |
+  - **Keep your saved prompts as templates.** Any prompt you retype more than twice (a
+    meeting-summary format, a study-quiz generator, a review checklist) goes into your templates
+    folder as its own note, one "Insert template" hotkey away from ChatGPT, Claude or Gemini.
+  - **Promote the heaviest prompts to a Custom GPT, Gem or Project.** A prompt you run daily with
+    the same files behind it earns standing instructions, so one click drops the structure
+    instead of you rebuilding it.
+  - **Know which questions are a view and which need an assistant.** "Every open task across my
+    projects" is a filter, so build a base or a saved search. "Which of my projects is blocked on
+    the same thing" is synthesis, so upload the notes to an assistant and ask.
+  - **Add one thing at a time, and prune monthly.** A new plugin, Custom GPT or browser extension
+    gets a week on one real problem before the next. Remove anything untouched for a month.
+recap:
+  - emoji: "🧰"
+    title: "Before you install anything"
+    text: "Daily notes, Backlinks, Graph, Templates, Quick switcher and Bases all ship built-in. Enable those before reaching for anything external."
+  - emoji: "🧩"
+    title: "Where a base keeps its data"
+    text: "A `.base` file turns your notes into a database view. It stores nothing new — it reads the properties already in your markdown."
+  - emoji: "🖱️"
+    title: "How you build a view"
+    text: "Add a column by picking a property and filter by clicking a condition. The same table in Dataview means hand-typing a query that fails if you guess the syntax."
+  - emoji: "⚙️"
+    title: "One hotkey, one note type"
+    text: "One hotkey drops a dynamic note — today's date, prompts, light logic — so every repeated note type becomes a single keystroke."
+  - emoji: "🗃️"
+    title: "When Dataview still wins"
+    text: "Still the tool for complex logic and JavaScript that Bases can't express — now the second thing you reach for, not the first."
+  - emoji: "🤖"
+    title: "Filter or synthesis?"
+    text: "A view filters and sorts structure. Questions needing judgement across note bodies aren't queries at all — that's an AI reading the notes, whether a coding agent on the folder or a chat assistant with them uploaded."
+  - emoji: "🩹"
+    title: "How plugin sprawl starts"
+    text: "Install a plugin, live with it a week, then consider the next. Plugin sprawl is how vaults break and people quit."
+task: |
+  Enable **Bases** in Settings → Core plugins, install **Templater** from Community plugins and
+  set its template folder to `templates/`. Then build the template you planned in Apply it, and
+  one view twice: by hand, then with an AI.
+
+  **1 · The template.** Get a draft from an AI, then bind it: add it under Templater's
+  **Template hotkeys**, give it a key in Settings → Hotkeys, and create one note with it.
+
+  ```prompt
+  Write an Obsidian Templater template for my [note type]. Start with a properties block
+  between --- lines: type: [type], [the properties I chose], and
+  date: <% tp.date.now("YYYY-MM-DD") %>. Then an H1 with the note type and the same date, and
+  the sections I fill in every time: [your sections]. Use only core Templater syntax.
+  ```
+
+  With a chat assistant, paste the answer into a new note in `templates/`. With a coding
+  agent, add "Write it to templates/[note type].md, show me the file first, and touch nothing
+  else."
+
+  **2 · A view by hand (5 min).** Command palette → *Bases: Create new base*. It loads your
+  whole vault. Add a filter, add a property as a column. That's the whole interaction.
+
+  **3 · The same view with an AI.**
+
+  **With a chat assistant (no code):**
+
+  - Upload every page in `wiki/` to a chat in your Vault Project and run:
+
+  ```prompt
+  Read the properties actually present on these pages. Write a Bases definition I can paste
+  into a code block tagged base: a global filter for type == "concept", a table view showing
+  file.name, topic and source sorted by topic, and a second view grouped by topic. Then list
+  which properties you found and which pages are missing one. Don't suggest edits to the pages.
+
+  Success: valid Bases YAML that renders on first paste, and a list of pages missing a property.
+  ```
+
+  - In `index.md`, add a `## Concepts` heading and below it a fenced code block tagged `base`,
+    and paste the YAML inside it. Switch to Reading view: the table renders in place. Add one
+    dated line to `log.md` noting the view and how many pages it shows.
+
+  Success: a hotkey that creates your note type with its properties filled in, the same table
+  built twice (by clicking, and as a `base` block in `index.md`), and a list of pages missing a
+  property.
+
+  **With a coding agent:**
+
+  - At the vault root:
+
+  ```prompt
+  Read the properties actually present on the pages in `wiki/`. Do not add, rename or
+  edit a property on any note to make this easier. Write one new file,
+  `wiki/concepts.base`, containing valid Bases YAML: a global filter for
+  `type == "concept"`, a table view showing file name, `topic` and `source` sorted by
+  topic, and a second view grouped by `topic`. Embed it in `index.md` with
+  `![[concepts.base]]`. Then report which properties you found and which pages are
+  missing one — as a list, not as edits. Append one dated line to `log.md` noting the view
+  you built and how many pages it captures.
+  Success: `concepts.base` opens in Obsidian with no YAML error, and `index.md` and
+  `log.md` are the only markdown files you touched.
+  ```
+
+  Success: a hotkey that creates your note type with its properties filled in, the same table
+  built twice (by clicking, and as a `.base` file), and a list of pages missing a property.
+
+  **4 · Read the gaps report.** The pages it flags as missing `topic` are the ones lesson 6's
+  run rushed. Trace one back to its source: that report is the first thing your vault has told
+  you.
+selfCheck:
+  - q: "A blog post from 2023 tells you to install Dataview and learn its query language to build a reading list table. What do you do instead in 2026, and when would the blog still be right?"
+    a: "Use Bases first. It's a core plugin (Obsidian 1.9, 2025), so it ships with the app, stays supported, and you build a view by clicking properties instead of writing syntax. Dataview is a third-party plugin whose last release was 0.5.70 in April 2025, and its declared successor Datacore is still 0.1.x work-in-progress with different syntax. Reach for Dataview only when you need query logic or JavaScript that Bases genuinely can't express."
+  - q: "You delete a `.base` file by accident and panic that your reading-list data is gone. Is it?"
+    a: "No. A base stores nothing. It reads the properties (YAML front matter) already in your markdown notes; the `.base` file only describes the filters, columns and views. That's why Bases can pull your entire vault instantly and why it can't show you anything your notes don't already record — no properties, no view. It also means the whole thing stays plain text you own."
+  - q: "Give one question a Bases view answers well and one it can't answer at all. What's the dividing line?"
+    a: "A view answers 'every note where type is decision and area is billing, newest first' — filtering and sorting over structured properties. It cannot answer 'which of my decisions in one project do my notes on another project now contradict?' — that needs reading prose across notes and making a judgement, which is not a filter over anything. The line is structure versus synthesis: if the answer is a subset of your notes, it's a view; if the answer is a *new sentence*, it's the agent. Cheapest test — could you express it as a filter? If not, stop trying to build a query."
+backupResources:
+  - label: "Obsidian Dataview Plugin: Beginners Guide and Advanced Workflows — Paul's Obsidian Systems (watch [03:54–08:35] for the four query types and FROM/WHERE/GROUP BY/SORT/LIMIT, and [15:26–19:28] for the hands-on redo; the middle depends on the MetaBind plugin this course never teaches)"
+    url: "https://www.youtube.com/watch?v=6p5Eb1sqgIY"
+    type: "video · Dataview craft"
+  - label: "The Only 6 Obsidian Plugins You Actually Need in 2026 — Focus Café"
+    url: "https://www.youtube.com/watch?v=a-beIdZBe6k"
+    type: "video · curated what-to-install"
+  - label: "Obsidian Help — community plugins"
+    url: "https://help.obsidian.md"
+    type: "docs · official"
+tags:
+  - obsidian
+  - plugins
+  - bases
+  - dataview
+  - templater
+---
+
+Obsidian is great out of the box, and **plugins** make it yours. The trap is installing fifty
+and breaking everything. So start with the **core plugins** (already built in) and add a
+small, deliberate set of community plugins. The single most useful "plugin" in this lesson is
+now one you don't install.
+
+## Turn on the core plugins first
+
+You've met most of them: **Daily notes**, **Backlinks**, **Graph view**, **Templates**,
+**Quick switcher**, **Outline** — and **Bases**, Obsidian's built-in database views, which
+shipped to core in **Obsidian 1.9 (2025)**. Enable them in settings before reaching for
+anything external.
+
+## Bases — the one that changed the answer
+
+A **base** turns your notes into a table. Rows are files, columns are their **properties**
+(lesson 6 is where you started writing those). It stores nothing new: the data stays in the
+YAML front matter of your markdown, and the `.base` file just describes filters, columns and
+views. Delete the base and you lose a view, never a note.
+
+- **You build it by clicking.** Pick a property to add a column, pick a condition to filter. A
+  base with no filters shows your whole vault; you narrow from there.
+- **Views are cheap.** One base can hold several views — a "reading list" and a "recently
+  finished" over the same notes — and a filter can apply to one view or all of them.
+- **It embeds.** Drop `![[Books.base]]` into any note, or write a `base` code block inline. The
+  embedded table updates itself as your notes change.
+
+Here's a whole base as a code block — paste it into a note inside a fenced block tagged
+`base`:
+
+```
+filters:
+  and:
+    - 'type == "concept"'
+views:
+  - type: table
+    name: Concepts
+    order:
+      - file.name
+      - topic
+      - source
+```
+
+That's the syntax the buttons write for you. You'll rarely type it by hand.
+
+> 💡 **Try it:** turn on Bases, run *Bases: Create new base* from the command palette, and
+> add one property as a column. With no filter it lists every note in your vault, which is
+> usually the moment you see how few of your notes have properties yet.
+
+## Templater — still worth installing
+
+**Templater** is supercharged templates. A hotkey inserts a note that's pre-filled and
+dynamic: today's date, prompts, inserted values, light logic. Put this at the top of a template
+note and every note created from it stamps itself:
+
+```markdown
+# Decision — <% tp.date.now("YYYY-MM-DD") %>
+```
+
+The real move is having your template write **properties**, not just headings. A template
+that stamps `type: decision` on every entry is what makes a base over your decision log
+possible three weeks later. Templates feed views.
+
+## Dataview — the second tool now, and why
+
+**Dataview** queries your vault with a real query language: four query types (`LIST`,
+`TABLE`, `TASK`, `CALENDAR`) and components you compose — `FROM`, `WHERE`, `GROUP BY`,
+`FLATTEN`, `SORT`, `LIMIT`. Paste this into a ` ```dataview ` fenced block:
+
+```
+TASK
+FROM #side-project
+WHERE !completed
+GROUP BY file.link
+```
+
+That is more expressive than a base, but two things have changed. **Bases covers the common
+case natively**, with no syntax to guess and no plugin to keep alive. And **Dataview's own risk
+has materialised**: its last release was **0.5.70 in April 2025**, and its declared successor,
+**Datacore**, is still a self-described work-in-progress on **0.1.x**, with different syntax.
+
+So: **Bases first. Dataview when Bases can't express it** — task rollups from inside note
+bodies, `FLATTEN` over nested lists, anything that wants JavaScript. Learning some Dataview is
+worth an evening. Building your system on it is not.
+
+## What Bases can't do at all — and what an AI does instead
+
+A base is a **live filter over structure**. It is superb at questions whose answer is a
+*subset of your notes*, expressible as a condition on a property:
+
+- *"Every note where `type` is decision and `area` is billing, newest first."*
+- *"Concept pages with no `source`."*
+
+It is powerless at questions whose answer is a *new sentence*:
+
+- *"Which of my side project's architecture decisions do my later meeting notes now
+  contradict?"*
+- *"Summarise everything in `wiki/` that touches offline-first sync, and tell me what I never
+  resolved."*
+
+The answer doesn't exist in the vault yet; it has to be *made* by reading prose across many
+notes. That's an AI: a coding agent with the vault as its working folder, a chat assistant
+with the notes uploaded, or an AI plugin inside Obsidian (next lesson).
+
+The cheapest test: **could you express it as a filter?** If yes, build the view; it's live
+and free forever. If no, ask an AI. The base is the dashboard you glance at daily; the AI is
+the colleague you ask a hard question once.
+
+## Errata — this video was recorded in the 1.9 beta
+
+It's from 2025-06-06, when Bases was in early access. Three things have moved:
+
+- **[00:00–03:49] "early access", Catalyst, how to enable it** — obsolete. Bases is a public
+  core plugin; toggle it on in settings.
+- **[23:28] "right now bases are table, that's it"** — no longer true, and it's his main
+  criticism. **Table** and **Cards** both shipped in **1.9**, and **List** is a core layout in
+  **1.10**. **Map is not core**: it's `obsidian-maps`, an official *community* plugin you
+  install from the directory, so don't hunt Settings for it.
+- **[10:49] the filter that won't apply to all views** — a beta bug. The Filter menu now has
+  explicit "all views" and "this view" sections, and they work. Treat **[25:22] the roadmap
+  chapter** as history: most of it has shipped.
+
+Everything else holds, including the build-by-clicking contrast at [07:39].
+
+## The rule that keeps your vault healthy
+
+**One at a time.** Install a plugin, live with it for a week, then consider the next. Worth
+trying when you feel the need: **Calendar** (jump between daily notes), **QuickAdd** (fast
+capture + macros), **Excalidraw** (sketches), **Style Settings** (theme tweaks). Plugin sprawl
+is how vaults break and how people quit Obsidian — and tonight's most useful addition required
+installing nothing at all.
+
+With Bases reading your properties and Templater writing them, the mechanical layer is done.
+Next: the layer that reads what your properties can't capture — **AI inside Obsidian.**

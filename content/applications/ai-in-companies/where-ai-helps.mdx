@@ -1,0 +1,204 @@
+---
+title: "Where AI actually helps"
+subtitle: "Mapping a business"
+summary: "Map a business's recurring processes, score them on value and feasibility, and pick the first AI use-cases worth piloting."
+changeNote: "New: a worked example from an online furniture shop's support team, a common-failures list, and a 10-minute exercise that reframes one AI idea as a scored process."
+section: applications
+pillar: ai-in-companies
+order: 1
+level: intermediate
+estMinutes: 13
+taskMinutes: 35
+shortPath: "About 40 min: read the breakdown and do the whole task, from the ranked steps to the 2×2 and the one-line brief. Watch the 58-minute lecture in a second sitting; it deepens the same skill."
+prerequisites: [automation-mindset]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "fUiezSdnYZ0"
+  published: "2019-04-16"
+  year: 2019
+  minutes: 58
+  title: "How to identify business opportunities with AI"
+  channel: "MIT Bootcamps"
+  why: "A university-run session focused on the exact skill this lesson teaches: spotting where AI creates real value in a business instead of starting from a tool. It isn't selling any AI product, which matters for a strategy topic. At 58 minutes it's long, so treat it as a lecture. A video on Gartner's AI Opportunity Radar is in the backups if you want a sharper prioritization framework."
+applyIt: |
+  Map before you automate: the most common mistake is starting from a tool ("let's use ChatGPT
+  for this") instead of a process. Take the last AI idea you heard at work, in class or from a
+  client, or one of your own, and spend ten minutes turning it into a process you can score.
+
+  1. Rewrite it as a process: the input, the output, who does it today and roughly how many
+     hours a week (mark any guess as an estimate).
+  2. Score it value-if-improved 1–5 and feasibility 1–5 (repetitive, data already at hand, low
+     blast-radius if wrong), and multiply.
+  3. Decide: pilot it (12 or more), park it, or drop it, and write one line saying why.
+
+  **As an employee:** that line is a ready-made note for your manager. **As a manager:** ask
+  each process owner for one idea and compare scores. **As a consultant:** use the three steps
+  to triage the ideas a client brings to the first call.
+
+  Success: one idea rewritten as a process, scored, and marked pilot, park or drop with a reason.
+toolkit: |
+  - **List your own recurring chores, not the tools you'd reach for.** Weekly reports, meeting
+    follow-ups, inbox triage, data clean-up, status updates — write each as a process with an
+    input and an output in your notes file. That list is what you score.
+  - **Score every chore value × feasibility before you automate it.** High value + high
+    feasibility (repetitive, data already at hand, low blast-radius) is what earns a saved
+    prompt, a custom GPT / Gem / Claude Project, an agent skill or a small automation — not the
+    flashy moonshot.
+  - **Write the one-line brief before building.** "Turn Monday's sales export into a 5-bullet
+    summary for the team, weekly, numbers must match the export" tells you whether it's a saved
+    prompt, a scheduled automation (Zapier, Make, n8n) or just a documented checklist.
+  - **Keep the ranked list where your assistant can read it.** Store it in a notes file, a
+    Project's knowledge, or your Project's instructions, so the next session picks the next pilot
+    instead of re-deciding.
+recap:
+  - emoji: "🗺️"
+    title: "Where most projects go wrong"
+    text: "They start with a tool hunting for a use. Walk the business as processes first, then decide what AI should touch."
+  - emoji: "🔬"
+    title: "The unit you map"
+    text: "The process: a repeatable sequence turning an input into an output. Write every step, handoff and wait; the waits and copy-paste glue are where time leaks."
+  - emoji: "📊"
+    title: "Two scores per step"
+    text: "Value if improved, and feasibility (data there, repetitive, low blast-radius if wrong). Multiply them for a priority score."
+  - emoji: "↖️"
+    title: "Where to start"
+    text: "Plot value up the side and difficulty along the bottom: the top-left corner (high value, easy) is your launchpad. The exciting moonshot usually sits top-right and waits."
+  - emoji: "🧩"
+    title: "Shapes that win early"
+    text: "Drafting, extracting, classifying or routing, searching, and summarizing. If a mapped step looks like one of those, it's a strong candidate."
+  - emoji: "📝"
+    title: "What you walk away with"
+    text: "Not a tool: a ranked opportunity list plus a one-line brief for the top pick (task, who does it now, hours a week, what good looks like)."
+task: |
+  Now go one level deeper on a single department — score its steps and rank them into a pilot
+  list. Use your own department, a client's, or (if you're not working right now) a business
+  you see from the outside every week: a dental clinic's front desk, a café, your university's
+  admissions office.
+
+  ```prompt
+  Act as a process analyst. I'll describe one department of a real business [paste: the
+  department and what it does]. Break it into 8–12 concrete steps — every trigger, handoff, and
+  place work waits. For each step, score value-if-improved 1–5 and feasibility 1–5 (repetitive,
+  data already there, low blast-radius if wrong), multiply for a priority score, and rank the
+  steps highest-first. Flag which of the five shapes each top step is: drafting, extracting,
+  classifying, searching, or summarizing.
+  Success: a ranked list where the #1 step is an obvious, boring, high-volume place to start.
+  ```
+
+  Sketch the top steps on a 2×2 on paper or in a slide: value up the side, difficulty along the
+  bottom (easy on the left, so difficulty is just feasibility flipped). Then write your #1 a
+  one-line opportunity brief (task, who does it now, hours/week, what "good" looks like).
+  That's your pilot.
+  Success: a 2×2 with every step placed and a brief you could read aloud to the person who does
+  that work today.
+selfCheck:
+  - q: "Your manager wants 'an AI strategy' and proposes starting with a chatbot on the website because a competitor launched one. How do you redirect the conversation?"
+    a: "Ask to map the work first: list the recurring processes, score each on value × feasibility, and see where the chatbot actually lands. It may score well, but often a boring internal task (tagging tickets, drafting order-status replies) delivers more value with less risk."
+  - q: "Two candidates tie on score: auto-approving refunds under $50, and drafting replies to 'where's my order?' emails for staff to send. Which goes first, and why?"
+    a: "The drafted replies. A human approves each one and a mistake is cheap to catch, so the blast radius is low. Auto-approved refunds move money with no human check, so they wait until you've built trust and controls."
+  - q: "What's the deliverable of this stage?"
+    a: "A short, ranked list of opportunities and a one-line brief for the top one (the task, who does it now, hours a week, what good looks like). It turns 'we should use AI' into a specific pilot you can actually run and measure."
+backupResources:
+  - label: "Gartner AI Opportunity Radar — Prioritize your AI Use Cases — CharlieCowanAI"
+    url: "https://www.youtube.com/watch?v=2n-wBgjyGss"
+    type: "video · framework"
+  - label: "OpenAI — Identifying and Scaling AI Use Cases (report)"
+    url: "https://cdn.openai.com/business-guides-and-resources/identifying-and-scaling-ai-use-cases.pdf"
+    type: "reference · guide"
+tags:
+  - companies
+  - strategy
+  - use-cases
+  - prioritization
+---
+
+Many "AI in the business" projects fail for the same reason: they start with the tool, not the
+problem. Someone reads about an AI feature, buys it, and then hunts for somewhere to use it. This
+lesson flips that. You **map the business first**, find where work genuinely piles up or repeats,
+and only then decide what (if anything) AI should touch. It works the same whether you're mapping
+your own team, a client's company, or a business you only see from the outside.
+
+## Start with processes, not tools
+
+A business is a set of **processes**: repeatable sequences of steps that turn an input into an
+output. Sales takes a lead and turns it into a customer. Support takes a question and turns it
+into a resolution. Finance takes an invoice and turns it into a paid bill. Walk one of these end
+to end and write down every step, every handoff, and every place work *waits*. The waits and the
+copy-paste glue between systems are where time leaks, and where AI tends to help most.
+
+The best source is the person who does the work. Ask them to walk you through last Tuesday, not
+"the process." Real days surface the workarounds and exceptions that never make it into a
+diagram.
+
+## Score on value × feasibility
+
+For each step, ask two questions:
+
+- **Value if improved**: does fixing this save real hours, cut cost, lift revenue or raise
+  quality? Be concrete: "support spends ~10 hrs/week tagging tickets" beats "support is slow."
+- **Feasibility**: is the task repetitive and rule-ish? Is the data already available? Is there
+  a clear notion of a *correct* output? And crucially: **how bad is it if the AI is occasionally
+  wrong?** Low blast-radius tasks are safe places to start.
+
+Score each 1–5 and multiply. Then plot the steps on a simple 2×2 with value up the side and
+difficulty along the bottom (difficulty is feasibility flipped, so easy sits on the left). The
+**top-left corner, high value and easy, is your launchpad.** The boring, high-volume, repetitive
+tasks win first. The exciting moonshot usually sits top-right, high value but hard, and should
+wait until you've built skills and trust.
+
+## The shape of good first use-cases
+
+In practitioners' reports, early wins tend to cluster into a few patterns: **drafting**
+(emails, docs, replies), **extracting** (pulling fields out of documents, PDFs and forms),
+**classifying/routing** (tag this ticket, triage this lead), **searching** (answering "where's the
+doc that says…") and **summarizing** (turning a long thread or report into a decision). If your
+mapped step looks like one of those, it's a strong candidate.
+
+## Worked example: an online furniture shop's support team
+
+A six-person customer-service team. After interviewing two of them, you list five processes and
+score them (scores are judgment calls; that's fine as long as you write down why):
+
+| Process | Value | Feasibility | Score |
+|---|---|---|---|
+| Replying to order-status emails | 4 | 5 | 20 |
+| Writing the weekly complaints report | 3 | 4 | 12 |
+| Processing returns | 4 | 3 | 12 |
+| Updating the FAQ | 2 | 4 | 8 |
+| Predicting which customers will leave | 5 | 1 | 5 |
+
+Order-status replies win: high volume, the data sits in the order system, and a person can
+approve each draft. Returns score well on value but touch money, so they wait. The churn
+prediction is the moonshot: valuable, but there's no clean data yet.
+
+The brief: "Draft replies to order-status emails from the order system; the team spends an
+estimated 8 hours a week on these (to confirm with a one-week count); good = correct status and
+tracking link, on-brand tone, approved by an agent before sending."
+
+> 💡 **Try it:** Write down five things you did more than twice last week. Give each a value
+> score and a feasibility score from 1 to 5, and multiply. Three minutes, and you have your
+> own first ranking.
+
+## Common failure modes
+
+- **Everything scores 4 or 5** → no anchor for the scores → tie value to hours or money, and
+  force a strict ranking with no ties.
+- **The list names tools, not work** → "use ChatGPT for emails" → rewrite each item as an input
+  and an output ("customer email in, sent reply out").
+- **The pilot surprises the people who do the work** → you mapped from the org chart → interview
+  the person doing the task before scoring it.
+- **The first pick is the moonshot** → excitement beat feasibility → start top-left and earn the
+  moonshot with an early win.
+- **Hours figures were never checked** → estimates treated as facts → count for a week before
+  the pilot; you'll need that baseline for ROI anyway (→ measuring-roi).
+
+## The deliverable
+
+You don't leave this stage with a tool. You leave with a **ranked opportunity list** and a
+one-line brief for the top pick: the task, who does it today, how many hours a week it takes, and
+what "good" output looks like. That brief is the spec for the rest of this track.
+
+## Next
+
+You've found *where*. Next we go *deep on one*: automating a single department end to end.

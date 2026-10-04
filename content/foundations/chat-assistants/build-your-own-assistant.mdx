@@ -1,0 +1,295 @@
+---
+title: "Build your own assistant"
+subtitle: "Projects, skills, Custom GPTs and Gems: standing instructions plus files"
+summary: "Turn a job you repeat into a reusable assistant with standing instructions and files, test it on tricky questions, then share it safely."
+changeNote: "New lesson: turn a job you repeat into a reusable assistant, test it with six tricky questions, and see what Gems becoming skills and GPTs becoming plugins means for you."
+section: foundations
+pillar: chat-assistants
+order: 8
+level: beginner
+estMinutes: 30
+taskMinutes: 40
+prerequisites: [prompting-in-2026, privacy-and-setup]
+reviewedOn: "2026-10-04"
+status: published
+video:
+  videoId: "YMlSKguLbxg"
+  published: "2026-01-01"
+  year: 2026
+  minutes: 20
+  title: "I Wish I Started Using \"Projects\" Sooner (ChatGPT, Gemini, Claude)"
+  channel: "Dylan Davis"
+  why: "Dylan Davis, an AI consultant, builds the same kind of reusable assistant in ChatGPT, Claude and Gemini one after another, so you see that the ingredients (standing instructions plus files) are the same everywhere and only the menus differ. Single-tool tutorials teach one builder's buttons; this one gives a what-why-how recipe for the instructions and a three-question test for when a reusable assistant is worth building at all. He briefly advertises his own newsletter and coaching."
+  notes:
+    - "At about 4:05 he pauses to advertise his newsletter and coaching; skip ahead when it starts."
+    - "Recorded in January 2026, before Gems began turning into Gemini skills and Custom GPTs began giving way to plugins, so his Gemini screen is on its way out. The ingredients carry over."
+    - "His tax-adviser example comes with his own advice to have a human expert check the output; keep that rule for anything you build that gives advice."
+readAfter:
+  - label: "OpenAI Help — Creating and editing GPTs: the retirement notice, plus how to write instructions and use knowledge files"
+    url: "https://help.openai.com/en/articles/8554397-creating-and-editing-gpts"
+    kind: docs
+  - label: "Gemini Apps Help — About the transition from Gems to skills"
+    url: "https://support.google.com/gemini/answer/18560919"
+    kind: docs
+applyIt: |
+  Before you build anything, pick the right job. Scroll back through the last two weeks of your
+  chats and list the requests you keep retyping, then let an assistant help you score them:
+
+  ```prompt
+  Here are tasks I've asked AI to do more than once recently: [list 3-5, e.g. "turn lecture notes
+  into flashcards", "draft replies to delivery complaints", "summarise meeting notes into our
+  status format"]. For each, answer: (1) does it need consistent, high-quality output? (2) do I
+  do it at least weekly? (3) would other people use it too? Pick the task with the most yeses and
+  write a one-paragraph job card: who it's for, what I'll paste in, exactly what it returns,
+  what it must refuse or flag, and which reference files it needs.
+  ```
+
+  **If you study:** think "quiz me on this week's readings in the format my exams use". **At
+  work:** think a recurring reply, report or summary that follows a house format. **Otherwise:**
+  a club newsletter, a side business's product descriptions, or weekly meal plans with your
+  household's rules.
+  Success: you have one job card for a task that scored at least two yeses, and a list of the files it will need.
+toolkit: |
+  - **Keep the master copy outside the app.** Store each assistant's instructions and a list of
+    its files in a plain note. Products are being renamed and migrated right now, and a text
+    copy lets you rebuild in ChatGPT, Claude or Gemini in minutes.
+  - **Date every edit.** Start the instructions with a version line ("v3, 2026-10-04: added the
+    refusal rule") so when answers get worse you know what changed and can roll back.
+  - **Keep a test sheet beside it.** Save your tricky questions and what a good answer looks like;
+    rerun them after every edit and whenever the underlying model changes.
+  - **One workspace per client, course or confidential job.** Separate Projects keep files and
+    chat history from crossing over (→ privacy-and-setup).
+recap:
+  - emoji: "🔁"
+    title: "Stop reintroducing yourself"
+    text: "Chatting means re-explaining context every time. Delegating means building an assistant
+      once that already knows the task, then handing it a small input."
+  - emoji: "🧱"
+    title: "Two ingredients"
+    text: "Every version, in every tool, is the same pair: standing instructions (what to do and
+      how) and files (the context it should draw on)."
+  - emoji: "❓"
+    title: "Three questions for the prompt"
+    text: "Write the instructions as what (the task, in detail), why (the purpose, so it can infer
+      what you left out) and how (format, style and constraints). Then he runs it through a
+      prompt improver."
+  - emoji: "📊"
+    title: "The big spreadsheet trap"
+    text: "Large multi-tab spreadsheets confuse assistants. Export only the tab the task needs as a
+      CSV and upload that."
+  - emoji: "🧭"
+    title: "Go to it, or it comes to you"
+    text: "A Project is a place you open to use. A skill is a packaged instruction you can call into
+      any chat. He combines them: a Project whose instructions call a skill."
+  - emoji: "🤝"
+    title: "Built once, used by the team"
+    text: "Share the assistant with view or edit permissions so colleagues get the same quality
+      output, and compare the same build across vendors over time to find each task's winner."
+  - emoji: "✅"
+    title: "When it's worth building"
+    text: "Ask: does it need consistent quality, do I do it often, do others need it? Two yeses
+      means build a reusable assistant; otherwise a normal chat is fine."
+task: |
+  Build the assistant from your job card (or, if you skipped Apply it, a "study-guide maker" for
+  one of your courses or an "email reply drafter" for one recurring kind of email) in a ChatGPT
+  Project, a Claude Project or a Gemini skill. Free tiers include Projects in ChatGPT and Claude.
+
+  1. **Write the standing instructions** with all five parts:
+
+  ```prompt
+  Role: You are [role] helping [who] with [the one job].
+  Audience: Outputs are read by [who], who [what they know / need].
+  Format: Always return [structure, length, headings, tone]. Example of a good output: [short example].
+  Refuse or flag: Don't [out-of-scope things]. If asked, say so and suggest [alternative].
+  Ask before guessing: If information you need isn't in my message or the files, ask me one
+  question instead of assuming. When you use a file, name it.
+  ```
+
+  2. **Add 1–3 clean reference files** (a style guide, a syllabus, a template, a price list),
+     text-forward, one version each.
+  3. **Write six test questions** before you try it: two normal requests, one with missing
+     information, one out of scope, one the files can't answer, and one that asks it to ignore
+     its rules.
+  4. **Run all six**, note which failed, edit the instructions, and rerun until five of six pass.
+  5. **Open the sharing settings** and confirm who can see it and its files. Leave it private
+     unless you meant otherwise.
+  Success: the assistant passes at least five of your six test questions, including asking you a question when information is missing, and you've confirmed who can see it.
+selfCheck:
+  - q: "A teacher uploads the full course handbook to a reusable assistant and tells students it
+      'knows the handbook'. A student gets a wrong deadline from it. What's the likely cause, and
+      what should the teacher change?"
+    a: "The assistant doesn't memorise the handbook; it searches it for passages that look relevant
+      and can miss the right one, pick up an outdated section, or fill a gap with a plausible
+      date. The teacher should keep one current version of each file, tell the assistant to quote
+      the section it used and to say when it can't find an answer, test it on deadline questions
+      before sharing, and tell students to check dates against the official page."
+  - q: "Your team asks you to share the reply-drafting assistant you built. It contains your
+      instructions plus a file of past customer emails. What do you check before you share it?"
+    a: "Who can see what: in most tools people you share with can see or extract the instructions
+      and files, so the customer emails (names, orders, complaints) shouldn't be in it. Replace
+      them with scrubbed examples, check your organisation allows the tool for this data, and
+      share with the narrowest group and the lowest permission that works."
+  - q: "You've used a Gemini Gem or a Custom GPT for months. What should you do now, given the
+      October 2026 changes?"
+    a: "Copy its instructions and download its knowledge files into your own notes now, then follow
+      the provider's migration (Gems to Gemini skills, Custom GPTs to ChatGPT plugins) or rebuild
+      it as a Project. Retest it on your test questions afterwards: OpenAI warns that migrated
+      versions may behave differently, and sharing settings may not carry over."
+  - q: "Your reusable assistant answers confidently when information is missing. Which part of the
+      instructions fixes that, and how do you confirm the fix worked?"
+    a: "An explicit 'ask before guessing' rule: if needed information isn't in the message or the
+      files, ask one question instead of assuming. Confirm it with a test question that leaves out
+      a key detail, and check that it asks rather than invents."
+mcq:
+  - q: "Your report-summary assistant follows your team's format about half the time. Its instructions describe the format in one long paragraph. Which change is most likely to fix it?"
+    options:
+      - "A list of every formatting mistake it must never make"
+      - "Upload the format description as a knowledge file too"
+      - "One short example of a good output in the instructions"
+      - "A model with a longer context window for the paragraph"
+    answer: 2
+    explain: "Format drift usually means there's nothing concrete to copy; a short model answer shows the structure faster than any description. A long list of prohibitions works worse than clear positive directions plus an example, and a knowledge file is searched for passages, not followed as a standing rule."
+  - q: "Once a quarter you turn a board pack into a summary. The format changes each time, and nobody else does this job. Is it worth building a reusable assistant?"
+    options:
+      - "No: a fresh chat with the context pasted in will do"
+      - "Yes: any task you repeat at all deserves its own one"
+      - "Yes: a quarterly task is easy to forget, so save it"
+      - "No: reusable assistants only make sense for teams"
+    answer: 0
+    explain: "Run the three questions: does it need consistent output (no, the format changes), do you do it often (quarterly isn't), do others need it (no)? With no yeses, a normal chat is fine. Repetition alone isn't the test, and a solo user can justify one when the job is frequent and needs consistency."
+  - q: "You tested your email-reply assistant on five ordinary customer emails and every draft looks good. Before sharing it with your team, which test is most worth adding?"
+    options:
+      - "Five more ordinary emails, to be sure the result holds"
+      - "The same five emails again, to check it's consistent"
+      - "An email from a different industry, to test its range"
+      - "An email missing the order number the reply depends on"
+    answer: 3
+    explain: "Ordinary requests rarely fail; the failures sit in the edge cases. A request with missing information shows whether it asks or invents, the failure that does most damage once others rely on it. More of the same only confirms what you know; out-of-scope, beyond-the-files and ignore-your-rules tests come next."
+  - q: "You built a proposal-writing assistant whose files include three past client proposals with their prices. A freelancer friend asks for access. What's the safe move?"
+    options:
+      - "Share it view-only, so they can't change your files"
+      - "Give them a copy of the instructions, not your files"
+      - "Share it with a rule telling it never to reveal files"
+      - "Share it with edit access so they can add their own"
+    answer: 1
+    explain: "Assume anyone you share with can read the instructions and pull content out of the files, whatever the permission level, so client proposals must not travel with it. View-only stops edits, not reading, and a do-not-reveal instruction is a request to the model, not access control."
+backupResources:
+  - label: "Claude Help — What are projects? (knowledge, instructions, retrieval on paid plans, sharing)"
+    url: "https://support.claude.com/en/articles/9517075-what-are-projects"
+    type: "docs · Claude Projects"
+  - label: "OpenAI Help — Projects in ChatGPT (files, project instructions, sharing)"
+    url: "https://help.openai.com/en/articles/10169521-projects-in-chatgpt"
+    type: "docs · ChatGPT Projects"
+  - label: "Google Gemini Skills Are Finally Here — Skill Leap AI"
+    url: "https://www.youtube.com/watch?v=XQtvloPXap4"
+    type: "video · Gemini skills walkthrough"
+tags:
+  - chat-assistants
+  - custom-assistants
+  - projects
+  - instructions
+  - no-code
+---
+
+If you paste the same background into a new chat every week ("I'm a second-year nursing
+student, use British spelling, format it like this…"), you're doing by hand what a reusable
+assistant does for you. You write the standing instructions once, attach the files it should
+draw on, and every chat in it starts briefed. This is the no-code cousin of
+→ context-engineering: you decide once what the model sees in every conversation.
+
+## When a reusable assistant beats a fresh chat
+
+Build one when a job is repeated, needs consistent output, or is used by more than one person:
+a study-guide maker for one course, a reply drafter for one kind of customer email, a report
+summariser that follows your team's format. Use a fresh chat for one-offs, and for anything
+where yesterday's context would mislead today's answer. Good candidates often come from the
+writing and meeting routines in → writing-with-ai and → meetings-email-documents.
+
+## Three shapes, and what each vendor calls them
+
+The names changed in late 2026, so this is the picture as of October 2026; check the current
+docs.
+
+- **Projects: a place you go.** A ChatGPT Project or a Claude Project holds instructions, files
+  and the chats you have inside it. ChatGPT's project instructions override your general custom
+  instructions, and projects can be shared, including on the free plan. Claude Projects are
+  available on free accounts (up to five); on paid plans, large knowledge bases switch to
+  retrieval, and sharing is limited to Team and Enterprise organisations.
+- **Skills: instructions that come to you.** A skill is a packaged set of instructions, with
+  optional files, that you call into any chat. Google is replacing Gems with skills in Gemini
+  (personal accounts from November 2026, work and school accounts in 2027): you type "/" and the
+  skill's name, can combine several, and Gemini may apply one on its own. Claude also has skills,
+  and OpenAI's replacement for Custom GPTs, plugins, bundles skills with reference files and
+  connected apps.
+- **Standalone custom bots: being retired.** Custom GPTs and Gems were separate, named assistants.
+  Personal ChatGPT accounts can no longer create new GPTs, and OpenAI has said GPTs will be
+  retired in favour of plugins; Gems are migrating to skills. If you rely on one, copy its
+  instructions and files out now.
+
+## Writing standing instructions
+
+Good instructions cover five things:
+
+1. **Role**: who the assistant is and the one job it does.
+2. **Audience**: who reads the output and what they already know.
+3. **Format**: structure, length and tone, with one short example of a good output.
+4. **Refusal rules**: what's out of scope and what to say instead.
+5. **Ask before guessing**: when information is missing, ask one question rather than invent.
+
+Put rules in the instructions and reference material in the files. Keep instructions short
+enough to read in a minute; a long list of prohibitions works worse than clear positive
+directions with an example (→ prompting-in-2026).
+
+## Knowledge files: retrieval, not memorisation
+
+Uploading a file doesn't teach the assistant its contents. For large files it searches for the
+passages that look relevant to each question and reads those; for small ones it may read them
+whole. Either way it can miss the right passage, mix two versions, or fill a gap with something
+plausible. So: one current version of each file, clear headings, text rather than scans, only
+the spreadsheet tab you need, and an instruction to name the file and section it used.
+
+## Worked example: a study-guide maker
+
+A student builds one for a statistics course:
+
+1. **Job card:** "Turns one week's lecture notes into a one-page guide plus five exam-style
+   questions."
+2. **Instructions:** role (study coach for this course), audience (a student who attended but
+   is rusty), format (one page, key formulas in a table, questions last), refusal rule (won't
+   write graded coursework), ask before guessing (if the notes skip a step, ask).
+3. **Files:** the syllabus and one past exam paper, so questions match the real format.
+4. **Test:** a normal week, a week with gaps in the notes, a request to write the graded
+   assignment, a question about a topic not on the syllabus. The gap test failed (it filled the
+   missing step itself), so they made the ask-before-guessing rule more explicit and reran it.
+5. **Share:** kept private; classmates get a copy of the instructions instead of access to the
+   student's files.
+
+> 💡 **Try it:** open any reusable assistant you already use and ask it something its files can't
+> answer. Does it say so, or does it invent? That one test tells you whether it needs an
+> ask-before-guessing rule.
+
+## Test before you share
+
+Six tricky questions catch most problems: two normal, one with missing information, one out of
+scope, one the files can't answer, and one asking it to ignore its rules. Rerun them after every
+edit. It's the same idea engineers formalise as evals (→ evals-and-testing).
+
+## Sharing and privacy
+
+Assume anyone you share with can read the instructions and pull content out of the files, and
+choose the narrowest audience and lowest permission. Don't put other people's personal data,
+client documents or anything confidential into an assistant you'll share (→ privacy-and-setup).
+
+## Common failure modes
+
+- **Answers ignore the file** → retrieval missed it → clearer headings, name the section.
+- **It invents missing details** → no ask-before-guessing rule → add it and test.
+- **Output drifts from the format** → no example → paste a short model answer.
+- **It worked last month, not now** → model or instructions changed → rerun your test sheet.
+
+## What not to build
+
+Don't build an assistant that gives final medical, legal, tax or financial advice to others
+without an expert checking it, one that does graded work your course bans, or one that holds
+data you aren't allowed to share. A reusable assistant repeats its mistakes as consistently as
+its strengths.

@@ -1,0 +1,266 @@
+---
+title: "System design for LLM apps"
+subtitle: "Architecture, fallbacks & scale"
+summary: "Sketch an LLM feature's architecture with a gateway, cache, fallbacks, validation and tracing, and size it for real traffic."
+changeNote: "New: a worked design for 10,000 requests a day, a failure-modes list, a six-box architecture map, and a design task that includes a rate limit and a regression alert."
+section: foundations
+pillar: applied-ai-engineering
+module: "Job-ready extras"
+order: 13
+level: advanced
+estMinutes: 30
+taskMinutes: 40
+prerequisites: [calling-an-llm-api, cost-latency-caching, evals-and-testing]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "LzeC1AQ-U5o"
+  published: "2023-11-02"
+  year: 2023
+  minutes: 17
+  title: "Building Blocks for LLM Systems & Products: Eugene Yan"
+  channel: "AI Engineer"
+  why: "Eugene Yan presents his own widely cited patterns for LLM systems (evals, RAG, fine-tuning, caching, guardrails, defensive UX and collecting user feedback) as a talk at the AI Engineer Summit. It's the same author and the same patterns as his long written article, compressed to talk length, so watch it first for the architecture in his own words and keep the article below as the reference. The talk predates today's agent tooling, but these patterns are the part that has lasted."
+readAfter:
+  - label: "Patterns for Building LLM-based Systems & Products — Eugene Yan (full article)"
+    url: "https://eugeneyan.com/writing/llm-patterns/"
+    kind: article
+applyIt: |
+  Take ten minutes to map one AI feature you own (in your repo, at work, or a no-code flow)
+  onto the reference architecture. Mark each box present or missing:
+
+  - **Gateway:** the key server-side, auth, a rate limit.
+  - **Cache:** repeat inputs served without a model call.
+  - **Model call with a timeout.**
+  - **Fallback chain:** what users get when the call fails.
+  - **Output validation** before anything is stored or shown.
+  - **Observability:** a record of every call you can query.
+
+  Most first versions miss the same few. Pick the one missing box that would hurt most if
+  traffic doubled tomorrow, and write two lines on what you'd add. **If you don't have an AI
+  feature yet:** map an AI feature in a product you use every day, and mark which boxes you can
+  infer from how it behaves when it fails.
+
+  Success: a six-box map of one real feature, with the most urgent missing box and a two-line fix.
+toolkit: |
+  - **Keep a reference-architecture checklist where your agent can see it.** Paste the six boxes
+    (gateway, cache, model call, fallback chain, validation, observability) into your instruction
+    file (AGENTS.md, CLAUDE.md, `.cursor/rules`, Copilot instructions) and ask your coding agent
+    to name which ones a new AI feature covers before it writes code.
+  - **Read your own AI setup as an LLM system.** A hook or CI check that runs tests before an
+    agent's change lands is "validate output before it ships"; a notes file you update before
+    clearing a long session is graceful degradation; your global instruction file is the gateway
+    policy. Spot the missing box and add it.
+  - **Track cost per task, not tokens.** For each AI feature or automation, keep one line in your
+    project notes ("each summarized thread costs about $X") and recheck it after prompt changes,
+    so a retry loop or a longer prompt can't quietly multiply the bill.
+  - **Design the fallback first, everywhere you call a model.** Whether it's an app feature, a
+    script or an n8n flow, decide what happens on timeout or garbage output before you write the
+    happy path.
+recap:
+  - emoji: "📦"
+    title: "Your least reliable component"
+    text: "The smartest component is remote and untrusted: it times out, rate-limits, drifts on upgrade and emits confident nonsense. Every design choice follows from that."
+  - emoji: "🗺️"
+    title: "The shape everything converges on"
+    text: "Serious LLM systems land on the same boxes: gateway, cache, model call, fallback chain, output validation, observability. Learn the shape once and reuse it."
+  - emoji: "🧯"
+    title: "Four failures, four answers"
+    text: "Timeout means retry with backoff; a latency tail means stream and route small; bad output means validate; a cost blowup means budgets and cheap-first routing."
+  - emoji: "🗄️"
+    title: "Three ways to skip the model"
+    text: "An exact-match response cache, provider prompt caching on the static prefix, and semantic caching for near-duplicates. Each cuts a different cost."
+  - emoji: "🧮"
+    title: "Arithmetic before invoices"
+    text: "Requests × tokens × price gives the monthly bill; requests per second × latency gives how many calls are in flight. Do it out loud until it's reflexive."
+  - emoji: "💵"
+    title: "The unit users pay for"
+    text: "Users buy outcomes, not tokens. A task hides several calls, retries and tool hops, and cost per task shows whether loops are quietly multiplying your bill."
+  - emoji: "✏️"
+    title: "What the interview really asks"
+    text: "You rarely need every box on day one. The skill is drawing the architecture and defending which box you'd add first, and why."
+task: |
+  Do a timed 40-minute design exercise, out loud, like an interview: "A 'summarize this support
+  thread' feature in a helpdesk app hits 10,000 calls per day" (or swap in an AI feature from your
+  own project). Estimate tokens per call and monthly model cost using one provider's public price
+  page, set a p95 latency target, and name the first thing that breaks. Then design three
+  production boxes:
+
+  - **Fallback chain:** bounded retries with exponential backoff on timeouts and 5xx, then a
+    cheaper model, then a cached or generic response.
+  - **Per-user rate limit:** enforced server-side, so one client can't burn the budget (e.g. N
+    calls per day).
+  - **Regression alert:** fires when the fallback or validation-failure rate jumps week over
+    week, and names where it reads its numbers.
+
+  Write it up as a one-page design doc in your notes; you'll reuse the structure in real
+  interviews. Pen and paper is enough.
+  Success: a one-page doc with the cost arithmetic shown, a latency target, the first bottleneck named, a three-step fallback chain, a per-user cap and an alert with its data source.
+selfCheck:
+  - q: "Your summarization feature's p95 latency jumps from 4 to 25 seconds every afternoon, and users abandon it. What do you add, and in what order?"
+    a: "First open a few traces to confirm the time is in the model call, not your retrieval. Then a timeout so calls fail fast, a fallback to a faster model or second provider, and streaming so users see progress. Anything the user isn't watching moves to an async job."
+  - q: "One customer's script calls your AI endpoint in a tight loop, and your daily bill triples overnight. Which boxes should have stopped it?"
+    a: "The gateway, with a per-user rate limit and budget enforced server-side; the cache, which serves repeated identical inputs without a model call; and observability, alerting when request rate or cost per user changes sharply."
+  - q: "A teammate wants semantic caching on a 'where's my order?' chatbot to cut costs. What's the risk, and where would semantic caching be safe?"
+    a: "Near-duplicate questions from different users would get each other's (or stale) order answers, because the right answer depends on who's asking and when. Use it for generic, non-personal questions such as FAQs; personal answers need exact keys that include the user, and a short expiry."
+  - q: "Why do engineers track cost per *task* instead of cost per token?"
+    a: "Users buy outcomes. One task may involve several calls, retries and tool hops, so cost per task (\"each summarized ticket costs about $0.004\") shows the real unit economics and exposes loops that multiply the bill."
+mcq:
+  - q: "Your sizing for a 10,000-calls-a-day feature shows about 4 calls in flight at peak. A teammate wants the first sprint spent on raising provider rate limits. What's the better first investment?"
+    options:
+      - "A timeout and fallback chain for the latency tail"
+      - "A queue that batches calls to stay under limits"
+      - "A second API key to double the rate allowance"
+      - "Semantic caching to cut the number of calls"
+    answer: 0
+    explain: "At a handful of concurrent calls, rate limits aren't the bottleneck; the latency tail and provider hiccups are, so a timeout with a fallback chain comes first. Extra keys and queues solve a throughput problem you don't have yet."
+  - q: "Your feature's outputs changed overnight and its tone checks started failing. Nobody deployed anything. What's the most likely cause?"
+    options:
+      - "The prompt cache expired and served older replies"
+      - "User inputs drifted toward harder questions"
+      - "The provider upgraded the model behind your alias"
+      - "Temperature randomness built up over many calls"
+    answer: 2
+    explain: "A floating model alias can point to a new version with no deploy from you; pin model versions and rerun your evals before you move. A prompt cache doesn't change the model's style, and sampling randomness doesn't accumulate from one call to the next."
+  - q: "During a short provider blip, your service retries every failed call immediately, and your outage lasts longer than the provider's. What's missing?"
+    options:
+      - "A higher retry count so more calls get through"
+      - "Backoff with jitter, a retry cap and a breaker"
+      - "A longer timeout so calls wait for recovery"
+      - "A cache of the last good reply for every user"
+    answer: 1
+    explain: "Instant, synchronized retries pile load onto a struggling provider. Exponential backoff with random jitter spreads them out, a cap bounds them, and a circuit breaker fails fast instead of queueing requests. More retries or longer timeouts only add to the pile."
+  - q: "Your feature writes the model's JSON reply straight into the database. One morning a malformed response corrupts a batch of records. Which box was missing?"
+    options:
+      - "A retry with backoff on every failed call"
+      - "A second provider as the fallback model"
+      - "Tracing that records every model response"
+      - "Output validation before anything is stored"
+    answer: 3
+    explain: "Bad output is a normal failure of the least reliable component, so validate against a schema and fall back to a safe default before anything is written. Tracing tells you what happened afterwards, and retries or a second provider handle failed calls, not calls that succeed with garbage."
+backupResources:
+  - label: "Building LLM applications for production — Chip Huyen"
+    url: "https://huyenchip.com/2023/04/11/llm-engineering.html"
+    type: "reference · deep dive"
+  - label: "Production best practices — OpenAI docs"
+    url: "https://platform.openai.com/docs/guides/production-best-practices"
+    type: "docs · official"
+tags:
+  - system-design
+  - architecture
+  - scaling
+  - applied-ai
+---
+
+System design questions for LLM apps are a common part of applied-AI interviews, and
+they're where "I've called an API" gets separated from "I've shipped a system". More
+importantly, this is the lesson that keeps your feature standing when real traffic, real
+outages and real bills arrive.
+
+## The core mindset: you don't control the model
+
+Classic system design assumes your components obey you. Here, the smartest component is a
+**remote black box** that times out, rate-limits you, drifts between versions and
+occasionally emits confident nonsense. Everything in LLM architecture follows from
+designing around that one fact.
+
+## The reference architecture
+
+Almost every serious LLM feature converges on the same boxes:
+
+```diagram
+client
+  │
+  ▼
+gateway
+  auth, rate limits,
+  key stays server-side
+  │
+  ▼
+cache check
+  exact / semantic
+  │
+  ▼
+model call
+  timeout + retry + budget
+  │
+  ▼
+fallback chain
+  retry → cheaper model
+  → canned response
+  │
+  ▼
+output validation
+  schema, guardrails
+  │
+  ▼
+observability
+  traces, cost, quality
+```
+
+You rarely need all of it on day one. You need to be able to **draw it and say which boxes
+you'd add first, and why**. For most first versions the answer is the same three: a
+timeout with a fallback, output validation, and basic tracing.
+
+## Failure modes and their standard answers
+
+- **Provider outage or timeout** → timeouts, retries with exponential backoff, a second
+  provider or model as fallback, and a circuit breaker so you fail fast instead of piling
+  up waiting requests.
+- **Latency tails** → streaming (perceived speed), smaller models for easy cases, and
+  async processing for anything the user isn't watching.
+- **Bad outputs** → schema validation, guardrails and a safe default response. Never let
+  raw model output reach users or databases unchecked.
+- **Cost blowups** → per-user budgets, caching, model routing (cheap model first, escalate
+  the hard cases) and alerts on cost per task.
+
+## Worked example: 10,000 summaries a day
+
+Here's the classic drill done out loud. A helpdesk app adds "summarize this support
+thread", and it reaches 10,000 calls a day. The prices are **made-up round numbers**; in
+real life you'd read the provider's price page.
+
+1. **Tokens.** A thread plus instructions is about 3,000 input tokens; a summary is about
+   300 output tokens. Per month (×30): 300,000 calls, 900 million input tokens and 90
+   million output tokens.
+2. **Bill.** Pretend $1 per million input and $4 per million output: $900 + $360 = about
+   **$1,260 a month**, or roughly $0.004 per summary. That last number is your cost per
+   task, and it's the one to watch.
+3. **Concurrency.** 10,000 a day averages about 0.12 requests per second, but traffic
+   clusters. If the busiest hour carries 15% of the day, that's 1,500 calls in an hour, or
+   about 0.4 per second. At an 8-second p95 latency, about **3–4 calls are in flight** at
+   peak (requests per second × seconds each). Rate limits aren't your first problem.
+4. **What breaks first?** More likely the latency tail and provider hiccups. So: a 15-second
+   timeout, one retry with backoff, then a cheaper fast model, then a canned "summary
+   unavailable, here's the thread".
+5. **Cheap wins.** The instruction block is identical on every call, so provider prompt
+   caching on that prefix cuts input cost. Caching each thread's summary until a new
+   message arrives skips repeat calls entirely.
+
+That's a whole design answer: numbers shown, a bottleneck named, a fallback chain ordered.
+
+> 💡 **Try it:** Pick an AI feature you use every day (an email assistant, a meeting
+> summarizer). Sketch the six boxes on paper and, next to each, write what you'd see as a
+> user if that box failed. Five minutes, and you'll start spotting missing boxes in every
+> AI product you touch.
+
+## Common failure modes
+
+- **Retries make the outage worse** → every client retries instantly and in sync →
+  exponential backoff with random jitter, a retry cap and a circuit breaker.
+- **The fallback quietly runs for days** → nothing alerts on fallback rate → chart it and
+  alert when it jumps (→ observability-tracing).
+- **The cache serves one user another user's answer** → the cache key leaves out the user
+  or context → key on everything that changes the answer; keep semantic caching for
+  non-personal questions.
+- **Outputs change overnight with no deploy** → the code points at a floating model alias
+  that the provider upgraded → pin model versions and rerun evals before you move.
+- **Cost per task creeps up** → agent loops or retries multiply calls → track cost per task
+  and cap steps per request.
+
+## The 10,000-requests-a-day question
+
+Interviewers like it because it forces arithmetic: requests × tokens per request × price
+per token = the monthly bill; requests per second × latency = how many calls are in flight
+when things clog. Practice the estimate until it's reflexive. Engineers who budget tokens
+*before* the bill arrives are the ones teams trust with production.

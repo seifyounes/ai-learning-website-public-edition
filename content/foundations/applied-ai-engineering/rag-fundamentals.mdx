@@ -1,0 +1,273 @@
+---
+title: "RAG fundamentals"
+subtitle: "Give the model your data"
+summary: "Build retrieval-augmented generation that answers from your own documents, and debug a wrong answer by checking retrieval and generation apart."
+changeNote: "New: when long context beats retrieval, agentic retrieval, a worked example, a 34-minute watch segment, and four quick design decisions for your own RAG."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 4
+level: intermediate
+estMinutes: 15
+taskMinutes: 45
+prerequisites: [calling-an-llm-api, verification-and-grounding]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "sVcwVQRHIc8"
+  published: "2024-04-17"
+  year: 2024
+  minutes: 153
+  start: 0
+  watchMinutes: 34
+  title: "Learn RAG From Scratch – Python AI Tutorial from a LangChain Engineer"
+  channel: "freeCodeCamp.org (Lance Martin, LangChain)"
+  why: "A free, structured course that builds ingest, retrieve and generate from scratch, then goes where short intros stop: why retrieval misses and the fixes (query rewriting, routing, better indexing, reranking). It's taught by a LangChain engineer, so the code uses LangChain; the concepts don't depend on it."
+  notes:
+    - "It runs about two and a half hours in short parts. Watch the first six, from the start to about 33:50: overview, indexing, retrieval, generation, then multi-query and RAG Fusion."
+    - "Worth adding: the closing talk, Is RAG really dead? (from about 2:12:05, about 21 minutes), which weighs RAG against long-context models."
+    - "The advanced parts in between (decomposition, step-back, HyDE, routing, query construction, indexing tricks, corrective and adaptive RAG) are optional; return to them when your first real RAG underperforms."
+    - "Recorded in 2024, so some on-screen imports have changed: follow the ideas, not the syntax. The retrieval failure modes and fixes still apply."
+applyIt: |
+  Take ten minutes to make the four RAG decisions for documents you actually have: your
+  project's docs and README, your team's wiki or handbook, your course notes, or the help pages
+  of a product you support. Write one line for each:
+
+  - **Corpus:** what goes in, and what stays out (drafts, outdated versions, anything private).
+  - **Chunking:** the natural boundary in these documents (headings, sections, one FAQ entry),
+    not a fixed character count.
+  - **Hybrid or not:** do people search with exact terms (error codes, product names, ids) that
+    pure vector search can miss? If yes, you need keyword search alongside it.
+  - **Refuse when:** the questions the assistant should decline rather than guess.
+
+  **If you code:** ask your coding agent to list the heading structure of the docs folder you'd
+  index, and check your chunking line against it. **If you don't code yet:** load the same
+  documents into Gemini Notebook (formerly NotebookLM) or a ChatGPT or Claude Project, ask five
+  questions you already know the answers to, and note which answers cite the wrong source or
+  none.
+
+  Success: four written decisions for a real corpus, each with a one-line reason.
+toolkit: |
+  - **Keep each Project's files current.** In a ChatGPT or Claude Project, a Gemini Gem or
+    Gemini Notebook (formerly NotebookLM), the assistant answers from the files it retrieves. Remove superseded documents
+    (last year's price list, an old policy) so they can't be retrieved and quoted as current.
+  - **Ask for citations to the uploaded file.** End a question with "cite the file and section
+    you used". A wrong answer then shows whether retrieval picked the wrong document or the
+    model misread the right one.
+
+  **If you use a coding agent:**
+
+  - **Read your instruction files as retrieval, not knowledge.** Your assistant answers from what
+    got loaded this session (AGENTS.md, CLAUDE.md, rules files, Project files), not from what it
+    "knows" about you. A stale line gets faithfully used, so delete it the way you'd delete a
+    wrong chunk.
+  - **Scope rules so the right chunk surfaces.** Path-scoped rules are manual retrieval: Claude
+    Code rules with `paths:`, Cursor rules with globs, Copilot instruction files with `applyTo`.
+    The API conventions load only when you touch the API folder; keep each rule tight.
+  - **Debug an ignored rule in RAG order.** Is it in the file → did it load (location, scope,
+    imports) → did the model use it (buried mid-file, contradicted elsewhere)? Same chain as a
+    retrieval miss.
+  - **Keep always-loaded files short.** A long instruction file buries its middle rules exactly
+    like an over-stuffed prompt; "retrieve fewer, better" means moving detail into scoped files
+    (→ claude-md-and-memory).
+  - **Build real RAG over your own notes.** Point an embeddings pipeline
+    (→ embeddings-vector-databases) at your notes folder or Obsidian vault, so "chat with my
+    notes" is your own working code, not a someday.
+recap:
+  - emoji: "🎯"
+    title: "Instead of hoping it knows"
+    text: "Fetch the right passages from your data and put them in the prompt. Grounded answers hallucinate far less than recalled ones."
+  - emoji: "📥"
+    title: "The ingest half"
+    text: "Chunk documents, embed each chunk, store vectors with source and metadata. It reruns whenever documents change."
+  - emoji: "🔎"
+    title: "The per-question half"
+    text: "Embed the question, retrieve similar chunks, add them to the prompt, and generate an answer that cites them."
+  - emoji: "✂️"
+    title: "Small handbook, big window"
+    text: "For a small, stable corpus, just put it all in a long context. Move to RAG when size, cost or per-user permissions demand it."
+  - emoji: "🕳️"
+    title: "When one search isn't enough"
+    text: "Agentic retrieval gives the model a search tool so it can query, read, and search again. More capable on multi-step questions, but cap the searches."
+  - emoji: "📉"
+    title: "Two halves, two scores"
+    text: "Score retrieval with recall@k and generation with groundedness. Low recall means no prompt change will save you."
+  - emoji: "🩺"
+    title: "A wrong answer, three questions"
+    text: "Is the right chunk in the store? Was it retrieved? Did the model use it? The first stage that fails is where you fix."
+  - emoji: "🆚"
+    title: "Versus fine-tuning"
+    text: "RAG updates anytime, cites sources and respects permissions. Fine-tuning changes how a model behaves; RAG changes what it knows right now."
+task: |
+  Practice the core RAG debugging skill: walk a retrieval miss in order. Use 10-15 short
+  notes of your own (study notes, meeting notes, FAQ entries) or write a mock help center for a
+  small online shop (shipping, returns, refunds, sizing, payments).
+
+  ```prompt
+  Set up a tiny RAG over these 10-15 notes [paste them or point to the folder] using Chroma
+  (local and free) and any embedding model. Seed a deliberate retrieval miss: a question whose
+  right note uses different wording than the query (e.g. "my package never showed up" vs a note
+  titled "Lost shipments"). If the embedding model finds it anyway, make the query harder or
+  set k=1 until it misses. Diagnose it in strict order and tell me which stage failed: (1) is
+  the right note IN the store, (2) was it RETRIEVED for this query (print the top-k with
+  scores), (3) did the model USE it. Then apply the fix for the failing stage (query rewrite /
+  hybrid search / reranking) and show the miss resolve.
+  ```
+
+  **No-code path:** let the assistant write the whole thing as one notebook and run it in a free
+  Google Colab session; you only paste your notes and press run.
+
+  Success: you can name which of in-store / retrieved / used broke, and the matching fix makes the note surface.
+selfCheck:
+  - q: "Your RAG bot answers confidently from the wrong policy document. Name two likely causes and how you'd tell them apart."
+    a: "Either the right document isn't in the store (or a stale version outranks it), or it's there but wasn't retrieved because the wording differs. Search the index for the right document, then print the top-k for the question: missing means an ingest problem, present but ranked low means a retrieval problem."
+  - q: "Your team's whole product manual is 30 pages and changes twice a year. A colleague proposes a vector database and a chunking pipeline. What would you suggest first, and when would you switch?"
+    a: "Put the whole manual in the context (with prompt caching) and skip retrieval. Switch to RAG when the corpus outgrows the window, cost per question gets too high, or different users must see different documents."
+  - q: "On your labelled set, recall@5 is 55% and groundedness is 95%. A teammate wants to rewrite the generation prompt. Is that the right move?"
+    a: "No. The model is faithful to what it gets, but the right chunk is missing from the top 5 almost half the time. Fix retrieval first (chunking, hybrid search, query rewriting, reranking) and re-measure recall."
+  - q: "Users ask questions like \"which plan has SSO, and what does it cost per year?\" and single-shot RAG keeps answering half. What pattern helps, and what does it cost you?"
+    a: "Agentic (iterative) retrieval: give the model a search tool so it can run one query per sub-question and combine the results. It costs more calls and latency and is harder to test, so cap the searches and log them."
+mcq:
+  - q: "Your RAG bot says \"returns are accepted within 30 days\" but leaves out the exception for opened electronics in the very next paragraph. Chunks are a fixed 500 characters. What's the fix?"
+    options:
+      - "Chunk along headings and sections, with overlap"
+      - "Raise k so more 500-character chunks come back"
+      - "Tell the model to always mention any exceptions"
+      - "Switch to a larger embedding model for chunks"
+    answer: 0
+    explain: "Fixed-size chunks split rules mid-thought, so the exception lands in a chunk that may not be retrieved with the rule. Chunk along the document's natural boundaries with a little overlap; a bigger k might catch it by luck, and a prompt can't mention text the model never saw."
+  - q: "To be safe, you retrieve 20 chunks per question. The right chunk is usually among them, yet answers often ignore it. What do you change?"
+    options:
+      - "Retrieve 40 chunks to raise recall further"
+      - "Rewrite the prompt to read every chunk"
+      - "Rerank and keep only the best few chunks"
+      - "Switch the embedding model for better scores"
+    answer: 2
+    explain: "Recall is fine; the model overlooks the middle of an over-stuffed context. Retrieve broadly, then rerank and keep the best few, so the right chunk sits in a short context the model actually reads. Adding more chunks makes the problem worse."
+  - q: "An internal assistant serves staff across departments, and some documents are HR-only. The whole corpus would fit in the context window. Why might you still build RAG?"
+    options:
+      - "Because RAG always answers more accurately"
+      - "Because RAG needs no labelled eval set"
+      - "Because prompt caching doesn't work on documents"
+      - "So each user retrieves only what they may read"
+    answer: 3
+    explain: "Different users seeing different documents is one of RAG's clear wins: you retrieve only what this user is allowed to read. For a small corpus long context can be just as accurate, prompt caching makes a repeated document cheap, and RAG needs its own labelled set to measure recall."
+  - q: "Users type \"my package never showed up\", but the help article that answers it is titled \"Lost shipments\" and never gets retrieved. What helps most?"
+    options:
+      - "A longer generation prompt about shipping"
+      - "Query rewriting before the search"
+      - "A lower temperature on the answer step"
+      - "Fine-tuning the model on the help center"
+    answer: 1
+    explain: "When the user's wording differs from the document's, retrieval misses; rewriting the query (alongside hybrid search) bridges the phrasing. Nothing on the generation side helps, because the article never reaches the model, and fine-tuning changes behavior, not what the system can look up."
+backupResources:
+  - label: "RAG Tutorial 2026: Complete Introduction — Sujan Anand"
+    url: "https://www.youtube.com/watch?v=vAK0iqA6-QI"
+    type: "video · gentler intro"
+  - label: "Build Your First RAG Application with LLMs — Alexey Grigorev (DataTalksClub)"
+    url: "https://www.youtube.com/watch?v=KSItlTAsMsk"
+    type: "video · hands-on"
+  - label: "Anthropic — retrieval & RAG (contextual retrieval) reference"
+    url: "https://www.anthropic.com/news/contextual-retrieval"
+    type: "reference"
+tags:
+  - rag
+  - retrieval
+  - applied-ai
+---
+
+LLMs are capable but ignorant of *your* world: your docs, your policies, last week's changes.
+**RAG (Retrieval-Augmented Generation)** fetches the relevant information from your data and
+hands it to the model, so the answer is grounded in your sources instead of guessed from
+memory. It's one of the most widely used patterns in applied AI.
+
+## The core idea and the two phases
+
+Ask "what's our refund policy?" and the system pulls the actual policy text, then the model
+answers from *that*. Grounded answers hallucinate far less (→ verification-and-grounding).
+
+1. **Ingest (once, then on every document change):** split documents into **chunks**,
+   **embed** each chunk into a vector (→ embeddings-vector-databases) and store it with its
+   source and metadata.
+2. **Query (every question):** embed the question, **retrieve** the most similar chunks,
+   **augment** the prompt with them and **generate** an answer that cites them.
+
+## Long context or RAG?
+
+Context windows now hold hundreds of thousands of tokens, so a fair question is: why not paste
+everything in? For a **small, stable corpus** (a 40-page handbook) that's often the right
+call. It's simpler, nothing can be "not retrieved", and prompt caching makes the repeated
+document cheap (→ cost-latency-caching).
+
+RAG wins when the corpus **outgrows the window or keeps growing**, when sending everything on
+every question costs too much or is too slow, when **different users may see different
+documents** (you only retrieve what this user is allowed to read), and when you need precise
+citations. Long inputs also have their own failure: models often use the start and end of a long
+context better than the middle, and accuracy tends to drop as the input grows. A practical rule: start with long context while the
+corpus is small, and move to RAG when size, cost or permissions force it. With large windows,
+many teams now retrieve whole sections or documents rather than tiny chunks.
+
+## Agentic and iterative retrieval
+
+Classic RAG retrieves once, before the model sees the question. **Agentic retrieval** gives the
+model a search tool (→ structured-outputs-tools) and lets it decide what to search, read the
+results, and search again until it has enough. That handles multi-step questions ("which
+plan includes priority support, and what does it cost annually?") that no single query
+answers, and lets the model rewrite a query that missed. It's how coding agents explore a
+repo with search commands. The price is more calls, more latency and behaviour that's harder
+to test, so cap the number of searches and log every query it makes.
+
+## Evaluate retrieval separately from generation
+
+When a RAG answer is wrong, you need to know which half failed. Build a small labelled set:
+20–50 real questions, each tagged with the chunk or document that contains the answer.
+
+- **Retrieval: recall@k.** For what share of questions does a correct chunk appear in the top
+  *k* results? If recall@5 is low, no prompt change will save you; fix chunking, search or
+  reranking first. (MRR adds *how high* the first correct chunk ranks.)
+- **Generation: groundedness (faithfulness).** Is every claim in the answer supported by the
+  retrieved text? Usually scored by an LLM judge that you spot-check by hand.
+- **Answer correctness and citations.** Does the answer match the reference, and does the
+  cited source actually say it?
+
+Open-source libraries such as Ragas implement these metrics, but a spreadsheet and a script
+are enough to start (→ evals-and-testing).
+
+## Worked example: the bot quotes last year's policy
+
+An internal HR assistant says parental leave is 10 weeks. The current policy says 16. Diagnose
+in order:
+
+1. **Is the right chunk in the store?** Search the index for the 2025 policy. It's there, but
+   so is the superseded 2023 version.
+2. **Was it retrieved?** Print the top 5 chunks with scores for the question. The 2023 chunk
+   ranks first; the 2025 chunk ranks fourth.
+3. **Did the model use it?** It answered from the first chunk, as models usually do.
+
+The root cause is at stage 1: stale documents in the corpus. Fix: remove or tag superseded
+documents, store an `effective_date` in metadata and filter on it. Then add this question to
+the labelled set so recall@k catches any return of the problem.
+
+> 💡 **Try it:** Upload one long document to Gemini Notebook (formerly NotebookLM), a ChatGPT
+> or Claude Project, or a Gemini Gem. Ask a question using a word the document never uses (for example "time off"
+> when it says "leave"). Check whether the cited passage is the right one.
+
+## Common failure modes
+
+- **Answers miss half the rule** → chunks split mid-thought → chunk along headings and
+  sections, with a little overlap.
+- **The right passage never comes back** → the user's wording differs from the document's →
+  **hybrid search** (vectors plus keyword/BM25) and **query rewriting**.
+- **The answer ignores a retrieved chunk** → 20 chunks stuffed in and the middle gets
+  overlooked → retrieve more, **rerank**, keep the best few.
+- **Confidently cites an outdated document** → stale or duplicate content in the store →
+  metadata filters and a re-ingest process for changed documents.
+- **Grounded but still wrong** → the model misreads the retrieved text → measure
+  groundedness and correctness, not just retrieval.
+
+## Why RAG usually beats "just fine-tune it"
+
+For "make it use my data," RAG lets you **update the data anytime** without retraining,
+**cite sources** and **enforce permissions**. Fine-tuning changes *how* a model behaves; RAG
+changes *what it knows right now* (→ fine-tuning-fundamentals). Next lesson opens the engine:
+embeddings and vector databases.

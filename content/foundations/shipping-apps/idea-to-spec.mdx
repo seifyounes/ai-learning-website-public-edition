@@ -1,0 +1,198 @@
+---
+title: "Idea → spec"
+subtitle: "Define what to build"
+summary: "Turn a rough app idea into a short written spec, with users, an MVP, non-goals and success criteria, that an AI agent can build against."
+changeNote: "New: a worked example from one sentence to a half-page spec, a failure-modes list, one interview-style spec task, a spec check, and a note on the video's hype title."
+section: foundations
+pillar: shipping-apps
+order: 1
+level: intermediate
+estMinutes: 13
+taskMinutes: 30
+prerequisites: [plan-mode-spec-driven]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "YsVQcUbEeGU"
+  published: "2026-01-25"
+  year: 2026
+  minutes: 17
+  title: "Create PRDs in Minutes with Claude Code & Codex (4 Proven Workflows)"
+  channel: "Snapper AI"
+  why: "Snapper AI shows four concrete ways to turn an idea into a written spec (a PRD) with coding agents, Claude Code and Codex, so the spec ends up next to the code it governs instead of in a chat window. It's hands-on and short enough to watch in one sitting. The title oversells: 'in minutes' covers the agent's draft, not the thinking a good spec needs, which is still yours. For a slower, tool-free intro to PRDs, see the Jordan Urbs guide in the backups."
+applyIt: |
+  Hold one piece of work you already have against the spec shape. Ten minutes: a feature you've
+  started, a request a client or manager sent you, or the idea you keep putting off.
+
+  1. **Check the five sections:** problem, target user, MVP features, non-goals, success
+     criteria. Which ones are missing or only implied?
+  2. **Write three non-goals,** things you'll deliberately not build in this version.
+  3. **Rewrite one success criterion so it can be checked.** "Sharing is easy" becomes "a second
+     account opens a shared link read-only without signing up again."
+
+  **If you code:** do it for the next feature in your repo's backlog. **If you don't code yet:** do
+  it for a request at work or the app idea you'd hand to a builder (→ scaffold-with-ai).
+  Success: three named non-goals and one success criterion someone else could test without asking you.
+toolkit: |
+  - **Make a plans folder the standard first artifact.** Give every project a `docs/plans/`
+    folder (or a "Specs" page in your notes app) and add one line to its instruction file
+    (AGENTS.md, or CLAUDE.md / GEMINI.md for those agents; `.cursor/rules`, Copilot instructions):
+    nothing gets built from a chat message alone.
+  - **Save the interview prompt.** Store "interview me one question at a time until you can
+    write the spec" as a reusable prompt: a Claude Code skill or slash command, a Cursor rule,
+    a ChatGPT or Claude Project instruction, or a Gemini Gem. Then it's one step away before
+    any build.
+  - **Keep a one-page spec template.** A small file with the six headings (problem, users, MVP,
+    non-goals, flows, success criteria) that the AI fills in, so every spec has the same shape
+    and a missing section is obvious at a glance.
+  - **Point the agent at the committed spec, not the chat.** Open build sessions with "read
+    docs/plans/[feature].md and build against it", so work stays on-spec across sessions
+    instead of drifting on whatever the last conversation said.
+recap:
+  - emoji: "🎯"
+    title: "Why speed needs steering"
+    text: "AI builds fast in whatever direction you point it. A vague idea produces a wandering, half-right app; a spec is the steering wheel."
+  - emoji: "📄"
+    title: "How long, which sections?"
+    text: "One page: problem, users, MVP features, user flows, success criteria. Small enough to actually write, complete enough to build against."
+  - emoji: "🚫"
+    title: "The list everyone forgets"
+    text: "Non-goals: what you're deliberately not building yet. Naming them controls scope as much as the feature list does."
+  - emoji: "🎤"
+    title: "Who asks the questions?"
+    text: "Let the AI interview you, one question at a time, until it can write the spec. Gaps surface in text instead of three sessions into code."
+  - emoji: "💾"
+    title: "Where the spec lives"
+    text: "Saved in the repo or your project notes, not in a chat. Every session then builds against the same contract."
+  - emoji: "🧭"
+    title: "You've met this before"
+    text: "It's spec-driven development from the Claude Code pillar, scaled up to a whole app: decide what 'done' means before you build."
+task: |
+  Let AI interview you until it can write the spec, so gaps surface in text instead of three
+  sessions into code. Use any assistant (ChatGPT, Gemini, Claude, or your coding agent):
+
+  ```prompt
+  Interview me one question at a time about [my app idea or next feature, in one line] until
+  you can write a brutally small spec. Do not draft anything until you have enough. When you
+  stop asking, output: problem / target user / MVP features / non-goals / success criteria.
+  Then cut everything that isn't needed for v1 and move it to the non-goals list. List anything
+  you're unsure of as an open question instead of inventing an answer.
+  ```
+
+  Answer each question honestly, then save the result as a file, not a chat message.
+  **If you code:** run it in your coding agent (Claude Code, Cursor, Codex, Copilot agent mode)
+  inside the repo; have it read the README and any existing specs first to match the house style,
+  and save it as `docs/plans/[feature].md` next to the code it governs. **If you don't code
+  yet:** run it in ChatGPT, Gemini or Claude and save the result as a doc you'll paste into an
+  app builder later (→ scaffold-with-ai). No idea handy? Use a small to-do app for one specific
+  kind of user (students tracking assignments, say) and see how much the interview narrows it.
+  Success: a saved half-page spec that a fresh session could build from without asking you a
+  question, with a non-goals list longer than you first expected.
+selfCheck:
+  - q: "Three sessions into building a recipe app, your coding agent keeps adding things you never asked for: meal plans, a shopping list, a sharing page. What went wrong upstream, and what's the fix?"
+    a: "There's no written scope, so each session fills the gaps with plausible extras. Write a one-page spec with explicit non-goals (\"no meal planning in v1\"), save it in the repo, and open every session with \"read the spec and build only against it\"."
+  - q: "A friend's spec lists \"sharing lists is easy\" as a success criterion. Why is that weak, and how would you rewrite it?"
+    a: "Nobody can check \"easy\", so neither your friend nor an agent can tell when it's done. Make it observable, for example: \"a signed-in user sends a list link, and a second account opens it read-only without signing up again\"."
+  - q: "What belongs in a minimal app spec, and which section do people most often leave out?"
+    a: "Problem, target user, MVP features, explicit non-goals, core user flows and success criteria. Non-goals are the usual omission, and they're what stops scope from sprawling."
+backupResources:
+  - label: "Build Better Apps with AI Using This One Simple Document (PRD Guide) — Jordan Urbs"
+    url: "https://www.youtube.com/watch?v=MZjW7mlRgdw"
+    type: "video · PRD basics"
+  - label: "GitHub Spec Kit — spec-driven development toolkit"
+    url: "https://github.com/github/spec-kit"
+    type: "tool · reference"
+tags:
+  - shipping-apps
+  - spec
+  - prd
+  - planning
+---
+
+AI can build an app shockingly fast, which is exactly why you must decide **what** to build
+first. The people who ship good AI-built apps don't start with code; they start with a
+**spec**. A clear spec is the steering wheel. Without one, the AI drives fast in a random
+direction, and every session picks a slightly different direction from the last.
+
+## What a spec captures
+
+Keep it to a page:
+
+- **Problem**: what real pain are you solving, in one or two sentences?
+- **Users**: who is this for, specifically? "Everyone" is not an answer.
+- **MVP features**: the smallest set that delivers value, **and the non-goals**, the things
+  you're deliberately *not* building yet.
+- **User flows**: the key paths a user takes through the app, step by step.
+- **Success criteria**: how you'll know it works, written so someone else could check.
+
+A page is the right size because it's short enough that you'll actually write it and keep it
+current, yet complete enough that a coding agent (or a human developer, or an app builder)
+can build from it without guessing. A thirty-page requirements document goes unread; a
+one-line idea gets interpreted.
+
+## Worked example: from one sentence to half a page
+
+Start with the kind of sentence most ideas begin as: *"An app that helps students stop
+falling behind."* Hand that straight to a coding agent and you'll get *something*: a
+calendar, a to-do list, maybe a chatbot, because the sentence allows all of them. Here's how
+an interview narrows it.
+
+1. **Problem.** The AI asks what "falling behind" actually looks like. Your answer:
+   assignments live on four different course sites, there's no single list, and deadlines
+   get discovered the night before. The problem is now *scattered deadlines*, not
+   "productivity".
+2. **User.** It asks who, exactly. "University students taking four or more courses, checking
+   on their phone between classes." That one answer already implies a phone-friendly layout,
+   fast entry and no long setup.
+3. **MVP features.** Add an assignment (title, course, due date); see everything due in the
+   next seven days, sorted by date; mark one done. Three features.
+4. **Non-goals.** This is where the interview earns its keep. No syncing with course
+   platforms, no grades, no study timer, no group sharing, no AI study plans, *in v1*. Each
+   is a reasonable idea, and each is days or weeks of work.
+5. **Flows.** First open → add the first assignment in under thirty seconds → see it on the
+   seven-day list. Daily use → open, glance, tick something off.
+6. **Success criteria.** "A new user adds an assignment without instructions." "The seven-day
+   list is correct across a month boundary." "Usable on a 375px-wide phone screen."
+
+That fits on half a page, and a fresh session in a different tool could build from it
+without asking you a single question. That is the test of a good spec.
+
+## Let AI help you write it
+
+Writing a spec from a blank page is hard; answering questions about your idea is easy. So
+have the AI **interview you**: "Ask me one question at a time until you can write a clear
+spec for this idea." *One at a time* matters. Ask for a full draft instead and the model
+fills every gap with a confident guess, and you end up editing its assumptions rather than
+stating yours. Questions surface the gaps you'd otherwise hit in code, when they cost more.
+
+Then refine the draft together and save it as a file **in the repo** (`docs/plans/` or
+`spec.md`), or as a doc in your notes if you don't code yet. Your coding agent (Claude Code,
+Cursor, Codex, Copilot) or app builder then builds against that file, session after session.
+For bigger projects, tools such as GitHub Spec Kit add structure (spec, plan, tasks), but the
+one-page habit comes first.
+
+> 💡 **Try it:** Paste your idea in one line into any assistant, followed by: "Ask me one
+> question at a time until you can list five non-goals for v1. Then list them." In five
+> minutes you'll see scope you didn't realise you were carrying.
+
+## Common failure modes
+
+- **The agent keeps adding features you didn't ask for** → the spec has no non-goals, so every
+  gap gets filled with plausible extras → add an explicit non-goals list and tell each
+  session to build only against the file.
+- **Success criteria nobody can check** ("fast", "intuitive") → they describe feelings, not
+  behavior → rewrite each one as something you could observe or test ("the list loads in
+  under a second on a phone").
+- **A "minimal" spec with ten MVP features** → nothing was ranked, so nothing was cut →
+  force-rank them, keep the top three, and move the rest to non-goals marked "v2".
+- **The spec lived in a chat that's now gone** → it was never saved → commit it to the repo or
+  a notes doc and point every session at that file.
+- **The AI invents answers you never gave** → you asked for a draft before it had enough
+  information → tell it to interview first and to list unknowns as open questions.
+
+## This is spec-driven development, scaled up
+
+You met this in the Claude Code pillar: decide what "done" means before building
+(→ plan-mode-spec-driven). Here it's the whole app. The most common reason AI app projects
+sprawl is a fuzzy spec. Nail this and everything downstream (stack, scaffold, build) gets
+easier. Next: choosing the tech you'll build it on.

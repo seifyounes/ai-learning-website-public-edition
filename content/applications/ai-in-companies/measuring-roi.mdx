@@ -1,0 +1,247 @@
+---
+title: "Measuring ROI"
+summary: "Capture a baseline before you automate, count the full cost, and report an AI project's return in one honest sentence."
+changeNote: "New: a worked example on AI-drafted support replies, a common-failures list, a note on the video's Asana framing, and a 10-minute metric-and-baseline decision."
+section: applications
+pillar: ai-in-companies
+order: 6
+level: intermediate
+estMinutes: 13
+taskMinutes: 30
+prerequisites: [where-ai-helps, automating-a-department]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "NOybqovsYpk"
+  published: "2025-11-25"
+  year: 2025
+  minutes: 19
+  title: "How to measure the ROI of AI using Asana's 4-step framework"
+  channel: "Asana"
+  why: "Made by Asana, so it presents Asana's own framework and expect some product framing. It's here because the 4-step method itself is concrete and works with any tool, which suits a team lead, a consultant or a small business better than abstract enterprise theory. For a counterweight, the backups include a 2026 talk arguing that usage is the wrong thing to measure."
+applyIt: |
+  Decide how one AI initiative will be judged **before** it ships, or now, if it already has:
+  yours, your team's or a client's. ROI is after-minus-before, so in ten minutes write down five
+  lines. Running example if you need one: an online shop adds AI-drafted replies to its support
+  inbox.
+
+  1. **The outcome metric:** one number the business already cares about (not usage), defined
+     exactly ("median minutes from ticket to first reply").
+  2. **The baseline window** and an equal-length comparison window.
+  3. **Where each number comes from:** a report, an export, or a time log you'd have to start.
+  4. **The full-cost lines:** tool fees, build hours, ongoing review time.
+  5. **What else could explain a change:** a new hire, a seasonal spike, a pricing change.
+
+  ```prompt
+  Check my measurement plan for [the AI initiative]: [paste the five lines]. Tell me if the
+  metric is really an outcome (not usage), and roughly how long I need to collect before a
+  difference means anything.
+  ```
+
+  **As an employee:** start a simple time log for the task now; two weeks of "before" beats any
+  estimate. **As a manager:** agree on the metric with whoever owns the budget before launch, not
+  after. **As a consultant:** put the five lines in the proposal so the client signs off on how
+  success will be judged.
+
+  Success: five lines you can start collecting against this week.
+toolkit: |
+  - **Baseline before you automate your own work.** Before building a saved prompt, agent skill or
+    automation, time the chore by hand twice. You can't prove a saving you never measured.
+  - **Count minutes saved, not invocations.** A prompt or tool you run often isn't ROI; time saved
+    per run × frequency is. Usage is the vanity metric even for your personal setup.
+  - **Count the full cost.** Build time + subscriptions and model/token spend (flagship models
+    aren't free) + the time you spend checking output. An automation that saves 10 minutes but
+    needs 8 of babysitting isn't the win it looked like.
+  - **Keep a one-line ledger and prune.** In a notes file, log each tool or automation with its
+    measured result ("weekly-report prompt: ~45 min → ~10 min") and review it monthly. Something
+    you built but never reach for has zero return; cut it or fix its rollout, not its model.
+recap:
+  - emoji: "🎯"
+    title: "Why measure at all"
+    text: "ROI is the difference between AI as a renewed budget line and a quietly cancelled experiment. Inside a company it funds the next project; for a consultant it's the best sales asset there is."
+  - emoji: "📏"
+    title: "The whole formula"
+    text: "After minus before. You can only prove improvement against a number you recorded first, which is why earlier lessons kept saying to measure the manual process."
+  - emoji: "📉"
+    title: "The tempting wrong metric"
+    text: "Usage: logins, messages, active seats. It shows motion, not value; tie ROI to a number the business already cares about, like hours saved or cost per item."
+  - emoji: "🧾"
+    title: "The cost people forget"
+    text: "Ongoing human review time. Honest ROI subtracts it along with subscriptions, build time and training; a tool that saves 5 hours but needs 4 of checking isn't a win."
+  - emoji: "📈"
+    title: "When ROI disappoints"
+    text: "Check adoption before blaming the tool. A capable tool nobody uses returns zero, which sends you back to the rollout lesson, not to a different model."
+  - emoji: "🗣️"
+    title: "How every initiative ends"
+    text: "With one sentence a non-technical decision-maker can act on: what moved, by how much, worth what, at what cost."
+task: |
+  Take one AI workflow (yours, your team's, or a client's), turn its before/after numbers into a
+  defensible ROI, and write the single-sentence result. No real numbers yet? Practise on this
+  made-up case, then redo it with your own: invoice entry took 6 hrs/week by hand; with an AI
+  extraction step it takes 1.5 hrs plus 1 hr/week of checking; the tool costs $30/month; setup
+  took 10 hours; staff time is valued at $40/hour.
+
+  ```prompt
+  I have numbers for one AI workflow: before = [metric + sample size or period], after =
+  [metric + sample size or period], plus its full cost — build hours, tool and model/API spend,
+  and ongoing review time. Compute the ROI honestly: the outcome delta (after − before), the
+  annualized value of that delta, minus the full cost — and call out whether the sample sizes
+  are large enough to trust or the difference is noise. Then write the single-sentence result a
+  manager or client would act on: "the [workflow] moved [metric] from X to Y — about $Z/year at
+  $C cost."
+  Success: one defensible ROI number and one plain sentence, with the noise caveat stated.
+  ```
+
+  Check the assistant's arithmetic in a spreadsheet; ROI numbers get quoted, so they must be
+  right.
+selfCheck:
+  - q: "Your team's AI tool logged 2,000 prompts last month, and leadership asks whether it's paying off. What do you report, and what do you start measuring?"
+    a: "Say plainly that prompt counts show activity, not value. Pick one outcome metric the business cares about (minutes per ticket, cost per invoice), compare it with a baseline from before the tool or from a team not using it yet, and subtract the full cost."
+  - q: "Handling time per support ticket fell sharply right after launch, but launch week was also the quiet holiday season. How do you check the AI actually caused the drop?"
+    a: "Compare like with like: per-ticket time (not total hours) against the same period last year, or against a team that hasn't got the tool yet. Also check a quality metric such as reopen rate, so you know speed didn't come at the cost of worse answers."
+  - q: "What costs belong in an honest AI ROI calculation?"
+    a: "All of them: subscriptions and model/API spend, build and setup time, training and change-management effort, and the ongoing human-review time. Counting only the licence fee inflates ROI; the full cost gives a number you can defend."
+mcq:
+  - q: "AI drafting frees about 10 hours a week across your team, valued at roughly $20,000 a year. Nobody's workload or headcount has changed yet. How do you report it?"
+    options:
+      - "As $20,000 a year saved, since the hours are measured"
+      - "As no benefit at all, since no cost has gone down"
+      - "As usage figures, since savings can't be proven yet"
+      - "As freed capacity, worth that if used for other work"
+    answer: 3
+    explain: "Saved hours only become money when they go to other work or actually cut cost. Until then, freed capacity is the honest label, and it's still a real result. Reporting $20,000 saved won't survive a budget review, and calling it nothing ignores time you measured."
+  - q: "After an AI tool launched, total support hours fell from 40 to 30 a week. Over the same period, ticket volume fell from 400 to 250 a week. What's the honest reading?"
+    options:
+      - "A 25% time saving, worth reporting to leadership now"
+      - "Time per ticket went up, so the tool may slow agents"
+      - "Nothing yet; wait a full quarter before any reading"
+      - "The AI deflected a third of tickets before they came"
+    answer: 1
+    explain: "Per ticket, the work took 6 minutes before (2,400 ÷ 400) and 7.2 minutes after (1,800 ÷ 250), so the fall in total hours came from lower volume. Totals move with volume, which is why you measure per unit. Crediting the tool with the drop in tickets assumes a cause you haven't checked."
+  - q: "An automation saves 6 hours a week of data entry, but staff now spend 5 hours a week checking its output, and it costs $50 a month. What do you recommend?"
+    options:
+      - "Net about 1 hour: cut the checking load before scaling"
+      - "Report 6 hours saved; checking is normal work anyway"
+      - "Stop checking its output, since it's usually accurate"
+      - "Call it a loss and cancel, since net time is so small"
+    answer: 0
+    explain: "Honest ROI subtracts review time, leaving about an hour a week minus the fee, so the useful move is finding out why checking takes so long. Reporting 6 hours ignores a cost you know about, and dropping the checks removes the guard that stops faster work from becoming worse work."
+  - q: "Six weeks after rollout, an internal AI assistant's measured return is near zero. Logs show only 3 of 25 staff use it. What's the next step?"
+    options:
+      - "Trial a stronger model, since its answers fall short"
+      - "Cancel the tool, since the measurement says it doesn't pay"
+      - "Fix the rollout: training, champions and framing"
+      - "Report the three users' activity as the success metric"
+    answer: 2
+    explain: "A capable tool nobody uses returns zero, so low adoption sends you back to the rollout before the model. Cancelling judges the tool on three users, and their activity is usage, not an outcome. Once adoption rises, re-measure the outcome metric against the baseline."
+backupResources:
+  - label: "The REAL Way to Measure AI ROI (Hint: It's Not Usage) | AI Strategy 2026 — AI4teams"
+    url: "https://www.youtube.com/watch?v=Z4gc471xmf0"
+    type: "video · vanity metrics"
+  - label: "How to Calculate ROI on AI Projects: A Framework for Enterprise Leaders"
+    url: "https://www.youtube.com/watch?v=jeBJpbDL5q0"
+    type: "video · framework"
+tags:
+  - companies
+  - roi
+  - metrics
+  - measurement
+---
+
+Everything in this track converges here. You mapped opportunities, automated a department, built
+an assistant, rolled it out and put guardrails on it. **Measuring ROI** is how you prove it was
+worth doing, and it's the difference between AI being a renewed budget line and a quietly
+cancelled experiment. Inside a company, a real, measured result is what gets your next project
+funded; for a consultant or agency, it's one of the strongest sales assets you can have.
+
+## ROI is after minus before, so capture before
+
+The most common ROI failure is having no **baseline.** You can only prove improvement against a
+number you recorded *before* you changed anything. That's why the earlier lessons kept saying
+*measure the manual process*: hours a week, cost per task, error rate, turnaround time. Skip the
+baseline and your ROI is a guess, and guesses rarely survive a budget review.
+
+Normalize the numbers. Total hours rise and fall with volume, so measure **per unit**: minutes
+per ticket, cost per invoice. Otherwise a quiet month looks like an AI success and a busy one
+looks like a failure.
+
+## Measure outcomes, not activity
+
+**Usage is a vanity metric.** Logins, messages sent, "seats active": they show motion, not
+value. Real ROI ties to a number the business already cares about:
+
+- **Operations** → hours saved per week, throughput.
+- **Finance** → cost per processed item, error or rework rate.
+- **Support** → response time, tickets resolved per agent, customer satisfaction.
+- **Marketing/Sales** → conversion, pipeline, revenue per campaign.
+
+Pick the one metric that maps to your use case and measure *that.* Then pick one **quality**
+guard metric (error rate, reopen rate) so a faster process that produces worse work doesn't
+count as a win.
+
+## Count the full cost
+
+Honest ROI subtracts everything: subscriptions and model or API spend, the time spent building,
+training and change-management effort, and, easy to forget, the **ongoing human-review time**
+that human-in-the-loop requires. A tool that saves 5 hours but needs 4 hours of checking isn't
+the win the licence-fee math suggested.
+
+Be careful with "hours saved." Saved hours only become money if they're used for something else
+(more tickets, new work) or genuinely reduce cost. Often the honest description is "capacity
+freed," and that's still a result worth reporting.
+
+## Worked example: AI-drafted support replies
+
+An online shop's support team starts using AI-drafted replies that agents review and send. All
+numbers are hypothetical.
+
+1. **Metric.** Minutes per routine ticket, from the help-desk export. Guard metric: the share of
+   tickets reopened.
+2. **Baseline.** Two weeks before launch: about 200 routine tickets a week at about 4 minutes
+   each, roughly 13.3 hours a week.
+3. **After.** Two comparable weeks after launch: the same volume, about 1.5 minutes each to
+   review and send, so 5 hours a week. The reopen rate is unchanged.
+4. **Value.** About 8.3 hours saved a week × $30 an hour ≈ $250 a week, or about $12,000 a year
+   over 48 working weeks.
+5. **Full cost.** Tool and API spend of $80 a month ($960 a year), plus 20 hours of setup at
+   $50 an hour ($1,000): about $1,960 in the first year.
+6. **Result.** About $10,000 net in year one, if the freed time goes to useful work.
+7. **Caveat.** Two weeks is a small window; keep measuring for a quarter before quoting it widely.
+
+> 💡 **Try it:** Pick one AI tool or prompt you use weekly. Write down, honestly, how many
+> minutes the task took before and how many it takes now, including checking. If you can't
+> answer the "before," you've found your first baseline to start.
+
+## Adoption is a leading indicator
+
+If ROI is disappointing, check usage before you blame the tool. **A capable tool nobody uses has
+zero return.** Low adoption sends you back to the rollout lesson (training, champions, framing),
+not to a different model. High adoption plus a moving outcome metric is the signal that it's
+working.
+
+## Common failure modes
+
+- **The ROI uses the vendor's estimate** → no measurement of your own → time the task yourself,
+  before and after.
+- **The baseline comes from memory** → nobody logged it → run a one- or two-week time log before
+  launch.
+- **A seasonal dip looks like an AI win** → totals instead of per-unit numbers → normalize per
+  ticket or per invoice and compare like periods.
+- **Speed went up, quality went down** → no guard metric → track errors or reopens alongside
+  time.
+
+## The one-sentence result
+
+End every AI initiative with a sentence a non-technical decision-maker can act on:
+
+> "Cut invoice processing from ~6 hrs to ~1 hr/week — about \$X saved a year, at a tool cost of \$Y."
+
+That sentence renews budgets, justifies the next project and, for a consultant, helps close the
+next client.
+
+## You finished the track 🎉
+
+Map → automate → assistant → roll out → govern → measure. You can now walk into a business, find
+where AI creates real value, ship it responsibly and **prove the return.** Inside an organization,
+that makes you the person who leads the next initiative; as a consultant, it's a service you can
+sell.

@@ -1,0 +1,208 @@
+---
+title: "Zapier vs Make vs n8n"
+subtitle: "Choosing your tool"
+summary: "Choose Zapier, Make or n8n as your default automation tool for a clear reason, knowing how each one prices and where it runs."
+changeNote: "New: how each tool charges, a worked example with three learners, a failure-modes list, a 15-minute watch segment, and a two-editor trial matched to who you are."
+section: foundations
+pillar: workflows-agents
+order: 2
+level: beginner
+estMinutes: 14
+taskMinutes: 25
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "MjIngZJHjBc"
+  published: "2025-05-02"
+  year: 2025
+  minutes: 34
+  start: 0
+  watchMinutes: 15
+  title: "1 Automation Built On 3 Different Platforms (n8n vs Make vs Zapier)"
+  channel: "Nick Saraev"
+  why: "Nick Saraev builds automations for clients, and here he builds the same automation (a YouTube-transcript flow) on all three platforms. Watching one flow take shape in three editors shows the real differences (data mapping, branching, how each one feels) far better than a feature table can. A straight feature comparison is in the backups."
+  notes:
+    - "Watch the intro and his first build, on Zapier (0:00–14:50)."
+    - "Then skim the Make build (from 14:50) and the n8n build (from 24:10) for how the editors differ."
+applyIt: |
+  Draw one boundary for your own work before you build much: these tools are for the **ops glue
+  around** your work, not the product itself. Ten minutes, three jobs.
+
+  1. **List three jobs** you'd like automated (feedback triage, a weekly report, a sign-up flow,
+     a payment receipt).
+  2. **Place each one:** the automation tool, your app or backend, or "stays manual".
+  3. **Write one reason per placement.**
+
+  **If you code:** logic that runs inside your app (payments, sign-up, in-app AI features) belongs
+  in your codebase or backend functions; the no-code tool handles the glue around it (feedback
+  triage, weekly reports, repo notifications). **If you don't code:** the no-code tool *is* your
+  backend for now, and that's fine. **At work:** check which tool your company already pays for
+  and approves; it often decides for you.
+  Success: three jobs placed with a reason each, and one you've decided to keep out of the automation tool.
+toolkit: |
+  - **Write your default tool into your assistant's custom instructions.** One line in ChatGPT,
+    Gemini or Claude ("automations: Make unless I say otherwise") stops every chat from suggesting
+    a different platform when you ask for build help.
+  - **Keep API keys in the tool's credential store, never in node text or prompts.** If keys must
+    stay on your own machine, self-hosted n8n is the option the other two don't offer.
+  - **Practice "pick one, go deep."** Commit to a single editor in a notes file, with the date and
+    the reason, and ignore the others until a real job forces a switch. Tool-hopping is the most
+    expensive habit in this space.
+  - **Start from templates.** Browse your chosen tool's template gallery for the flow you need
+    before building from scratch, and save the ones you adapt as your own starting points.
+recap:
+  - emoji: "🗺️"
+    title: "What actually differs"
+    text: "All three solve trigger→action; they differ by who you are, not what they do. Choosing is about fit, not a winner."
+  - emoji: "🟠"
+    title: "Zapier's trade-off"
+    text: "Biggest app catalogue, most polished, mostly linear Zaps. Fastest to a working flow — and the priciest as volume climbs."
+  - emoji: "🟣"
+    title: "Make's sweet spot"
+    text: "A branching, looping canvas you can actually see, at great value. The sweet spot for most people most of the time."
+  - emoji: "🔵"
+    title: "n8n's ceiling"
+    text: "Source-available and free to self-host, cheapest at scale, with first-class AI/agent nodes. More technical, but the strongest base for the AI lessons."
+  - emoji: "🔀"
+    title: "What carries over"
+    text: "Trigger→action is universal, so nothing you learn in one editor is wasted in another. The concepts port; only the canvas changes."
+  - emoji: "🎯"
+    title: "How many to learn"
+    text: "Don't learn all three — choose by how the editor feels and commit. Depth in one beats a shallow tour of three."
+task: |
+  Practice what the lesson preaches: don't sign up for all three. Open the **two editors that
+  fit you**:
+
+  - **No code, low volume** (a few simple flows a week) → **Zapier and Make**.
+  - **You build, run high volume or want AI steps** → **Make and n8n** (n8n's free cloud trial
+    or a free self-hosted install).
+
+  Free plans or trials are enough. Spend 10 minutes in each editor, building the same tiny flow:
+  a manual or schedule trigger → set one field → send yourself an email. Note which editor made
+  the data mapping obvious and which made you hunt.
+
+  Then commit to ONE **in writing**, a single line in your notes: "My default is ___ because ___."
+  Use the feel of the editors plus this rule of thumb:
+
+  - Just want it to work, simplest path, biggest app catalogue → **Zapier**.
+  - Want visual power and good value for branching, multi-step flows → **Make**.
+  - Want control, low cost at scale, self-hosting, and the strongest AI/agent support → **n8n**
+    (this pillar leans on it for the AI lessons).
+
+  For a builder, n8n is the high-ceiling pick and Make the friendliest powerful middle; for a
+  no-code, low-volume user, Zapier is usually the fastest route to a working flow. Whichever pair
+  you tried, today is about going deep, not wide.
+  Success: the same flow attempted in both editors, and one written commitment with a reason.
+selfCheck:
+  - q: "A 12-step flow (a trigger plus 11 actions) will run about 20,000 times a month. Which tool's meter hurts least, and why?"
+    a: "n8n. Zapier counts every action step as a task (about 11 × 20,000 = 220,000 tasks a month) and Make counts every module run, trigger included (about 240,000), while n8n cloud counts one execution per run however many steps it has: 20,000. Self-hosted, it costs only the server. On any tool, filter early so irrelevant runs stop at step one."
+  - q: "A marketer who doesn't code needs 'new form entry → add to the email list → post in team chat' working by this afternoon, at low volume. Which tool, and why?"
+    a: "Zapier. The flow is linear, the apps almost certainly have ready-made connectors, and at low volume the per-task price doesn't matter. Speed to a working flow wins here."
+  - q: "Your six-step Make scenario runs on every new order. Orders tripled and so did the bill. What's happening, and what are your options?"
+    a: "Make meters each module run, so cost grows with steps × runs. Put filters as early as possible so irrelevant runs stop at step one, cut or merge steps, or move high-volume flows to n8n, which counts whole workflow executions (or costs only a server when self-hosted)."
+  - q: "A developer friend says, 'Just self-host n8n, it's free.' What does that leave out?"
+    a: "The licence is free, the work isn't: you run the server, apply updates, keep backups, secure it and fix it when it goes down. Worth it for control, privacy and scale, but start on n8n cloud if you don't want to be the ops team."
+backupResources:
+  - label: "Zapier vs Make vs n8n: Which One Is The BEST For You? (2026) — Tutorials by Manizha & Ryan"
+    url: "https://www.youtube.com/watch?v=fH42AQLZxLI"
+    type: "video · feature comparison"
+  - label: "n8n — official site & docs"
+    url: "https://n8n.io"
+    type: "docs · official"
+tags:
+  - automation
+  - zapier
+  - make
+  - n8n
+  - tool-choice
+---
+
+Three tools dominate no-code automation, and being vendor-neutral here matters:
+they solve the same problem for **different people**. Here's the honest map so you
+pick one and stop tool-hopping.
+
+## The three, side by side
+
+- **Zapier** — the easiest on-ramp, the largest app catalogue, the most polished.
+  Mostly linear "Zaps" (it has Paths for branching, but linear is its comfort zone).
+  Brilliant for getting something working in minutes; the priciest as volume grows.
+- **Make** (formerly Integromat) — a visual canvas with real power: branching (routers),
+  loops (iterators), error handlers, data transforms. Excellent value and a joy to *see* your
+  flow. The sweet spot for most people.
+- **n8n** — **source-available / fair-code** (Sustainable Use License), **free to
+  self-host**. The most flexible and the cheapest at scale, with first-class AI/agent
+  nodes and a Code node for JavaScript or Python when the visual nodes run out — but a bit
+  more technical. The high ceiling.
+
+All three now ship AI steps and some form of agent feature, so "which one has AI" is no longer
+the question. The questions are how the editor fits your brain, how you'll pay, and where your
+data lives.
+
+## How they charge (the shape, not the price)
+
+Prices change often, so check each pricing page before you commit. What matters more is **what
+each one counts**, because that decides how your bill grows:
+
+- **Zapier** counts **tasks**: each successful action step is one task. A trigger plus four
+  actions, run 1,000 times a month, is roughly 4,000 tasks.
+- **Make** counts each **module run** (its plans now call these units credits). The same flow is roughly 5,000 units a month, because the
+  trigger module counts too.
+- **n8n cloud** counts **executions**: one run of the whole workflow is one execution, however
+  many steps it has. The same flow is 1,000. Self-hosted n8n costs whatever your server costs.
+
+So long, many-step flows at high volume favour n8n; short, low-volume flows barely notice the
+difference, and Zapier's speed wins.
+
+## Worked example: three people, three picks
+
+1. **A marketer at a small shop, no code.** She wants "new Typeform entry → add to the email
+   list → ping the team chat", a few dozen times a week. Every app has a ready connector, the flow
+   is a straight line and the volume is tiny. **Zapier**: working before lunch.
+2. **An operations lead** routing incoming orders: different branches by country, a loop over
+   each line item, an error path when stock is missing. He wants to *see* the logic. **Make**:
+   routers and iterators are first-class, and the canvas makes the branching legible to his team.
+3. **A developer** building AI triage and agents, who wants customer data to stay on a server
+   she controls. **n8n self-hosted**: agent nodes, a Code node for the odd custom step, and no
+   per-step meter.
+
+Notice each pick follows from the situation, not from which tool is "best".
+
+> 💡 **Try it:** Open the integrations directory of Zapier, Make and n8n and search for the three
+> apps you use most. Note which tools have a ready-made connector for all three. Five minutes,
+> and it often settles the choice.
+
+## Other tools you'll hear about
+
+If your company runs on Microsoft 365, **Power Automate** may be the approved choice, and it
+covers the same trigger→action pattern. Developer-leaning options like Pipedream and open-source
+Activepieces exist too. The concepts in this pillar carry over to all of them.
+
+## How to choose (pick one, go deep)
+
+- **Simplicity & breadth** → Zapier.
+- **Visual power + value** → Make.
+- **Control, scale, and AI** → n8n.
+
+Don't try to learn all three. The skills transfer (trigger → action is universal),
+so commit to one editor and get fluent.
+
+## Common failure modes
+
+- **Tool-hopping** → three half-built flows in three tools → each switch resets your fluency →
+  write down your default and only switch when a real job forces it.
+- **Bill shock at volume** → a cheap flow becomes expensive when traffic grows → per-step
+  metering multiplies with runs → estimate steps × runs per month before scaling, and filter early.
+- **Self-hosting before you're ready** → a server that's down, unpatched or unbacked-up → nobody
+  owns the ops → use n8n cloud until you're comfortable running a server.
+- **Building your product inside the automation tool** → core logic that's hard to test and
+  version → glue and product got mixed → keep app logic in code; let the tool handle the glue.
+- **Ignoring your employer's approved list** → a security review blocks your flow → the tool
+  touches company data → check what's approved before you build at work.
+
+## The steer for this course
+
+If your goal is **AI-powered automation** — for your own work, your team, or clients — the
+two best bets are **Make** (friendliest powerful tool) and **n8n** (control, cost, and the
+strongest AI/agent support). This pillar uses **n8n** for the AI-heavy lessons because of those
+agent nodes — but if Make's canvas clicks better for you, the concepts all carry over. Next:
+build your first real automation (→ first-automation).

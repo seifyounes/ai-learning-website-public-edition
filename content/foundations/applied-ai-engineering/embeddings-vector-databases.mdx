@@ -1,0 +1,253 @@
+---
+title: "Embeddings & vector databases"
+summary: "Turn text into embeddings, search it by meaning with a vector database, and pick an embedding model you can live with."
+changeNote: "New: how to choose an embedding model, a worked example, a failure-modes list, and a quick call between passing text whole, keyword search or vectors."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 5
+level: intermediate
+estMinutes: 14
+taskMinutes: 45
+prerequisites: [rag-fundamentals]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "dN0lsF2cvm4"
+  published: "2023-05-06"
+  year: 2023
+  minutes: 4
+  title: "Vector Databases simply explained! (Embeddings & Indexes)"
+  channel: "AssemblyAI"
+  why: "Four minutes that connect the two ideas this lesson needs, embeddings (meaning as vectors) and the database that searches them, including what an index is for, without teaching one product's API. It comes from AssemblyAI, a speech-AI company, not a vector-database vendor. The lesson body covers what it leaves out (model choice, hybrid search, thresholds); a second explainer and a vector-DB primer are in the backups."
+applyIt: |
+  Start with the judgment call, which takes ten minutes and saves you a service you don't need.
+  List three places in your project or work where people (or your feature) look things up, and
+  put each on the ladder:
+
+  - **Pass it whole:** the data fits in one prompt (ten FAQ entries, a short settings page, a
+    user's profile). No vector DB needed.
+  - **Keyword search:** people search with exact terms (ids, error codes, names) and rarely miss.
+  - **Search by meaning:** thousands of notes, tickets, docs or products where people phrase
+    things differently from the text. Write one query keyword search would fail on.
+
+  For anything on the last rung, note the database you already run that could hold the vectors
+  (pgvector on Postgres, or your platform's equivalent) before you consider a new service. **If
+  you code:** ask your coding agent which table or folder in your repo would benefit from
+  semantic search and which wouldn't, and why, without building anything. **If you don't code
+  yet:** use a shared drive, a ticket backlog or an FAQ page at work as your three places.
+
+  Success: three lookups placed on the ladder with a reason each, and a failing keyword query for any that needs vectors.
+toolkit: |
+  - **Don't add a vector DB you don't need.** A short notes file or a list of fifty snippets is
+    better served by a plain pass or a keyword filter until scale forces the upgrade. Put that
+    rule in AGENTS.md (or CLAUDE.md / GEMINI.md for those agents) so your coding agent doesn't
+    propose a managed vector service for a twenty-row table.
+  - **Make your own notes searchable by meaning.** Once your notes, bookmarks or past write-ups
+    pass a few hundred items, embed them and query by similarity; inside Obsidian, plugins such
+    as Smart Connections do this for a vault.
+  - **Use the vector extension of the database you already run.** pgvector on Postgres (or your
+    platform's equivalent) beats spinning up and paying for a separate service you also have to
+    secure and back up.
+  - **Log the embedding model per vector.** It's a commitment: switching models means
+    re-embedding every chunk, so record which model made each one or a swap silently corrupts
+    your search.
+recap:
+  - emoji: "🧭"
+    title: "Text in, numbers out"
+    text: "An embedding turns text into a vector, a fixed-length list of numbers that captures its meaning. The model learned this geometry in training."
+  - emoji: "🧲"
+    title: "Two phrasings, no shared words"
+    text: "'Cancel my subscription' and 'how do I end my plan' land near each other. Nearness means similar topic and meaning."
+  - emoji: "🗃️"
+    title: "What a vector DB returns"
+    text: "The nearest stored vectors to a query, optionally filtered by metadata. That's the retrieve step of RAG."
+  - emoji: "➕"
+    title: "Where vectors stumble"
+    text: "Exact codes, SKUs and rare names carry little meaning, and opposite opinions on one topic can sit close. Add keyword search for the first."
+  - emoji: "🔒"
+    title: "Switching embedding models"
+    text: "Vectors from different models can't be compared, so a switch means re-embedding everything. Record which model made each vector."
+  - emoji: "📏"
+    title: "Scores aren't probabilities"
+    text: "Their scale varies by model, so pick a similarity floor per model from real examples and answer 'not found' below it."
+  - emoji: "🧰"
+    title: "Where to store them first"
+    text: "In the database you already run (pgvector on Postgres) or Chroma locally. Reach for Pinecone, Weaviate or Qdrant when scale demands it."
+  - emoji: "🚀"
+    title: "Fast at millions of items"
+    text: "Approximate nearest-neighbour indexes like HNSW trade a sliver of recall for speed. Measure recall@k to know what you gave up."
+task: |
+  Build your first running semantic search, about 45 minutes. Use 10 short texts you know well:
+  your last 10 notes or to-dos, 10 FAQ entries from a product you use, or 10 one-line
+  descriptions of your own projects.
+
+  ```prompt
+  Embed these 10 texts [paste them] with Chroma locally (zero setup), or pgvector if I already
+  run Postgres: embed + store each one, then embed a query that shares almost no words with its
+  best match (e.g. "where's my parcel" for a note about delivery tracking) and return the
+  nearest texts with their similarity scores. Run two more queries, including one whose result
+  surprises me, and explain why it ranked that way. Log which embedding model made the vectors.
+  ```
+
+  **No-code path:** run the script in a free Google Colab notebook; a small open embedding model
+  from the sentence-transformers library runs there with no API key.
+
+  Success: a query with no shared keywords retrieves the right text first, and you have working add (embed+store) + query (embed+nearest) code.
+selfCheck:
+  - q: "After you switch to a newer embedding model for new documents, search quality collapses for old ones. What happened, and what's the fix?"
+    a: "Old and new vectors come from different models, so they live in different spaces and their distances are meaningless across the two. Re-embed the whole corpus with the new model, and store the model name with every vector."
+  - q: "Users paste error codes like `ERR-4012` into your docs search and get vaguely related pages instead of the one page that lists that code. Why, and what do you change?"
+    a: "Codes carry little semantic meaning, so pure vector search treats them as noise. Add keyword (BM25) search and merge both result lists (hybrid search)."
+  - q: "Your semantic FAQ search returns a confident-looking top answer even for questions the FAQ doesn't cover. What's missing?"
+    a: "A similarity floor. Nearest-neighbour search always returns *something*; pick a per-model threshold from real matches and non-matches, and answer \"not found\" below it."
+mcq:
+  - q: "You build a search over product reviews to surface complaints. A search for \"charger stopped working\" also returns glowing reviews saying the charger \"works great\". Why?"
+    options:
+      - "The vector index is approximate and skipped matches"
+      - "Cosine similarity should be swapped for dot product"
+      - "Embeddings mostly capture topic, not opinion"
+      - "The embedding model truncated the longer reviews"
+    answer: 2
+    explain: "Both reviews are about a charger working, so they sit close together; embeddings alone don't separate opposite opinions or negations. An approximate index occasionally misses a neighbour rather than promoting wrong ones, and with normalised vectors cosine and dot product rank the same."
+  - q: "An embedding model tops the MTEB leaderboard, but on your medical-notes search it ranks results worse than a smaller model. What's the right reading?"
+    options:
+      - "Your test is wrong, since MTEB covers medical text"
+      - "Leaderboards shortlist; your own data decides"
+      - "Bigger vectors always need more data to pay off"
+      - "Switch to dot product to unlock the larger model"
+    answer: 1
+    explain: "MTEB is a reasonable shortlist, but a model can still lose on your domain's vocabulary, so test two or three candidates on your own queries and keep the winner. Vector size affects storage cost, not whether the model understands your terms."
+  - q: "Your vector search filters to documents the current user may see. Some users now get only one or two results where they should get ten. What's the likely cause?"
+    options:
+      - "The similarity floor is set too high for users"
+      - "The embedding model can't encode permissions"
+      - "Those users' documents need re-embedding"
+      - "The filter runs after the approximate search"
+    answer: 3
+    explain: "If the database takes its top candidates first and filters afterwards, most candidates belong to other users and get dropped; use pre-filtering or raise the candidate count. Permissions belong in metadata filters, not in the embedding, so the model isn't the problem."
+  - q: "You embed whole 30-page manuals as single vectors. Questions about material near the end of each manual never match. What's happening?"
+    options:
+      - "Text beyond the model's input limit was cut off"
+      - "The ANN index drops vectors for long documents"
+      - "Long documents need a lower similarity floor"
+      - "The query and documents use different prefixes"
+    answer: 0
+    explain: "Embedding models have a maximum input length and often truncate longer text silently, so the end of each manual never reached the vector; chunk documents to fit the limit. A query and document prefix mismatch would weaken every match, not only material near the end."
+backupResources:
+  - label: "Embeddings & Vector Databases Explained — LearnThatStack"
+    url: "https://www.youtube.com/watch?v=rw1YfQQttfo"
+    type: "video · alternative"
+  - label: "Pinecone — what is a vector database (primer)"
+    url: "https://www.pinecone.io/learn/vector-database/"
+    type: "reference"
+tags:
+  - embeddings
+  - vector-database
+  - rag
+  - applied-ai
+---
+
+The last lesson treated retrieval as a box. Here it is opened: **embeddings turn meaning into
+numbers, and vector databases make those numbers searchable.** Together they're the engine
+behind RAG, semantic search, recommendations and duplicate detection.
+
+## Embeddings: meaning as math
+
+An **embedding model** converts a piece of text (or an image) into a **vector**: a fixed-length
+list of numbers, typically several hundred to a few thousand of them. The crucial property:
+**similar meanings produce nearby vectors.** "Cancel my subscription" and "how do I end my
+plan" land close together even though they share almost no words. The model learned that
+geometry during training.
+
+Two subtleties practitioners learn early:
+
+- **"Similar" means what the model learned it to mean.** Embeddings mostly capture *topic*.
+  "This charger works great" and "this charger stopped working" can sit close together,
+  because both are about a charger working. Don't expect embeddings alone to separate
+  opposite opinions or negations.
+- **Exact identifiers are a weak spot.** Error codes, SKUs, invoice numbers and rare names
+  carry little "meaning", so a vector search may miss `ERR-4012` that a keyword search finds
+  instantly. That's why production retrieval is usually **hybrid**.
+
+## Vector databases: search by similarity
+
+A normal database finds exact matches. A **vector database** finds the **nearest** vectors to a
+query vector, using a similarity measure. Three operations:
+
+1. **Add**: embed your chunks and store each vector with its text and metadata (source, date,
+   owner).
+2. **Query**: embed the question and find the nearest stored vectors, optionally filtered by
+   metadata ("only documents this user can see", "only 2025 policies").
+3. **Index**: the structure that keeps search fast at scale.
+
+Comparing a query against every stored vector (exact search) is fine for thousands of items.
+Beyond that, databases use **approximate nearest neighbour (ANN)** indexes such as HNSW, which
+are much faster and occasionally miss a true nearest neighbour. That small recall loss is a
+tunable trade-off, and one more reason to measure recall@k (→ rag-fundamentals).
+
+**Cosine or dot product?** Cosine compares direction only; dot product also rewards vector
+length. Many embedding models return normalised vectors, which makes the two equivalent, so
+cosine is the safe default.
+
+## Choosing an embedding model
+
+Hosted options (from OpenAI, Google, Cohere, Voyage and others) need only an API call. Open
+models (the sentence-transformers family, BGE, E5, Nomic and others) run locally for free.
+Public leaderboards such as MTEB are a reasonable shortlist, but test two or three candidates
+on *your* data: a model that tops a leaderboard can still lose on your domain's vocabulary.
+Check three things on the model card: the **maximum input length** (longer text is often
+silently truncated), whether it expects **different prefixes or input types for queries and
+documents**, and the **vector size** (bigger costs more storage).
+
+Your choice is a **commitment**: vectors from different models live in different spaces and
+can't be compared. Switching models means re-embedding everything, so record which model made
+each vector.
+
+## Worked example: an FAQ that understands paraphrases
+
+A small online shop has three FAQ entries: "Tracking your delivery", "Returns and exchanges"
+and "Changing your password".
+
+1. **Ingest.** Embed each entry's title and answer with one model and store them in Chroma
+   with metadata `{id, model}`.
+2. **Query.** A customer types "where's my parcel". Embed it with the *same* model.
+3. **Rank.** The store returns all three with similarity scores. "Tracking your delivery"
+   comes first, well above the others, despite sharing no words with the question.
+4. **Set a floor.** Now try "do you sell gift cards?", which no entry covers. The top match
+   still comes back, just with a lower score. Similarity scores aren't probabilities and their
+   scale varies by model, so you pick a threshold *for this model* by looking at real matches
+   and non-matches, and below it you answer "I couldn't find that; here's how to contact us."
+5. **Patch the gap.** Add keyword search alongside so an order number typed into the box also
+   matches exactly.
+
+> 💡 **Try it:** Many embedding models on Hugging Face (for example the small
+> `all-MiniLM-L6-v2`) have a sentence-similarity widget on their model page. Compare "the
+> meeting is cancelled" with "the meeting is not cancelled" and with "our call is off". Which
+> pair scores closer?
+
+## You don't build it from scratch
+
+- **Chroma** or **LanceDB**: easiest start, runs locally.
+- **pgvector**: add vectors to Postgres you already run (most hosted Postgres providers
+  support it).
+- **Pinecone, Weaviate, Qdrant, Milvus**: dedicated or managed, built for scale.
+
+Start with the database you already have; add a dedicated service only when scale or features
+demand it.
+
+## Common failure modes
+
+- **Search results become nonsense after an "upgrade"** → old and new vectors from different
+  models mixed in one index → store the model name per vector and re-embed everything on a
+  switch.
+- **Long documents match poorly** → text beyond the model's input limit was truncated → chunk
+  to fit the limit.
+- **Exact codes and names aren't found** → pure vector search → add keyword (BM25) search and
+  merge the results.
+- **Irrelevant answers to out-of-scope questions** → no similarity floor → set a per-model
+  threshold and answer "not found" below it.
+- **Filtered queries return too few results** → the filter is applied after the approximate
+  search → use the database's pre-filtering or raise the candidate count.
+
+Next, the pillar comes together: an **agent in code** (→ build-agent-in-code).

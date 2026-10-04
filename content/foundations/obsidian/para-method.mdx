@@ -1,0 +1,316 @@
+---
+title: "Organize with PARA"
+summary: "Sort your own notes into Projects, Areas, Resources and Archive by how actionable they are, and keep your notes index in step when files move."
+changeNote: "New: a ten-minute sort of your own commitments with an AI second opinion, a no-code move plan you approve row by row, and ways to mirror PARA in your chat assistant."
+section: foundations
+pillar: obsidian
+order: 5
+level: beginner
+estMinutes: 16
+taskMinutes: 35
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "T6Mfl1OywM8"
+  published: "2023-07-13"
+  year: 2023
+  minutes: 11
+  title: "Organize Your ENTIRE Digital Life in Seconds (The PARA Method)"
+  channel: "Tiago Forte"
+  why: "PARA explained in eleven minutes by Tiago Forte, who created it, so you get the definitions first-hand. He's precise where second-hand versions blur: a project has an outcome *and* an end; an area is a standard you maintain and never complete; resources are 'waiting to be activated'; archives are cold storage, never deletion. It's his own framework, so expect him to present it at its best. Take the decision rules from him and the vault layout from the lesson."
+  notes:
+    - "Watch all eleven minutes. Listen for why he numbers the folders 1 to 4: to sort them from most actionable to least."
+    - "There is no Obsidian in this video. The tour from 4:49 is his Evernote, because PARA is meant to work the same in every app."
+    - "Take the folders, the vault layout and keeping `index.md` in step from the lesson below, not from his demo."
+    - "Inside `1 Projects` he keeps one folder per active project. That's one level down, not a tree; the lesson body draws that line."
+readAfter:
+  - label: "The PARA Method — Tiago Forte's canonical written version"
+    url: "https://fortelabs.com/blog/para/"
+    kind: article
+applyIt: |
+  Before any AI sorts anything, write your own four lists on paper or in a scratch note. Ten
+  minutes, and it's the judgment the task below leans on:
+
+  - **Projects** — an outcome with an end. **If you study:** "submit the databases coursework",
+    "pass the statistics midterm". **If you code:** "ship the login flow for my side project",
+    "migrate the blog to a new framework". **At work:** "launch the Q3 newsletter", "finish the
+    vendor comparison".
+  - **Areas** — responsibilities with a standard and no finish line: "my degree", "health",
+    "finances", "the team's weekly reporting", "keeping my portfolio current".
+  - **Resources** — what you collect on but are not acting on: "machine learning", "design
+    systems", "negotiation". Parked until a project pulls one out.
+  - **Archive** — done or dormant: last semester's courses, a finished client job, the side
+    project you paused.
+
+  Then trace one thing through its lifecycle. A side project is a good example: building the
+  first version is a Project, keeping it running is an Area, and each finished feature's notes
+  graduate to Archive. Sorted by what you'll open when you sit down to work, not by subject.
+
+  **With a chat assistant (no code):** paste the four lists into a chat and ask "Using Forte's
+  tests (an outcome with an end is a project, an ongoing standard is an area, reference I'm not
+  acting on is a resource, done or dormant is archive), which items would you move, and why?
+  Don't rewrite my lists." Answer each flag: move it, or keep it with a reason.
+
+  Success: four lists, every flag answered, and one item traced from Project to Area or Archive.
+
+  **With a coding agent:** save the lists as `inbox/para-lists.md` and ask your agent the same
+  question, plus which commitments your `daily/` notes keep mentioning that appear in no list.
+  Report in chat only; edit no file.
+
+  Success: four lists, every flag answered with the note behind it, and no file changed.
+toolkit: |
+  - **Mirror PARA in your chat assistant.** One ChatGPT or Claude Project (or Gemini Gem) per
+    active project, never one per topic. When the project ends, save what's worth keeping into
+    `archive/` and archive or delete the Project, so stale files stop shaping new answers.
+  - **Put actionability in your custom instructions.** Add a short "Current focus" line to
+    ChatGPT's custom instructions, Claude's profile preferences or Gemini's saved info listing
+    your 2–3 active projects, so the assistant weighs what's live over what's archived.
+  - **Separate the folders you open from what your assistant knows.** PARA organises your working
+    folders; an index note (`index.md`, or a `notes-index.md` you upload to a Project) catalogs
+    what your assistant should know. Don't sort the catalog into four buckets — it answers a
+    different question.
+  - **Re-point the index in the same sitting.** Any time you move or rename notes, update the
+    index lines before you close Obsidian. A path that points at nothing is worse than no path.
+recap:
+  - emoji: "🧩"
+    title: "The problem PARA solves"
+    text: "Forte's opening claim: people over-complicate note-taking because they have no rule, so they redo the same filing decision forever. PARA is one rule you run on every new note."
+  - emoji: "🚀"
+    title: "What makes a project"
+    text: "An outcome you are committed to that takes several work sessions and has a deadline. He runs 15–25 at once and says that is a normal number, not an excessive one."
+  - emoji: "🔁"
+    title: "What makes an area"
+    text: "A role or responsibility you maintain to a standard and never check off — health, finances, a relationship, a business function. Important now and important later."
+  - emoji: "📚"
+    title: "What makes a resource"
+    text: "Topics and reference material you are not acting on. Low actionability, kept in case a future project needs it — and a whole folder can be promoted to a project in one move."
+  - emoji: "🧊"
+    title: "What the archive is for"
+    text: "Inactive items from any of the other three, kept as cold storage. His archive is larger than the other three combined, and he says that is exactly right."
+  - emoji: "🔢"
+    title: "Why the numbers?"
+    text: "He prefixes the folders 1 to 4 so they sort from most actionable to least. The ordering is not decoration — it is the reason the system saves you time."
+  - emoji: "🌍"
+    title: "One system, many apps"
+    text: "The point is one filing philosophy across every app and drive you use, so you stop inventing a new one per tool. His demo is Evernote; yours will be a vault."
+task: |
+  Do the sort with an AI, but keep the veto: it proposes a move plan, you approve it row by
+  row, and nothing moves before that. Create the four folders first (`projects`, `areas`,
+  `resources`, `archive`) in Obsidian's file pane.
+
+  **With a chat assistant (no code):**
+
+  - Upload every note in `daily/`, the loose notes at the vault root, and `index.md` to a chat
+    in your Vault Project, then ask for the plan:
+
+  ```prompt
+  Classify every uploaded note except index.md, vault-rules.md and log.md by actionability,
+  Forte's way: a live outcome with an end → projects; an ongoing responsibility → areas;
+  reference I am not acting on → resources; finished or dormant → archive.
+
+  Give me a move plan as one markdown table: current path, proposed bucket, one-line reason.
+  Mark anything you are unsure about UNSURE. Then list the index.md lines that would need
+  rewriting after the moves, each with its new version.
+
+  Success: a plan I can approve row by row, and index.md lines ready to paste.
+  ```
+
+  - Paste the table into a new note, `move-plan`, and type KEEP or SKIP at the end of each row.
+    Argue with it — the rows you disagree with are the interesting ones.
+  - Drag each KEEP note into its bucket in Obsidian's file pane; Obsidian rewrites the
+    `[[links]]` that point at it. Skip every UNSURE row.
+  - Replace the affected `index.md` lines with the new versions (fix any for rows you skipped),
+    and add one dated line to `log.md` with how many notes landed in each bucket.
+  - Add the four buckets to `vault-rules.md` and your Project's instructions as **yours**: an AI may
+    suggest a move, never file into them itself.
+
+  Success: only the rows you kept were moved, and `index.md` points at no missing file.
+
+  **With a coding agent:**
+
+  - From a terminal at the vault root:
+
+  ```prompt
+  Work in my Obsidian vault; this folder is the vault root. Read vault-rules.md and index.md.
+
+  Classify every note in daily/ and every loose note at the vault root by actionability,
+  Forte's way: a live outcome with an end → projects; an ongoing responsibility → areas;
+  reference I am not acting on → resources; finished or dormant → archive.
+
+  Move nothing. Write move-plan.md instead: one row per note — current path, proposed bucket,
+  one-line reason — then list the index.md lines that would need rewriting after the moves.
+  Mark anything you are unsure about UNSURE and leave it out of the totals.
+
+  Do not touch sources/ or wiki/. Do not classify vault-rules.md, index.md, log.md or your
+  own rules file (AGENTS.md, or CLAUDE.md / GEMINI.md) — those are the vault's spine, they
+  belong to no bucket, and they stay at the root.
+
+  Success: a plan I can approve row by row, and zero files moved.
+  ```
+
+  - Read the plan, argue with it, and mark the rows you accept KEEP. Then execute only those:
+
+  ```prompt
+  Execute move-plan.md, but only the rows I marked KEEP. Go one row at a time: state the
+  move, make it, then show me the next. If a destination file already exists, stop and ask
+  — never overwrite. Skip every UNSURE row. Leave the spine files at the root.
+
+  When the moves are done, rewrite the affected index.md lines to the new paths and append
+  one dated line to log.md naming how many notes landed in each bucket.
+
+  Success: only KEEP rows moved, nothing overwritten, and index.md has no path pointing at
+  a file that isn't there any more.
+  ```
+
+  - Last step, by hand: add the four buckets to `vault-rules.md` as **yours**, so the agent never
+    files anything into them by itself.
+
+  Success: only the rows you kept were moved, nothing was overwritten, and `index.md` points
+  at no missing file.
+selfCheck:
+  - q: "Edge cases: where does a client retainer with no end date go? And where does a research note on landing-page copywriting live while you are actively writing the landing page for your own project?"
+    a: "The retainer is an AREA — ongoing responsibility, no finish line (each deliverable inside it can be a Project). The copywriting note goes in the active PROJECT (writing the landing page) because actionability wins while it's hot; when the push ends, it moves to Resources (copywriting knowledge) or Archive. Bucket-ambiguity is where PARA fails people — the tiebreaker is always 'where will I look when acting?', not 'what topic is this?'"
+  - q: "Your vault also has `sources/`, `wiki/` and `index.md`. Do those get sorted into PARA too?"
+    a: "No — and this is the load-bearing distinction. PARA governs YOUR layer: the four folders holding notes you wrote. `sources/` stays flat and immutable (raw material isn't more or less actionable, it's just source). `wiki/` is the agent's layer and its organisation is `index.md`, not folders — foldering it would scatter the cross-references for no gain. You get folders; the agent gets an index."
+  - q: "You move eight notes between buckets on a Friday. What breaks, and whose job is fixing it?"
+    a: "Every `index.md` entry pointing at an old path is now wrong, and a stale index is worse than none because the agent trusts it. Moving is yours (judgment); re-pointing the index and logging the pass is the agent's (bookkeeping). Do both in one sitting — that's why the task has it produce a move plan that lists the affected index lines up front, instead of moving files and leaving you to find the wreckage. Without an agent the same rule applies to you: fix the index lines before you close the vault."
+backupResources:
+  - label: "How to use the PARA method in your notes — Reflect Notes"
+    url: "https://www.youtube.com/watch?v=ff-GiRq23WU"
+    type: "video · concept"
+tags:
+  - obsidian
+  - para
+  - organization
+  - index
+---
+
+Ingest fills your vault fast — now the notes *you* wrote need just enough structure to
+stay usable. **PARA** is the lightest system that works: four folders, sorted by how
+*actionable* something is, not what topic it's about.
+
+## The four buckets
+
+- **Projects** — an outcome you're committed to, needing several work sessions, with an
+  end. "Ship the next feature of my side project", "a client site launch", "submit the
+  term paper". Forte runs 15–25 at once and calls that normal.
+- **Areas** — a role or responsibility with a standard you maintain and never finish.
+  "My degree", "Clients", "Finances".
+- **Resources** — topics and reference you're not acting on yet. "AI engineering",
+  "Mobile development", "Marketing". Waiting to be activated by some future project.
+- **Archive** — anything inactive from the other three. Cold storage, not a bin. You
+  never delete; you just get it out of your eyeline.
+
+## The key move: actionability over topic
+
+Most people file by subject and end up with notes scattered across a dozen topic
+folders, half-forgotten. PARA flips it: **what's actionable sits closest to you.** A
+note about a marketing tactic lives under the *project* it serves while that project is
+hot, then graduates to Resources or Archive when it's done. Things flow between buckets
+as their status changes — a whole Resources folder can be promoted to a Project the
+moment you commit to acting on it.
+
+Forte's own tell is that he numbers his folders 1 to 4 so they sort most-actionable to
+least. If your file explorer sorts alphabetically, do the same. The ordering is the
+system.
+
+> 💡 **Try it:** open the folder where you keep most of your work files (Documents, a
+> cloud drive, your desktop) and sort five recent items into P, A, R or A in your head.
+> Notice which ones you hesitate over. Hesitation almost always means "this is a resource
+> I'm pretending is a project."
+
+## Which layer PARA actually governs
+
+Here's the part every PARA tutorial skips, and the part that matters most in this
+pillar: **your vault has two owners, and PARA only governs one of them.**
+
+Lesson 2 called the top level a contract, and it still is — but the contract is about
+*ownership*, not folder count. So the count does change here and the contract doesn't:
+PARA adds four folders that are unambiguously **yours**, beside the ones already there.
+Nothing the agent owns moves, and nothing new becomes writable by it:
+
+```diagram
+vault/
+├── vault-rules.md
+├── index.md
+├── log.md
+├── inbox/
+├── daily/
+├── sources/
+├── wiki/
+├── projects/   ┐
+├── areas/      │ PARA:
+├── resources/  │ your notes
+└── archive/    ┘
+```
+
+The first seven entries are the ones from lesson 2: `vault-rules.md` (the schema), `index.md`
+(the catalog, agent-maintained), `log.md` (the append-only record), `inbox/` (raw, unprocessed
+capture), `daily/` (dated notes), `sources/` (immutable raw material the agent reads and never
+edits) and `wiki/` (agent-owned pages). The bracket marks the four new ones: PARA, your notes
+sorted by actionability.
+
+Read that bracket carefully:
+
+- **`projects/`, `areas/`, `resources/`, `archive/`** hold notes *you* wrote and will
+  act on. This is the PARA part of the vault, and it's the only part.
+- **`inbox/` and `daily/` are not PARA buckets.** The inbox is a loading dock; daily
+  notes are chronological. Both sit upstream — what's worth keeping graduates out of
+  them into a bucket.
+- **`sources/` stays flat.** Raw material isn't more or less actionable, it's just
+  source. You reach it through `index.md`, not by walking folders.
+- **`wiki/` is never PARA'd.** That's the agent's layer, and its organisation *is*
+  `index.md` plus the links between pages. Splitting it across four folders would
+  scatter the cross-references and buy nothing.
+
+One line to remember: **you get folders, the agent gets an index.** They answer
+different questions. PARA answers *"where do I look when I'm about to act?"* `index.md`
+answers *"what does this vault know?"* Give both questions the same structure and you
+get a system that's bad at both.
+
+## The thing that must stay in sync
+
+Every move you make in PARA turns some line in `index.md` into a lie, and a stale index
+is worse than no index — the agent trusts it and cites paths that no longer exist.
+
+So the rule: **you decide the moves, the AI re-points the index — in the same sitting.**
+That's why the task below makes it produce a move *plan* rather than moving anything.
+You keep the judgment call and the veto; it keeps the bookkeeping, which is the part
+you'd skip at 11pm on a Friday.
+
+**Don't code?** The rule still holds; only the hands change. Drag notes between buckets inside
+Obsidian (it rewrites the `[[links]]` for you), then paste a before-and-after list of paths into
+a chat assistant and ask it to rewrite the affected `index.md` lines, or fix them by hand while
+the moves are fresh.
+
+## How shallow is shallow?
+
+Forte keeps one folder per active project inside his Projects bucket. That's fine, and
+it's the line: **one level under a bucket, never two.** Four top-level folders, one
+folder per live project or area inside them, and no topic hierarchy below that.
+
+The rule that saves you: if you're about to create a folder *inside* a project folder,
+write a note and link it instead. Folders organise storage; links organise meaning
+(lesson 3). Deep trees are how a vault becomes a place you file things and never look
+again.
+
+## Common failure modes
+
+- **Projects never leave Projects** → nothing moves finished work out → make "move what
+  shipped to Archive" part of the weekly review (lesson 10).
+- **Resources becomes a giant topic tree** → the old file-by-subject habit crept back → one
+  level of folders, and links for everything below it.
+- **You can't decide between Project and Area** → you're asking "what topic?" → ask "does
+  this have an end date?" If yes, Project; if no, Area.
+- **`index.md` points at files that moved** → you moved notes without re-pointing the index
+  → move and re-index in the same sitting, as the task does.
+
+## Why it pairs with linking
+
+PARA gives you a calm top-level home so you're never lost when you sit down to work;
+`[[links]]` weave meaning across everything regardless of which folder a file happens
+to sit in. Keep PARA shallow and let the linking do the heavy lifting.
+
+That covers organising for *action*. Next we go the other direction — organising for
+*insight* — where a long source gets broken into atomic, densely linked concept pages,
+and the agent's layer of the vault finally starts filling up.

@@ -1,0 +1,251 @@
+---
+title: "Pricing AI work"
+summary: "Price an AI service on the client's measured outcome, add a maintenance retainer, and decide who pays the model usage bill."
+changeNote: "Primary replaced with Nate Herk's 21-minute guide to pricing AI workflows; recap, watch notes and a note on pricing ratios now match it. The Futur lecture moved to backups."
+section: applications
+pillar: agency-freelance
+order: 4
+level: intermediate
+estMinutes: 13
+taskMinutes: 25
+prerequisites: [productized-services, measuring-roi]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "wIcw0T9NhZM"
+  published: "2025-11-30"
+  year: 2025
+  minutes: 21
+  title: "How to Price AI Workflows (Without Losing Clients)"
+  channel: "Nate Herk | AI Automation"
+  why: "Nate Herk, who builds AI automations for clients and teaches it, gives a 21-minute pricing guide made for AI work rather than translated from design: price on the time, money or errors you save, show the math behind the number, use retainers that protect your margin, and follow one worked example end to end. It beats longer design-pricing lectures on focus. Weaknesses: his ratios are personal rules of thumb, not data; he skips who pays for model usage; and he pitches his paid community."
+  notes:
+    - "The 10x rule (6:29) means pricing at about a tenth of the first-year savings, yet his own example charges about 15%. Treat the ratio as a judgement call you can defend, not a law."
+    - "The retainer ranges and the 50–70% margin target (7:41) are his figures for agency work; check them against your own costs and market."
+    - "He doesn't cover who pays the model usage bill after go-live; the breakdown's section on model usage fills that gap."
+    - "Stay for the worked example near the end (about 17:40): it closes with what he'd change, tracking the system's impact every month after go-live."
+applyIt: |
+  Before any number goes in a quote, settle the two things a value price rests on. Take one of
+  your offers (a neutral example: an automation that drafts replies for a small online shop's
+  support inbox) and decide, in ten minutes:
+
+  1. **The outcome metric, defined exactly.** Not "saves time" but "hours per week the shop
+     spends on routine tickets, measured over two weeks before and after". Say who measures it
+     and where the number comes from.
+  2. **Who pays the model usage bill.** Pass-through at cost, a monthly cap inside the retainer,
+     or the client's own account. Pick one and write the one-line reason.
+
+  ```prompt
+  Pressure-test this outcome metric for my offer [one line]: [your metric]. Is it measurable
+  before and after, owned by the client, and hard to argue with? Suggest one sharper version.
+  ```
+
+  **If you already have a client:** use their real numbers from discovery. **If you don't:** use
+  a realistic hypothetical client in your niche.
+
+  Success: one precisely defined metric and one usage-bill choice, each with a one-line reason.
+toolkit: |
+  - **Keep a price sheet your assistant can read.** Store each offer's value-based price and its
+    one-line justification in your offers note, or upload it to a ChatGPT or Claude Project or a
+    Gemini Gem, so quotes start from your numbers, not from scratch.
+  - **Bake "no hourly billing for AI delivery, default to retainer" into your instructions.**
+    One line in your custom instructions in ChatGPT, Claude or Gemini (or in that Project's
+    standing instructions) stops drafted quotes from anchoring on build time.
+  - **Make maintenance and usage standard line items.** Add a "monitoring and prompt/eval tuning"
+    retainer line and a "model usage" clause (pass-through, capped, or client-held account) to
+    your proposal template, so neither turns into a freebie.
+  - **Save a metric-definition prompt.** Before any quote, have a saved prompt snippet turn
+    discovery notes into one precisely defined outcome metric and its baseline (→ measuring-roi).
+recap:
+  - emoji: "⏱️"
+    title: "Outcomes, not hours"
+    text: "Businesses don't pay for your time. An AI workflow saves them money, saves time or cuts human error, and the price is tied to that return."
+  - emoji: "🧮"
+    title: "Show your math"
+    text: "Expect 'how did you get that number?' and be ready to walk through the calculation. A price the client can follow builds trust."
+  - emoji: "🔍"
+    title: "Discovery sets the number"
+    text: "Map the manual process first: how often it runs, what triggers it, who does it, how long it takes and what an hour costs. Count only the part you actually automate."
+  - emoji: "📐"
+    title: "A rule of thumb"
+    text: "He aims for the client to get about ten times the price back in the first year: an hour of support a day at $50 is about $12,000 a year, so he starts near $1,200."
+  - emoji: "🔁"
+    title: "Retainers protect the margin"
+    text: "Price ongoing work from what it costs you to deliver plus a healthy margin, and sell maintenance, monitoring and version-two work as recurring add-ons."
+  - emoji: "🗣️"
+    title: "Outcome first, number last"
+    text: "Describe the result, list what's included and what isn't, explain testing and the client's part, then name the price. If they push back, cut scope, not price."
+  - emoji: "📈"
+    title: "Prove it after go-live"
+    text: "His own miss in the worked example: not tracking the system's impact after launch. Monthly numbers would have justified the retainer and the next version."
+task: |
+  Price one offer three ways side by side, then pick and justify the value number:
+
+  ```prompt
+  Price this offer three ways in a comparison table: [offer, plus how many hours it would take
+  me with AI and without]. Columns: hourly (and what I'd "lose" by being fast with AI), fixed
+  on the client's outcome value, and a monthly retainer. For the value column, define the
+  metric first (what is measured, how, over what period) before any number is trusted, then
+  pick the value-based figure and write the single sentence that justifies it ("this lifts X
+  by Y, so the price is Z").
+  Success: three prices in a table, one chosen, one justifying sentence.
+  ```
+
+  Run it in ChatGPT, Claude or Gemini and save the table with your offer. Then say the chosen
+  price out loud three times, the way you'd say it on a call; if you flinch, write down why.
+  Success: a saved three-way table, one chosen price with its justification, and one note on
+  what would make you discount it (so you can decide now whether you would).
+selfCheck:
+  - q: "You quote a fixed price for an automation and the client replies, 'With AI that's a weekend's work for you, so why so much?' How do you respond?"
+    a: "Re-anchor on the outcome: the price reflects the hours it saves them each year, plus testing, handover and reliability, not your build time. If the budget really is the issue, reduce the *scope* (a smaller tier), never the price of the same scope."
+  - q: "Six months after go-live, the client's AI ticket triage has started misrouting, and they expect you to fix it for free. What should have been in place?"
+    a: "A maintenance retainer, sold with the build. Models, inputs and edge cases change, so drift is expected; a retainer makes tuning paid, scheduled work instead of an argument about whose problem it is."
+  - q: "What sets the floor and the ceiling of a value-based price?"
+    a: "The floor is your own cost (your time, tools and a margin); below it you lose money. The ceiling is the value to the client. You price at a fraction of the value that gives the client an obvious payback, as long as it stays above your floor."
+backupResources:
+  - label: "How To Price YOUR Work (Full Whiteboard AdobeMAX) — The Futur (Chris Do): the former main video, a 73-minute value-pricing lecture taught for design, strongest on the live price conversation"
+    url: "https://www.youtube.com/watch?v=6rZQPhXGOlk"
+    type: "video · lecture"
+  - label: "The Value-Based Pricing Formula for Freelancers — Skill2Earn Academy"
+    url: "https://www.youtube.com/watch?v=c1SsXslQI44"
+    type: "video · the formula, compact"
+  - label: "Freelance Pricing Models Explained (retainer, hourly, project) — Latasha James"
+    url: "https://www.youtube.com/watch?v=hgNWEqwkApM"
+    type: "video · models"
+  - label: "The BEST Way To Price Your Freelance Consulting In 2026"
+    url: "https://www.youtube.com/watch?v=W1KhofI0zh0"
+    type: "video · pricing"
+tags:
+  - agency
+  - pricing
+  - value
+  - retainers
+---
+
+Pricing is where AI freelancers either thrive or quietly undercut themselves. The instinct is to
+bill by the hour, and with AI that instinct works against you. If AI lets you deliver in 2 hours
+what used to take 20, hourly billing means a 90% pay cut for getting *better.* This lesson is the
+mindset shift that fixes it: price the **value you create**, not the time you spend.
+
+## The hourly trap
+
+Hourly pricing has a built-in punishment for efficiency: the faster and more skilled you get, the
+less you earn for the same result. AI is a large efficiency multiplier, so it makes the trap
+much worse. The client doesn't care whether the automation took you two hours or two weeks; they
+care that it works. **Stop selling time.**
+
+## Value-based pricing
+
+Anchor the price to the client's **outcome**, not your effort:
+
+- An automation that saves a client **$50,000 a year** → pricing it at **$8,000** is an easy yes,
+  and the build time is irrelevant. (Illustrative numbers.)
+- A content engine that drives new sales pipeline → priced against that pipeline, not per
+  article.
+
+To price on value you have to *know* the value, which is why the AI-in-companies track hammers
+on baselines and ROI (→ measuring-roi). Walk into the conversation able to say "this saves or
+earns you $X." That number, not your hours, sets the price.
+
+Value pricing has a **floor** and a **ceiling**. The floor is your cost: your time, your tools
+and the margin you need. The ceiling is the value to the client. Your price sits between them,
+at a fraction of the value that gives the client an obvious payback.
+
+How big a fraction? There is no standard. The video's rule of thumb is a tenfold return in the
+first year, which means pricing at about a tenth of the yearly value; the worked example below
+charges a larger share and still pays back within months. Whatever ratio you pick, be ready to
+walk the client through the math.
+
+## Choose the right model
+
+- **Fixed price**: for productized, well-scoped deliverables. The client knows the cost up
+  front; your margin grows as you get faster.
+- **Retainer**: for ongoing work such as managed automations, content, or an internal assistant
+  you maintain. Predictable **recurring revenue** for you, continuous value for them.
+- **Hourly**: almost never for AI delivery. At most for genuinely open-ended advisory where scope
+  can't be defined, and even then a day rate is usually cleaner.
+
+## Don't forget maintenance
+
+AI systems drift: models change, the client's needs evolve, edge cases appear. That ongoing
+monitoring and tuning is real value, and a **retainer** is how you charge for it. Selling only
+the one-time build leaves recurring revenue (and the client's long-term success) on the table.
+Define what the retainer includes, such as a monthly accuracy check, prompt fixes and a set
+number of small changes, so it doesn't turn into unlimited free work.
+
+## Who pays for model usage
+
+Every AI feature you hand over keeps costing money each time it runs: the API calls to the model
+provider, billed by usage. While you build and test, that cost is yours, so include it in a fixed
+price. After go-live, decide in writing who carries it. There are three clean options:
+
+- **Pass it through at cost.** You keep the provider account and re-bill the actual monthly usage,
+  with the provider's invoice attached (some freelancers add a small handling fee; say so up
+  front). Transparent and fair, but the client's bill varies and you front the cash.
+- **Include a usage cap, with an overage rate.** The retainer covers usage up to a stated amount
+  per month; anything above it is billed at a stated rate. The client gets a predictable bill, and
+  you're protected if volume grows. Price the cap with headroom over normal usage.
+- **The client holds the API account and keys.** The client signs up with the provider, pays the
+  provider directly and gives you a key with limited access. Usage never touches your books, the
+  client owns the account when you part ways, and it's the safest choice when usage is large or
+  hard to predict. You still set the spending limits and alerts in their dashboard.
+
+**The risk to plan for is a usage spike.** A busy season, a marketing campaign, a bug that loops,
+or staff pasting in much longer documents can multiply the bill in a single month. If you promised
+"usage included" in a flat retainer with no cap, that spike comes out of your margin. Set a
+monthly spending limit and budget alerts with the provider, and state in the contract who pays when
+a spike comes from the client's volume (the client) versus from your bug (you).
+
+**Worked numbers** for the support-inbox automation below. Every figure is an assumption to swap
+for your own; check your provider's current per-token prices before quoting.
+
+| | Normal month | Spike month (holiday sale) |
+|---|---|---|
+| Tickets drafted by AI (assumed) | 600 | 1,800 |
+| Model cost per drafted reply (assumed) | $0.02 | $0.05 (longer threads) |
+| Usage cost | 600 × $0.02 = **$12** | 1,800 × $0.05 = **$90** |
+
+With a usage cap of $30 a month inside the retainer and overage at cost plus 10%, the normal
+month is covered by the cap, and the spike month bills ($90 − $30) × 1.10 = **$66** extra. With
+"usage included" and no cap, you'd have priced the retainer around a $12 month and would absorb
+the extra $78 yourself, and a spike from a looping bug could run far higher. With the client-held account, the $90 lands on the client's
+provider bill, and your job is the alert that fired at, say, $50.
+
+## Worked example: pricing a support-inbox automation
+
+All numbers here are hypothetical; the method is the point.
+
+1. **Define the metric.** "Hours per week staff spend answering routine tickets," measured from
+   the shop's help-desk export or a two-week time log.
+2. **Get the baseline from the client.** Discovery shows about 12 hours a week on routine
+   tickets, and the shop values staff time at $25 an hour.
+3. **Estimate the change conservatively.** With AI drafting and staff approving, you expect
+   about 7 of those hours back. Label it an estimate to be confirmed in a pilot.
+4. **Turn it into a yearly value.** 7 hours × $25 × 50 working weeks ≈ $8,750 a year.
+5. **Pick the price.** A fixed build at $3,000 pays back in roughly four months
+   ($8,750 ÷ 12 ≈ $730 a month), which is an easy decision. Add a retainer for monthly tuning.
+6. **Check the floor.** If the build takes you 25 hours, is $3,000 above what you need? If not,
+   shrink the scope rather than drop the price.
+7. **Write the one sentence.** "This frees about 7 staff hours a week, roughly $8,750 a year,
+   for a one-off $3,000."
+
+> 💡 **Try it:** Take one offer and write only step 7, the one justification sentence. If you
+> can't fill in the outcome number, you've found what to ask in your next discovery call.
+
+## Common failure modes
+
+- **The client rejects your value number** → you estimated it alone → get the baseline numbers
+  from the client in discovery, so it's *their* number.
+- **You discount on the call** → nothing to trade except price → offer a smaller tier; change
+  scope, never the price of the same scope.
+- **The retainer becomes unlimited support** → no defined monthly scope → list what it covers
+  and what triggers a new quote.
+- **A usage spike wipes out your retainer margin** → "usage included" with no cap → add a cap
+  with an overage rate, or move the API account to the client, and set provider spending alerts.
+- **You price low because it was quick** → anchoring on your hours → reprice against the
+  outcome, and keep the speed as your margin.
+
+## Next
+
+You know what to sell, how to package it, how to deliver it fast and what to charge. Now win the
+deal: proposals, demos and closing.

@@ -1,0 +1,238 @@
+---
+title: "Linear algebra for AI"
+subtitle: "Vectors, matrices & why attention is just multiplication"
+summary: "Use vectors, dot products and matrix shapes to explain how embedding search works, how attention scales and why LoRA is cheap."
+changeNote: "New: a worked example, a failure-modes list, a quick search test on a tool you already use, and a task that ranks results on your own data."
+section: foundations
+pillar: math-ml-core
+order: 1
+level: intermediate
+estMinutes: 20
+taskMinutes: 30
+prerequisites:
+  - what-is-an-llm
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "fNk_zzaMoSs"
+  published: "2016-08-05"
+  year: 2016
+  minutes: 10
+  title: "Vectors | Chapter 1, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "3Blue1Brown teaches the geometry (what a vector is as an arrow, what a matrix does to space) rather than the symbol-shuffling most courses open with, and that geometric picture is exactly what embeddings and attention need. Animation makes 'similar meaning = similar direction' visible in a way a textbook page can't. Chapter 1 is ten minutes and anchors the series; the later chapters run about the same length, so you can watch one a day this week."
+applyIt: |
+  **Any "find the most relevant item" feature is one dot product, so read it as vectors, not
+  prose.** Take a search or chatbot you already use over a collection: a help-center search, a
+  notes app's semantic search, a document chatbot. It ranks every item against
+  your query by cosine similarity (a normalized dot product), so the ranking, and any bug in it,
+  lives in the vectors rather than the wording of a prompt.
+
+  Run one quick test. Ask it something you know the collection answers, but phrase it with none
+  of the item's own words (ask "how do I get my money back?" when the page says "refund policy").
+  Then write two lines in your notes: did it find the item, and if it hadn't, what you'd check
+  first (the chunks and the similarity scores of the top hits, before rewording anything).
+
+  **If you build search or RAG:** log the top hits' scores next to each answer so that check takes
+  seconds. **If you don't:** the test shows you whether a tool searches by meaning or by keyword.
+
+  Success: one test query, its result, and a two-line "check the vectors first" note.
+toolkit: |
+  - **Do the dot product in a spreadsheet.** Put two short vectors in two rows and compute cosine
+    similarity with `=SUMPRODUCT(A1:E1,A2:E2)/(SQRT(SUMSQ(A1:E1))*SQRT(SUMSQ(A2:E2)))`. Change one
+    number and watch the score move, then rank a few made-up "document" vectors against a query.
+  - **Set up a chat assistant as a linear-algebra tutor.** In a ChatGPT or Claude Project or a
+    Gemini Gem: "Give me the matrix shapes and ask me to predict the result's shape before you
+    tell me." Shape-predicting is the skill that makes attention and LoRA readable.
+  - **Keep your always-on instructions short.** Every token in your custom instructions or a
+    Project's instructions rides through the model's weight matrices on every turn. Trim to the
+    lines that actually steer, and remember "bigger model" means "bigger matrices"
+    (→ models-and-effort).
+  - **Check similarity before rewriting a prompt.** When a document chatbot or a notes app's
+    semantic search pulls the wrong page, the bug usually lives in the chunks or embeddings, not
+    the wording. If you keep "see also" links by hand, embedding the pages computes "nearest
+    pages" as dot products instead.
+recap:
+  - emoji: "➡️"
+    title: "An embedding, pictured"
+    text: "A vector is an arrow in space, not just a list of numbers. Similar meanings become arrows pointing the same way, which is the whole trick of AI retrieval."
+  - emoji: "🧮"
+    title: "The one operation you need"
+    text: "The dot product: large when two arrows align, near zero when they're unrelated. Normalize it and you get cosine similarity, the score retrieval systems rank by."
+  - emoji: "🌀"
+    title: "What a matrix really does"
+    text: "A matrix is a function that rotates, stretches or projects space. A neural layer is output = activation(W·x + b), and the matrix W is that learned function."
+  - emoji: "🔢"
+    title: "What '7B' is counting"
+    text: "Seven billion learned numbers sitting inside weight matrices. Training finds good values for them, and every forward pass multiplies through all of them."
+  - emoji: "🎯"
+    title: "Attention in matrix terms"
+    text: "QKᵀ scores every token against every token; softmax turns the scores into weights that blend V. That n×n score matrix is why doubling a prompt roughly quadruples attention cost."
+  - emoji: "🪶"
+    title: "Why LoRA is cheap"
+    text: "Rank is how much independent structure a matrix really has. LoRA bets the fine-tuning update is low-rank, so it learns two skinny matrices instead of one giant one."
+  - emoji: "👁️"
+    title: "The series' real gift"
+    text: "Seeing what the math does to space instead of memorizing procedures. Map each object to a production concern (dot product to retrieval, matrix size to cost) and it sticks."
+task: |
+  Prove the geometry to yourself (no similarity library allowed), then point it at your own
+  material.
+
+  ```prompt
+  Write a single Python script for a free Google Colab notebook that takes three short
+  sentences — two that mean nearly the same thing in different words ("I want to get fitter" /
+  "my goal is better health") and one unrelated fact ("the invoice is due Friday") — gets an
+  embedding for each from the free sentence-transformers model all-MiniLM-L6-v2, and computes
+  the three pairwise cosine similarities BY HAND: dot product divided by the two norms, written
+  as plain loops, no numpy/sklearn similarity helper. Print the three scores and assert the
+  similar pair scores highest. Then add a second part: embed a list of 10-20 short items I paste
+  in plus one query, rank the items with the same hand-written cosine, and print the top 3 with
+  their scores.
+  Success: the script runs, the similar pair wins, and no library computed the similarity for me.
+  ```
+
+  Run part one, then paste 10–20 short items from your own work or studies (FAQ answers, support
+  tickets, meeting notes, product descriptions, lecture summaries) and one real question someone
+  would ask. Before you run it, predict the top item. No coding background? Paste the script into
+  a new Colab notebook and press run; you only need to read the output.
+
+  You've now implemented semantic search's core: the operation that vector databases such as
+  pgvector or Pinecone run for you at scale.
+  Success: the similar pair wins in part one, and you can explain your own top-3 ranking as
+  angles between arrows (a score near 1 is a small angle; near 0 is unrelated).
+selfCheck:
+  - q: "Your help-center search returns a refunds article for the query 'cancel my subscription' (cosine 0.82) above the real cancellation article (0.79). What do you check before touching any prompt?"
+    a: "The inputs to the vectors: how the articles were chunked (are the cancellation steps buried in a long billing chunk?) and whether the query and documents were embedded with the same model. A 0.03 gap is effectively a tie, so fix chunking or add keyword (hybrid) search, then re-read the scores."
+  - q: "A colleague says 'dimension 212 of our embeddings must be the sentiment axis, so let's filter on it.' What's wrong with the plan?"
+    a: "Learned embedding dimensions rarely map to a single human concept; meaning lives in the *direction* of the whole vector. Filtering on one coordinate will behave erratically. Compare whole vectors with cosine, or train a small classifier on the embeddings if you need sentiment."
+  - q: "Why is 'attention is just matrix multiplication' more than a slogan?"
+    a: "Queries, keys and values are matrices; scores are QKᵀ, softmaxed, then multiplied against V. The mechanism is a handful of matmuls, which is why GPUs (built for matmuls) run LLMs and why cost scales with matrix sizes."
+mcq:
+  - q: "A notes app embeds every note. Your note 'my goal is to train three times a week' scores cosine 0.91 against the query 'skipped gym' and 0.34 against 'invoice reminder'. What does the 0.91 actually measure?"
+    options:
+      - "The two vectors have almost exactly the same length"
+      - "The two vectors point in almost the same direction"
+      - "About 91% of their coordinates hold matching values"
+      - "The straight-line distance between them is 0.91"
+    answer: 1
+    explain: "Cosine similarity is the dot product of the normalized vectors, so lengths are divided out and only direction remains. Two vectors can differ in every coordinate and still be nearly parallel. Distance is a different measure (and a small distance would be the good sign), and length says nothing about meaning."
+  - q: "In attention, Q and K are each (n × d) for n tokens, so the score matrix QKᵀ is (n × n). What does that shape tell you about long prompts?"
+    options:
+      - "A 2× longer prompt gives about 2× as many scores"
+      - "Score count is fixed by d, not by prompt length"
+      - "Only nearby tokens are scored, so length is cheap"
+      - "A 2× longer prompt gives about 4× as many scores"
+    answer: 3
+    explain: "An n × n matrix holds n² scores: every token against every token. Double n and the score count quadruples, which is why long context is expensive. The width d sets the cost of each score, not how many there are, and standard attention compares all pairs, not just neighbours (sliding-window variants exist, but they are a deliberate change to the architecture)."
+  - q: "LoRA replaces a weight update ΔW (4096 × 4096 ≈ 16.8M numbers) with A (4096 × 8) times B (8 × 4096). Where does the saving come from?"
+    options:
+      - "A and B hold ~65K trainable numbers, not 16.8M"
+      - "A and B are stored at lower precision than the base"
+      - "It skips attention layers and trains only the MLPs"
+      - "It quantizes the frozen base model down to 4-bit first"
+    answer: 0
+    explain: "4096×8 + 8×4096 ≈ 65K trainable numbers, about 250× fewer. The bet is that the useful change to the matrix has low rank (little independent structure), and in practice that bet usually pays. Quantizing the base is a separate trick (the Q in QLoRA), and LoRA adapters are commonly attached to the attention matrices, not kept away from them."
+  - q: "A model is described as '7B parameters'. In linear-algebra terms, what are the seven billion things?"
+    options:
+      - "The number of training tokens it read in pretraining"
+      - "The count of neurons summed across all of its layers"
+      - "The entries of its weight matrices and bias vectors"
+      - "The number of dimensions in each embedding vector"
+    answer: 2
+    explain: "Parameters are the learned numbers inside the weight matrices (plus biases) that every forward pass multiplies through. Training tokens are a separate figure, usually counted in trillions; each neuron owns many weights; embedding width is a few thousand at most. More parameters means bigger matrices, so more memory and compute per token."
+backupResources:
+  - label: "Essence of linear algebra — full series (3Blue1Brown)"
+    url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab"
+    type: "course · the whole arc"
+  - label: "Mathematics for Machine Learning — free book (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+  - embeddings
+  - math-ml-core
+---
+
+**You need:** high-school algebra: multiplying, adding and reading a short formula. No
+calculus, and no linear algebra beyond what this lesson builds.
+
+If you met linear algebra in school, it was probably determinants, row reduction and
+eigen-homework; if you never did, you start with nothing to unlearn. This lesson is the **AI
+re-read**: four objects, seen as the machinery inside every model you call.
+
+## Vectors: meaning as direction
+
+An **embedding** is just a vector: a point in a space with hundreds or thousands of
+dimensions. The whole trick of modern AI retrieval is that *similar meanings become nearby
+directions*. The one operation you need is the **dot product**: multiply matching coordinates
+and add them up. It's big when vectors align and near zero when they're unrelated. Divide by
+the two lengths and you have **cosine similarity**, the number most semantic search and RAG
+systems rank by.
+
+> 💡 **Try it:** in your head — if cos(a,b) = 1, the texts mean nearly the same thing; what
+> does cos(a,b) ≈ 0 mean? (Unrelated, not opposite — that would drift negative.) This is
+> exactly the intuition you'll use to debug "why did my RAG retrieve garbage."
+
+## Worked example: rank two documents by hand
+
+Real embeddings have hundreds of dimensions, but the arithmetic is identical in three. Say a
+query embeds to **q = (1, 2, 0)** and two documents embed to **A = (2, 3, 1)** and
+**B = (0, 1, 3)**.
+
+1. **Dot products.** q·A = 1×2 + 2×3 + 0×1 = 8. q·B = 1×0 + 2×1 + 0×3 = 2.
+2. **Lengths** (square root of the sum of squares). |q| = √5 ≈ 2.24, |A| = √14 ≈ 3.74,
+   |B| = √10 ≈ 3.16.
+3. **Cosine.** cos(q, A) = 8 ÷ (2.24 × 3.74) ≈ **0.96**. cos(q, B) = 2 ÷ (2.24 × 3.16) ≈
+   **0.28**.
+
+Document A wins: its arrow points almost the same way as the query. Notice what you did *not*
+need: any idea what each coordinate "means". That's the point. A vector database does exactly
+these three steps, just across millions of documents, with clever indexing so it doesn't have
+to compare every pair.
+
+## Matrices: functions, not tables
+
+Stop seeing a matrix as a grid of numbers; see it as a **function that moves space** —
+rotating, stretching, projecting. A neural-network layer is literally
+`output = activation(W·x + b)`: the matrix W *is* the learned function. Training a model means
+finding good numbers for these matrices.
+
+Count one: a layer that maps a 4,096-wide vector to another 4,096-wide vector needs a
+4,096 × 4,096 matrix, about **16.8 million** numbers, plus 4,096 biases. Stack enough layers
+like that and you reach the billions behind a "7B model".
+
+## Attention is three matmuls in a trench coat
+
+Transformers compute **Q**ueries, **K**eys and **V**alues from your tokens (three matrix
+multiplications), then score every token against every other with **QKᵀ**, softmax the
+scores, and blend values with a final multiply. That score matrix is n × n. At 1,000 tokens
+it holds a million scores per attention head per layer; at 2,000 tokens, four million. The
+quadratic cost of context windows is a matrix **shape**, not a business decision.
+
+## Rank: the idea that makes fine-tuning cheap
+
+The **rank** of a matrix is how much independent structure it really has. LoRA's entire bet:
+the *change* you need to make to a giant weight matrix during fine-tuning is **low-rank**, so
+instead of updating 16.8M numbers you learn two skinny matrices holding ~65K. You'll meet this
+again in the fine-tuning lesson (→ fine-tuning-fundamentals); now you know *why* it works.
+
+## Common failure modes
+
+- **Rankings look random** → the query and the documents were embedded with different models
+  (or versions of one), so their spaces don't line up → re-embed everything with one model and
+  store the model name next to each vector.
+- **Long documents always win** → raw dot product without normalization, so bigger vectors
+  score higher regardless of direction → use cosine, or check that your vector store's distance
+  setting matches what the embedding model recommends.
+- **The right document ranks fifth** → its chunk covers several topics, so its vector averages
+  them and points nowhere in particular → split into chunks of one idea each and re-check the
+  scores.
+- **Long prompts cost far more than expected** → a linear mental model of attention → remember
+  the n × n matrix; trim, summarize or retrieve instead of pasting everything.
+
+## Why this pillar exists
+
+None of this is prerequisite trivia. Each object maps to a production concern you already
+have: dot products → retrieval quality, matrix sizes → cost and latency, rank → cheap
+fine-tuning. When the math connects to the bill, it sticks.

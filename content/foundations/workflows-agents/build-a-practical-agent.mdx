@@ -1,0 +1,228 @@
+---
+title: "Build a practical AI agent"
+summary: "Build a no-code agent in n8n with a tight prompt, a few tools and memory, and keep a human approving anything it sends."
+changeNote: "New: a step-by-step n8n wiring walkthrough, a failure-modes list, a tuning section, and a ten-minute design sheet to plan your agent before you build it."
+section: foundations
+pillar: workflows-agents
+order: 7
+level: advanced
+estMinutes: 18
+taskMinutes: 45
+prerequisites: [intro-to-agents, ai-in-automations]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "PfdnYe2690E"
+  published: "2025-07-21"
+  year: 2025
+  minutes: 24
+  title: "n8n AI Agent Tutorial for Beginners 2026 - Step by Step"
+  channel: "Metics Media"
+  why: "Metics Media (the channel behind the video in → first-automation) builds a working n8n agent step by step: model, tools, memory and the loop, without skipping the wiring that short demos gloss over. It's current and paced for someone building along. A use-case reel is in the backups for ideas to build next."
+applyIt: |
+  Before you wire anything, write the one-page design for an agent you'd actually want in your
+  own work. Ten minutes; this is the sheet you'd hand to n8n, Make or a developer.
+
+  1. **Goal, in one line:** the recurring job (triaging feedback, researching a supplier,
+     preparing a meeting brief).
+  2. **Tools, at most two:** the smallest set the job needs, such as read-feedback and
+     write-to-tracker.
+  3. **The leash:** what it must never do without you (send, post, delete, pay), and when it
+     should flag a human: a crash, lost data, money, or anything it's unsure of.
+  4. **Done when:** the output you'd check, such as strict JSON with a drafted reply.
+
+  **At work:** pick a shared inbox and compare the design against how your team filed last week's
+  messages. **If you have no stream yet:** design for ten varied test messages you write yourself
+  (an angry one, a vague one, a two-requests-in-one).
+  Success: a four-line design where every tool is justified and every external action needs your OK.
+toolkit: |
+  - **Design your custom assistants the way you design an agent.** One goal, a tight set of
+    instructions and only the files or tools the job needs, whether it's a custom GPT, a Gemini
+    Gem or a Claude Project.
+  - **Build a low-risk research-and-draft agent for your own recurring research.** Input a topic,
+    let it search and draft a shortlist of sources or options, then you approve. A human still
+    opens every link before anything is used.
+  - **Write the approval leash into your instructions.** One line in your ChatGPT, Claude or Gemini
+    custom instructions, and in every agent's system prompt in n8n or Make: "never send, post,
+    delete or pay without asking me first." Then check the tool's settings actually enforce it.
+  - **Fewer tools, more reliable.** Don't hand an agent every connector you have; give it only the
+    one or two the job needs, and add more only when a run fails for lack of them.
+
+  **If you use a coding agent:**
+
+  - **Give subagents and custom modes the same shape.** A Claude Code subagent or a custom mode in
+    Cursor or Copilot gets one goal, minimal tools (including MCP servers) and a tight system
+    prompt, exactly like the n8n agent you built here.
+recap:
+  - emoji: "🧠"
+    title: "Start with the brain"
+    text: "Start with an LLM and a tight system prompt stating the goal, the limits, and the output shape. All your prompting skills apply here."
+  - emoji: "🧰"
+    title: "How many tools"
+    text: "Web search, send-email, read/write a sheet — only what the job needs. Fewer tools means more reliable behaviour."
+  - emoji: "🔄"
+    title: "The engine"
+    text: "The agent node lets it act, see the result, and choose the next step until the goal is reached. That loop is the engine."
+  - emoji: "📝"
+    title: "A good first job"
+    text: "Best first agent: input a name → search → summarise → draft an email → drop it in a sheet. It prepares; you approve and send."
+  - emoji: "⛓️"
+    title: "The leash"
+    text: "Narrow scope and a human-in-the-loop for anything external separate 'saves me hours' from 'emailed a client nonsense.'"
+  - emoji: "🎚️"
+    title: "How you know it works"
+    text: "Run several real cases and tune the prompt until the output is reliably good. Now you have a teammate doing the boring 80%."
+task: |
+  Now build the research-and-draft agent and test it hard:
+
+  ```prompt
+  Help me build a competitor-research agent in n8n with 2-3 tools (a web-search tool, a
+  summariser, write-to-sheet). Goal: given a competitor's name, search it, summarise its features
+  and pricing, and draft a one-paragraph positioning note for [my product, project, or a product
+  idea I'm exploring] into a sheet for my review. Tight system prompt, minimal tools, a human
+  approves before anything leaves the sheet. After I run it on 3 real competitors, help me tune the
+  prompt wherever a draft was vague or wrong.
+  ```
+
+  You'll need a model API key (Gemini's API has a free tier) and a search tool; most search
+  tools in n8n need their own key, so check the free plan before you start. **No product of your
+  own?** Pick a category you know well (note-taking apps, budgeting apps) and a product idea in it.
+  **Not ready to wire n8n?** Dry-run the same system prompt in a chat assistant with web search
+  on (ChatGPT, Gemini, Claude) for one competitor, then build. Low-risk by design: it drafts, you
+  approve.
+  Success: all 3 competitors produce a positioning note you'd actually use, with no tool the agent didn't need.
+selfCheck:
+  - q: "Your competitor agent's note quotes a price that appears nowhere on the competitor's site. What went wrong, and what do you change?"
+    a: "The model filled a gap with a plausible guess. Require every fact to carry the source URL it came from, tell it to write 'not found' when a search turns up nothing, and check the links before you use the note."
+  - q: "The agent writes great notes but answers in the chat instead of calling the write-to-sheet tool. Two fixes?"
+    a: "Make the instruction explicit in the system prompt and the tool's description ('always save the final note with write-to-sheet'). Better still, take the decision away: let the agent return the note and add a fixed 'append row' step after it, because steps that never vary don't belong inside the agent."
+  - q: "Why start with a 'research and draft' agent rather than a 'send' agent?"
+    a: "It's low-risk: the agent prepares work (drafts, summaries) and YOU approve before anything goes out. You get the speed-up without an autonomous mistake reaching a client."
+mcq:
+  - q: "Your agent's output feeds a sheet step. Most runs return clean JSON, but every few runs it adds a sentence before the JSON and the sheet step breaks. What's the sturdiest fix?"
+    options:
+      - "Put \"ALWAYS return only JSON\" in capitals in the system message"
+      - "Move to a larger model that sticks to formats more reliably"
+      - "Add an output parser or JSON check between agent and sheet"
+      - "Attach memory so it recalls the format it used on past runs"
+    answer: 2
+    explain: "A prompt rule is a request; an enforced format is a check. A structured output parser, or a validation step after the agent, catches the stray sentence every time instead of most of the time. A larger model lowers the failure rate but doesn't guarantee the shape the next step depends on."
+  - q: "You tuned your research agent's system message until its note on one competitor was excellent. On the next two competitors the notes are thin and off-target. What were you missing?"
+    options:
+      - "A set of varied inputs rerun after every prompt change"
+      - "A longer system message that covers more possible cases"
+      - "More tools, so it has other ways to find the information"
+      - "Memory, so it carries what it learned to the next company"
+    answer: 0
+    explain: "Tuning on one input fits the prompt to that input. Keep five to ten varied test cases and rerun all of them after each change, so a fix for one doesn't break the others. A longer prompt written without that test set is still a guess."
+  - q: "You're designing an agent that prepares a one-page brief before each client meeting from your calendar and a shared drive. A teammate suggests connecting all twelve company connectors \"so it never gets stuck.\" What do you do?"
+    options:
+      - "Connect all twelve, since extra tools cost nothing until they're used"
+      - "Connect all twelve, but write a careful description for each one"
+      - "Replace them all with one general HTTP tool that can reach anything"
+      - "Connect only calendar and drive; add a tool when a run truly needs it"
+    answer: 3
+    explain: "Every extra tool is another wrong choice the model can make, so reliability drops as the toolset grows. Start with the two the job needs and add one only when a real run fails for lack of it. Good descriptions help, but they don't make ten unneeded options harmless."
+  - q: "Your agent takes a company name and returns a research note; each run is independent. A tutorial you're following adds a memory node. Should you?"
+    options:
+      - "Yes, so it learns from past runs and gets better each week"
+      - "No; a one-shot job gains nothing from remembering past turns"
+      - "Yes, so it doesn't repeat searches it already ran this run"
+      - "Yes, because without memory the agent loop can't function"
+    answer: 1
+    explain: "Memory lets a chat-style agent recall earlier turns of a conversation; a one-shot job has no conversation. Within a single run the loop already sees its own tool results, and memory doesn't train the model, so it won't improve week to week. Leaving it out keeps runs cheaper and easier to read."
+backupResources:
+  - label: "8 Insane AI Agent Use Cases in N8N! (automate anything) — AI Foundations"
+    url: "https://www.youtube.com/watch?v=ZXtVvroop_U"
+    type: "video · ideas"
+  - label: "n8n — building AI agents (docs)"
+    url: "https://docs.n8n.io/advanced-ai/"
+    type: "docs · official"
+tags:
+  - ai-agents
+  - n8n
+  - hands-on
+  - automation
+---
+
+Time to build a real one. A practical agent isn't a sci-fi robot — it's a model,
+a few tools, and a loop, pointed at a useful goal. Start small and supervised, and
+it'll save you hours.
+
+## The anatomy you'll wire up
+
+1. **The brain** — an LLM with a clear **system prompt** stating its goal, its
+   limits, and the output you want. (All your prompting skills apply here.)
+2. **The tools** — only what it needs: web search, send-email, read/write a sheet,
+   query a database. Fewer tools = more reliable.
+3. **The loop** — the agent node lets it act, see the result, and choose the next
+   step until the goal is reached.
+
+Optionally, a fourth part: **memory**, so a chat-style agent remembers earlier turns. A
+one-shot research job usually doesn't need it.
+
+## A great first agent: research & draft
+
+Build a **research agent**: input a company name → it searches the web → summarises
+what it found → drafts a tailored outreach email → drops it in a sheet for you to
+approve and send. It's genuinely useful, and it's **low-risk** because the agent
+*prepares*, you *approve*.
+
+## Worked example: wiring it in n8n
+
+Exact labels move between n8n versions, but the shape is stable.
+
+1. **Trigger.** Start with a manual trigger (or a chat trigger) that passes in one field:
+   `company`.
+2. **AI Agent node.** Add it and attach a **chat model** underneath: OpenAI, Gemini, Anthropic,
+   or a local model through Ollama. The agent node is the loop; the model is the brain.
+3. **System message.** State the job in five lines: who it works for, the goal, the output
+   shape, what to do when it can't find something ("write *not found*, never guess"), and what it
+   must never do ("never send anything").
+4. **Tools.** Attach two: a web-search tool and a sheet tool. Give each a plain description of
+   *when* to use it ("use search to find the company's site and pricing page"). The model chooses
+   tools from those descriptions, so vague descriptions mean wrong choices.
+5. **Limits.** Set an iteration cap (n8n's agent node has a max-iterations setting) so a confused
+   run stops instead of searching forever.
+6. **Run three real inputs.** Then open the execution log and read it like a transcript: which
+   tool it called, with what input, what came back, what it decided next.
+
+That log is where you learn the most. You'll spot the run where it searched the same query
+twice, or summarised a review site instead of the company's own page, and each one points to a
+specific line to fix in the system message or a tool description.
+
+**If you code:** the same agent is about a page of code in the OpenAI Agents SDK, the Claude
+Agent SDK or LangGraph (→ build-agent-in-code). **If you don't code:** n8n *is* your path; the
+skills of scoping, describing tools and reading the log are identical.
+
+> 💡 **Try it:** Open one finished run's execution log and write one line per step: tool,
+> input, what it decided. Mark the single step where you'd have decided differently. That one
+> mark is your next prompt fix.
+
+## Keep it on a leash
+
+Two rules that separate "saves me hours" from "emailed a client nonsense":
+
+- **Narrow scope** — one job, minimal tools, a tight prompt.
+- **Human in the loop** — for anything external or high-stakes, the agent drafts and
+  *you* hit send. (Whole next lesson on this: → reliability.)
+
+## Common failure modes
+
+- **It ignores a tool** → answers from memory instead of searching → the tool's description
+  doesn't say when to use it → describe the trigger for each tool in one plain sentence.
+- **It invents facts** → a price or feature that isn't real → no rule for missing data →
+  require a source URL per fact and "not found" when there's none.
+- **Runs get long and expensive** → repeated searches, dozens of steps → no cap, no finish line
+  → set max iterations and say exactly what "done" looks like.
+- **The output shape changes every run** → the next step can't parse it → no enforced format →
+  add a structured output parser or validate the JSON after the agent.
+- **Great on one test, bad on the next** → you tuned it on a single input → no test set → keep
+  five to ten varied inputs and rerun all of them after each prompt change (→ evals-and-testing).
+
+## Tune until it's boring
+
+Build the research-and-draft agent, test it on a few real inputs, and tune the
+prompt until the output is reliably good. You now have a teammate that does the
+boring 80% while you keep the judgment. Next: making agents reliable enough to
+trust.

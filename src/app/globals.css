@@ -1,0 +1,427 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * The Computation Pad design system, Indigo ink pad.
+ * The pad slots (desk … muted, shadow) are the only themeable values; graphite, pencil and the
+ * red pen are fixed inks. Light only: there is no dark variant by design.
+ */
+:root {
+  color-scheme: light;
+
+  --desk: #ccd3e5;
+  --sheet: #e5eaf6;
+  --grid-fine: #ccd4e8;
+  --grid-major: #b8c2da;
+  --print: #2d3e7e;
+  --muted: #4e5566;
+  --pad-shadow: 40 45 61;
+
+  --graphite: #262b25;
+  --pencil: #3d433c;
+  --red-pen: #a82c17;
+
+  /* A faint print tint for code paper and hover rows, derived, never a new hue. */
+  --code-bg: color-mix(in srgb, var(--print) 5%, var(--sheet));
+  --tint: color-mix(in srgb, var(--print) 8%, var(--sheet));
+  --tint-strong: color-mix(in srgb, var(--print) 10%, var(--sheet));
+
+  --grid-minor-size: 20px;
+  --grid-major-size: 100px;
+}
+
+@layer base {
+  html {
+    background: var(--desk);
+    color: var(--graphite);
+    font-family: var(--font-prose), system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--desk);
+    color: var(--graphite);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--print);
+    color: var(--sheet);
+  }
+  :focus-visible {
+    outline: 2px solid var(--print);
+    outline-offset: 2px;
+  }
+  input,
+  textarea {
+    caret-color: var(--print);
+    accent-color: var(--print);
+  }
+  ::placeholder {
+    color: var(--muted);
+    opacity: 1;
+  }
+  a {
+    text-underline-offset: 3px;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--grid-major) transparent;
+  }
+  /* Reflow: nothing on a page may push it wider than the screen. Code blocks and tables scroll
+     inside their own box (in callouts too, where prose styles don't reach), and long inline
+     code, URLs and identifiers break instead of overflowing. */
+  pre {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  :not(pre) > code {
+    overflow-wrap: anywhere;
+  }
+  a,
+  p,
+  li {
+    overflow-wrap: break-word;
+  }
+}
+
+@layer components {
+  /* The sheet lying on the desk: grid paper, and the only shadow on the page. */
+  .sheet {
+    margin-inline: auto;
+    max-width: 1200px;
+    background-color: var(--sheet);
+    background-image:
+      linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+      linear-gradient(0deg, var(--grid-major) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-fine) 1px, transparent 1px),
+      linear-gradient(0deg, var(--grid-fine) 1px, transparent 1px);
+    background-size:
+      var(--grid-major-size) var(--grid-major-size),
+      var(--grid-major-size) var(--grid-major-size),
+      var(--grid-minor-size) var(--grid-minor-size),
+      var(--grid-minor-size) var(--grid-minor-size);
+    background-position: -1px -1px;
+    border-radius: 2px;
+    box-shadow:
+      0 1px 1px rgb(var(--pad-shadow) / 0.1),
+      0 5px 12px -3px rgb(var(--pad-shadow) / 0.18),
+      0 26px 46px -22px rgb(var(--pad-shadow) / 0.45);
+  }
+  @media (width < 760px) {
+    .sheet {
+      box-shadow: none;
+      border-radius: 0;
+    }
+  }
+
+  /* Printed field label: names the field of the ruled cell it sits in. Never a kicker. */
+  .field-label {
+    font-family: var(--font-print), "Arial Narrow", sans-serif;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-variation-settings: "wdth" 80;
+    color: var(--print);
+  }
+
+  /* Action label: printed buttons, tabs, back cells. */
+  .label-action {
+    font-family: var(--font-print), "Arial Narrow", sans-serif;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-variation-settings: "wdth" 80;
+  }
+
+  /* Condensed printed voices. */
+  .print-display {
+    font-family: var(--font-print), "Arial Narrow", sans-serif;
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    font-variation-settings: "wdth" 75;
+  }
+  @media (width >= 760px) {
+    .print-display {
+      font-size: 42px;
+    }
+  }
+  .print-title {
+    font-family: var(--font-print), "Arial Narrow", sans-serif;
+    font-weight: 700;
+    font-size: 21px;
+    line-height: 1.2;
+    font-variation-settings: "wdth" 80;
+    color: var(--graphite);
+  }
+  .print-sheet-title {
+    font-family: var(--font-print), "Arial Narrow", sans-serif;
+    font-weight: 650;
+    font-size: 17px;
+    line-height: 1.2;
+    font-variation-settings: "wdth" 87;
+    color: var(--graphite);
+  }
+  @media (width >= 760px) {
+    .print-sheet-title {
+      font-size: 19px;
+    }
+  }
+
+  /* Headline: a group heading on its 2px print rule. */
+  .group-heading {
+    border-block-end: 2px solid var(--print);
+    padding-block-end: 4px;
+    font-family: var(--font-print), "Arial Narrow", sans-serif;
+    font-size: 25px;
+    line-height: 1.1;
+    font-weight: 700;
+    font-variation-settings: "wdth" 75;
+    color: var(--print);
+  }
+
+  /* Every quantity: mono, tabular. */
+  .qty {
+    font-family: var(--font-quantity), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* Printed buttons: square, ruled in print. Next is the one filled control on a view. */
+  .btn-print,
+  .btn-next {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-block-size: 42px;
+    padding-inline: 16px;
+    border: 1.5px solid var(--print);
+    font-family: var(--font-print), "Arial Narrow", sans-serif;
+    font-size: 15px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-variation-settings: "wdth" 80;
+    text-align: start;
+    transition: background-color 150ms ease-out;
+  }
+  .btn-print {
+    background: var(--sheet);
+    color: var(--print);
+  }
+  .btn-print:hover {
+    background: var(--tint-strong);
+  }
+  .btn-next {
+    background: var(--print);
+    color: var(--sheet);
+  }
+  .btn-next:hover {
+    background: color-mix(in srgb, var(--print) 82%, black);
+  }
+  .btn-print:disabled,
+  .btn-next:disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .btn-sm {
+    min-block-size: 32px;
+    padding-inline: 10px;
+    font-size: 13px;
+  }
+
+  /* Ruled boxes: print for printed structure, pencil for the student's working. */
+  .pad-box {
+    background: var(--sheet);
+    border: 1.5px solid var(--print);
+  }
+  .pencil-box {
+    background: var(--sheet);
+    border: 1.2px solid var(--pencil);
+  }
+  .rule-row {
+    border-block-end: 1px solid color-mix(in srgb, var(--pencil) 50%, transparent);
+  }
+  .hover-tint {
+    transition: background-color 150ms ease-out;
+  }
+  .hover-tint:hover {
+    background: var(--tint);
+  }
+
+  /* Honesty/fallback cell: hatched in 11% print diagonal lines. */
+  .hatch {
+    background-color: var(--sheet);
+    background-image: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--print) 11%, transparent) 0 1px,
+      transparent 1px 9px
+    );
+  }
+
+  /* The answer: boxed twice in print ink, a stroke and never a fill. Red pen stays for errors. */
+  .answer-frame {
+    border: 1.5px solid var(--print);
+    outline: 1.5px solid var(--print);
+    outline-offset: 3px;
+  }
+
+  /* Square gauge: a pencil frame with a print fill. */
+  .gauge {
+    block-size: 10px;
+    inline-size: 100%;
+    border: 1.2px solid var(--pencil);
+    background: var(--sheet);
+    overflow: hidden;
+  }
+  .gauge > span {
+    display: block;
+    block-size: 100%;
+    inline-size: 100%;
+    background: var(--print);
+    transform-origin: left center;
+    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Step box: 24px square, pencil border, mono number. Current is a graphite fill. */
+  .step-box {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: 26px;
+    block-size: 26px;
+    border: 1.5px solid var(--print);
+    background: var(--sheet);
+    color: var(--print);
+    font-family: var(--font-quantity), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  /* Printed tabs on a pencil baseline; the selected tab takes the sheet and graphite. */
+  .pad-tab {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 36px;
+    padding-inline: 12px;
+    border: 1.5px solid transparent;
+    border-block-end: 0;
+    color: var(--print);
+    white-space: nowrap;
+    transition: background-color 150ms ease-out;
+  }
+  .pad-tab:hover {
+    background: var(--tint);
+  }
+  .pad-tab[aria-current="page"] {
+    border-color: var(--print);
+    background: var(--sheet);
+    color: var(--graphite);
+    margin-block-end: -1.5px;
+  }
+
+  /* A lesson/prose measure held off the dense grid. */
+  .measure {
+    max-inline-size: 72ch;
+  }
+}
+
+/* ---- Motion: the pen on the sheet. Transform, opacity and stroke only. ---- */
+
+/* Celebration paper scraps (Confetti.tsx): square, pad inks, never red. */
+.confetti-piece {
+  position: absolute;
+  top: -14px;
+  width: 8px;
+  height: 12px;
+  opacity: 0;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation-fill-mode: forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(105vh) rotate(540deg);
+  }
+}
+
+/* A value lands where the pen writes it: 2px above, 260ms. */
+.pen-land {
+  animation: pen-land 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pen-land {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Drawn marks (ticks, arrows, rings) ink themselves along their path. */
+.pen-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: pen-draw var(--draw-ms, 300ms) cubic-bezier(0.37, 0, 0.63, 1) var(--draw-delay, 0ms)
+    forwards;
+}
+
+@keyframes pen-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.pen-fade {
+  animation: pen-fade 260ms ease-out both;
+}
+
+@keyframes pen-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  .confetti-piece {
+    display: none;
+  }
+}

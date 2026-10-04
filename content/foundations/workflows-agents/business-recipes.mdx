@@ -1,0 +1,201 @@
+---
+title: "Reusable recipes for your business"
+summary: "Build one reusable business automation, such as a weekly AI-written report, that computes its numbers first and can be redeployed or sold."
+changeNote: "New: a 22-minute watch segment covering two recipes, a reusable weekly-report worked example, a failure-modes list, and a short write-up of the offer you'd make."
+section: foundations
+pillar: workflows-agents
+order: 10
+level: intermediate
+estMinutes: 14
+taskMinutes: 45
+prerequisites: [ai-in-automations, reliability]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "Ey18PDiaAYI"
+  published: "2025-05-23"
+  year: 2025
+  minutes: 507
+  start: 4262
+  watchMinutes: 22
+  title: "Build & Sell n8n AI Agents (8+ Hour Course, No Code)"
+  channel: "Nate Herk | AI Automation"
+  why: "Nate Herk runs an automation agency, and this free course builds a long series of client-style automations step by step. That makes it closer to this lesson than any five-minute 'top workflows' list, which shows results without the build. The chapters set below build two of this lesson's recipes, inbox triage and content repurposing, and everything maps to the trigger → AI step → action pattern you already have."
+  notes:
+    - "Don't binge it: watch the 'Customer Support Workflow' and 'LinkedIn Content Creator Workflow' chapters (from 1:11:02, about 22 minutes)."
+    - "If your recipe needs it, 'Bonus Workflow: Invoice Processing' (from 1:32:58) and 'Error Workflows' (from 6:02:16) are the next most useful; the rest is optional."
+applyIt: |
+  A recipe only pays twice if someone else can say yes to it. Spend ten minutes turning one recipe
+  (the weekly report you build below, or any flow you already run) into a one-paragraph offer.
+
+  ```prompt
+  Write a one-paragraph offer for this automation: [what it does, in one line]. Include the
+  outcome in the client's words, what's included, one clear exclusion, a price structure (setup
+  fee plus monthly maintenance; I'll fill in the amounts) and a delivery window. Honest, specific.
+  ```
+
+  **If you freelance or want to:** each recipe is a productized offer; this feeds the
+  Applications → Agency track, and → pricing-ai-work covers the numbers. **At work:** ask for an
+  internal proposal instead, with hours saved per month and a go-live date in place of the price.
+  Success: the paragraph names a price (or hours saved) and a deadline; without both it's a description, not an offer.
+toolkit: |
+  - **Treat your best saved prompts as recipes.** A prompt, skill, custom GPT or Gem you reuse
+    weekly is a build-once template. Give each one a name, a one-line purpose and an example input
+    so you (or a client) can redeploy it without you in the room.
+  - **Start from template libraries, then adapt.** n8n, Make and Zapier all publish workflow
+    templates; import the closest one, strip what you don't need, and save your version as your
+    own recipe.
+  - **Build each recipe on your own work first, then clone it.** Run it on your own inbox, your
+    own numbers or your own content for a few weeks; the bugs you fix there are what make it
+    sellable.
+  - **Keep a recipe log.** One line per recipe in a notes file: trigger, tools, the AI prompt it
+    uses, how to switch it off, and, if you sell it, the price and delivery window.
+recap:
+  - emoji: "📖"
+    title: "What this lesson is"
+    text: "A recipe book: the automations actually worth building, chosen because they save real hours and can be sold."
+  - emoji: "🎯"
+    title: "Five worth stealing"
+    text: "Lead capture, onboarding, content repurposing, inbox triage, weekly reporting. Each targets frequent, high-value glue work."
+  - emoji: "♻️"
+    title: "The point of a recipe"
+    text: "Build each as a template, then redeploy across clients with small tweaks. Effort compounds."
+  - emoji: "🧱"
+    title: "Under every recipe"
+    text: "Every recipe is trigger → AI step → action with error handling and a human gate — the toolkit you already have, aimed at a job."
+  - emoji: "💰"
+    title: "The business angle"
+    text: "Each build is a sellable service — 'AI lead-response setup,' 'automated onboarding.' Learn it on yourself, then package it."
+  - emoji: "🏷️"
+    title: "Two things an offer needs"
+    text: "An offer without a price and a delivery window is just a description. Name both to make it real."
+  - emoji: "🎉"
+    title: "Where you've arrived"
+    text: "Mindset → tools → build → AI steps → webhooks → agents → reliability → frameworks → recipes. The machine now works while you sleep."
+task: |
+  Build the recipe with the most reuse in it, a **weekly report**, in under 45 minutes. Pull the
+  numbers you already track (a Google Sheet, your shop or payments dashboard export, analytics, a
+  project tracker) on a schedule, compute the changes in a normal step, hand them to an AI step,
+  and email or post a plain-English summary every Monday. Use a sheet of sample numbers if you
+  don't have live data yet. Configure the AI step with this:
+
+  ```prompt
+  Configure the AI step in my weekly n8n report recipe. Input: this week's and last week's numbers
+  for [what you track, e.g. orders, revenue, refunds and top products for a small online shop; or
+  tickets opened/closed for a team; or study hours and assignments done]. System prompt: "You are
+  a careful analyst. Turn these numbers into a 5-line plain-English Monday report: what moved vs
+  last week, one thing that's working, one thing to fix, and the single number to watch. No hype,
+  and never state a number that isn't in the input." Output: short markdown, ready to post to
+  Slack or email.
+  ```
+
+  Add an error notification, and keep yourself as the approver before anything is sent to someone
+  else. Put the parts that change per user (data source, recipients, wording) in a settings block
+  at the top, so the next deployment is an edit, not a rebuild.
+  Success: the summary reads like a smart teammate wrote it, not a metrics dump, and every number in it appears in the input.
+selfCheck:
+  - q: "Your weekly report says revenue grew 12%, but the sheet shows 8%. Where do you look, and how do you redesign so it can't recur?"
+    a: "The AI step did the arithmetic and got it wrong. Compute every number in a normal step before the model sees it, have the model only phrase the results, and add a check that every number in the output appears in the input."
+  - q: "You built onboarding for one client. A second client wants it, but uses Dropbox instead of Google Drive and a different welcome email. How should the recipe have been built?"
+    a: "With the client-specific parts separated: a settings block at the top (folder location, email text, names) and swappable storage steps. Then a new client means editing settings and one module, not rebuilding the flow."
+  - q: "What makes an automation 'worth building' for a business?"
+    a: "It targets repetitive, frequent, high-value glue work (lead follow-up, onboarding, reporting, content repurposing) — saving real hours every week, and often something you can package and sell."
+backupResources:
+  - label: "6 AI Agency Offers That Actually Make Money in 2026 — Michele Torti"
+    url: "https://www.youtube.com/watch?v=vYRUpnnePmA"
+    type: "video · offer ideas"
+  - label: "Top 10 AI Workflows for Small Businesses — Jon Law"
+    url: "https://www.youtube.com/watch?v=ir0z_oaG_ao"
+    type: "video · more ideas"
+  - label: "n8n — workflow templates library"
+    url: "https://n8n.io/workflows/"
+    type: "templates · official"
+tags:
+  - automation
+  - recipes
+  - business
+  - agency
+---
+
+You've got the whole toolkit now — triggers, tools, AI steps, agents, reliability.
+This last lesson is a **recipe book**: the automations actually worth building,
+chosen because they save real hours and (bonus) can be **sold** as services.
+
+## High-ROI recipes to steal
+
+- **Lead capture → enrich → follow-up.** A new lead triggers an AI-drafted, tailored
+  reply and a CRM entry. Never let a lead go cold.
+- **Client onboarding.** On signature: create the folders, send the welcome + intake
+  form, and schedule the kickoff — automatically.
+- **Content repurposing.** One long video or post → AI spins out a blog, a thread,
+  and captions. Multiply your output.
+- **Inbox triage.** Classify incoming messages, draft replies, and flag the few that
+  truly need you.
+- **Weekly reporting.** Pull the metrics, have AI write the plain-English summary,
+  send it to the client like clockwork.
+
+Each one is a pattern you've already built: lead follow-up and triage are the AI step from
+→ ai-in-automations, onboarding is plain trigger→action, and reporting adds a schedule.
+
+## Worked example: the weekly report, built to reuse
+
+Here's the weekly report as a recipe you could hand to someone else.
+
+1. **Trigger:** a schedule, Monday 8:00.
+2. **Settings block:** one step at the top holding everything client-specific: the sheet's
+   location, the metric names, the recipient, the report's tone. Nothing else in the flow
+   mentions a client by name.
+3. **Fetch:** read the last 14 days of rows from the sheet or export.
+4. **Compute:** a normal step (a formula, a Code node, or a summarise step) calculates this
+   week's totals, last week's totals and the change for each metric. **The model never does the
+   arithmetic.**
+5. **AI step:** the prompt from "Do this now" receives the computed numbers and writes five plain
+   lines.
+6. **Check:** a small step confirms that every number in the AI's text appears in the computed
+   input. If not, send the plain numbers with a note instead of the prose.
+7. **Deliver:** to you for approval in week one; straight to the recipient once you trust it.
+8. **Guards:** an error workflow and a heartbeat from → reliability.
+
+Step 4 and step 6 are what separate a recipe from a demo. A language model is good at phrasing
+"orders fell slightly while refunds doubled" and unreliable at computing percentages, so you
+give it the computed numbers to phrase and check its work afterwards.
+
+> 💡 **Try it:** Write a recipe card for one automation you already run, in five lines: trigger,
+> inputs, the AI prompt (if any), output, and how to switch it off. If you can't fill a line,
+> that's the gap that would make it hard to reuse.
+
+## Build once, reuse forever
+
+The point of a *recipe* is reuse. Build each as a template, then redeploy across
+clients with small tweaks. Your effort compounds: the onboarding flow you build for
+one client serves the next ten — **if** the client-specific parts live in one settings block
+and nowhere else.
+
+## These are also your offers
+
+Here's the strategic kicker if you freelance, consult, or plan to: **every recipe above is a
+sellable service.** Build them for yourself to learn the craft, then package them —
+"AI lead-response setup," "automated onboarding," "content-repurposing engine." That
+hands you straight into the **Applications → Agency / freelance** track later in the
+course (→ productized-services). If you're employed, the same recipes are internal wins with
+your name on them.
+
+## Common failure modes
+
+- **Every new client is a rebuild** → client details are scattered through the flow → no
+  settings block → move everything client-specific into one step at the top.
+- **The report states wrong numbers** → the model did the maths → arithmetic was left to the
+  AI → compute first, let the AI phrase, then check.
+- **Bugs reach the client first** → you sold it before running it → no time on your own data
+  → run each recipe on your own work for a few weeks.
+- **Unpaid upkeep** → logins expire and APIs change after handover → maintenance wasn't part
+  of the deal → price a monthly maintenance line, or name an internal owner.
+- **Five half-finished recipes** → none reliable enough to sell → too many at once → take one
+  to "boring and dependable" before starting the next.
+
+## You finished the pillar 🎉
+
+Automation mindset → tools → first build → AI steps → webhooks/APIs → agents →
+reliability → frameworks → recipes. You can now wire your tools into pipelines that
+run without you, add judgment with AI, keep them reliable, and turn them into offers.
+That's leverage — the machine works while you sleep.

@@ -1,0 +1,254 @@
+---
+title: "Skills & plugins"
+subtitle: "Package what you know"
+summary: "Package a prompt you keep repeating into a skill your agent loads on its own, and share your skills across projects as plugins."
+changeNote: "New: a short inventory of what to package and where, a task that builds two skills (one by name, one automatic), and a note that SKILL.md works in other agents."
+section: foundations
+pillar: claude-code
+order: 6
+level: intermediate
+estMinutes: 16
+taskMinutes: 30
+prerequisites: [claude-md-and-memory, prompting-claude-code]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "fOxC44g8vig"
+  published: "2025-11-26"
+  year: 2025
+  minutes: 3
+  title: "Claude Agent Skills Explained"
+  channel: "Anthropic"
+  why: "Made by Anthropic, so it presents their own feature, but in three minutes it gives the cleanest mental model of what a Skill is: a folder of instructions Claude loads when the task matches. Watch it for the three ideas that matter (the description is the trigger, loading happens in layers, Claude invokes it on its own); longer community videos mostly add setup clicks."
+  notes:
+    - "It was made before custom slash commands were folded into skills; the breakdown below covers how that works now."
+    - "Let the official skills and plugins docs in Read-after carry the current mechanics."
+readAfter:
+  - label: "Extend Claude with Agent Skills — official Claude Code docs"
+    url: "https://code.claude.com/docs/en/skills"
+    kind: docs
+  - label: "Create plugins — official Claude Code docs"
+    url: "https://code.claude.com/docs/en/plugins"
+    kind: docs
+applyIt: |
+  Take inventory of what you could package. Spend five to ten minutes listing what you paste or
+  re-explain to an AI assistant: a review checklist, a commit-message format, the rules of a
+  tricky part of your project, a report template. Sort each item into one of four bins:
+
+  - **One always-on line** → your `CLAUDE.md` (or `AGENTS.md` for other agents)
+    (→ claude-md-and-memory).
+  - **Heavy reference for one area** → a reference skill that loads only when the agent works
+    in that area.
+  - **A procedure you run by name** → a workflow skill you call as `/name`.
+  - **Not worth packaging yet** → used once or twice; wait for the third time.
+
+  Then draft the `description` for your top candidate as a trigger: what it does, "Use
+  when…", and two concrete situations that should fire it.
+
+  **If you don't code yet:** run the same inventory on your writing standards: a style guide,
+  an email format, a meeting-notes template.
+
+  Success: a sorted list and one trigger-style description ready to paste into a `SKILL.md`.
+toolkit: |
+  - **Turn your most-retyped prompt into a skill this week.** Look back over your last few
+    sessions for the prompt you pasted more than twice (a commit message, a code review, a
+    weekly summary) and save it as `.claude/skills/[name]/SKILL.md`. The same idea exists as
+    Cursor rules and commands, Codex skills, Copilot prompt files and ChatGPT custom GPTs.
+  - **Write every description as a trigger.** "What it does + use when…" plus three concrete
+    situations. Re-read the descriptions of any skills you already have; a vague one is why a
+    skill sits unused.
+  - **Build a `new-project` workflow skill.** Package the routine you repeat when starting a repo
+    (README, `CLAUDE.md` skeleton, folder layout, `.gitignore`, first commit), so every new
+    project starts to your standard in one command.
+  - **Decide in-context vs fork per skill.** A formatter or file-writer stays in-context because
+    you need its output next; a "check this repo against its `CLAUDE.md`" audit should fork to
+    a subagent so the noisy read never floods your main thread (→ subagents-and-agent-teams).
+  - **Package your standards as a plugin once you have three or more skills.** Put them behind a
+    `.claude-plugin/plugin.json` in a git repo with a `marketplace.json`, and every project
+    installs the same *versioned* playbook with `/plugin install` instead of holding drifting
+    copies.
+recap:
+  - emoji: "📦"
+    title: "What a skill physically is"
+    text: "Stop re-pasting your best prompt. Park it in a SKILL.md and it becomes a tool Claude owns, ready every session — instructions plus any scripts and files the job needs."
+  - emoji: "🎯"
+    title: "The most important line"
+    text: "It's the one line Claude reads to decide when to reach for a skill. Pack it with the exact situations that should fire it, or the skill sits there unused."
+  - emoji: "🪆"
+    title: "Why a big skill is cheap"
+    text: "Only the tiny description is always in context. The full instructions load when the task matches, and bundled files load only when the body reaches for them — so a huge skill costs almost nothing until it's used."
+  - emoji: "🤖"
+    title: "Who decides to use it?"
+    text: "Skills are model-invoked: describe the capability once and Claude pulls the right one automatically, instead of you remembering which command to type."
+  - emoji: "🧱"
+    title: "Specialist without a rebuild"
+    text: "A general agent becomes a specialist by snapping together the skills a task needs — you don't hand-build a bespoke agent per job."
+  - emoji: "✈️"
+    title: "Sharing it beyond one repo"
+    text: "Because a skill is just files, it moves across projects, sessions, and teammates — and a plugin bundles many into one versioned, installable package."
+  - emoji: "👑"
+    title: "What happened to commands"
+    text: "The old custom slash command is just a skill you invoke by name. Author once as a skill and get both the on-demand command and the auto-trigger for free."
+task: |
+  Build two skills, one you call by name and one Claude reaches for on its own (about 30
+  minutes, any repo or even an empty folder). First, convert one prompt you retype:
+
+  ```prompt
+  Create .claude/skills/commit-message/SKILL.md [or a name that fits your prompt]. Write a
+  description packed with the situations that should trigger it (e.g. "Use when writing a git
+  commit message"), put the prompt body under the frontmatter, and reload.
+  ```
+
+  Test it *both* ways: type `/commit-message` (or your skill's name) to invoke it, and
+  separately describe the situation *without* naming it and watch Claude reach for it on its
+  own. If you only ever want to invoke it by hand, add `disable-model-invocation: true`.
+
+  Second, package what you know about the most fragile area of your project (the pricing
+  rules, the permissions logic, a data-import parser) as a reference skill: the rules, the edge
+  cases, the files that must stay in sync, and a description like "Use when editing or
+  reviewing [area]". Ask for a small change in that area and check that Claude loads the skill
+  without being told. **If you don't code yet:** make the second skill your writing style guide
+  and ask for a draft in that style.
+
+  Success: one skill that fires by name, and one that loads on its own from a description of
+  the situation.
+selfCheck:
+  - q: "You have a 400-line style guide you want Claude to follow, but only when it's writing UI copy — not eating context the rest of the time. Reference skill or workflow skill, and what keeps it cheap to have around?"
+    a: "A reference skill — it packages knowledge, not a procedure. Put the guide in the SKILL.md body (or bundled files) and write a description that only matches copywriting tasks. Progressive disclosure means just the one-line description is always in context; the 400 lines load only when a task triggers it, so a big reference costs almost nothing until it's needed."
+  - q: "You wrote a skill but Claude never reaches for it on its own — you always have to type /name. Most likely fix?"
+    a: "The description isn't doing its job. It's the trigger Claude matches the task against, so a vague one ('formats things') won't fire. Rewrite it as what it does + exactly when to use it, packed with the situations and phrases that should invoke it. (If you actually want it invoke-only, that's disable-model-invocation: true — but then don't expect auto-trigger.)"
+  - q: "You've got a skill that audits your whole repo against your conventions — it reads dozens of files and prints a report. In-context or forked to a subagent, and why?"
+    a: "Fork to a subagent. The value is the final report, not the dozens of files it read to get there — so isolate that noisy work in a subagent that returns just the summary, keeping your main context clean. Skills whose intermediate output you keep working with (a prompt formatter, a file writer) stay in-context. (Subagent mechanics → subagents-and-agent-teams.)"
+  - q: "Your /review and /commit skills live loose in three repos and have already drifted apart. What's the move, and what do you gain over copying the files?"
+    a: "Package them as a plugin (a .claude-plugin/plugin.json manifest + a skills/ folder) and distribute it through a marketplace — a git repo with a marketplace.json. Every repo installs the same versioned bundle with /plugin install instead of holding a drifting copy; bump the version once and everyone updates. That's the difference between sharing knowledge and duplicating it."
+backupResources:
+  - label: "Equipping agents for the real world with Agent Skills — Anthropic Engineering"
+    url: "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"
+    type: "article · engineering"
+  - label: "Create and distribute a plugin marketplace — official docs"
+    url: "https://code.claude.com/docs/en/plugin-marketplaces"
+    type: "docs · official"
+  - label: "Discover and install plugins — official docs"
+    url: "https://code.claude.com/docs/en/discover-plugins"
+    type: "docs · official"
+tags:
+  - claude-code
+  - skills
+  - plugins
+  - marketplaces
+---
+
+`CLAUDE.md` taught Claude your project's *rules*. A **skill** goes one level up: it packages
+a *capability* — a folder of instructions Claude loads itself the moment a task matches. It's
+how you stop re-pasting your best prompt forever, and it's the real step from *using* Claude
+Code to *engineering* it. One 2026 change reframes the whole lesson: the custom slash command
+didn't get a sibling — it got absorbed. **The primitive is now the Skill.**
+
+## The primitive is the skill (commands are legacy)
+
+A skill is a folder with a **`SKILL.md`** — YAML frontmatter (`name`, `description`) plus the
+instructions, optionally alongside scripts and reference files. Claude discovers it and loads
+it **when the task matches**. That last part is the leap: skills are **model-invoked**. You
+describe the capability once and Claude reaches for it — you don't have to remember it exists,
+the way you had to remember which slash command to type.
+
+Every skill is *also* invocable by name — `/name` for a personal skill, `/plugin-name:skill`
+for one shipped in a plugin. So the thing you used to call a "custom slash command" is just a
+skill you happen to invoke by hand.
+
+That's why commands are legacy, not gone. Your old `.claude/commands/review.md` still runs, but
+the official docs now treat the `commands/` folder as the flat-file legacy form of skills and
+point all new work at `skills/`. The modern home is `.claude/skills/review/SKILL.md`
+with a real `description`. If you want a skill to **only** fire when you type it and never
+auto-trigger, add `disable-model-invocation: true`; otherwise give it a sharp description and
+get both behaviours for free. That's the whole migration.
+
+Same idea elsewhere: Anthropic has published the `SKILL.md` format as an open standard, and
+OpenAI's Codex and GitHub Copilot can load skills in the same folder shape, so a skill you
+write here usually travels.
+
+## Write the description like it's the trigger — because it is
+
+The **`description`** is the single most important line in the file. Only the frontmatter loads
+into the system prompt at startup — that thin slice is what Claude matches every task against to
+decide whether to pull the skill in. A vague description is a skill that never fires.
+
+So write it as **what it does + exactly when to use it**, stuffed with the situations and
+phrases that should invoke it. Look at any well-authored skill and its description reads like
+*"…Use when… Triggers include…"* — that density is deliberate; the description is doing
+retrieval.
+
+```md
+---
+name: commit
+description: Write a conventional-commit message for the staged diff. Use when the
+  user asks for a commit message, says "commit this", or right after staging changes.
+---
+Read the staged diff and write a single `type: description` message — imperative mood,
+under ~70 chars, no body unless the change is non-obvious.
+```
+
+The reason a big skill stays cheap is **progressive disclosure**: metadata is always on, the
+`SKILL.md` body loads only when the trigger hits, and bundled files load only when the body
+reaches for them. Keep the description tiny and high-signal; push the bulk down a layer. (*Why*
+a loaded token is a real cost — the economics, JIT retrieval — is → `context-engineering`; here
+you just apply the rule.)
+
+> 💡 **Try it:** open a skill you already have and rewrite its description from *what it is* to
+> *when to use it* — add three concrete trigger situations. Then describe one of those
+> situations without naming the skill and see if Claude now reaches for it.
+
+## Two shapes: reference vs workflow
+
+Skills come in two flavours, and knowing which you're writing tells you *how* to write it.
+
+- **Reference skill** — packaged *knowledge*: a style guide, an API's quirks, a schema, your
+  brand tokens. Mostly declarative content Claude pulls in as a lookup when the topic comes up.
+- **Workflow skill** — packaged *procedure*: a sequence of steps Claude executes, imperative
+  and often with scripts. A `/wrap-up` skill (harvest decisions → write them to files → commit
+  → hand off) or a `/format-prompt` skill (rough idea → structured prompt) is a workflow skill.
+
+Reference = content to load; workflow = steps to run. Most real skills lean one way, and the
+lean decides whether the body is a document or a runbook.
+
+## In-context, or forked to a subagent
+
+By default a skill runs **in-context**: its instructions load into your current thread and
+Claude acts inline, so everything it reads and produces lands in *your* window. That's exactly
+what you want when you need the intermediate work — a formatter that returns a prompt you'll use
+next, a writer whose files you want to inspect.
+
+The alternative is a skill that **forks to a subagent**: the work runs in an isolated context
+that returns only a summary. Reach for this when the value is the *result*, not the noisy
+exploration behind it — a whole-repo audit, a research fan-out. The isolation *is* the point:
+the subagent burns its own context and hands you back a clean answer.
+
+The decision rule is one question — *does the caller need the work, or just the result?* Need
+the work → in-context. Need only the result, or it's heavy and noisy → fork. (Defining and
+configuring the subagents themselves → `subagents-and-agent-teams`.)
+
+## Plugins & marketplaces: package it for everyone
+
+A loose `.claude/skills/` folder is personal and per-project. A **plugin** packages skills —
+plus, optionally, agents, hooks (→ `hooks-automation`), and MCP servers (→ `mcp-servers`) —
+behind a `.claude-plugin/plugin.json` manifest, so the bundle is **versioned, namespaced, and
+installable** across projects and teammates. Plugin skills carry a namespace (`/codex:review`)
+so two plugins can't clash.
+
+A **marketplace** is a catalog — a `marketplace.json` in a git repo — listing plugins. Users
+`/plugin marketplace add <repo>` and then `/plugin install <name>`. Anthropic runs an
+official curated marketplace plus a community one for public submissions.
+
+A concrete example is the **Codex plugin** for Claude Code (→ codex-inside-claude-code): it
+ships skills (`/codex:review`, `/codex:rescue`, `/codex:adversarial-review`), a review subagent,
+and its own runtime as a single versioned install. That's the shape — a bundle of capability you add in one command and update by bumping
+a version, instead of copying files between repos and watching them drift.
+
+## Packaging knowledge is the whole point
+
+Zoom out and every skill is the same move: it turns something *you* know — the prompt you
+retype, the convention only you follow, the runbook in your head — into a tool your future
+sessions, your subagents, and your teammates inherit. A hard-won prompt becomes a permanent
+capability; a new hire installs one plugin and gets the whole playbook; a fresh session starts
+already knowing your standards. That is the line between operating Claude Code and engineering
+it.

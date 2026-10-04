@@ -1,0 +1,337 @@
+---
+title: "Connect"
+subtitle: "Zettelkasten & evergreen notes"
+summary: "Split a long source into atomic, claim-titled notes that link to each other, and review AI-drafted notes for ideas you can actually defend."
+changeNote: "New: a claim-title rewrite of your own headings, a no-code route for drafting atomic notes, and a 13-minute watch range that skips the dated setup."
+section: foundations
+pillar: obsidian
+order: 6
+level: intermediate
+estMinutes: 15
+taskMinutes: 50
+prerequisites: [markdown-and-linking, install-and-vault-setup]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "E6ySG7xYgjY"
+  published: "2021-11-03"
+  year: 2021
+  minutes: 17
+  start: 0
+  watchMinutes: 13
+  title: "My simple note-taking setup | Zettelkasten in Obsidian | Step-by-step guide"
+  channel: "Artem Kirsanov"
+  why: "Most Zettelkasten videos teach a template; this one teaches the order of operations, which is the part that lasts. Kirsanov opens by mocking his own over-engineered setup (25 plugins, 253 tags, 39 folders), then argues the thing that actually matters: structure should EMERGE from links, not be imposed by folders. His four-folder system keeps reference notes (one per book or course) separate from atomic idea notes, the direct ancestor of this pillar's immutable `sources/` and agent-owned `wiki/`."
+  notes:
+    - "Watch 0:00 to 5:13 and 8:28 to 16:07, about 13 minutes."
+    - "Skip 5:13 to 8:28: it re-teaches lesson 2's vault, settings and plugin install, and both plugins it recommends are now obsolete."
+    - "It's from November 2021, so four things on his screen have drifted. Read the errata in the breakdown before you copy anything he clicks."
+applyIt: |
+  A claim title is the part of this craft you can use everywhere, not only in a vault. Pick five
+  titles you already use: note names, document headings, slide titles, email subjects. **If you
+  study:** "Week 4 lecture", "Regression". **If you code:** a design doc's headings, a README's
+  sections. **At work:** "Q3 retro", "Pricing notes".
+
+  Rewrite each as one claim someone could disagree with ("Week 4 lecture" → "Retrieval
+  practice beats rereading for exam recall"), and mark it TRANSFERS (useful beyond this
+  document) or LOCAL. A title you can't turn into one claim holds several ideas, or none yet;
+  that's a note waiting to be split.
+
+  **With a chat assistant (no code):** paste your five rewrites and ask "Which of these are
+  still topics rather than claims? Don't rewrite them for me." Fix the flagged ones yourself.
+
+  Success: five claim titles in your own words, each marked TRANSFERS or LOCAL.
+
+  **With a coding agent:** ask it to list your repo's doc headings that are topics rather than
+  claims, editing nothing, and rewrite five of them yourself.
+
+  Success: five claim titles you wrote yourself, and no file changed.
+toolkit: |
+  - **Write your custom instructions as atomic claims.** "Ask before sending anything to a
+    client" beats a vague paragraph in ChatGPT's custom instructions, a Project's instructions or
+    a Gemini Gem. One rule per line; split any line smuggling two ideas, the way one note holds
+    one thought.
+  - **Save a "split into atomic notes" prompt.** Keep it in your note of reusable prompts: "Split
+    this into one-idea notes, each titled as a full claim, paraphrased, with the related ideas
+    listed under each." Paste a source, then rewrite the weakest note yourself.
+  - **Give your assistant a Map of Content.** One hub note that links to a subject's key notes
+    is the file to upload first to a Project or Gem: the entrance an assistant (and you) can start
+    from instead of guessing.
+  - **You are the reviewer, not the typist.** When an assistant drafts pages for `wiki/`, the only
+    rule it can't keep for you is "in your own words". Knowing the craft is how you catch a page
+    that's fluent and empty.
+recap:
+  - emoji: "💡"
+    title: "How big is a note?"
+    text: "Each note holds a single idea, so it can be reused and linked in many contexts. Big sprawling notes get filed once and forgotten."
+  - emoji: "✏️"
+    title: "Why not copy-paste?"
+    text: "Rewriting forces understanding. Copy-paste builds a junkyard; rephrasing in your own voice is what actually builds knowledge."
+  - emoji: "🔗"
+    title: "What the links are for"
+    text: "Wire each new note to related ones with `[[ ]]`. The links themselves are the thinking, not decoration on top of it."
+  - emoji: "🌲"
+    title: "How to title a note"
+    text: "Write concept notes meant to be developed and reused over time, titled as a full claim you can build on."
+  - emoji: "🧭"
+    title: "Folders first, or later?"
+    text: "Don't pre-build folders for topics. Write atomic notes, link them, and let the shape of your thinking show up on its own."
+  - emoji: "✨"
+    title: "Where new ideas come from"
+    text: "When atomic linked notes pile up, two you wrote months apart suggest a third neither said — idea generation on tap."
+  - emoji: "🗺️"
+    title: "When a ghost note grows up"
+    text: "Link to a note that doesn't exist yet and it becomes a hub. When notes cluster around one, promote it into a real Map of Content."
+  - emoji: "🤖"
+    title: "Your role when an agent writes"
+    text: "Atomic, linked, evergreen pages are exactly what an agent produces well — which is why you learn the craft as the reviewer, not the typist."
+task: |
+  Pick your first long source: one dense document you wrote or rely on, full of reusable
+  ideas that are trapped in one place and readable only in order. **If you study:** a
+  semester's lecture notes for one course. **If you code:** a project's README, design doc or
+  decision log. **At work:** a long process doc, a project retrospective, or your own running
+  meeting notes. Paste it into a new note at `sources/first-source.md`; later lessons reuse it
+  under that name. `sources/` keeps it exactly as written and `wiki/` will hold the distilled
+  claims: copy in, never edit.
+
+  Then do the human half first, hand the same job to an AI, and grade it.
+
+  **1 · By hand (10 minutes).** Write one atomic note from the source you picked — one
+  idea, in your own words, titled as a full claim ("Integer arithmetic keeps two systems'
+  totals exactly equal", "Retrieval practice beats rereading"). Link it to one note you
+  already have. You now know what good looks like from the inside.
+
+  **2 · By AI.** Pick a route.
+
+  **With a chat assistant (no code):**
+
+  - Upload `sources/first-source.md` and `index.md` to a chat in your Vault Project and run:
+
+  ```prompt
+  Read first-source.md and never change its text. Split it into atomic wiki pages: one idea
+  per page, titled as a full claim, paraphrased rather than quoted. List the titles first and
+  wait for my go-ahead.
+
+  Then give me each page as its own markdown block, starting with a properties block between
+  --- lines: `type: concept`, `topic:` (one or two lowercase words, reused across pages about
+  the same thing), and `source: "[[first-source]]"`. Below it, an H1 that matches the title,
+  the paraphrased idea, and at least two [[links]] to other pages in this set. Finish with one
+  index.md line per page and one dated log.md line naming the source and the page count.
+
+  Success: each page states one claim, carries the three properties, and links to two others.
+  ```
+
+  - Pick the five best pages. For each, create a note in `wiki/` named after its title (drop
+    any colon or question mark, which file names can't hold) and paste the block. Obsidian
+    shows the three properties in its Properties panel.
+  - Add the index lines for those five to `index.md` and the log line to `log.md`.
+
+  Success: five pages in `wiki/` carrying the three properties, linked to each other, listed
+  in `index.md`, and `sources/` unchanged.
+
+  **With a coding agent:**
+
+  - In your coding agent at the vault root:
+
+  ```prompt
+  Read `sources/first-source.md`. Never edit anything in `sources/` — that layer is
+  immutable. Split it into atomic pages under `wiki/`: one idea per page, titled as a
+  full claim, paraphrased rather than quoted. Head each page with the properties
+  `type: concept`, `topic:` (one or two lowercase words, and reuse the same word across
+  pages about the same thing), and `source: [[first-source]]`. Wire the pages together
+  and into existing `wiki/` pages with `[[ ]]` — at least two links out each, no
+  orphans. Add every new page to `index.md`, and append one dated line to `log.md` naming
+  the source you split and how many pages came out. List the titles you plan to write and
+  wait for my go-ahead before creating any file.
+  Success: each page states one claim, carries the three properties, links to two
+  others, `index.md` and `log.md` both record the pass, and `sources/` is unchanged.
+  ```
+
+  Success: a set of pages in `wiki/` carrying the three properties, recorded in `index.md` and
+  `log.md`, and `sources/` unchanged.
+
+  **3 · Grade it.** Whichever route you took, open three pages the AI wrote and mark each
+  against the three rules. Rewrite the worst one in your own words. That edit is the lesson.
+
+  Success: one hand-written atomic note, a set of AI-drafted pages carrying the three
+  properties, and one page you rewrote because it was fluent but not yours.
+selfCheck:
+  - q: "Before writing a single note, you spend an evening building folders: Statistics > Regression > Linear, Statistics > Regression > Logistic, and so on. A month later half are empty and your strongest notes fit none of them. What would Kirsanov have you do instead?"
+    a: "Write atomic notes first and link them, including links to notes that don't exist yet. Watch which of those ghost links collect the most references, and only then promote one into a real hub, a Map of Content. Folders built up front encode a guess about your thinking; hubs built afterwards encode evidence. An evergreen note (Andy Matuschak's term) is one written to be developed and reused, so it shouldn't be trapped in one branch of a tree anyway."
+  - q: "Three rules — atomic, own words, densely linked. Which one can an agent NOT keep for you, and what does that mean for how you read its output?"
+    a: "Rule 2. An agent will happily produce atomic, densely linked, evergreen-shaped pages — that's mechanical, and it's exactly the bookkeeping you want off your plate. But 'in your own words' exists to force *your* understanding, and nobody can do that on your behalf. So its pages arrive fluent and plausible whether or not you understood the source. That's the whole reason you still learn this craft in 2026: you're the reviewer. Read for claims you couldn't defend out loud, and rewrite those."
+  - q: "You have a note titled 'Spaced repetition' that has grown to 2,000 words covering the research, three apps, your own exam schedule and a rant about flashcards. What do you do with it?"
+    a: "Split it. Each separate claim becomes its own atomic note titled as that claim ('Spaced repetition beats rereading for long-term recall', 'Short daily reviews beat one long weekly one'), linked to each other and to a 'Spaced repetition' hub. Your exam schedule belongs in a PARA project note, not the idea web: PARA organizes for action, the note web organizes for thinking."
+backupResources:
+  - label: "Evergreen notes — Andy Matuschak (canonical source)"
+    url: "https://notes.andymatuschak.org/Evergreen_notes"
+    type: "reference · source"
+  - label: "An LLM wiki — Andrej Karpathy's gist, the agent-maintained version of this idea"
+    url: "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f"
+    type: "reference · source"
+  - label: "Zettelkasten Smart Notes: Step by Step with Obsidian — Martin Adams"
+    url: "https://www.youtube.com/watch?v=ziE6UExsOrs"
+    type: "video · alternative"
+tags:
+  - obsidian
+  - zettelkasten
+  - evergreen-notes
+  - moc
+  - wiki
+---
+
+PARA keeps you organised for *doing*. Zettelkasten keeps you organised for
+*thinking* — and it's where a vault stops being storage and starts generating
+ideas. The method is old (Niklas Luhmann wrote 90,000 linked notes on paper
+cards); Obsidian just makes it cheap.
+
+This is also the lesson where the pillar's `wiki/` folder finally gets its
+definition. Everything below describes the shape of a good page in there. Learn it
+by hand first — you're about to become the reviewer of a machine that writes
+thousands of them.
+
+## Three rules that do all the work
+
+1. **Atomic** — one idea per note. Small notes can be reused and linked in many
+   contexts; big notes get filed once and forgotten.
+2. **In your own words** — rewriting forces understanding. Copy-paste builds a
+   junkyard; rephrasing builds knowledge.
+3. **Densely linked** — connect each new note to related ones with `[[ ]]`. The
+   links *are* the thinking.
+
+## Evergreen notes
+
+Andy Matuschak's **evergreen notes** sharpen the idea: write notes to be
+**developed over time and reused**, concept-oriented and continuously refined —
+the opposite of dated, throwaway journal entries. Title each one as a full claim
+("Optimistic UI feels faster than it is") so it states something you can build on.
+
+A title that's a claim is doing quiet work. "Optimistic UI" is a folder label; a
+claim can be *disagreed with*, which means it can be tested, revised, and linked
+to the note that contradicts it. That's the difference between a filing system and
+a body of thinking.
+
+> 💡 **Try it:** take the title of any note you already have ("Meeting 3 March",
+> "Marketing ideas", "Week 4 lecture") and rewrite it as one claim you could disagree with.
+> If you can't, the note holds no single idea yet, which is exactly what splitting fixes.
+
+## Structure emerges — it isn't designed
+
+The video's real argument is not about folders, it's about *order of operations*.
+Kirsanov opens by parodying his own past setup — 25 plugins, 253 tags, 39 folders
+— and then shows the alternative:
+
+1. Write atomic notes and link them, including links to notes that **don't exist
+   yet** (lesson 3's trick).
+2. Those ghost notes act as tags for free, and show up in graph view.
+3. When one ghost starts collecting a crowd of links, that topic has proven it
+   matters. *Now* promote it into a real note.
+
+That promoted hub is a **Map of Content (MOC)** — a hand-made table of contents
+made of curated `[[links]]`, and the entrance to a big topic. Folders built up
+front encode a guess about your own thinking. Hubs built afterwards encode
+evidence. Same for the other half of his system: he keeps a **reference note per
+source** (one per book, one per course) separate from the atomic idea notes, so
+"where did this come from" never gets tangled with "what do I now believe." That
+split is the ancestor of this pillar's `sources/` and `wiki/`.
+
+## Where insight comes from
+
+Here's the payoff: when atomic, linked notes accumulate, **new ideas emerge from
+the connections** — two notes you wrote months apart suddenly suggest a third
+thing neither said. That's idea generation on tap, and it's why the method
+outlasts every app trend.
+
+## The 2026 version: this is the wiki layer
+
+Everything above describes a page an agent can write. That is not a coincidence —
+it's the whole design of Andrej Karpathy's **LLM wiki**: you curate raw sources,
+and the agent compiles them into concept pages and entity pages that are atomic,
+cross-referenced, and continuously maintained. His schema file is a rules document
+(`AGENTS.md` for Codex, CLAUDE.md for Claude Code); he reads the results in Obsidian.
+Different vocabulary, same object.
+
+So the division of labour in your vault is:
+
+- **`sources/`** — you drop things in. Immutable. The agent reads it and never
+  writes to it, because a source you've edited is no longer a source.
+- **`wiki/`** — the agent writes and maintains it. Atomic pages, own-voice prose,
+  dense `[[ ]]`, one claim per title. Exactly the three rules.
+- **You** — curate what goes in, ask the questions, and *judge the pages*.
+
+Obsidian is where you read, link, and catch what's wrong. The agent, whichever you run, is
+what writes and maintains the files. Don't let anyone blur those two.
+
+**Don't code?** The division is the same with a chat assistant: paste the source into ChatGPT,
+Claude or Gemini, ask for the pages as separate markdown blocks, and save the ones that pass
+your review into `wiki/` yourself. The review is identical, which is the point of this lesson.
+
+## The one rule an agent can't keep for you
+
+Look at the three rules again and ask which parts are mechanical.
+
+**Atomic** is mechanical — split on idea boundaries. **Densely linked** is
+mechanical, and it's the part humans skip because it's tedious; an agent will
+happily maintain a hundred cross-references and never get bored. **Evergreen
+shape** is mechanical too: a claim-shaped title is a formatting rule.
+
+Rule 2 is not. "In your own words" was never about the words — it's a trick for
+forcing *your* understanding, and nobody can do that on your behalf. An agent's
+pages come out fluent and plausible whether or not you understood the source.
+That is the failure mode: a `wiki/` that reads beautifully and that you cannot
+defend a single line of.
+
+Which is the honest answer to "why learn this in 2026". You learn the craft
+because **you're now the reviewer**, and a reviewer who's never written a good
+atomic note can't tell a real one from a well-formed empty one. Read the agent's
+pages for claims you couldn't explain out loud, and rewrite those by hand. Lesson
+10's lint pass automates the other checks — orphans, contradictions, stale claims
+— precisely because those *are* mechanical.
+
+## Errata — this video is from November 2021
+
+The thinking has aged perfectly. Four things on screen have not:
+
+- **[07:55] Sliding Panes** — he installs it as a community plugin. It was
+  absorbed into core as **Stacked Tabs** in Obsidian **1.0 (October 2022)**. It's a
+  right-click on a tab group now. Install nothing.
+- **[08:05] Admonition** — Obsidian shipped **callouts** natively in **0.14 (March
+  2022)**. Type `> [!note]` in any note. Admonition today mostly wraps the built-in
+  syntax; you don't need it.
+- **[07:06] "safe mode"** — renamed **Restricted mode**. The setting exists, the
+  words on your screen won't match his.
+- **[09:49] the `tags:` field** in his template — this predates the **Properties**
+  editor (**1.4, 2023**). You'll get a proper property panel instead of raw
+  YAML. Same data underneath, and lesson 7 turns exactly those properties into a
+  live view.
+
+Notice the pattern: both plugins he recommends became core features within a year.
+Same lesson as the pillar opener — *plugin ecosystems churn, file formats don't.*
+His four-folder structure and his three rules are untouched, because they're about
+markdown and thinking, not about software.
+
+## What a property actually is
+
+Your prompt stamps three of them (or the chat assistant writes them into each block you
+paste), so be clear what you're asking for. A **property** is a
+key-value pair in a small block at the very top of a note, fenced by `---`:
+
+```
+---
+type: concept
+topic: pricing
+source: "[[first-source]]"
+---
+```
+
+That block is YAML front matter — plain text, part of the file, readable by anything. Since
+Obsidian **1.4** (2023) the app shows it as a typed **Properties** panel instead of raw
+text, but it's the same characters on disk either way.
+
+Properties are what turn a pile of notes into something queryable. Prose can't be filtered;
+`type: concept` can. That's the entire reason this rung stamps them and the next one can
+build a view in a few clicks — and it's why the three keys have to be spelled the same on
+every page. Lesson 7 reads exactly these three back.
+
+That's the human craft. Next: the tooling that reads the properties you just
+started writing — **Bases**, Dataview, and where an AI beats both.

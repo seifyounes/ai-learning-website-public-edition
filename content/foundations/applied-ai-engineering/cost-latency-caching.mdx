@@ -1,0 +1,256 @@
+---
+title: "Cost, latency & caching"
+summary: "Work out what each model call costs and how long it takes, then cut both with prompt caching, smaller models, trimming and streaming."
+changeNote: "New: where cost and waiting time come from, a priced worked example, a failure-modes list, and a quick check that your prompt order lets caching work."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 9
+level: advanced
+estMinutes: 15
+taskMinutes: 30
+prerequisites: [calling-an-llm-api, tokens-and-context, models-and-effort]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "u57EnkQaUTY"
+  published: "2026-02-07"
+  year: 2026
+  minutes: 9
+  title: "What is Prompt Caching? Optimize LLM Latency with AI Transformers"
+  channel: "IBM Technology"
+  why: "Explains the deepest lever in this lesson, prompt caching, down to *why* it works (the model reuses its computed state for a repeated prefix), which many explanations skip. It is short (nine minutes) and isn't tied to one model provider; it comes from IBM's technology explainer channel. The other levers (right-sizing, trimming, streaming, parallelising) are in OpenAI's latency guide under 'read after', and the per-provider caching fine print is in the breakdown below."
+readAfter:
+  - label: "Latency optimization — the seven principles (OpenAI official guide)"
+    url: "https://developers.openai.com/api/docs/guides/latency-optimization"
+    kind: docs
+applyIt: |
+  Prompt caching matches from the start of the prompt, so one changing token near the top
+  invalidates everything after it. Take ten minutes to check the order of one long prompt you
+  use: an AI feature in your project, a script or automation you run, or a prompt you reuse at
+  work. Mark each part as **static** (system instruction, tone rules, examples, reference
+  documents, tool definitions) or **per-call** (the user's input, retrieved chunks, today's
+  date, a name, a request id). Then answer:
+
+  - Does all the static text sit together at the top, as one prefix?
+  - Has anything per-call leaked above it? That leak is what breaks the cache.
+  - Is the static prefix long enough to be worth caching? Check your provider's minimum.
+
+  **If you don't code yet:** look at an automation you run (n8n, Make, Zapier) for the cheaper
+  lever: does any step call a model on empty, duplicate or unchanged input it could skip?
+
+  Success: one prompt marked static vs per-call, with any leak named and a one-line fix (move it down, or skip the call).
+toolkit: |
+  - **Treat always-loaded instructions as a per-request cost.** AGENTS.md, CLAUDE.md, rules files
+    and custom instructions ride along on every request, so pruning a stale rule is tokens back
+    on every session.
+  - **Order them as a cacheable prefix.** Stable standards at the top, volatile context lower:
+    prompt caching matches from the start, so a line near the top that changes often invalidates
+    the cache for everything after it.
+  - **Right-size the model per chore.** Send routine tasks to a fast, cheap tier (Claude Haiku,
+    an OpenAI mini model, Gemini Flash) and save the flagship for hard work: usually the biggest cost
+    lever (→ models-and-effort).
+  - **Find the call you can skip.** Audit your scripts and automations for model calls whose
+    answer you could cache (same input, same output) or skip entirely (empty input, nothing
+    changed since the last run). The cheapest call is the one you never make.
+recap:
+  - emoji: "💸"
+    title: "How a call is billed"
+    text: "Input tokens × input price plus output tokens × output price. Output tokens cost several times more, so verbose replies are expensive."
+  - emoji: "♻️"
+    title: "Why caching works"
+    text: "Send the same prefix repeatedly and the provider reuses its already-computed state instead of reprocessing it, so cached input is cheaper and faster."
+  - emoji: "📉"
+    title: "Two kinds of latency"
+    text: "Time to first token grows with prompt length; generation time grows with output length. For most features, output length dominates."
+  - emoji: "📌"
+    title: "One changed early token"
+    text: "Invalidates the cache for everything after it. Static content on top, variable data at the bottom, no timestamps in the prefix."
+  - emoji: "⚠️"
+    title: "Before projecting savings"
+    text: "Check the fine print: cache writes may cost extra, short prefixes don't cache, and entries expire. Low traffic may rarely hit the cache."
+  - emoji: "🎚️"
+    title: "Usually the biggest lever"
+    text: "Right-sizing the model: a small cheap model for easy steps, the flagship for hard ones, or a cascade that escalates only on failure."
+  - emoji: "⚡"
+    title: "Similar isn't the same"
+    text: "A semantic cache reuses answers for similar questions, but 'cancel my order' and 'cancel my subscription' need different answers. Tune and scope it."
+  - emoji: "📐"
+    title: "After every saving"
+    text: "Re-run your evals. A cheaper model or trimmed prompt is only a win if quality held, so measure cost and quality together."
+task: |
+  Put real numbers on the levers before you build: the estimate is the skill. Use an AI feature
+  from your own project, or a support-reply drafter whose prompt is a long policy document plus a
+  short customer ticket:
+
+  ```prompt
+  Estimate the economics of [feature]. Take the draft prompt: count input tokens (static
+  prefix: system instruction + reference docs; variable part: the user's input) and typical
+  output tokens, and compute cost-per-call at my candidate model's current list price (I'll
+  paste the pricing page). Then quantify three levers: (1) provider prompt caching on the
+  static prefix, using the cached-input price, minimum and TTL; (2) a response cache keyed on
+  (input hash, prompt version) for repeat requests; (3) skipping the call for inputs that need
+  no model (empty, duplicate, answerable by a rule), assuming that's 30% of traffic. Give
+  per-call and per-1,000-calls figures at two daily volumes I choose: a side project and a busy
+  product.
+  ```
+
+  **No-code path:** do it in a spreadsheet: get a rough token count from a tokenizer page (OpenAI
+  offers a free one), take prices from the provider's pricing page, and fill one row per lever.
+
+  Success: a short table with cost-per-call and each lever's savings per 1,000 calls, plus a note on whether prompt caching even triggers at the low volume (is the prefix re-read inside the TTL?).
+selfCheck:
+  - q: "You enabled prompt caching on your chatbot, but the usage logs show almost no cached tokens. The system prompt starts with \"Today is {date}, you are helping {user_name}…\". What's wrong, and the fix?"
+    a: "Caching matches from the start of the prompt, and the date and name change on every request, so the prefix never repeats. Move all variable content below the static instructions and documents."
+  - q: "Your summariser takes 12 seconds and users complain. Prompts are short; replies average 900 tokens. Which two levers do you pull first?"
+    a: "Output length dominates generation time, so bound the reply (a tighter length instruction and `max_tokens`) and stream it so the first words appear at once. Caching won't help much with a short prompt."
+  - q: "A nightly job re-tags 50,000 old support tickets with a flagship model. Name two changes that cut its cost without hurting the result."
+    a: "Run it through a batch API, since nobody waits on it, and try a smaller model on the tagging step, keeping it only if your eval set shows quality holds. Skipping duplicate tickets helps too."
+mcq:
+  - q: "An internal tool gets about five requests a day, each starting with the same long policy document. You turn on prompt caching expecting big savings, but the bill barely moves. What's the most likely reason?"
+    options:
+      - "Entries expire between requests, so few calls hit"
+      - "The prefix must be marked as static in the system role"
+      - "Caching only discounts output tokens, not input"
+      - "Caching only works when the whole prompt repeats"
+    answer: 0
+    explain: "Cache entries expire after a time-to-live, and at five requests a day the prefix is rarely re-read in time, so you mostly pay for cache writes (which can cost extra). Caching discounts a repeated input prefix, not output, and it matches the prefix, not the whole prompt."
+  - q: "You added prompt caching to a support-reply drafter, and drafts appear while a support agent waits. Output tokens are now the biggest line on the bill. What's the next lever?"
+    options:
+      - "Move more of the prompt into the cached prefix"
+      - "Switch to a semantic cache keyed on similar tickets"
+      - "Send every draft through the batch API"
+      - "Set a shorter reply limit on every call"
+    answer: 3
+    explain: "Output tokens cost several times more than input, and caching only discounts input, so the remaining money is in reply length: bound it with a tighter instruction and max_tokens. A batch API trades turnaround for price, which doesn't fit a draft someone is waiting for."
+  - q: "You add a semantic cache to a shop's support bot. A customer asking to cancel their subscription gets the cached reply about cancelling an order. What's the fix?"
+    options:
+      - "Lower the threshold so more questions share answers"
+      - "Shorten the cache's time-to-live to a few minutes"
+      - "Raise the similarity threshold or use exact matching"
+      - "Use a bigger model to generate the cached answers"
+    answer: 2
+    explain: "Similar sentences can need different answers, so a loose threshold reuses the wrong reply; tighten it, scope the cache, or fall back to exact match. Expiry time and model size don't change which question gets matched to which stored answer."
+  - q: "A feature classifies a ticket, then summarizes it, then extracts the order number, one call after another on a small model. Each step needs only the ticket text, and the whole thing takes 9 seconds. What do you change?"
+    options:
+      - "Swap in an even smaller model for all three"
+      - "Run the three independent calls at once"
+      - "Add prompt caching on the ticket text"
+      - "Send the three calls through the batch API"
+    answer: 1
+    explain: "The steps don't depend on each other, so running them in parallel cuts total time to roughly the slowest one. Caching speeds up a long repeated prefix, not a short ticket that changes every time, and a batch API makes turnaround slower, not faster."
+backupResources:
+  - label: "The Secret to Faster & Cheaper LLM Apps — Prompt Caching Explained (CoderzColumn)"
+    url: "https://www.youtube.com/watch?v=etYgu0Q50vI"
+    type: "video · caching deep-dive"
+  - label: "OpenAI — Prompt caching (docs)"
+    url: "https://platform.openai.com/docs/guides/prompt-caching"
+    type: "docs · official"
+  - label: "Artificial Analysis — compare model price, speed & quality"
+    url: "https://artificialanalysis.ai"
+    type: "tool · live comparison"
+tags:
+  - cost
+  - latency
+  - caching
+  - applied-ai
+---
+
+A feature that works in a demo can still be too slow or too expensive to ship. In production,
+**cost and latency are features.** The good news: a handful of well-known levers make a large
+difference, and you can estimate most of them before you write any code.
+
+## Where the bill and the wait come from
+
+Every call is billed as **input tokens × input price + output tokens × output price**. On the
+major providers, output tokens cost several times more than input tokens, so a verbose reply
+can cost more than a long prompt.
+
+Latency has two parts you should measure separately:
+
+- **Time to first token (TTFT)**: how long before anything appears. It grows with prompt
+  length and is what prompt caching helps most.
+- **Generation time**: roughly proportional to how many tokens the model writes. For most
+  features, **output length dominates total time**, so bounding the output is a speed lever as
+  well as a cost lever.
+
+Agents multiply both: ten turns means ten bills and ten waits.
+
+## Prompt caching: the biggest easy win
+
+If you send the **same context repeatedly** (a long system prompt, a reference document, an
+agent's growing history), **prompt caching** lets the provider reuse the already-computed
+state for that prefix instead of reprocessing it. OpenAI, Anthropic and Google all support it.
+Cached input tokens are billed at a steep discount, and time to first token drops because the
+prefix isn't recomputed. Some providers cache eligible prefixes automatically; others need you
+to mark the cache point in the request.
+
+Read the fine print before you count the savings:
+
+- **The static content must be a PREFIX.** Caching matches from the start of the prompt; one
+  changed early token invalidates everything after it. Stable instructions, examples and tool
+  definitions at the top, variable data at the bottom.
+- **Cache writes can cost extra.** On some providers, writing a cache entry costs more than
+  normal input, so you profit only when the prefix is re-read enough before it expires.
+- **Minimums and expiry exist.** Prefixes below a minimum length don't cache, and entries expire
+  after a time-to-live, so a low-traffic app may rarely hit the cache. Check your provider's
+  current numbers before projecting savings.
+
+## The other levers
+
+- **Right-size the model.** Use a small, cheap model for easy steps and reserve the flagship
+  for hard ones (→ models-and-effort). This is usually the largest cost driver. A **cascade**
+  goes further: try the cheap model first and escalate only when a check fails.
+- **Trim tokens.** Remove dead instructions, shorten retrieved context and set a bounded output
+  length.
+- **Stream.** Streaming makes the feature *feel* fast; perceived latency often matters more
+  than total time.
+- **Parallelise.** Independent calls (classify and summarise the same ticket) can run at once
+  instead of one after another.
+- **Batch.** Work that can wait (nightly reports, re-tagging a backlog) can go through the
+  providers' batch APIs, which trade a slower turnaround for a lower price.
+- **Cache responses.** An exact-match cache keyed on (input hash, prompt version) avoids paying
+  twice for repeat requests. A **semantic cache** also reuses answers for *similar* questions,
+  but tune it carefully: "cancel my order" and "cancel my subscription" are similar sentences
+  with different answers.
+- **Skip the call.** Empty inputs, duplicates and questions a rule can answer need no model.
+
+## Worked example: pricing a support-reply drafter
+
+Use made-up round prices for the arithmetic: input $1 per million tokens, cached input $0.10
+per million, output $4 per million. Each call sends a 3,000-token static prefix (instructions
+plus a policy document), a 300-token ticket, and gets a 250-token reply.
+
+1. **Baseline.** Input 3,300 tokens ≈ $0.0033; output 250 tokens = $0.001. About **$4.30 per
+   1,000 calls**.
+2. **Add prompt caching.** The prefix is billed at the cached rate: $0.0003, plus $0.0003 for
+   the ticket and $0.001 for the reply. About **$1.60 per 1,000 calls**, ignoring the
+   occasional cache write.
+3. **Skip 30% of calls** that are duplicates or answerable by a canned reply: about **$1.12**
+   per 1,000 incoming tickets.
+4. **Look at what's left.** Output is now the biggest line item, so the next lever is a
+   shorter reply limit, not more caching.
+
+The exact prices change; the method doesn't. Plug in your provider's current numbers.
+
+> 💡 **Try it:** Open the pricing page of a provider you use and find three numbers for one
+> model: input, cached input and output price per million tokens. Which is highest, and by how
+> much? That ratio tells you whether to trim the prompt or the reply first.
+
+## Common failure modes
+
+- **Caching is on but the hit rate is near zero** → something dynamic (a timestamp, user name,
+  request id) sits near the top of the prompt → move all variable content below the static
+  prefix.
+- **A sudden bill spike** → an agent looping or outputs with no length cap → per-run budgets,
+  `max_tokens` on every call, and cost alerts.
+- **A small model and still slow** → long outputs or calls made one after another → bound the
+  output, stream, and run independent calls in parallel.
+- **The semantic cache gives a confidently wrong answer** → its similarity threshold is too
+  loose or it isn't scoped per user → raise the threshold, scope it, or use exact-match only.
+- **Nobody knows which feature costs what** → token usage isn't logged per request → log
+  tokens, model and feature name on every call (→ observability-tracing).
+
+Measure cost per request and latency the way you measure quality (→ evals-and-testing). A
+caching change or a cheaper model on the easy path can cut the bill sharply, and your evals
+tell you whether quality held.

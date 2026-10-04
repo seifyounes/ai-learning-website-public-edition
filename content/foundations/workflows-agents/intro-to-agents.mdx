@@ -1,0 +1,218 @@
+---
+title: "Intro to AI agents"
+subtitle: "What they are & when they help"
+summary: "Tell, task by task, whether your work needs an AI agent or a plain automation with one AI step, and know what makes an agent run well."
+changeNote: "New: the spectrum from automation to agent, a worked agent loop, a failure-modes list, a task that runs a real agent, and a quick exercise labelling your own tasks."
+section: foundations
+pillar: workflows-agents
+order: 6
+level: intermediate
+estMinutes: 13
+taskMinutes: 30
+prerequisites: [ai-in-automations]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "no9VyCKy_oQ"
+  published: "2026-02-19"
+  year: 2026
+  minutes: 29
+  title: "AI Agents in 2026 Explained: What They Are and When You Should Use Them"
+  channel: "Everyday AI"
+  why: "Most agent explainers stop at what an agent is; this one spends real time on when not to use one, which is the judgment this lesson is about. It's a current, tool-agnostic conversation rather than a product demo. Tech With Tim's guide in the backups is the more hands-on follow-up."
+readAfter:
+  - label: "Building effective agents — Anthropic engineering"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    kind: "article"
+applyIt: |
+  Sort your own work by the one rule: are the steps the same every time, or do they vary per case?
+  Ten minutes.
+
+  - Fixed, predictable steps (every Friday → pull the week's numbers → one model call writes a
+    summary → store it)? **Automation with an AI step.** Cheaper, reliable, and not an agent.
+  - Open-ended, the path varies ("research these 20 competitors in my space and draft a
+    positioning note for each")? **Agent**: it decides the steps per case.
+
+  ```prompt
+  Here are 6 tasks from my work or studies: [list them, one per line]. For each, say whether the
+  steps are fixed or vary per case, then label it AUTOMATION, AUTOMATION + AI STEP, or AGENT.
+  Push back if I'm calling something an agent that's really a fixed pipeline.
+  ```
+
+  Success: every task carries a label you can justify, and at most one or two of them truly need an agent.
+toolkit: |
+  - **List the agents you already use.** The deep-research mode in ChatGPT, Gemini or Claude, a
+    browser agent, an agent step in n8n: each is an LLM + tools + a loop. Write them in a notes file
+    with what each is good at and where it wanders.
+  - **Sort your recurring work by the rule.** Fixed pipelines become a saved prompt or a no-code
+    automation; open-ended jobs (competitor research, comparing suppliers) go to an agent or a
+    research mode. Add the label next to each task in your notes.
+  - **Don't promote a saved prompt to an agent.** If the steps never change (reformat this, summarise
+    that), keep it a custom GPT, Gem or Claude Project with standing instructions. It's cheaper and
+    it behaves the same way every run.
+  - **Match model and effort to the task.** Open-ended agent runs earn your strongest model and
+    higher reasoning effort; fixed steps run fine on a smaller, cheaper model.
+recap:
+  - emoji: "🧭"
+    title: "The one-line distinction"
+    text: "An automation follows the steps you defined; an agent is handed a goal and finds its own. That single line is the whole distinction."
+  - emoji: "🤖"
+    title: "Three ingredients"
+    text: "An agent is an LLM with tools and a loop: act, observe, decide, repeat until the goal is met. The loop is what makes it act, not just answer."
+  - emoji: "💻"
+    title: "Where you've met one"
+    text: "Coding agents and research modes plan, read files, run tools and self-correct. Same pattern, pointed at your own work."
+  - emoji: "📐"
+    title: "When the path is fixed"
+    text: "Predictable, repeatable paths — lead → CRM → email — are cheaper, faster, and more reliable as plain automations. Don't over-engineer."
+  - emoji: "🌐"
+    title: "When the path varies"
+    text: "When the steps change per case — research these 20 apps, triage this inbox — no fixed recipe fits and an agent shines."
+  - emoji: "🎭"
+    title: "Reading the hype"
+    text: "A lot of 'agent' talk is really automation with an AI step. True agents earn their keep only on genuinely open-ended tasks."
+task: |
+  Watch a real agent loop run on a job of your own. You may already have one: the deep-research
+  modes in ChatGPT, Gemini and Claude plan and use tools toward a goal, and so do coding agents.
+
+  1. **Pick one open-ended task** from your work, studies or side project, like researching
+     rivals or options before a decision.
+  2. **Write the goal with a finish line:** what it should produce, and the condition that tells
+     it it's done (for example "three options, each with price and a source link").
+  3. **Run it in a research mode** and read the steps it shows. Note the tools it used, how many
+     times it changed plan from what it found, and one claim you had to check.
+  4. **Compare with a fixed task:** write one task from your week whose steps never change, and the
+     2-3 steps a plain automation would run instead.
+  Success: one agent run with its tools, plan changes and one checked claim written down, next to a fixed task you'd keep as an automation.
+selfCheck:
+  - q: "Your team asks for an 'agent' that every morning reads yesterday's sales from one sheet and emails the same five-line summary. Agent or automation?"
+    a: "Automation with one AI step. The path never changes: schedule → read sheet → model writes summary → email. An agent would add cost and unpredictability for nothing."
+  - q: "Your research agent made 40 tool calls and came back with a vague answer. Name two likely causes and a fix for each."
+    a: "No clear finish line, so it kept searching: define 'done when' and cap the steps. Or too many overlapping or vaguely described tools: give it fewer, clearly named tools and a precise output format."
+  - q: "What are the core parts of an agent?"
+    a: "A model (the brain), tools (things it can do — search, email, query a DB), optionally memory, and a loop that lets it act, see the result, and decide the next step until done."
+mcq:
+  - q: "A freelancer wants every incoming invoice email turned into a sheet row with the amount and due date. Invoices come from a dozen clients in different layouts. A colleague says, \"That's a job for an agent.\" What do you build?"
+    options:
+      - "An agent with inbox and sheet tools that adapts per invoice"
+      - "A fixed workflow whose single model step pulls out both fields"
+      - "A rule-based automation with no model, since AI is unpredictable"
+      - "A weekly research-mode run over the whole inbox at once"
+    answer: 1
+    explain: "The path is identical every time (email arrives → extract two fields → write a row); only the input layout varies, and one model call handles that. An agent would choose its own steps for a job that has none to choose, adding cost and run-to-run drift. Pure rules break on a dozen different layouts, which is exactly what the AI step is for."
+  - q: "Your supplier-research agent emailed a supplier to ask for a quote, which you never wanted it to do. What is the real fix?"
+    options:
+      - "Add \"never send email without asking me\" to its instructions"
+      - "Switch to a stronger model that follows instructions better"
+      - "Cut its toolset down so it has fewer options to choose from"
+      - "Give it read-only tools and require approval for outside actions"
+    answer: 3
+    explain: "It could send because it held a permission the job didn't need. Remove the capability (read-only by default) and gate anything external behind your approval. An instruction in the prompt is a request the model can still misread or override; a missing permission is a hard limit."
+  - q: "Your agent has a web-search tool and a notes-file tool. The answer you need is already in the notes file, yet it keeps searching the web. What's the most likely cause?"
+    options:
+      - "The two tools are vaguely described, so it can't tell when to use each"
+      - "The model is too small to plan, so it needs a larger one"
+      - "Its step cap is too low to reach the notes file in time"
+      - "It lacks long-term memory of where it stored things before"
+    answer: 0
+    explain: "Agents pick tools from their names and descriptions. If those don't say when each tool applies, a search looks as good as a file read. Rewrite each description around when to use it. A bigger model or more steps just lets it make the same wrong choice with more confidence and at higher cost."
+  - q: "Every Monday an agent compiles your team's status report from the same three sources. Each week the structure differs a little and it costs far more than you expected. What's the best move?"
+    options:
+      - "Set the temperature to zero so every run follows one path"
+      - "Add a second agent that reviews and reformats the first's output"
+      - "Rebuild it as a fixed workflow with one AI step that writes it"
+      - "Give the agent a stricter template so it formats things the same"
+    answer: 2
+    explain: "Same sources, same steps every week: the path was always fixed, so it never needed an agent. A workflow that fetches the three sources and makes one model call is cheaper and consistent. A template or a reviewer agent treats the symptom while you keep paying for a loop that decides nothing."
+backupResources:
+  - label: "The Complete Guide to AI Agents in 2026 (And How to Actually Use Them) — Tech With Tim"
+    url: "https://www.youtube.com/watch?v=LNkAW4SSgdY"
+    type: "video · deeper"
+  - label: "n8n — AI Agent node docs"
+    url: "https://docs.n8n.io/advanced-ai/"
+    type: "docs · official"
+tags:
+  - ai-agents
+  - agents
+  - automation
+---
+
+"Agent" is the most hyped word in AI right now, so let's make it concrete. An
+**automation follows steps you defined.** An **agent figures out the steps itself.**
+That's the whole difference — and knowing which to use is a real skill.
+
+## What an agent actually is
+
+An agent is an **LLM given a goal, plus tools, plus a loop.** It thinks, takes an
+action (search the web, send an email, query a database), looks at the result,
+decides the next action, and repeats until the goal is met. The model is the brain;
+the tools are its hands; the loop is what makes it *act* instead of just *answer*.
+
+If you've used a research mode in ChatGPT, Gemini or Claude, or a coding agent (Claude Code,
+Cursor's agent mode, Codex, GitHub Copilot's agent mode), you've already used one. You give it a
+goal, and it plans, searches or reads files, uses tools, and self-corrects. Same pattern, applied
+to your own work.
+
+## A spectrum, not a switch
+
+It helps to see three rungs rather than two boxes:
+
+1. **Plain automation** — fixed steps, no model. Form → sheet → alert.
+2. **Workflow with AI steps** — fixed steps, but one or more of them call a model to classify,
+   summarise or draft (→ ai-in-automations). The *path* is still yours.
+3. **Agent** — the model chooses which tool to call next, how many times, and when it's done.
+   The *path* belongs to the model.
+
+Anthropic's engineering post on building effective agents (linked below the video) draws the same
+line between workflows and agents, and makes the same recommendation: start with the simplest
+rung that works and climb only when you need to.
+
+## Worked example: watching the loop run
+
+Give an agent this goal: *"Find three venues in our city that can host a 40-person workshop on a
+weekday next month, under our budget, and draft a comparison."* It has two tools: web search and
+a notes file.
+
+1. **Think:** "I need venues with capacity and pricing. Search first."
+2. **Act:** search "workshop venue 40 people [city]".
+3. **Observe:** ten results; two are wedding venues, one lists no prices.
+4. **Think:** "Drop the wedding venues. Check the pricing page of the remaining ones."
+5. **Act / observe** (several rounds): open pages, note capacity, price and availability.
+6. **Think:** "I have three that fit. The goal says three. Write the comparison."
+7. **Stop:** the comparison goes into the notes file.
+
+No one wrote "drop wedding venues" in advance; the agent decided that from what it saw. That's
+the value. The cost is just as visible: many model calls instead of one, a different path every
+run, and a result you have to check, because a fluent comparison can still cite a price the
+page doesn't show.
+
+> 💡 **Try it:** Give a research mode (ChatGPT, Gemini or Claude) or a coding agent an
+> open-ended goal from your own life, and read the steps it shows while it works. Count how many
+> times it changed plan based on what it found. That's the loop.
+
+## When agents help — and when they don't
+
+- **Use an agent** for open-ended work where the path varies per case: "research
+  these companies and write tailored outreach for each," "triage this inbox and
+  handle what you can." No fixed recipe fits.
+- **Use a plain automation** for predictable, fixed flows: lead → CRM → email.
+  It's cheaper, faster, and more reliable. Agents add cost and unpredictability —
+  don't reach for one when a simple workflow does the job.
+
+## Common failure modes
+
+- **The agent loops forever** → it keeps searching or retrying → no finish line or step cap →
+  write "done when…" into the goal and set a maximum number of steps.
+- **It picks the wrong tool** → a search where it should have read a file → tool names and
+  descriptions are vague or overlap → fewer tools, each described by when to use it.
+- **Different results every run on a routine job** → the job never needed an agent → the path
+  was actually fixed → turn it into a workflow with an AI step.
+- **It does something you didn't want** → sent, deleted or posted → it had permission it didn't
+  need → read-only tools by default and approval before anything external (→ reliability).
+
+## The honest take
+
+Most "agent" hype is really just automation with an AI step. True agents shine on genuinely
+open-ended tasks — and there, they're remarkable. The pro move is matching the tool to the
+task: **fixed → automation, open-ended → agent.** Next, you'll build a real one
+(→ build-a-practical-agent).

@@ -1,0 +1,231 @@
+---
+title: "Reliability"
+subtitle: "Error handling, humans & cost"
+summary: "Make an AI automation safe to leave running, with fallbacks, error alerts, a human approval step and a cap on what it can spend."
+changeNote: "New: a worked hardening example, a failure-modes list, a note on the video title's '99%' claim, and one task that hardens a flow, fallback prompt included."
+section: foundations
+pillar: workflows-agents
+order: 8
+level: advanced
+estMinutes: 14
+taskMinutes: 45
+prerequisites: [build-a-practical-agent, ai-in-automations]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "Irk4-DO5qgM"
+  published: "2025-08-07"
+  year: 2025
+  minutes: 18
+  title: "Why 99% of AI Automations Fail in Production"
+  channel: "Nate Herk | AI Automation"
+  why: "Nate Herk builds n8n automations for clients, and this is a standalone session on what breaks once a flow runs unattended: silent failures, missing error branches, no retries, no fallbacks. Read the title's '99%' as a hook rather than a statistic; the content is practical and maps one-to-one onto this lesson. It beats a single episode of a tutorial series because it's about production habits, not one build. The human-in-the-loop backup covers the approval-gate half."
+applyIt: |
+  Run a five-minute pre-mortem on one automation or AI tool you rely on, or one you plan to switch
+  on. Assume it's three weeks from now and it has gone wrong. Write one line for each:
+
+  1. **How would it fail silently?** An expired login, a source that changed, a run that never
+     started.
+  2. **What does the reader get when the model returns junk?** Name the fallback line.
+  3. **What can it do without asking you?** Anything that sends, charges, posts or deletes should
+     be on the "asks first" side.
+  4. **What's the most it could spend in a bad week?** Your monthly cap or budget alert.
+
+  **At work:** answer for a flow your team depends on and share the four lines with its owner.
+  **On your own:** answer for the flow you built in this pillar.
+  Success: four lines, and at least one gap you now know to close.
+toolkit: |
+  - **Copy the three production moves into a flow template.** Save a starter workflow in n8n,
+    Make or Zapier that already has a fallback that never outputs a blank, an approval step
+    before anything external, and an error notification to you. Start every new flow from it.
+  - **Cap the bill before a loop bug does.** Use the cheapest model good enough for each step, set
+    max iterations on agents, and set a monthly spend limit or budget alert in your model provider's
+    console.
+  - **State human-in-the-loop as a standing rule.** Write "confirm before deleting, sending,
+    posting or charging" into your ChatGPT, Gemini or Claude custom instructions and any agent's
+    system prompt, and check the tool's settings make those actions wait for your approval.
+  - **Keep a pre-launch checklist.** A short note you run before switching any flow on: error
+    branch, heartbeat, retries only on safe steps, a named owner. Ticking it takes two minutes.
+recap:
+  - emoji: "🏭"
+    title: "Demo vs production"
+    text: "A cool demo works once; a client automation runs unattended and on repeat. When it breaks, it breaks at scale."
+  - emoji: "📣"
+    title: "How it should fail"
+    text: "APIs die and data arrives malformed. Add an error branch that notifies you, plus retries for flaky steps — surface problems, don't swallow them."
+  - emoji: "✋"
+    title: "Where a human stays"
+    text: "For anything external or irreversible, insert an approval step: the agent stages it, a human hits send. Speed without the autonomous-mistake nightmare."
+  - emoji: "💸"
+    title: "Guarding the bill"
+    text: "Use the cheapest model good enough per step, cap runs and iterations, and monitor tokens so a loop bug can't rack up charges."
+  - emoji: "🧪"
+    title: "Three production moves"
+    text: "A deterministic fallback line, per-key caching, and conditions that skip the model entirely are what make an AI feature production-grade."
+  - emoji: "🔁"
+    title: "The mindset shift"
+    text: "Production optimises for staying up and flagging failures, not for a single lucky run. It keeps working, and tells you when it doesn't."
+task: |
+  Harden one automation you've built in this pillar (the form-to-sheet flow or the AI triage flow
+  both work) so it's safe to leave running:
+
+  ```prompt
+  Help me add production guards to my n8n flow: [describe its trigger, steps and actions].
+  (1) Error branch: wrap the AI/API step so a failure notifies me (Slack, Discord or email)
+  instead of dying silently, with a retry only on steps that are safe to repeat.
+  (2) Fallback and validation: the AI step returns strict JSON; if the reply is empty, a refusal,
+  invalid JSON or fails my checks, emit a fixed fallback message instead of nothing. Write the
+  exact fallback text and the checklist the flow runs before passing output downstream.
+  (3) Human-approval gate: before any external send/charge/post, stop for my approval.
+  (4) Cost skip: route trivial inputs (empty messages, a one-word "thanks") past the model, and
+  cap iterations. Show me the flow before and after.
+  ```
+
+  **If you code:** put the validation checklist in code after the model call, not only in the
+  prompt. **If you don't code:** an IF node that checks the JSON fields before the next step does
+  the same job. **Using Make or Zapier?** Make has error-handler routes on each module and Zapier
+  sends error notifications; the same guards apply. To test the error branch, break it on
+  purpose: point the API step at a wrong URL or remove a required field.
+  Success: a forced failure pings you, a garbled AI reply produces the fallback, and nothing external sends without your approval.
+selfCheck:
+  - q: "A client says their weekly report hasn't arrived for three weeks, yet your flow shows no errors. What was missing, and what do you add?"
+    a: "The flow never ran (an expired login on the trigger, or it was switched off), so there was no error to catch. Add a heartbeat: a separate check that alerts you when the flow hasn't succeeded on schedule, on top of the normal error workflow."
+  - q: "After you add retries, some customers receive the same email twice. Why, and how do you fix it?"
+    a: "The retry re-ran a step that had actually succeeded, so the send happened twice. Only retry steps that are safe to repeat, or give each send a unique key and skip any key already sent."
+  - q: "When should you require a human-in-the-loop approval?"
+    a: "Before any high-stakes or irreversible action — sending an external email, charging money, posting publicly, deleting data. The AI prepares it; a human approves the send. Speed without the autonomous-mistake risk."
+  - q: "This month your AI email-sorting flow cost four times your estimate. Email volume is flat, and one run log shows 30 model calls for a single message. What do you change?"
+    a: "Something is looping: a retry or agent step with no cap. Add a run cap and a maximum number of iterations so a bug can't spin, and watch token usage per run so the next one shows up early. Then check whether every step needs the flagship model; a cheaper model that's good enough for sorting cuts the rest."
+mcq:
+  - q: "To be safe, you put an approval step on every action in a flow, including writing rows to an internal sheet. Two weeks in, approvals take a day and the approver clicks \"yes\" without reading. What do you change?"
+    options:
+      - "Add a second approver so two people check every action"
+      - "Remove the approvals and put the safety rules in the prompt"
+      - "Send hourly reminders so the queue is cleared more quickly"
+      - "Gate only external or irreversible actions; batch the rest"
+    answer: 3
+    explain: "When everything needs approval, approval stops meaning anything. Keep the gate where a mistake escapes or can't be undone (sending, charging, posting, deleting) and let internal, reversible steps run. A second approver doubles the queue that's already being rubber-stamped."
+  - q: "Your triage prompt says to answer with one of \"bug\", \"billing\" or \"feature\". Now and then the model returns \"Bug report\" or \"urgent\", and the alert branch misfires. What's the right fix?"
+    options:
+      - "Repeat the allowed values in capitals at the end of the prompt"
+      - "Check the value against the allowed list in a step after the model"
+      - "Move the triage step to a larger and more capable model"
+      - "Set the temperature to zero so the label never varies"
+    answer: 1
+    explain: "Rules that live only in the prompt are requests, not checks. An IF or validation step after the model compares the label to the allowed list and routes anything else to a review tab, so a bad label can never fire the alert. A bigger model or zero temperature makes off-list labels rarer, not impossible."
+  - q: "At night your AI classification step sometimes times out, and that message is simply lost. Which setup fixes it?"
+    options:
+      - "Retry a few times, then route errors to a fallback row with the raw text"
+      - "Stop the whole flow on any error so you can rerun it by hand later"
+      - "Retry the step without a limit until the model finally answers"
+      - "Skip the failed message quietly so the rest of the batch completes"
+    answer: 0
+    explain: "Retries heal momentary blips, and the error output catches what's left: the row lands as unclassified with the original message, so nothing is lost and you can review it. Stopping the flow at 3 a.m. leaves everything after it unprocessed until you notice. Unlimited retries turn a real outage into a loop that runs up your bill."
+  - q: "You've just set up an error workflow that should message you when your flow fails. How do you know it works?"
+    options:
+      - "Wait for the next real failure and see whether a message arrives"
+      - "Read through its settings once more to confirm every field is set"
+      - "Break a step on purpose, trigger the flow and time the alert"
+      - "Check the last month of runs to confirm there were no errors"
+    answer: 2
+    explain: "Point a step at a wrong URL or model name, run it, and confirm the alert reaches you and the fallback behaves. Waiting for a real failure means your first test happens during an incident. A month with no errors may only mean nothing ran, which is the silence an error workflow can't see."
+backupResources:
+  - label: "N8N Part 5 | Error Handling, Retries & Production Best Practices — Manas Krishna Jaiswal"
+    url: "https://www.youtube.com/watch?v=PJsiVWR36PQ"
+    type: "video · series walkthrough"
+  - label: "Human in the Loop in n8n: Full 2026 Guide — Ryan & Matt Data Science"
+    url: "https://www.youtube.com/watch?v=nHiEdjY9FKE"
+    type: "video · approvals"
+  - label: "n8n — error handling & error workflows (docs)"
+    url: "https://docs.n8n.io/flow-logic/error-handling/"
+    type: "docs · official"
+tags:
+  - reliability
+  - error-handling
+  - human-in-the-loop
+  - cost
+---
+
+The gap between a cool demo and something you'd run for a paying client is
+**reliability.** Automations run unattended and on repeat, so when (not if)
+something goes wrong, it goes wrong at scale. Three habits close that gap.
+
+## 1. Error handling — fail loud, not silent
+
+APIs go down; data arrives malformed. Without handling, your flow either crashes
+quietly or does the wrong thing 200 times. So:
+
+- Add an **error branch / error workflow** that catches failures and **notifies
+  you** (Slack, email).
+- Use **retries** for flaky steps (a momentary network blip shouldn't kill the run).
+
+The principle is the coding-agent one again: give it a way to surface problems.
+
+## 2. Human-in-the-loop — approve the risky stuff
+
+The single best safety mechanism: for anything **external or irreversible**, insert
+an **approval step.** The agent *prepares* (drafts the email, stages the charge),
+and a human *approves the send*. You keep the speed and remove the "AI emailed a
+client something wrong" nightmare. Reserve full autonomy for low-stakes tasks.
+
+## 3. Cost control — don't get a surprise bill
+
+AI steps and API calls cost money, and a loop bug can spend it fast:
+
+- Use the **cheapest model that's good enough** per step (→ models-and-effort).
+- Add **run caps and max-iteration limits** so nothing loops forever.
+- **Monitor** token usage so a runaway flow can't quietly rack up charges.
+
+A quick estimate keeps you honest: **runs per month × model calls per run × cost per call.** A
+plain AI step makes one call per run. An agent makes one call per loop iteration, so a run that
+takes ten steps costs roughly ten times as much, and a bug that loops 200 times costs 200 times
+as much. That's why the iteration cap matters more for agents than for anything else.
+
+## Worked example: hardening the triage flow
+
+Take the AI triage flow (→ ai-in-automations): form message → AI classifies → row in a sheet →
+alert for urgent bugs. Here's how it becomes safe to leave running, in n8n terms (Make and Zapier
+have equivalents for each move).
+
+1. **Retries on the flaky steps.** In the AI node's and the sheet node's settings, turn on retry
+   on fail with a few tries and a short wait. A timeout at 3 a.m. now heals itself.
+2. **An error output instead of a dead end.** Set the AI node to continue through its error
+   output, and route that output to the deterministic fallback: write the row with category
+   `unclassified` and the raw message, so nothing is lost.
+3. **A validation gate.** An IF step checks the JSON fields against the allowed values. Fails go
+   to a "Needs review" tab, never to the alert.
+4. **An error workflow.** Create a small separate workflow that starts with an Error Trigger and
+   sends you a message with the failed workflow's name and the error. Set it as the error
+   workflow in the main flow's settings.
+5. **A heartbeat.** Errors only fire when the flow runs. Add a daily check that alerts you if no
+   successful run happened in the last 24 hours. This catches the expired login that stops the
+   trigger without a single error.
+6. **Approval before anything leaves.** If the flow drafts replies, they wait for your click
+   (n8n can send a message and wait for a response; a "Ready to send" column works too).
+7. **Break it on purpose.** Point the AI step at a wrong model name, submit a message, and check
+   that you get pinged, the row lands as `unclassified`, and nothing else breaks.
+
+> 💡 **Try it:** Break one of your live flows on purpose (a wrong URL in one step), trigger it, and
+> time how long it takes you to find out. If the answer is "I wouldn't have," that flow needs
+> step 4 today.
+
+## Common failure modes
+
+- **Weeks of silent failure** → nobody noticed the flow had stopped → no error workflow and no
+  heartbeat → add both; errors catch crashes, heartbeats catch silence.
+- **Retries cause duplicates** → two emails, two charges → a non-repeatable step was retried →
+  retry only safe steps, or de-duplicate on a unique key.
+- **Approvals pile up unread** → the queue becomes the bottleneck and people approve blindly →
+  everything needs approval → gate only external or irreversible actions; batch the rest.
+- **A surprise bill** → a loop or a traffic spike ran the model thousands of times → no caps
+  → max iterations, a provider budget alert, and the cheapest adequate model.
+- **Bad output slips through** → the "rules" lived only in the prompt → prompts are requests,
+  not checks → validate in a separate step after the model.
+
+## The mindset shift
+
+Demos optimise for "it worked once." Production optimises for "it keeps working,
+and tells me when it doesn't." Bake in error alerts, approval gates, and cost
+guards, and you can actually trust your automations with real client work. Next, a
+quick map of the code-level agent frameworks for when no-code isn't enough
+(→ agent-frameworks).

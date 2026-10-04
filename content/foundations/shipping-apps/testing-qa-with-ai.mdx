@@ -1,0 +1,217 @@
+---
+title: "Testing & QA with AI"
+summary: "Have AI write and run tests for your app's critical flows, and read what each test asserts before you trust it."
+changeNote: "New: a streak-counter worked example, a failure-modes list, one task that writes the tests and wires them into a gate, a golden-case list, and AGENTS.md named first."
+section: foundations
+pillar: shipping-apps
+order: 7
+level: intermediate
+estMinutes: 13
+taskMinutes: 55
+prerequisites: [core-loop, frontend-with-ai]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "g2MnvCk1xt4"
+  published: "2025-10-17"
+  year: 2025
+  minutes: 27
+  title: "Playwright Agents Tutorial - AI Test Automation"
+  channel: "Codemify"
+  why: "This is the developer's version of AI testing: an AI agent driving real end-to-end tooling (Playwright) to write and run tests against an actual app, rather than a list of QA prompts. Codemify is a test-automation channel, so the focus stays on the testing workflow rather than the AI tool. That write-the-tests-then-run-them loop works with any coding agent on any stack: swap Playwright for Jest, pytest or `flutter test` and it's the same. The task below translates it to your stack."
+applyIt: |
+  Green tests only protect you if they assert the right thing. Spend ten minutes naming the
+  golden cases in your own project: the logic that must never silently change.
+
+  1. **List three behaviors** where a quiet change would hurt: a price or discount, a score or
+     streak, a permission check, a date calculation.
+  2. **For each, write one known input and the exact expected output.** "A cart of 2 × $10 with a
+     10% code totals $18.00", not "a total is shown".
+  3. **Mark the riskiest one.** That's the first test you'd freeze, with a note that nobody edits it
+     just to make it pass.
+
+  **If you code:** check whether your suite already asserts those exact outputs. **If you don't
+  code yet:** do it for a spreadsheet formula or a process at work you rely on.
+  Success: three golden cases, each with an exact expected output someone else could check.
+toolkit: |
+  - **Freeze a golden test for your most critical logic.** Whatever must never silently change
+    (a price calculation, a score, a permission check) gets a test with known inputs and
+    outputs, marked in the instruction file as "do not edit to make it pass".
+  - **Wire verify-before-ship as a hook.** Pre-commit hooks and CI work with every tool; Claude
+    Code adds Stop hooks, and Cursor, Codex and Copilot agents can be told in their instruction
+    files to run the test command before declaring a task done.
+  - **Ask the agent to test what it just wrote.** Add a standing line to AGENTS.md (or CLAUDE.md /
+    GEMINI.md for those agents) or `.cursor/rules`: after any feature, write its tests and list
+    five edge cases, then add tests for the scariest two.
+  - **Read what each test asserts.** AI writes tests that pass for the wrong reason. For
+    critical flows, read the assertions yourself before you trust the green tick: AI drafts,
+    you verify.
+recap:
+  - emoji: "🧪"
+    title: "The step everyone regrets"
+    text: "Skipping tests. AI removes the excuse by writing them for you, so quality stops being optional."
+  - emoji: "🤖"
+    title: "What the video's agent does"
+    text: "It drives Playwright to write and then run end-to-end tests against a live app: a working loop, not a list of QA prompts."
+  - emoji: "🔁"
+    title: "Swap the framework"
+    text: "The same write-then-run loop works with any coding agent and Jest, pytest or flutter test in place of Playwright. Watch the workflow, not the tool."
+  - emoji: "🧩"
+    title: "Four kinds of coverage"
+    text: "Unit tests for logic, end-to-end tests for whole flows, structured test plans from your spec, and edge cases you'd never think to try."
+  - emoji: "🎯"
+    title: "The moment to ask for tests"
+    text: "Right after the AI builds a feature: have it write the tests for what it just wrote, so every later change gets checked automatically."
+  - emoji: "🛡️"
+    title: "An old principle, made real"
+    text: "'Give the agent a way to check itself', turned into a real suite that catches regressions the moment they appear."
+  - emoji: "👀"
+    title: "Is green proof?"
+    text: "No. AI can write tests that pass for the wrong reasons or miss the real risk. Read what each asserts, especially on critical flows."
+task: |
+  Aim AI at one critical flow in your app, let it write the net, then make the net automatic so a
+  red result blocks the work instead of shipping with it. For a to-do app the flow is "add a task
+  → mark it done → it shows as completed"; pick the equivalent in yours.
+
+  ```prompt
+  Write a test for [my app's most important flow]. Cover the happy path and assert the
+  real behavior (the data and what the user sees), not just that an element exists. Run
+  the tests and show me pass/fail. Then brainstorm 5 edge cases (empty input, very long
+  text, duplicate action, offline, a user with no data yet) and add tests for the
+  scariest two. Don't change the app's logic to make a test pass; tell me if a test
+  exposes a bug.
+  ```
+
+  Read every assertion before you accept it. Then ask the agent to wire the project's existing
+  checks (lint, typecheck, these tests: `npm test`, `pytest`, `flutter test`) as a gate that
+  blocks on failure: a pre-commit hook, plus a CI workflow on every push (GitHub Actions is free
+  for public repos). Keep the gate fast. **If you don't code yet:** ask an assistant to write a
+  20-line function (a streak counter that takes a list of dates, say) plus its tests, and run
+  them in a free online sandbox such as Replit.
+  Success: the suite is green with the flow test and two edge-case tests you read and trust, and
+  making one test fail blocks the commit or the CI run.
+selfCheck:
+  - q: "Your AI-written suite is all green, but customers report a discount being applied twice. The test for the discount function passes. What do you look at first?"
+    a: "What the test actually asserts. It probably checks that a total exists or the function runs, not the exact expected amount; rewrite it with known inputs and the exact output, and confirm it fails against the buggy code before you fix the bug."
+  - q: "After a refactor your agent reports \"all tests pass\", and the diff shows it changed three expected values in the test file. What do you do?"
+    a: "Treat it as a red flag: the agent may have bent the tests to fit new, possibly wrong, behavior. Revert the test edits, re-run, decide case by case whether the code or the test was wrong, and add a rule that tests change only with your approval."
+  - q: "How does an app test suite relate to evals for AI features?"
+    a: "Both put \"give the agent a way to verify its work\" into practice. Tests check deterministic app behavior with exact pass/fail; evals (→ evals-and-testing) measure the quality of AI outputs that vary from run to run."
+mcq:
+  - q: "To check your suite, you change one comparison in a pricing function from `>=` to `>` and run all the tests. Everything stays green. What does that tell you?"
+    options:
+      - "The change was harmless, so either version of the code is fine"
+      - "The tests are flaky; run the suite again and compare results"
+      - "Deliberate breakage is artificial, so the result means little"
+      - "No test guards that line; add one that hits the exact boundary"
+    answer: 3
+    explain: "If a real change to the logic can't turn anything red, the suite isn't checking that line, whatever its coverage number says. Add a test at the boundary value where `>=` and `>` disagree, and confirm it fails on the broken version. Calling the change harmless assumes the very thing the test should prove."
+  - q: "Your Playwright tests fail on about one run in five. They pause with fixed two-second waits, and all of them share one test account. What's the right fix?"
+    options:
+      - "Wait for real conditions, and give each test its own data"
+      - "Raise each fixed wait to five seconds so pages always load"
+      - "Turn on automatic retries so CI passes on the second run"
+      - "Run the end-to-end tests only before a release, not daily"
+    answer: 0
+    explain: "Fixed sleeps race the app, and shared data lets tests trip over each other. Auto-waiting locators and per-test data remove both causes. Longer sleeps make the suite slower and still flaky, and retries hide the race instead of fixing it."
+  - q: "A test of your streak counter passes on your laptop but fails in CI every time. Nothing else differs in the code. What's the most likely cause, and fix?"
+    options:
+      - "CI is slower, so raise the test's timeout until it passes"
+      - "The code has a bug that only shows up on the CI server"
+      - "CI runs in a different time zone; pin it or set it in the test"
+      - "The test is unreliable in CI, so mark it to be skipped there"
+    answer: 2
+    explain: "Date logic is sensitive to time zone, and CI machines often run on UTC while your laptop doesn't. Pin the time zone in the CI config or have the test set its own clock and dates. A timeout doesn't change a wrong date, and skipping the test removes the guard where it matters."
+  - q: "Your team wants every behavior covered by end-to-end tests \"because they test what users actually do.\" The suite now takes 25 minutes and people have stopped running it. What do you propose?"
+    options:
+      - "Run the end-to-end suite in parallel so all-E2E stays fast enough"
+      - "Test logic with many fast unit tests and keep E2E for key flows"
+      - "Delete the unit tests, since end-to-end tests already cover them"
+      - "Keep everything as is, but run the full suite only before releases"
+    answer: 1
+    explain: "A healthy suite is mostly fast unit tests for logic, plus a few end-to-end tests for the flows that must never break. A slow suite stops being run, which is worse than a smaller one that runs on every commit. Parallelising buys some time but keeps the flakiness and cost of browser tests for checks a unit test does better."
+backupResources:
+  - label: "AI Makes QA Testing 80% Faster - Complete Guide (With Prompts) — AB Automation Hub"
+    url: "https://www.youtube.com/watch?v=Hnie8dTBYUg"
+    type: "video · QA-side prompts"
+  - label: "Playwright — official end-to-end testing docs"
+    url: "https://playwright.dev"
+    type: "docs · official"
+tags:
+  - shipping-apps
+  - testing
+  - qa
+  - playwright
+---
+
+Testing is the step everyone skips and everyone regrets. AI removes the excuse: it writes the
+tests *for* you, so quality stops being optional. It also ties directly to habits you already
+have: "let the agent verify its work" (→ core-loop) and "measure with evals"
+(→ evals-and-testing).
+
+## What AI tests for you
+
+- **Unit tests**: individual functions and logic. Fast, and the bulk of a healthy suite.
+- **End-to-end tests**: full user flows (sign up, log in, check out) with tools like
+  **Playwright** or **Cypress** driving a real browser. On mobile, Flutter's
+  `integration_test` package or a tool such as Maestro plays the same role.
+- **Test plans and cases**: structured coverage generated from your spec.
+- **Edge cases**: ask "what could break this?" and it surfaces inputs you didn't think of.
+
+Keep the proportions sensible: many fast unit tests, a few end-to-end tests for the flows that
+must never break. A suite that's all end-to-end gets slow, and a slow suite stops being run.
+
+The most useful move: after AI builds a feature, ask it to **write the tests for what it just
+wrote**. Then every later change gets checked automatically. Recent Playwright versions go a
+step further and include agent definitions that plan, generate and repair tests, which is what
+the video demonstrates.
+
+## Worked example: testing a streak counter
+
+Take a small, realistic function: given the dates a user completed a task, return their
+current streak of consecutive days. Here's how to test it with AI without fooling yourself.
+
+1. **Ask for the tests with the behavior spelled out.** "Write tests for `currentStreak(dates,
+   today)`. Assert exact numbers, not just that it returns something."
+2. **Read the assertions.** A test like `expect(result).toBeDefined()` passes for a function
+   that returns the wrong number. You want `expect(currentStreak([...three days...],
+   today)).toBe(3)`.
+3. **Ask for edge cases, then pick.** The AI suggests: empty list, duplicate dates, unsorted
+   input, a gap yesterday, a completion just before midnight in another time zone. The last
+   two are the scary ones. Add tests for those.
+4. **Break the code on purpose.** Change one comparison in the function (say `>=` to `>`) and
+   run the suite. If nothing goes red, your tests aren't guarding that line. This trick is a
+   manual version of mutation testing, and it's the fastest way to find out whether a green
+   suite means anything.
+5. **Restore the code and commit.** Code plus tests, together.
+
+> 💡 **Try it:** Pick any function that already has a test in a project you have. Break one
+> line on purpose, run the tests, and see whether anything fails. Five minutes, and you'll know
+> how much that green tick is worth.
+
+## Common failure modes
+
+- **All green, and the bug still ships** → assertions check that something exists, not that
+  it's correct → read the assertions, use exact expected values, and break the code to prove
+  each test can fail.
+- **The agent "fixes" a failing test by changing the expected value** → nothing told it tests
+  are the spec → add "never edit a test to make it pass without asking me" to the instruction
+  file.
+- **End-to-end tests fail at random** → fixed sleeps and shared test data → use Playwright's
+  auto-waiting locators, wait for real conditions, and give each test its own data.
+- **Passes on your machine, fails in CI** → environment differences (time zone, missing env
+  vars, seed data) → pin them in the CI config and make the test set its own data.
+
+## This is "verify your work", made real
+
+You met the principle in the Claude Code pillar (give the agent a way to check itself) and as
+**evals** for AI features. Here it becomes a real **test suite** for your whole app: a safety
+net that catches regressions the moment they appear, so you can ship fast *and* safely. Wiring
+the suite into a hook or CI makes it non-optional (→ hooks-automation).
+
+## Trust, but read the tests
+
+AI drafts the suite in minutes; your job is to make sure it tests the things that matter. A
+quick rule of thumb: for each critical flow, you should be able to say in one sentence what
+would have to break for its test to go red. If you can't, the test isn't guarding it yet. With
+a tested app, you're ready to put it in front of real users. Let's ship it.

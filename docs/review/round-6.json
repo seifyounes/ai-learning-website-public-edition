@@ -1,0 +1,110 @@
+{
+  "round": 6,
+  "scores": {
+    "1_content": 9.2,
+    "2_relevance": 9.1,
+    "3_learning_design": 9.0,
+    "4_onboarding": 9.2,
+    "5_navigation": 9.2,
+    "6_interactive": 9.1,
+    "7_visual": 9.0,
+    "8_mobile": 9.1,
+    "9_accessibility": 8.8,
+    "10_trust": 9.1,
+    "11_technical": 9.1
+  },
+  "overall": 9.08,
+  "evidence": {
+    "1_content": "Read in full: foundations/mental-models/what-is-an-llm, math-ml-core/transformers-attention, claude-code/hooks-automation, applied-ai-engineering/rag-fundamentals, ai-in-companies/measuring-roi; read the source of workflows-agents/zapier-make-n8n, obsidian/para-method, agency-freelance/pricing-ai-work, chat-assistants/privacy-and-setup. Explanations are accurate and current: the three training stages incl. RL on verifiable rewards, prefill vs decode and KV-cache/prompt-caching mechanics with a correct worked example, hook exit-code semantics and stop_hook_active, recall@k vs groundedness, per-unit ROI with a worked example whose arithmetic checks out (8.3 h x $30 x 48 = ~$12k, cost $1,960), Zapier tasks vs Make module runs vs n8n executions. Every breakdown has a worked example and a failure-modes list. Small slips: rag-fundamentals.mdx line 51 still says 'NotebookLM' while the same lesson (and 6 others) uses 'Gemini Notebook (formerly NotebookLM)'; meetings-email-documents.mdx video.why is missing a full stop ('work documents Longer courses dwell…'); transformers-attention suggests 'ollama run gemma4:e2b' (could not verify the tag; the lesson does tell readers to check the library).",
+    "2_relevance": "grep of content/ and src/ for private names, local paths, TODO/FIXME, private apps returned nothing private (only legitimate 'placeholder' teaching text and the author credit on /about and in the footer). Apply-it, 'Upgrade your AI setup' and tasks are written for any learner with explicit branches ('If you study / If you code / At work', 'No coding project yet?', 'No-code path', 'If you don't code yet'), neutral running examples (an online bookshop, a shop support inbox) and assistant-agnostic instructions (ChatGPT/Claude/Gemini). The one audience gap: /get-hired is entirely an Applied-AI-Engineer job roadmap and is a top-level nav item, so the non-coding professional the home page courts gets no equivalent career page.",
+    "3_learning_design": "Every lesson has the same anatomy: video with 'why this one' and watch notes (e.g. RAG: 'watch the first six parts, to about 33:50'), recall-then-flip recap, breakdown, apply-it with success criteria, setup upgrade, 15-45 min task with a success line, self-check, notes. Prerequisites are signposted ('DO THESE FIRST Linear algebra · Probability · Neural networks' on transformers-attention), time is split video/read/task, Start Here + three goal routes + /path give a coherent beginner-to-advanced spine. Gaps: self-checks are reveal-and-self-grade only (no committed answer before reveal), and the commit-first MCQ challenge quiz exists only in the 7 Math & ML lessons, so the other 104 lessons have no check a learner can't talk themselves into passing.",
+    "4_onboarding": "Home at 1280 and 335 px: H1 'Learn AI and AI tools, one studied lesson at a time.', a one-paragraph who-it's-for (students, developers, professionals who don't code), a single filled START HERE, a FREE · NO SIGN-UP strip, three 'Pick your route' cards, and an 8-step 'How every lesson works'. A newcomer knows what, who and where within 30 s. On a 320-px phone the stats title block sits above the headline, so the first screen is mostly chrome and the START HERE button lands at the fold.",
+    "5_navigation": "Desktop lesson sidebar lists every pillar with counts and expands the current one; jump-to-section chips (WATCH…NOTES), previous/next lesson cards, 'Back to pillar', breadcrumb cell in the title block. Search keeps state in the URL (/search?q=rag&level=advanced), ranks well ('rag' → RAG fundamentals first, then AI inside Obsidian, Fine-tuning), handles empty results with a helpful message, level filters work with aria-pressed. Mobile menu opens as a ruled list with Escape-to-close. 404 page is in-voice ('This page isn't in the course') with noindex.",
+    "6_interactive": "Fresh localStorage: recap flip + 'I had it/Not yet' produced 'You recalled 4 of 7' with 'Go over the 3 you missed'; self-check graded 5/5 with 'Last time: 5/5' shown after reload; transformers challenge quiz commits on click, marks pick vs correct, explains, scores 4/5, persists; note autosaves ('Saved at 12:15:45 PM · this browser only') and survives reload; Mark complete → 'Completed' (aria-pressed=true) persists and updates the dashboard (Explorer, 94 XP, 1/111, badges Liftoff + Bullseye earned); Get-Hired checkbox persists (ai-learn:career:v1); Export produces a versioned JSON (ai-learning-progress-2026-10-04.json, 'Exported 6 saved items.'); import filters to ai-learn:* keys; Erase asks for confirmation. Nit: CompleteButton renders 'Mark complete' as the filled btn-next on the server and swaps after hydration, so a completed lesson flashes the wrong state (and animates the background) on every load.",
+    "7_visual": "The 'Computation Pad' look (indigo ruled sheet, condensed Archivo labels, Atkinson Hyperlegible prose, mono numerals) is distinctive and consistent across home, lessons, dashboard and OG images. Lesson title block reads like an engineering drawing and makes hierarchy obvious; prose sits at a comfortable measure; ASCII diagrams in transformers-attention are legible. Nits: sidebar lesson links are 14 px muted grey on a gridded background, which is the weakest-reading text on the page during long sessions; the per-lesson OG card falls back to a system font instead of the site's Archivo and leaves its lower fifth empty.",
+    "8_mobile": "At 320 px, scripted checks of 16 pages (home, start-here, both sections, a pillar, 5 lessons, dashboard, get-hired, path, search, about, 404) found documentElement.scrollWidth = 320 on all, no overflowing elements; ASCII diagrams scroll inside their own focusable pre; prompt cards use pre-wrap. Only undersized targets are inline text links (allowed). Title block reflows to a 2-column grid; menu works. Nit: prompt cards keep the source's hard line breaks at ~95 chars, so at 215 px they show ragged short lines ('…template prompt you reuse]. It is sent at' / 'the start of every call').",
+    "9_accessibility": "Skip-to-content link, :focus-visible 2 px outline, aria-current on the sidebar's current lesson, aria-pressed on complete/level/goal buttons, aria-expanded/aria-controls on self-check reveals, role=group + aria-live on the MCQ, role=status for scores, labelled search input and notes textarea ('Your notes'), lazy YouTube facade with a real button, prefers-reduced-motion block in globals.css, nothing under 12 px. Text/background pairs checked are ≥4.5:1 (graphite and print on the sheet); the sidebar announces completed lessons with sr-only '(completed)' and marks the current one by weight + underline, not colour alone. Keyboard test on /foundations/math-ml-core/transformers-attention at 1280 px: Tab → 'Skip to content' with a visible outline; Enter jumps to #main (tabindex=-1), but the next Tab lands on the sidebar's 'Foundations' link because the 'Course contents' nav sits inside <main> — 21 tab stops (25+ in the 13-lesson Claude Code pillar) before the first lesson control, on every lesson and pillar page. Get-Hired checkboxes are native 16 px boxes (label-wrapped, so tappable, but small to see).",
+    "10_trust": "Each lesson names the channel and year of its video, explains 'why this one' including honest caveats ('Made by Asana… expect some product framing'; 'Recorded in 2024… follow the ideas, not the syntax'), shows a Reviewed date and a 'What changed in the last review' note, and links a prefilled 'Report it on GitHub' issue. /about discloses AI-assisted drafting, says what a review covers, explains why most lessons share a date, and states no accounts/cookies/analytics with a nocookie video facade. I verified all 111 primary videos and all 146 backup YouTube links via oEmbed (all 200, channels match the credited creators, no duplicate primaries) and 321 other links: no 404/410; 403s are bot-blocking (OpenAI help, Medium, Make, Midjourney, Perplexity) and 4 Cloudflare hosts timed out (couldn't verify, as the brief warns). One overstatement: /about says links are 're-checked automatically before each release', but the repo has check-links.js as a manual npm script and no CI or prebuild hook.",
+    "11_technical": "All routes 200 in ~20 ms; made-up URLs return a real 404 with noindex; sitemap (131 URLs) and robots wired; per-lesson title, description, canonical, og:type=article and a generated 1200x630 OG image. No console errors except the 404s I caused. Gaps: home, /about, /start-here and other non-lesson pages emit no rel=canonical; lesson og:image:alt is the generic 'An AI Learning lesson'; no JSON-LD (Course/LearningResource) for a course site."
+  },
+  "fixes": [
+    {
+      "criterion": "3_learning_design",
+      "priority": "medium",
+      "issue": "Outside Math & ML, every check is reveal-and-self-grade; a learner can 'pass' without committing to an answer.",
+      "where": "SelfCheck.tsx; all non-math lessons",
+      "fix": "Add a 2-3 item commit-first mcq block (reuse McqQuiz) to at least the Get-Hired fast-track lessons and each pillar's capstone, or require a one-line typed answer before Reveal unlocks."
+    },
+    {
+      "criterion": "2_relevance",
+      "priority": "medium",
+      "issue": "Get Hired is a top-level nav item but only serves the developer route; non-coding professionals and students get no career equivalent.",
+      "where": "/get-hired, TopNav",
+      "fix": "Either rename the nav item to 'AI Engineer roadmap' or add a short 'Using AI at work' career track (portfolio of before/after workflow write-ups, ROI one-liners, a governance checklist) selectable on the same page."
+    },
+    {
+      "criterion": "1_content",
+      "priority": "low",
+      "issue": "Naming inconsistency and a typo.",
+      "where": "content/foundations/applied-ai-engineering/rag-fundamentals.mdx:51 ('NotebookLM'); content/foundations/chat-assistants/meetings-email-documents.mdx video.why ('work documents Longer courses')",
+      "fix": "Use 'Gemini Notebook' consistently; add the missing full stop. Add a lint in check-public.js for '[a-z] [A-Z][a-z]+ ' sentence joins inside why fields."
+    },
+    {
+      "criterion": "10_trust",
+      "priority": "low",
+      "issue": "'Every video and external link is also re-checked automatically before each release' is not backed by any automation in the repo.",
+      "where": "/about ('Found a mistake?'); package.json scripts",
+      "fix": "Wire check-links.js into a prebuild script or a GitHub Action on release, or reword to 're-checked with a link checker before each release'."
+    },
+    {
+      "criterion": "6_interactive",
+      "priority": "low",
+      "issue": "Completed lessons render as the filled 'Mark complete' button until hydration, then swap with a background transition.",
+      "where": "src/components/CompleteButton.tsx",
+      "fix": "Render a neutral, unfilled placeholder (or hide the label) while !hydrated, and suppress the transition on first paint."
+    },
+    {
+      "criterion": "9_accessibility",
+      "priority": "medium",
+      "issue": "'Skip to content' lands on <main>, which begins with the 21-25-link course sidebar, so keyboard users still tab through the whole table of contents before reaching the lesson.",
+      "where": "src/components/WithSidebar.tsx / LessonView.tsx; every lesson and pillar page",
+      "fix": "Point the skip link at the lesson/pillar content column (e.g. id=\"content\" with tabindex=-1 on the title block's container), or move the sidebar nav after the content in DOM order (keep it visually left with CSS order/grid), and optionally add a second 'Skip to course contents' link."
+    },
+    {
+      "criterion": "9_accessibility",
+      "priority": "low",
+      "issue": "Get-Hired checkboxes are 16 px native boxes.",
+      "where": "src/components/GetHiredView.tsx",
+      "fix": "Draw a 20-24 px custom box in the pad style (keeping the native input for semantics) so state is easy to see."
+    },
+    {
+      "criterion": "11_technical",
+      "priority": "low",
+      "issue": "No canonical on non-lesson pages; generic lesson og:image:alt; no structured data.",
+      "where": "src/app/layout.tsx metadata, page metadata for /, /about, /start-here, section and pillar pages",
+      "fix": "Set alternates.canonical on every route, make og:image:alt the lesson title, and emit Course/LearningResource JSON-LD on lesson pages."
+    },
+    {
+      "criterion": "7_visual",
+      "priority": "low",
+      "issue": "Sidebar lesson names are 14 px muted text over the grid; OG card uses a fallback font.",
+      "where": "Sidebar.tsx; [slug]/opengraph-image",
+      "fix": "Give the sidebar list a plain sheet background (no grid) or graphite text; load Archivo into the ImageResponse and use the empty bottom band for the pillar number."
+    },
+    {
+      "criterion": "8_mobile",
+      "priority": "low",
+      "issue": "Prompt cards keep hard line breaks from the source, producing ragged lines on phones.",
+      "where": "Markdown.tsx prompt code blocks",
+      "fix": "Unwrap single newlines inside paragraphs of ```prompt blocks at render (keep blank lines and list breaks), so text reflows to the card width and copies as clean paragraphs."
+    },
+    {
+      "criterion": "4_onboarding",
+      "priority": "low",
+      "issue": "On a 320-px phone the stats title block precedes the headline, pushing START HERE to the fold.",
+      "where": "/ (HomeContents.tsx)",
+      "fix": "On small screens put the H1 + START HERE before the course stats block, or collapse the stats into one line."
+    }
+  ],
+  "verdict": "A genuinely excellent free course: accurate, current, deeply worked lessons with honest video picks, every link and video alive, and interactive pieces that all work and persist. Nothing reads as written for one person. What remains is polish: commit-first checks outside the math pillar, a career page for non-coders, and a handful of small technical and consistency nits."
+}

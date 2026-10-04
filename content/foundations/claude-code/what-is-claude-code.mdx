@@ -1,0 +1,206 @@
+---
+title: "What Claude Code is & when to use it"
+summary: "Explain what an agentic coding tool does, and decide when Claude Code fits a task better than autocomplete or a chat window."
+changeNote: "New: a task that asks the agent and a plain chat the same question, so you see what a chat has to guess, plus a wrong-tool scenario in the self-check."
+section: foundations
+pillar: claude-code
+order: 1
+level: beginner
+estMinutes: 12
+taskMinutes: 20
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "AJpK3YTTKZ4"
+  published: "2025-02-24"
+  year: 2025
+  minutes: 4
+  title: "Introducing Claude Code"
+  channel: "Anthropic"
+  why: "Made by Anthropic, so it presents their own tool, but at four minutes it's the shortest clear demo of the core idea: an agent working on a real repo in a live terminal, which explains 'agentic' faster than any written definition. Longer third-party intros mostly add setup steps, which the next lesson covers."
+  notes:
+    - "This is the launch-era intro (early 2025), so the on-screen models and feature set are older than today's."
+    - "The definition and the mental model still hold; the breakdown below covers what has been added since."
+readAfter:
+  - label: "Extend Claude Code — the full 2026 feature surface (official docs)"
+    url: "https://code.claude.com/docs/en/features-overview"
+    kind: "docs"
+applyIt: |
+  Take the next three jobs on your own project and route each one by the **shape of the
+  change**, not by which tool you opened last. A worked example, using a small to-do web app:
+
+  - Adding **due dates with reminders** touches the data model, the API, two UI screens and
+    their tests: a multi-file, run-the-tests job. That's **agentic-CLI** territory (Claude
+    Code, Codex) — hand over the whole task and let it run the loop.
+  - Tuning one component's hover and empty state while you watch the pixels is often faster in
+    an **AI-native editor** (Cursor, Windsurf, or Claude Code inside VS Code), file by file
+    with every diff in view.
+  - A throwaway landing page to test whether anyone wants the app → an **app-builder** (v0.app,
+    Lovable, Bolt). Lift the good parts into the real repo later; don't ship the prototype as
+    the product.
+
+  **If you code:** write your next three tasks down and label each before you start.
+  **If you don't code yet:** pick one small idea you'd want built and run it through the same
+  question: is it a whole task, a hands-on tweak, a quick prototype, or pure thinking for a chat
+  assistant?
+
+  Success: three real jobs, each routed to a category with a one-line reason, before you touch
+  a tool.
+toolkit: |
+  - **Put the routing rule where your assistant reads it.** Add one line to the instruction file
+    your tools load (CLAUDE.md, AGENTS.md, `.cursor/rules`, or `.github/copilot-instructions.md`):
+    "Multi-file or run-the-tests work goes to the agent; one-line tweaks I do myself." It keeps
+    every session from defaulting to one tool for everything.
+  - **Keep a tiny "which tool" cheat sheet.** A five-line note in your repo or notes app mapping
+    job shapes to categories (whole task → agentic CLI, watch-the-diff → AI-native editor,
+    prototype → app-builder, thinking → chat). Glance at it before you start; update it when a
+    tool surprises you.
+  - **Make one repo agent-ready.** Choose the project you work in most, make sure it has a
+    working test or build command an agent can run, and commit it cleanly so every agent change
+    sits on a reviewable branch. That's the foundation every later lesson in this pillar builds
+    on (→ install-first-session).
+  - **Treat a second agent as a teammate, not a rival.** If you also use Codex, Cursor or Copilot,
+    frame it as division of labor (one drives, one reviews) rather than "which one wins"
+    (→ codex-inside-claude-code).
+recap:
+  - emoji: "🎯"
+    title: "What you hand over"
+    text: "You hand Claude Code an outcome in plain English and it works out the steps, instead of you spelling out every line. That's the leap from autocomplete to an agent."
+  - emoji: "💻"
+    title: "Where it does the work"
+    text: "It lives in your terminal, acting on the actual repo — real files, the real test command, the real git history — not a snippet pasted into a chat box, so it can run things and react."
+  - emoji: "🔁"
+    title: "One goal, many steps"
+    text: "Like a developer: it reads the files, forms a plan, edits across the project, runs commands, reads the output, and corrects its own mistakes — one goal, many steps."
+  - emoji: "🖥️"
+    title: "What the demo really shows"
+    text: "The demo's real content is the texture: the agent narrates in the terminal as it reads files, plans, and edits — every step visible as it streams by, nothing happening off-screen."
+  - emoji: "🛑"
+    title: "Before a file changes"
+    text: "In the demo, each file change and command stops at an approval prompt — you see exactly what it wants to do and say yes or no. Delegation with a hand on the wheel."
+  - emoji: "⚡"
+    title: "Where the payoff shows up"
+    text: "The payoff: multi-file chores, unfamiliar-codebase spelunking, and run-and-fix loops that used to eat an afternoon collapse into a single delegation."
+task: |
+  Two moves, about twenty minutes, on a repo you can open (your own project, or any small
+  open-source repo you clone from GitHub):
+
+  1. Open Claude Code in the repo and hand it a whole-task, *read-only* trace no autocomplete
+     could do. Pick one user-facing flow (sign-up, saving an item, checkout, a CLI command):
+
+     ```prompt
+     Read-only — change nothing. Trace [one flow, e.g. "what happens when a user saves a new
+     item"] end to end: start where the user acts, follow the data through every layer (UI,
+     state, API or service, storage), and note where errors are handled. List every file the
+     flow touches, in the order data moves through them.
+     Success: a file list I can read top-to-bottom, produced without a single edit.
+     ```
+
+     Watch it explore across files and synthesize — an agent doing a task, not completing a
+     line. No Claude Code yet? Run the same prompt in Codex, Cursor's agent mode or Copilot agent
+     mode; the point is the category, not the brand.
+  2. Now feel the category difference. Open a plain chat assistant (ChatGPT, Claude or Gemini),
+     paste in only the one file where the flow starts, and ask the same question. Compare the
+     two answers: which files did the chat have to guess at, and what could it not check
+     because it can't open the repo or run anything?
+
+  Success: an ordered file list from a read-only trace, plus one sentence naming what the chat
+  version had to guess that the agent could look up.
+selfCheck:
+  - q: "You need to rename a variable across ~15 files in your app and update the tests too. Copilot or Claude Code — and why?"
+    a: "Claude Code. Copilot completes the line you're typing; it can't own a multi-file, run-the-tests task. This is whole-task delegation — the agentic-CLI category — where the agent edits across files and verifies. Copilot shines for the next-line flow inside one file, not the 15-file sweep."
+  - q: "You want a throwaway landing page for a mobile app idea in 20 minutes. Which category, and what's the catch?"
+    a: "An app-builder (v0.app / Lovable / Bolt) — prompt-to-app gets a working UI fast. The catch: less control, harder maintenance, and it may not even be built in your app's stack — so treat it as a prototype and graduate the good parts, don't marry it to production."
+  - q: "A classmate opens Claude Code in an empty folder to brainstorm names for a startup and to have a concept explained. It works, but it feels slow and clunky. What went wrong?"
+    a: "Wrong category for the job: there's no repo to act on, so this is pure thinking and drafting. Claude Code's edge is acting on real files and running commands; a plain chat assistant (ChatGPT, Claude, Gemini) is faster for work that never touches a codebase."
+  - q: "A teammate says 'Claude Code is better than Cursor, full stop.' Why is that the wrong frame?"
+    a: "Because the question is per-task, not per-tool. They're different categories — Cursor is a fused GUI editor for hands-on, watch-every-diff work; Claude Code is terminal delegation for whole tasks. The pro is tool-fluent, not tool-loyal, and picks the category the job needs. (Also: comparison claims expire in months — re-check before repeating one.)"
+backupResources:
+  - label: "The future of agentic coding with Claude Code (Boris Cherny + Alex Albert) — Anthropic"
+    url: "https://www.youtube.com/watch?v=iF9iV4xponk"
+    type: "video · what agentic coding IS (official)"
+  - label: "Mastering Claude Code in 30 minutes — Anthropic (Boris Cherny)"
+    url: "https://www.youtube.com/watch?v=6eBSHbLKuN0"
+    type: "video · full official walkthrough — watch after the pillar to consolidate"
+tags:
+  - claude-code
+  - getting-started
+  - agentic-coding
+  - landscape
+  - comparison
+---
+
+**Claude Code is an *agentic* coding tool.** "Agentic" is the whole idea, so start there:
+you hand it a goal in plain language — "add a settings screen," "find why the build got
+slow," "map this repo" — and it does the work a developer does. It reads your files, forms a
+plan, edits across the project, runs commands, reads the output, and corrects itself.
+Underneath every session is one loop — **gather context → act → verify** — repeated until the
+goal is met. That's the line between an *agent* and *autocomplete*: autocomplete finishes the
+keystroke you're typing; an agent owns the task.
+
+The second half of the definition is *where* it works. Claude Code lives in your **terminal**
+(and inside editors like VS Code), so it acts on your **real** codebase — the actual files,
+the actual test command, the actual git history — not a copy pasted into a chat window. That's
+why it can run your tests and react to a real failure instead of guessing. It's deliberately
+**low-level and unopinionated**: no forced UI, no proprietary workflow, so it composes with the
+tools you already run. The video above shows this in a live terminal — the fastest way to *get*
+it. How to *drive* that loop well is its own lesson (→ core-loop); teaching it your project with
+a `CLAUDE.md` is another (→ claude-md-and-memory). Here we answer the question that comes first:
+what it is, and when it's the right tool at all.
+
+## The four ways to code with AI
+
+Be **tool-fluent, not tool-loyal** — this course is vendor-neutral on purpose, and this is
+where that matters most. There are roughly four categories, and the strongest engineers move
+between them per task:
+
+- **Agentic CLI tools — Claude Code & OpenAI Codex.** You hand over a *task*; the agent
+  explores, plans, edits across files, and runs commands. Best for multi-file work, refactors,
+  exploration, and automation you can script. Codex is the closest sibling, built on OpenAI's
+  models — and in a Claude-Code-first setup it's a **complement, not a competitor** (CC drives,
+  Codex reviews and rescues → codex-inside-claude-code), not a coin-flip between two rivals.
+- **AI-native editors — Cursor & Windsurf.** Chat and editor fused in
+  a GUI. Best when you want to stay hands-on, watch every diff, and steer file-by-file. Often
+  lets you pick among models.
+- **Autocomplete + assistant — GitHub Copilot.** Widely deployed: inline completions
+  plus chat and an agent mode, wired into GitHub and every major IDE. Best when you live in
+  GitHub and want ambient help *everywhere* with near-zero setup.
+- **App-builders — v0.app, Lovable, Bolt.** Prompt-to-app: describe it, get a working UI in
+  minutes. Best for prototypes, landing pages, and starting points — the trade-off is less
+  control and harder long-term maintenance.
+
+The fifth thing you'll still use daily — a plain **chat assistant** — isn't really "coding": no
+repo access by default, ideal for thinking, explaining, and drafting. Keep it in the mix for
+what it's good at (more below), but it's not one of the four ways to put an agent on your code.
+
+## When to reach for Claude Code — and when not
+
+Choose **per task, not forever**:
+
+- **Reach for it when** a whole job spans several files; the codebase is unfamiliar and needs
+  mapping; the work involves *running* things — tests, builds, scripts — and reacting to output;
+  or you want your standards encoded once and followed every time.
+- **Don't reach for it when** it's pure ideation or learning with no code to touch (a chat
+  assistant is faster), or a one-character tweak you'd just type yourself. And on a critical repo
+  you haven't fenced yet, start on a branch and review every change until you trust the loop —
+  the safety model that makes hands-off delegation safe is the next lesson (→ install-first-session).
+
+Rule of thumb: if you can describe the entire change in one sentence, you don't need an agent;
+if the job is a *task*, you do. The reassuring part is that almost everything in this pillar —
+prompting, context engineering, `CLAUDE.md`-style memory, and especially **MCP** — is a shared
+or open standard, so getting good with Claude Code transfers to any of these tools. Loyalty is
+to the craft, not the brand.
+
+## The 2026 surface, in one breath
+
+The launch-era intro above nails the core idea; the tool has since grown a deep surface you'll
+meet lesson by lesson. Persistent memory (`CLAUDE.md`), reusable **Skills** and **plugins**,
+**subagents** and **agent teams** that work in parallel, **hooks** that fire on events, **MCP**
+to reach external systems, **plan mode** and spec-driven development, an **auto mode** with OS
+sandboxing that trims the approval clicks, and `/goal`, routines, and headless runs for autonomy
+at scale. Don't memorize the list — just know the ceiling is high and none of it changes the
+definition. The rest of this pillar is a guided climb up it.
+
+The mental model to keep: **Claude Code is a teammate you delegate to, not an autocomplete you
+nudge.** Everything that follows is about delegating well — giving it context, a clear plan, and
+a way to verify its own work.

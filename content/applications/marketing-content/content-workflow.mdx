@@ -1,0 +1,221 @@
+---
+title: "Content workflow"
+subtitle: "Ideation to publish"
+summary: "Run a weekly content pipeline from idea to published post, with AI drafts in your own voice, a human edit and an approval gate."
+changeNote: "New video: a practitioner interview (a 39-minute segment), plus sections on getting your voice into drafts, a worked example, and a process-audit exercise."
+section: applications
+pillar: marketing-content
+order: 2
+level: intermediate
+estMinutes: 13
+taskMinutes: 50
+shortPath: "About 45 min: watch 1:37–41:00 and read the breakdown down to Keep the human at the wheel. Come back for the rest of the breakdown and the task: one idea through the pipeline, then the weekly cadence."
+prerequisites: [ai-marketing-stack, prompting-in-2026]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "iVZrVeESnFQ"
+  published: "2026-04-28"
+  year: 2026
+  minutes: 51
+  start: 97
+  watchMinutes: 39
+  title: "How to automate blog writing with AI from keyword to published | Ryan Law (Ahrefs)"
+  channel: "Ahrefs Podcast"
+  why: "A practitioner interview, not a demo: Ryan Law, who runs marketing at Ahrefs, explains why splitting content work into small AI-assisted steps (research, outline, draft, edit) beats one giant prompt. His points on teaching AI your voice through examples, not instructions, and on supplying human context a model can't know, are this lesson's core. Ahrefs sells SEO software and one segment works its product into posts; treat that as their context. He builds in Claude, but each step works as a saved prompt in any assistant."
+  notes:
+    - "The player starts at 1:37; the lesson needs 1:37–41:00 (about 39 minutes): the pipeline, voice and human-context chapters."
+    - "Everything after 41:00 is optional."
+    - "Pabbly's vendor demo of the automation glue is in the backups."
+applyIt: |
+  Before you change any tool, audit the content process you run today (for a product, a client,
+  your employer or your personal brand) against the six stations:
+
+  1. Write the stations down: ideate, outline, draft, edit, format, repurpose.
+  2. Mark each one **I do it**, **I skip it** or **AI does it unchecked**.
+  3. Circle the point where a person approves before anything goes public. If there isn't one,
+     that's your first fix.
+  4. Pick the one station you'll add or tighten this week, in one sentence.
+
+  **For a personal brand:** if you skip the outline, start there; it's the cheapest place to
+  fix a piece. **For a client or employer:** name who holds the approval gate and get
+  that agreed before you produce anything.
+
+  Success: a six-line station audit, a named approval point and one change for this week.
+toolkit: |
+  - **Save the pipeline as one starting point.** Put ideate → outline → draft in your voice → you
+    edit → repurpose → schedule into a Custom GPT, a Gemini Gem, a ChatGPT or Claude Project or a
+    saved prompt, so the weekly cadence runs from one place instead of a manual crawl.
+  - **Few-shot the voice from a real file.** Keep 3–5 of your best pieces and your voice note in
+    one `brand-voice` doc, uploaded as Project knowledge (ChatGPT, Claude) or Gem files (Gemini),
+    so every draft starts on-brand instead of you re-pasting examples.
+  - **Put the human gate in the workflow, not in willpower.** Start from an n8n, Zapier or Make
+    template with a status column (Idea → Drafted → Approved → Scheduled) and let only a person
+    set *Approved* before anything schedules (→ first-automation).
+  - **Run bulk generation in its own chat.** Generate the week's drafts in a separate
+    conversation and bring back only the ones you keep, so the chat you plan in stays readable.
+recap:
+  - emoji: "🏭"
+    title: "Small steps, not one prompt"
+    text: "Split the work into stations (research, outline, draft, edit), one focused prompt each. A small step is easier to check and fix than a do-everything request."
+  - emoji: "🔎"
+    title: "Before the outline"
+    text: "Research what already exists on the topic and find the gap your piece fills. AI can compare the competing pieces in minutes."
+  - emoji: "🧩"
+    title: "The cheap place to fix"
+    text: "The outline. Cover each point once, with no overlaps or gaps. Reviewing an outline takes a minute; fixing a finished draft takes twenty."
+  - emoji: "🎙️"
+    title: "Sounding like you"
+    text: "Examples beat instructions. Show the model your best past pieces plus a short voice note, so the first pass sounds like you, not like an AI."
+  - emoji: "✋"
+    title: "What only you can add"
+    text: "Context the model can't know: real stories, data and opinions. Then the edit for accuracy and taste, because AI drafts sound fine, which is exactly the risk."
+  - emoji: "♻️"
+    title: "Where the leverage is"
+    text: "Reuse. One strong piece becomes a thread, an email and a video script, each re-angled, and old pieces get refreshed instead of rewritten."
+  - emoji: "⚙️"
+    title: "The boring handoffs"
+    text: "Automate them: new draft, notify to review, schedule on approval. Busywork runs itself; judgment stays human."
+task: |
+  Run one idea through the whole pipeline in a single sitting, from idea to draft to three
+  repurposed formats. Pick an idea your audience genuinely cares about: a question a customer
+  asked, a comment you got, a client FAQ, or something you explain over and over.
+
+  ```prompt
+  Take this content idea for [what you promote]: "[the question or take]". Audience: [who].
+  In one pass: (1) outline a ~600-word article in our voice (samples: [paste 1-2]); (2) write the
+  draft; (3) repurpose it into a LinkedIn or X thread, a short-video hook + script, and a
+  newsletter email. No hype, and no facts or numbers I didn't give you. Output the article, then
+  the 3 repurposed formats, each labeled.
+  ```
+
+  Edit all four for truth and voice, and time the whole pass. Then size your week from that
+  number: tell the assistant how many hours you have and how long one pass took, and ask for a
+  weekly cadence (day · format · channel · hook) that fits. The human still owns the edit step;
+  automate the glue (draft → review → schedule) later with n8n, Zapier or Make.
+
+  Success: one idea became four publishable drafts you only had to edit, plus a weekly cadence
+  sized to the time the pass really took.
+selfCheck:
+  - q: "Your drafts are accurate, but readers keep saying they 'sound like AI'. What's probably missing from your prompt and your process?"
+    a: "Real voice samples and a voice note (few-shot examples plus phrases you never use) in the prompt, and an edit pass that adds something only you have: a specific story, an opinion or a detail from real work. Adjectives like 'friendly' alone don't carry a voice."
+  - q: "An automation published a post with a wrong price, because drafts went straight from the AI step to the scheduler. Where does the fix belong?"
+    a: "In the workflow itself: a required approval state that only a person can set (for example, a sheet status changed to *Approved*) before anything schedules. A reminder to check doesn't stop a post; a gate does."
+  - q: "You have three hours a week for content. Three original pieces, or one strong piece repurposed into five formats?"
+    a: "Usually one strong core piece, repurposed. You get depth in the original and reach across channels for little extra time, as long as each format is re-angled for its platform rather than copy-pasted."
+backupResources:
+  - label: "Automate Your Content Creation Workflow with AI — From Idea to Publishing — Pabbly (vendor demo)"
+    url: "https://www.youtube.com/watch?v=ZgmwBPzDHmo"
+    type: "video · automation glue"
+  - label: "How I Use AI to Automate Content Creation - Step-by-Step Guide (2026) — AI Master"
+    url: "https://www.youtube.com/watch?v=bv4JFUQarV0"
+    type: "video · step-by-step"
+  - label: "n8n — workflow templates (automate your pipeline)"
+    url: "https://n8n.io/workflows/"
+    type: "templates · official"
+tags:
+  - marketing
+  - content
+  - workflow
+  - repurposing
+---
+
+Great marketing runs on a **content engine**, not random bursts. AI lets you build a
+repeatable pipeline that takes an idea all the way to published, and then multiplies it.
+The tools matter less than the shape: once you know the stations and where the human sits,
+you can run the same line in any assistant and any automation tool.
+
+## The pipeline
+
+1. **Ideate.** AI suggests topics from your niche, the questions your audience asks, and what
+   they're reacting to. Your best ideas still come from real conversations; AI turns one into
+   ten angles, and can compare what's already published on the topic so you find the gap your
+   piece fills.
+2. **Outline.** Turn the idea into a structure: the point, three supporting beats, the example
+   that proves it. Reviewing an outline takes a minute; fixing a 1,000-word draft takes twenty.
+3. **Draft.** AI writes a first pass *in your brand voice* (more on that below).
+4. **Edit.** **You** take over: fix accuracy, sharpen voice, add real insight. This is the
+   non-negotiable human step.
+5. **Format & publish.** Adapt it to the platform: headings for a blog, short lines for
+   LinkedIn, a subject line for email.
+6. **Repurpose.** The multiplier (below).
+
+## Getting your voice into the draft
+
+"Write in a friendly, professional tone" produces the same voice everyone else gets. What
+works is **few-shot prompting**: paste two or three pieces you're proud of and say "match
+this voice". Add a short **voice note** next to them:
+
+- three words that describe the voice, each with what it *doesn't* mean ("direct, not rude");
+- phrases you never use (many writers ban "game-changer", "unlock" and "in today's
+  fast-paced world");
+- how you open and close (a question? a story? straight to the point?).
+
+Save the samples and the note in one file or in Project knowledge, so every draft starts from
+them instead of from a blank prompt.
+
+## Keep the human at the wheel
+
+AI drafts fast and sounds *fine*, which is the problem. Generic, occasionally wrong content
+quietly erodes trust in a brand. So the **editing step is yours**, and it's a checklist, not
+a vibe:
+
+- **Facts:** every number, name, price and claim traces to something you know or supplied.
+- **One real thing:** a story, an example from your work, an opinion you'd defend. This is
+  what makes a piece worth reading.
+- **Cut:** delete the throat-clearing intro and the summary conclusion; most AI drafts
+  improve when they get shorter.
+- **Read it aloud:** anything you'd never say out loud gets rewritten.
+
+## Repurpose: the real leverage
+
+This is where small teams win. One solid piece becomes many: an **article** → a **LinkedIn or
+X thread** → **captions** → an **email** → a **short-form video script**.
+
+The rule is *re-angle, don't copy-paste*. A thread leads with the sharpest claim; an email
+leads with the reader's situation; a video script needs a hook in the first seconds. Ask for
+each format separately, and tell the model which part of the original to lead with.
+
+## Worked example: one question, one evening
+
+A hypothetical freelance bookkeeper keeps hearing "What can I deduct if I work from home?"
+
+1. **Ideate (5 min):** she asks the assistant for five angles on the question; she picks "the
+   three things people forget to claim".
+2. **Outline (5 min):** point, three items, one real (anonymised) client example she supplies,
+   a closing line inviting questions.
+3. **Draft (5 min):** the assistant writes 600 words using her two pasted sample posts.
+4. **Edit (25 min):** she checks every rule against official guidance for her country, adds
+   the client example, cuts the intro and generic advice, and adds a "this isn't tax advice for
+   your situation" line.
+5. **Repurpose (15 min):** a LinkedIn post leading with the most-forgotten item, a newsletter
+   email, and a 30-second video script. She edits each briefly.
+6. **Publish:** the article goes on her site; the rest go into the scheduler for the week.
+
+Notice where the time went: most of it was the edit. That's correct.
+
+> 💡 **Try it:** Paste a piece you've already published into your assistant and ask: "Describe
+> this writing voice in five bullet points, including what it avoids." Fix anything it gets
+> wrong, and you have the first draft of your voice note in under five minutes.
+
+## Automate the glue
+
+Wire the boring parts with **n8n**, Zapier or Make. A simple version uses a spreadsheet or
+Notion table with a status column: *Idea → Drafted → Approved → Scheduled*. When a row reaches
+*Drafted*, the workflow notifies you; when **you** set it to *Approved*, it sends the post to
+your scheduler and logs the date. The approval is the gate, and only a person can open it.
+The workflows pillar covers how to build this from scratch (→ first-automation).
+
+## Common failure modes
+
+- **Symptom:** every post sounds like every other AI post. **Cause:** no samples or voice note
+  in the prompt. **Fix:** few-shot with your real work and a list of banned phrases.
+- **Symptom:** a wrong fact went live. **Cause:** the edit step was skipped under time
+  pressure, or the automation had no approval gate. **Fix:** make approval a required status in
+  the workflow.
+- **Symptom:** your repurposed posts get no engagement. **Cause:** the same text pasted into
+  every channel. **Fix:** prompt each format separately with its own lead.
+- **Symptom:** the cadence collapses after two weeks. **Cause:** a plan bigger than your real
+  hours. **Fix:** time one full pass, then size the weekly plan to that number.
+
+Next, the most important words in marketing: copy that converts.

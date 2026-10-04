@@ -1,0 +1,250 @@
+---
+title: "Orchestration frameworks"
+subtitle: "LangGraph, LlamaIndex & when vanilla wins"
+summary: "Tell when a plain SDK loop is enough and when state, cycles or human checkpoints justify LangGraph, LlamaIndex or similar."
+changeNote: "New: one agent built two ways as a worked example, a failure-modes list, a quick sort into single call, workflow or agent, and a graph sketch inside the build."
+section: foundations
+pillar: applied-ai-engineering
+module: "Job-ready extras"
+order: 17
+level: advanced
+estMinutes: 25
+taskMinutes: 50
+prerequisites: [build-agent-in-code, rag-fundamentals]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "qAF1NjEVHhY"
+  published: "2024-11-04"
+  year: 2024
+  minutes: 10
+  title: "LangChain vs LangGraph: A Tale of Two Frameworks"
+  channel: "IBM Technology"
+  why: "IBM Technology's whiteboard comparison teaches the judgment this lesson is about: chains versus graphs, meaning when a linear pipeline is enough and when you need stateful, controllable orchestration. In ten minutes you get the criterion you'll apply to your own vanilla-versus-framework call. For hands-on practice, the free Hugging Face Agents Course below builds with three frameworks side by side (smolagents, LlamaIndex and LangGraph)."
+  notes:
+    - "It was recorded before LangChain and LangGraph reached 1.0, so some details are dated; the lesson text carries the current picture."
+readAfter:
+  - label: "AI Agents Course — Hugging Face Learn (three frameworks, hands-on)"
+    url: "https://huggingface.co/learn/agents-course/unit0/introduction"
+    kind: course
+applyIt: |
+  Take ten minutes to run the framework decision on your own work, in both directions. List the
+  AI features you have or plan (in a project, or automations at work) and sort each one:
+
+  - **Single call** (assemble the prompt -> one model call -> validate -> store): vanilla wins.
+    A framework adds a dependency, version churn and a debugging layer while removing nothing.
+  - **Workflow** (a fixed sequence of steps): still vanilla, or your no-code tool.
+  - **Agent with durable state, cycles or human checkpoints:** the first place a framework like
+    LangGraph earns its keep.
+
+  Then write the verdict as one standing rule plus the one trigger that would change it, e.g.
+  "single-call features use the provider SDK directly; adopt a framework only for durable state,
+  cycles or human-approval checkpoints". **If you code:** put it in your project's rules file,
+  AGENTS.md (or CLAUDE.md / GEMINI.md for those agents). **If you don't code yet:** put it in
+  your notes as the test for the next tool someone pitches you.
+
+  Success: each feature sorted into single call, workflow or agent, and a written verdict with its trigger.
+toolkit: |
+  - **Write the vanilla verdict into your instruction file.** One rule in AGENTS.md, CLAUDE.md,
+    `.cursor/rules` or your Copilot instructions ("single-call AI features use the provider SDK
+    directly; adopt a framework only for durable state, cycles or human checkpoints") stops your
+    coding agent from scaffolding LangChain into a one-call feature.
+  - **Recognize your AI setup as simple composable patterns.** Saved prompts, skills, custom
+    GPTs or Gems, hooks and subagents are exactly the "simple composable patterns" advice made
+    real. Don't reach for a heavyweight agent framework where a saved prompt plus a small script
+    already does the job.
+  - **Keep a "when I'd adopt a framework" sketch.** File the node-and-edge sketch of the feature
+    that would flip your call in your project's `docs/`; it's a ready interview and portfolio
+    artifact.
+  - **Make "keep the stack as boring as the problem allows" a standing rule.** Put it in your
+    global instructions so every new automation has to earn its complexity instead of defaulting
+    to a framework.
+recap:
+  - emoji: "🏭"
+    title: "What a framework adds"
+    text: "You already built the call-tool-feedback loop by hand. Frameworks add durable state, resumable checkpoints and a catalog of pre-built integrations on top of it."
+  - emoji: "📊"
+    title: "The deciding question"
+    text: "Is your flow a straight line, or does it need state, branching and cycles? Linear work stays a chain; stateful, controllable work wants a graph."
+  - emoji: "🧱"
+    title: "How the two layers stack"
+    text: "LangGraph is the low-level runtime of state machines, nodes, cycles and checkpoints. LangChain 1.0 is the high-level agent layer built on top of it, not a legacy tool it replaced."
+  - emoji: "🗃️"
+    title: "Different jobs, different tools"
+    text: "LlamaIndex owns the data side (ingestion, indexing, retrieval); smolagents writes code-first agents. Real systems mix them per layer."
+  - emoji: "🥗"
+    title: "Where to start"
+    text: "Most production systems use simple composable patterns (a single call, chaining, routing), not heavyweight frameworks. Start there."
+  - emoji: "🧾"
+    title: "The bill you pay regardless"
+    text: "A debugging layer between you and the API, version churn, lock-in to its mental model and hidden token overhead, whether you needed the framework or not."
+  - emoji: "🎯"
+    title: "The senior skill"
+    text: "Knowing what frameworks do is table stakes. Naming the one trigger (durable state, cycles or human checkpoints) that would make you adopt one is the real skill."
+task: |
+  Prototype the shop support agent the boring way first, to prove where the framework line
+  actually is:
+
+  ```prompt
+  Prototype a support agent for an online shop as a BARE composable loop, no framework, in one
+  file: a model call with a few mock tools (getOrderStatus, getReturnPolicy), a short
+  conversation loop, and simple branching on the result (order delayed -> apologize and give the
+  new date; return request -> explain the policy). Get it answering a two-turn exchange. Then,
+  at the bottom, write the single trigger that would justify adopting LangGraph instead
+  (durable state, cycles, or human-approval checkpoints) and which one this agent would hit
+  first. Finally, sketch the graph it would become once it gains a createReturnRequest tool
+  that needs human approval before acting: list the nodes, the edges and where the checkpoint
+  sits.
+  ```
+
+  **If you code:** let your coding agent (Claude Code, Cursor, Codex, Copilot) write it, then read
+  every line of the loop. **No-code path:** build the same agent with n8n's AI Agent node and two
+  mock tools, and list which parts n8n manages for you (memory, tool routing, retries): that list
+  is exactly what a framework buys.
+
+  Success: a working vanilla (or no-code) agent loop, a named trigger (state/cycles/checkpoints) that would flip you to a framework, and a node-and-edge sketch of the graph version.
+selfCheck:
+  - q: "A colleague scaffolds LangChain, a vector-store wrapper and an agent executor for a feature that turns a form submission into one summary email. What do you say?"
+    a: "Vanilla wins: it's a single call (assemble the prompt, call the model, validate, send). The framework adds a debugging layer, version churn and lock-in while removing nothing. Use the provider SDK in one small function, and revisit only if the feature grows state, branches or approvals."
+  - q: "Your hand-rolled support agent must now pause for a manager's approval on large refunds, sometimes for hours, and resume where it left off even after a server restart. What changed, and what do you reach for?"
+    a: "It now needs durable state and a human checkpoint, which is exactly the trigger. Either adopt a graph runtime with checkpointing (LangGraph's home turf) or build a persisted state machine yourself, and be honest that the second option means rebuilding what the framework already does."
+  - q: "Your RAG project's hard part is ingesting thousands of PDFs, spreadsheets and slide decks full of tables, and keeping the index fresh. Which framework's home turf is that, and do you also need LangGraph?"
+    a: "That's LlamaIndex: loaders, parsing, chunking, indexing and retrieval. You'd add LangGraph only if the agent flow on top needs state, cycles or checkpoints; a single retrieve-then-answer path doesn't."
+mcq:
+  - q: "After you moved a feature onto a framework, your token bill is 40% higher than your own prompts explain. What's the first step?"
+    options:
+      - "Switch to a cheaper model for every step"
+      - "Trace the calls and read what's actually sent"
+      - "Shorten your own prompts to make up the gap"
+      - "Upgrade the framework to its latest release"
+    answer: 1
+    explain: "Frameworks can add hidden prompts or default memory to every call, so trace what's actually sent before changing anything. Trimming your own prompts or swapping models treats the symptom while the overhead stays."
+  - q: "A routine dependency update breaks your agent in production, even though you changed none of your own code. What practice prevents this?"
+    options:
+      - "Pin versions and upgrade on purpose, with evals"
+      - "Always run the latest release to get fixes"
+      - "Replace the framework with a different one"
+      - "Add retries around every framework call"
+    answer: 0
+    explain: "Fast-moving frameworks churn, so pin versions and upgrade deliberately, rerunning your eval set each time. Retries can't fix code that changed underneath you, and switching frameworks just moves the churn somewhere else."
+  - q: "Your manager asks which of these four planned features would justify adopting LangGraph. Which one?"
+    options:
+      - "A form that turns each submission into a summary email"
+      - "A pipeline that tags, then translates, then files tickets"
+      - "An onboarding agent that pauses days for HR sign-off"
+      - "A chatbot that routes questions to one of three prompts"
+    answer: 2
+    explain: "Pausing for days and resuming, possibly after a restart, needs durable state and a human checkpoint, which is a graph runtime's home turf. A single call, a fixed sequence and simple routing are composable patterns that stay vanilla."
+  - q: "Your hand-rolled agent restarted mid-run and then sent the same customer email twice. What's the underlying problem?"
+    options:
+      - "The model forgot it had already sent the email"
+      - "The loop's turn cap was set too high for the task"
+      - "The email tool needed a stricter argument schema"
+      - "State lives in memory and actions aren't idempotent"
+    answer: 3
+    explain: "After a restart, in-memory state is gone, so the run replays from an earlier point and repeats a side effect. Persist state and make actions idempotent, or adopt a runtime with checkpoints. Blaming the model misses that the record of the send was lost with the process."
+backupResources:
+  - label: "Building effective agents — Anthropic"
+    url: "https://www.anthropic.com/research/building-effective-agents"
+    type: "reference · deep dive"
+  - label: "LangGraph documentation"
+    url: "https://docs.langchain.com/oss/python/langgraph/overview"
+    type: "docs · official"
+  - label: "LlamaIndex documentation"
+    url: "https://docs.llamaindex.ai/"
+    type: "docs · official"
+tags:
+  - agents
+  - langgraph
+  - llamaindex
+  - frameworks
+  - applied-ai
+---
+
+Applied-AI job listings name **LangGraph, LlamaIndex, LangChain and the OpenAI Agents
+SDK** often enough that you should know what each one does. But the senior skill is
+knowing **when you don't need them**. This lesson gives you both: fluency in what they do,
+and a clear rule for when one earns its place in your codebase.
+
+## What frameworks actually give you
+
+You built an agent loop by hand earlier in this pillar (→ build-agent-in-code): LLM call,
+tool request, execute, feed the result back, repeat. Frameworks industrialize that loop:
+
+- **State management.** Durable state across steps, resumable after crashes, and
+  checkpoints a human can approve before the agent continues.
+- **Graphs, not lines.** Branching, parallel paths and cycles ("critique your answer, then
+  retry") as explicit nodes and edges you can visualize.
+- **Plumbing.** Retries, streaming, memory and a large catalog of pre-built tool and
+  retrieval integrations.
+
+## The cast, in one line each
+
+- **LangGraph**: the low-level **runtime**. Agents as state machines with nodes, edges,
+  cycles and checkpoints; the durable base the higher layer builds on.
+- **LangChain**: the **high-level agent layer that runs on LangGraph's runtime**, not a
+  legacy tool it superseded. The fast path to a working agent, with LangGraph underneath
+  when you need fine control. Both reached a stable 1.0 on 22 October 2025
+  ([LangChain's announcement](https://blog.langchain.com/langchain-langgraph-1dot0)).
+- **LlamaIndex**: the **data framework**. Ingestion, parsing, chunking, indexing and
+  retrieval; strongest when the RAG pipeline is the hard part.
+- **smolagents** (Hugging Face): minimal, code-first agents that write Python instead of
+  JSON tool calls. Good for learning and lightweight jobs.
+- **Vendor agent SDKs**: the OpenAI Agents SDK, Google's Agent Development Kit and the
+  Claude Agent SDK give you a thin agent loop tuned to one provider's models, usually with
+  ways to call others. CrewAI is a popular option for multi-agent "crews".
+
+## When vanilla wins
+
+Anthropic's widely cited engineering post *Building effective agents* (in the backups)
+makes the point plainly: the most successful production systems tend to use **simple,
+composable patterns** (a single call, prompt chaining, routing) rather than heavyweight
+agent frameworks. A framework earns its place when you need durable state, complex
+branching or human checkpoints. It costs you a debugging layer, version churn and lock-in
+from day one.
+
+## Worked example: one support agent, two ways
+
+Take a support agent for an online shop with two tools, `getOrderStatus` and
+`getReturnPolicy`.
+
+1. **Vanilla version.** A list of messages and a loop: call the model with the tools; if it
+   asks for a tool, run it and append the result; otherwise return the answer. Around 60
+   lines in any language, and every line is yours to debug.
+2. **Add branching.** Simple questions get answered; return requests get the policy first.
+   Still vanilla: that's an `if` on the model's classified intent.
+3. **Add a human checkpoint.** Refunds over a set amount need a manager's approval, which
+   can take hours. Now you need to save the conversation and pending action somewhere,
+   resume after a server restart, and make sure the refund never runs twice. You're
+   writing a state store, resume logic and idempotency checks.
+4. **That's the trigger.** Step 3 is what a graph runtime gives you: nodes (`classify`,
+   `lookupOrder`, `answer`, `proposeRefund`, `humanApproval`, `executeRefund`), edges
+   between them, an interrupt before `executeRefund`, and a checkpointer that persists
+   state. LangGraph now earns its costs.
+
+The framework didn't become right because the agent got "serious". It became right at the
+exact moment you needed durable state and a human pause.
+
+> 💡 **Try it:** Pick one AI feature or automation you have (or want). Answer three yes/no
+> questions: does it keep state across more than one request? Does it loop or branch back
+> on itself? Does it pause for a human? Zero yeses means vanilla. One or more means a
+> framework is worth a look.
+
+## Common failure modes
+
+- **Stack traces run through five layers you didn't write** → a framework was adopted for
+  a one-call feature → strip it back to the provider SDK.
+- **A routine upgrade breaks the app** → a fast-moving dependency isn't pinned → pin
+  versions and upgrade deliberately, rerunning your eval set each time.
+- **The token bill is higher than your prompts explain** → hidden framework prompts or
+  default memory → trace the calls (→ observability-tracing) and read what's actually sent.
+- **A hand-rolled agent loses progress or repeats an action after a restart** → state
+  lives in memory and actions aren't idempotent → persist state, or adopt a runtime with
+  checkpoints.
+
+## Why this closes the pillar
+
+You now have the full applied-AI toolkit: raw API skills, RAG, agents, MCP, evals, cost
+control, fine-tuning judgment, system design, observability, security, local models, and
+the judgment to keep the stack as boring as the problem allows. That last part is what
+experienced reviewers look for in your code.

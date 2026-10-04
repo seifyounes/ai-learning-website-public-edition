@@ -1,0 +1,195 @@
+---
+title: "Scaffold a project fast with AI"
+summary: "Get a new project running fast with an AI app builder or coding agent, then move the code into your own repo and tools."
+changeNote: "New: a landing-page worked example, a failure-modes list, one task that scaffolds and then makes a scoped fix, a builder-or-codebase decision, and AGENTS.md named first."
+section: foundations
+pillar: shipping-apps
+order: 3
+level: intermediate
+estMinutes: 14
+taskMinutes: 50
+prerequisites: [idea-to-spec, choosing-your-stack]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "OZOokCf2R_4"
+  published: "2026-01-01"
+  year: 2026
+  minutes: 33
+  title: "I Ranked Every AI App Builder for 2026: Lovable vs. Bolt vs. Replit vs. Cursor (No Code)"
+  channel: "Build Great Products"
+  why: "A recent side-by-side ranking of the main AI app builders (Lovable, Bolt, Replit and Cursor) that judges each on what it actually produced, so you can pick a starter by its real strengths rather than its marketing. It's pitched at non-coders, which makes it useful whether or not you write code. It compares tools rather than building one app; for a hands-on Bolt build, see the backups."
+applyIt: |
+  Decide, for one project of your own (or the one you're planning), whether a builder is its
+  doorway or its home. Five to ten minutes.
+
+  1. **Where does it start?** An app builder (v0, Lovable, Bolt, Replit) or the framework's own
+     CLI? Most builders are strongest on the web; a native mobile app usually starts from
+     `flutter create` or `npx create-expo-app` plus a coding agent.
+  2. **When does it graduate?** Name the trigger: the first fix that breaks something else, the
+     first test you need, the first native feature.
+  3. **Where does the code live from day one?** A GitHub repo you own, even while you build in
+     the builder.
+
+  **If you code:** the graduation target is your editor and coding agent. **If you don't code
+  yet:** the target is still a GitHub export, so the code isn't stranded in one tool.
+  Success: a two-line rule you'd follow, "start in ___; graduate when ___", and a repo named for the code.
+toolkit: |
+  - **Codify "scaffold, then graduate".** Add one line to your global instruction file
+    (AGENTS.md, or CLAUDE.md / GEMINI.md for those agents; Cursor user rules): a builder gets a
+    new web project to "it runs", then the code moves into your editor and coding agent for the
+    depth.
+  - **Note each builder's limits where your agent reads them.** In a mobile project's
+    instruction file, say that it starts from the framework CLI, not an app builder, so nobody
+    (human or agent) reaches for a web builder on a native task.
+  - **Get the code out of the builder's cloud early.** Export or sync to your own GitHub repo
+    on day one, and add a `README.md` and an instruction file, so the project lives where your
+    tools, backups and history are.
+  - **Save your spec-to-builder prompt.** The prompt that turned your spec into a good scaffold
+    is reusable; keep it in your prompt library, a skill, or a ChatGPT/Claude Project so the
+    next prototype starts from it.
+recap:
+  - emoji: "🏗️"
+    title: "The slowest part of a build"
+    text: "The empty project. AI app builders turn your spec into a running skeleton in minutes, so you start from 'it works'."
+  - emoji: "🛠️"
+    title: "Which builder for which job"
+    text: "v0 for polished Next.js + Tailwind UI, Lovable or Bolt for full-stack scaffolds, Replit for an all-in-one environment. Match the tool to the job."
+  - emoji: "📋"
+    title: "What you feed it"
+    text: "Your spec. Describe the app and you get pages, components and a basic backend to build on, ideal for prototypes and MVPs."
+  - emoji: "🎓"
+    title: "The two-step pro move"
+    text: "Get to 'it runs' with a builder, then export the code into a coding agent (Claude Code, Cursor, Codex, Copilot) for refactoring, features and tests."
+  - emoji: "⚖️"
+    title: "The cost of staying inside"
+    text: "Building entirely inside a builder is fast at first but gets harder to control and maintain as the app grows."
+  - emoji: "🚪"
+    title: "Doorway or home?"
+    text: "A doorway. Treat builders as a brilliant starting point and move anything serious into a proper editor with version control."
+task: |
+  Run the scaffold-to-engineer handoff once, on something with a future: a landing page for your
+  project or app idea (most side projects don't have one, and it's the first thing anyone asks
+  for). No idea? A landing page for a small to-do app works.
+
+  1. **Scaffold.** Paste your spec (→ idea-to-spec) into **v0**, **Lovable** or **Bolt** on a free
+     tier, get it to "it runs", and export the code to GitHub.
+  2. **Engineer one bounded pass:**
+
+  ```prompt
+  I exported a landing-page scaffold for [my project, in one line] from [v0 / Lovable / Bolt].
+  Do one engineering pass: replace the placeholder copy with real copy from this description:
+  [2-3 sentences on what it does and for whom], marking anything you'd have to invent (numbers,
+  testimonials, prices) as [PLACEHOLDER]. Wire the primary button to a simple contact or
+  waitlist form, and fix the breakpoints so there's no horizontal scroll at 375px. Don't
+  redesign; change only what these need, and list the files you changed.
+  ```
+
+  3. **Check the diff yourself:** did anything outside those changes move?
+
+  **If you code:** do the pass in Claude Code, Cursor, Codex or Copilot on the exported repo.
+  **If you don't code yet:** do it through the builder's own chat, one request at a time, and
+  still export to GitHub at the end.
+  Success: the page builds and runs from your own repo with real copy, a working call to action
+  and no horizontal scroll at 375px, and nothing outside the pass moved.
+selfCheck:
+  - q: "Your builder project went well for a week, but now every fix you ask for in its chat breaks something else. What's happening, and what do you do?"
+    a: "The app has outgrown prompt-only editing: each request regenerates more than you asked for, and there are no tests or diffs to catch it. Export to GitHub, open it in a coding agent, and make scoped changes you review as diffs, with version control as your undo."
+  - q: "You need a native iOS and Android app with camera access, and a friend says \"just generate it in v0\". What do you tell them?"
+    a: "v0 is built for web UI (React / Next.js), so it's the wrong starter for a native app. Scaffold with the framework's CLI (`flutter create` or `npx create-expo-app`) and build with a coding agent; if a builder claims mobile support, check what it actually outputs before you commit."
+  - q: "What's the trade-off of building entirely inside an app builder?"
+    a: "Speed up front, less control and harder maintenance as the app grows, as the Claude Code pillar's comparison of tools showed (→ what-is-claude-code). Great for prototypes and starting points; graduate serious code into a real editor."
+backupResources:
+  - label: "The ultimate guide to Bolt.new | Build apps with AI (step-by-step) — No Code MBA"
+    url: "https://www.youtube.com/watch?v=0_Ij8FEvY4U"
+    type: "video · hands-on"
+  - label: "v0 by Vercel — AI app/UI builder"
+    url: "https://v0.dev"
+    type: "tool · official"
+tags:
+  - shipping-apps
+  - app-builders
+  - v0
+  - bolt
+  - scaffolding
+---
+
+The blank project is the slowest part of any build, and now the easiest to skip. AI app
+builders turn your **spec into a running skeleton in minutes**, so you start from "it works"
+instead of "untitled folder".
+
+## The tools
+
+You met these in the Claude Code pillar (→ what-is-claude-code); here's where each one shines:
+
+- **v0** (Vercel): generates polished React / Next.js + Tailwind UI from a prompt. A strong
+  fit if your stack is Next.js.
+- **Lovable / Bolt**: full-stack scaffolds (frontend, backend, auth, database) from a
+  description, runnable in the browser.
+- **Replit**: a full AI development environment if you want everything in one place.
+
+Paste your spec, describe the app, and you get pages, components and a basic backend to build
+on. There's also a quieter option: your **coding agent can scaffold too**. Ask Claude Code,
+Cursor, Codex or Copilot to run the framework's own starter (`npx create-next-app`,
+`npm create vite@latest`, `flutter create`, `npx create-expo-app`) and build the first screen
+from your spec. You lose the instant visual preview, but the code is in your repo from minute
+one. For native mobile, that's usually the better start.
+
+## The pro workflow: scaffold, then engineer
+
+Here's the move that separates working builds from prompt-and-pray:
+
+1. **Scaffold** with a builder → get to "it runs".
+2. **Export the code** into a coding agent → do the real engineering: refactor, add features,
+   wire up your spec properly, add tests.
+
+The builder beats the blank canvas; your skills (the whole Claude Code pillar) make it
+production-worthy.
+
+## Worked example: a landing page, end to end
+
+Say your spec is a to-do app for students. Here's the whole handoff, step by step.
+
+1. **Prompt the builder with the spec, not a vibe.** Paste the problem, user and three MVP
+   features, then ask for "a one-page landing page: headline, three feature blocks, a
+   waitlist form". The spec gives it real content to lay out.
+2. **Iterate visually, briefly.** Two or three requests in the builder's chat ("tighter
+   headline", "stack the cards on mobile") while changes are cheap and visual. Stop once it's
+   roughly right. Builders shine here.
+3. **Export or sync to GitHub.** Most builders can push to a repo or download the project. Do
+   it now, before you invest more.
+4. **Run it locally.** Clone, install, start (`npm install`, then `npm run dev` for a typical
+   JavaScript project). If it fails, the usual cause is missing environment variables; ask the
+   agent to list every one the code reads and create a `.env.example`.
+5. **Add the project's memory.** A `README.md` and an instruction file (CLAUDE.md, AGENTS.md,
+   `.cursor/rules`) describing the stack and your rules.
+6. **Do one engineering pass and commit.** Real copy, `[PLACEHOLDER]` wherever you'd have to
+   invent something, a working form. Commit with a clear message. That commit is your
+   baseline.
+
+If you don't code, steps 1–3 and the copy pass still work entirely inside the builder. The
+export simply keeps your options open.
+
+> 💡 **Try it:** Before you put an hour into any builder, open its export or GitHub-sync
+> option on a throwaway project and check what comes out. Does it run outside the builder?
+> Two minutes now saves you from discovering lock-in later.
+
+## Common failure modes
+
+- **Every fix in the builder's chat breaks something else** → the app has outgrown
+  prompt-only editing → export, then make scoped changes with a coding agent and review
+  each diff.
+- **The exported code won't start locally** → it depends on environment variables or hosted
+  services the builder set up for you → have the agent list them, fill a local `.env` file
+  from a `.env.example`, and note them in the README.
+- **Invented content ships** (fake testimonials, made-up user counts) → builders fill empty
+  slots with plausible filler → mark gaps as `[PLACEHOLDER]` and search for that marker before
+  you deploy.
+- **Credits or quota run out mid-project** → many small regenerations of the whole app → batch
+  your requests, and move to your editor once the skeleton is done.
+
+## Mind the trade-off
+
+Building *entirely* inside an app builder is fast but gets harder to control and maintain as
+it grows. So treat builders as a brilliant **starting point**, not the final home for serious
+code. Now that you have a skeleton, let's flesh out the frontend.

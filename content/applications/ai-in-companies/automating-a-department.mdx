@@ -1,0 +1,211 @@
+---
+title: "Automating a department (ops · finance · support)"
+summary: "Map one department workflow, split the fixed plumbing from the AI judgment step, and automate it with a human approval before anything goes out."
+changeNote: "New: a worked receipts-inbox example, a common-failures list, a 10-minute split of a process into plumbing, judgment and approval, and a build spec in the task."
+section: applications
+pillar: ai-in-companies
+order: 2
+level: intermediate
+estMinutes: 14
+taskMinutes: 50
+shortPath: "About 45 min: watch the video, then read the breakdown through Separate the plumbing from the judgment. Come back for the rest of the breakdown and the task: plumbing first, then the AI judgment node on 10 items."
+prerequisites: [where-ai-helps, first-automation]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "r5mXsF-fJ-o"
+  published: "2026-03-31"
+  year: 2026
+  minutes: 41
+  title: "7 Steps to Automate Any Business With AI"
+  channel: "n8n"
+  why: "Made by n8n, so every example is built in n8n, but the 7-step method for putting AI into a business process carries over to Make, Zapier or code. It's a practical, step-by-step walkthrough rather than a feature tour, which suits a lesson about one real process. Celigo's finance AP/AR walkthrough in the backups (also from a vendor) adds a department-specific example."
+applyIt: |
+  Take the #1 opportunity from your map (last lesson), or any recurring process you know, and
+  split it on paper before anyone wires anything. Ten minutes, three columns:
+
+  1. **Plumbing (no AI):** the trigger and every step that only moves, copies or reformats data.
+  2. **Judgment (AI):** the one step that reads and decides: drafting, extracting, classifying
+     or summarizing. If you find more than one, pick the one that saves the most time first.
+  3. **Approval (human):** where a person checks the output before it reaches a customer, a
+     payment or a record.
+
+  Then write one before-and-after number you'll measure (minutes per item, items per week, or
+  error rate) so → measuring-roi has something real to work with. If you need a running example,
+  use a small accounting firm's inbox: receipts arrive by email, someone types the fields into a
+  spreadsheet, and odd ones get flagged for a partner.
+
+  **As an employee or manager:** show the split to whoever owns the systems it touches (IT, ops)
+  before wiring anything. **As a consultant:** the three columns are the core of a fixed-scope
+  proposal.
+
+  Success: a three-column split with exactly one AI step, one human gate and one metric.
+toolkit: |
+  - **Draw the flow before you wire it.** Any recurring chore of yours (a weekly report, an inbox
+    triage, a data clean-up) is trigger → steps → decision → output. Sketch it in a doc before
+    building a saved prompt or an automation, or you're just automating confusion faster.
+  - **Split fixed plumbing from judgment in your own setup.** Scheduled tasks and Zapier, Make or
+    n8n flows fire predictably on an event; the AI step does the reading and deciding. Get the
+    wiring solid with no AI in it, then drop the judgment step in.
+  - **Save the judgment step as a reusable prompt.** Keep its instructions, allowed categories and
+    output format in one saved prompt or doc, with a dated change note, so a change is something
+    you test rather than an edit you forget.
+  - **Keep a human in the loop, then promote.** Route AI output to a drafts folder, a review
+    channel or an approval step first, and promote a step to autonomous only once it's proven on
+    real volume. Log before/after numbers in a notes file so → measuring-roi runs on real
+    numbers, not vibes.
+recap:
+  - emoji: "📐"
+    title: "Before the first node"
+    text: "Draw the manual process: trigger → steps → decisions → output. Ask the person who does it today for the edge cases nobody wrote down."
+  - emoji: "🔧"
+    title: "Two kinds of work"
+    text: "Every process is deterministic plumbing (move this data, when X do Y) plus judgment (read this and decide). They need two different tools."
+  - emoji: "🚰"
+    title: "The build order"
+    text: "Wire the plumbing in n8n, Make or Zapier with no AI, prove the data flows, then drop LLM steps into the judgment nodes. Now a break is either a wiring or a prompt problem."
+  - emoji: "🧠"
+    title: "The LLM's only job"
+    text: "Drafting, extracting, classifying, routing or summarizing; the workflow engine does the wiring. Keeping them separate keeps the whole system debuggable."
+  - emoji: "🙋"
+    title: "How a step earns autonomy"
+    text: "Start with AI proposes, human approves, especially for anything customer-facing or money-touching. Promote a step to automatic only once accuracy is proven and the risk is low."
+  - emoji: "📏"
+    title: "Numbers you'll need twice"
+    text: "Hours, cost and error rate, before and after. They prove the automation worked, and they feed the ROI lesson that closes the track."
+task: |
+  Build one bounded trigger → AI → output automation (e.g. triaging customer feedback, a shared
+  support inbox, or survey comments) and run 10 real items through it. Deterministic plumbing
+  first: wire the trigger (new email, new form entry, new row) and the steps that normalize and
+  route the data with NO AI, and test them on two items. Then add the AI judgment node:
+
+  ```prompt
+  Configure the AI judgment node for a bounded trigger→AI→output automation (feedback triage:
+  classify each message bug / praise / feature-request / billing, draft a reply, flag ones
+  needing a human). Write its system prompt: role, the allowed output categories, the exact
+  fields it receives, the exact JSON schema to return, and a rule to escalate low-confidence
+  items. I'll run 10 real messages through it, compare each to how I'd handle it by hand, and
+  log time saved and every error. Then tell me the single prompt change to make before I re-run.
+  Success: 10 items classified, error count logged, one concrete prompt fix identified.
+  ```
+
+  **Tools:** n8n (free to self-host), Make and Zapier all have free tiers for a 10-item test.
+  **No automation tool yet?** Do the judgment node by hand: paste the system prompt and the 10
+  messages one at a time into any chat assistant, and log results in a spreadsheet with columns
+  for AI answer, your answer, match, and seconds saved. Use your own team's messages only if
+  you're allowed to paste them into that tool (→ governance-security); otherwise anonymize them.
+  Keep a human-approval checkpoint on the output, then re-run after the fix.
+selfCheck:
+  - q: "Your receipt-extraction flow passed testing, but this week it wrote three rows with the total in the date column. Is it a wiring problem or a prompt problem, and how do you tell?"
+    a: "Look at the AI node's raw output for those items. If the JSON is right, the mapping into the sheet is wrong (wiring); if the JSON itself is wrong, it's the prompt or schema. Either way, add a validation step that rejects rows whose fields fail basic checks."
+  - q: "A colleague wants the AI to send support replies straight to customers from day one, 'to save the most time.' What do you propose instead?"
+    a: "Start with AI drafts and a person approves, and log how often drafts need changing. Promote the most reliable reply types to automatic only once the error rate on real volume is low, and keep anything involving money or complaints human-approved."
+  - q: "Where does AI fit inside an automation?"
+    a: "In the judgment steps (drafting, extracting, classifying, routing, summarizing), while the automation tool handles the deterministic plumbing: triggers, moving data between systems, and conditional logic. AI does the thinking; the workflow engine does the wiring."
+backupResources:
+  - label: "AI in Finance: How Teams Automate AP & AR Workflows — Celigo"
+    url: "https://www.youtube.com/watch?v=kPkbx61_2Xs"
+    type: "video · finance example"
+  - label: "n8n templates library — pre-built automation recipes"
+    url: "https://n8n.io/workflows/"
+    type: "tool · templates"
+tags:
+  - companies
+  - automation
+  - operations
+  - workflows
+---
+
+This is where the map becomes real. You picked a high-value, high-feasibility task last lesson;
+now you **automate it end to end** for one department. The skills are the same ones from the
+workflows pillar. Here you point them at a single business process and ship it.
+
+## Document the process first
+
+The most common mistake is building the automation before you understand the manual process.
+Draw the current workflow as a flowchart: **what triggers it, what steps happen, what decisions
+get made, and what comes out the other end.** Talk to the person who does it today; they know the
+edge cases that aren't written down. A clear flowchart is your spec. Without it, you're automating
+confusion.
+
+## Separate the plumbing from the judgment
+
+Every business process is a mix of two things:
+
+- **Deterministic plumbing**: move this data from email to spreadsheet, when X happens do Y, send
+  this to that system. This is classic automation, and **n8n, Make or Zapier** handle it
+  predictably. (If you code, a small script or serverless function does the same job.)
+- **Judgment**: read this and decide, draft a reply, pull the right fields out of a messy
+  document, route this ticket to the right team. This is where an **LLM step** goes.
+
+Build the plumbing first with no AI, prove the data flows, *then* drop AI into the judgment nodes.
+This separation keeps the system debuggable: when something breaks you know whether it's a wiring
+problem or a prompt problem.
+
+Make the AI node return **structured output**, a fixed JSON shape, rather than free text, and
+validate it before anything downstream uses it (→ structured-outputs-tools). A rule like "total
+must be a number, date must parse" catches most bad extractions before they reach a spreadsheet.
+
+## Department patterns
+
+- **Operations**: onboarding checklists, data entry between tools, status reports, scheduling.
+- **Finance**: invoice and receipt extraction (accounts payable), reconciliation, expense
+  categorization, payment-reminder drafts. Always human-approved before money moves
+  (→ governance-security).
+- **Support**: ticket tagging and routing, draft-first replies from your knowledge base,
+  escalation triage, summarizing long threads for the next agent.
+
+## Worked example: a receipts inbox
+
+A small accounting firm receives client receipts by email, and someone types each one into a
+spreadsheet. Here's the build:
+
+1. **Trigger (plumbing).** A new email with an attachment arrives in the shared receipts inbox.
+2. **Normalize (plumbing).** Save the attachment; convert it to text or an image the model can
+   read; record the sender and the client it belongs to.
+3. **Extract (AI judgment).** One LLM step returns JSON: vendor, date, total, tax, currency,
+   category and a confidence level. Its prompt lists the allowed categories and says to mark
+   anything unclear as low confidence rather than guess.
+4. **Validate (plumbing).** Check the total is a number, the date parses, and the currency is
+   expected. Failures and low-confidence items go to a "needs review" tab.
+5. **Approve (human).** A staff member checks the pending rows and approves them into the
+   ledger sheet. Unusual items are flagged to a partner, as before.
+6. **Measure.** Before launch, time 20 receipts done by hand. After launch, time the review of
+   20. That pair of numbers is your result.
+
+Receipts contain personal and financial data, so use tools your firm has approved for it.
+
+> 💡 **Try it:** Paste three real-looking (or invented) receipt emails into ChatGPT, Claude or
+> Gemini with: "Extract vendor, date, total and currency as JSON. If a field is unclear, set it
+> to null." Check each field by eye. Five minutes shows you where the judgment node will
+> struggle.
+
+## Human-in-the-loop, then promote
+
+Start with **AI proposes, human approves.** This is non-negotiable for anything customer-facing or
+money-touching. Run it on real volume, watch the error rate, and tune the prompt, kept versioned
+like code (→ prompt-as-code). Only once a step is reliably accurate *and* low-risk do you promote
+it to fully automatic. The goal isn't to remove humans; it's to remove the *boring* part and let
+humans spend their judgment where it counts.
+
+## Common failure modes
+
+- **Garbage rows in the sheet** → the AI's output went straight downstream → require JSON and
+  add a validation step that routes failures to review.
+- **It fails quietly for days** → no error handling → add an error branch that alerts a named
+  person when any step fails.
+- **Odd inputs break it** → you tested only clean examples → build a test set of messy real
+  cases (multi-page, foreign currency, photos) and re-run it after every prompt change.
+- **Nobody knows which prompt is live** → edits made directly in the tool → keep the prompt in a
+  versioned file and note every change.
+
+## Instrument it
+
+Capture the **before** (hours a week, cost, error rate) and the **after.** You'll need those
+numbers twice: to know the automation actually worked, and for the ROI lesson that closes this
+track.
+
+## Next
+
+One automated task is a win. A team that can *find* answers in its own company's knowledge gets
+more done every day: the internal AI assistant.

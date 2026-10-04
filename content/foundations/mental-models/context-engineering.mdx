@@ -1,0 +1,302 @@
+---
+title: "Context engineering"
+subtitle: "The current foundation"
+summary: "Decide what an assistant sees at each step of a long chat or agent session using four moves: write, select, compress and isolate."
+changeNote: "New: each of the four moves shown in a chat app as well as a coding agent, a common-failures list, and a video that starts right at its 31-minute framework section."
+section: foundations
+pillar: mental-models
+order: 5
+level: intermediate
+estMinutes: 16
+taskMinutes: 25
+prerequisites: [tokens-and-context, prompting-in-2026]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "_IlTcWciEC4"
+  published: "2025-09-11"
+  year: 2025
+  minutes: 63
+  start: 356
+  watchMinutes: 31
+  title: "Context Engineering for Agents"
+  channel: "Latent Space (Lance Martin)"
+  why: "Lance Martin (then at LangChain) reduces the whole discipline to four moves (Write, Select, Compress, Isolate), and the same four map closely onto Anthropic's written guidance linked below, so you learn one vocabulary that works across vendors. Most videos on context engineering are a list of tips; this one gives you a framework you can apply to a chat, a coding agent or an app."
+  notes:
+    - "It's a long podcast episode: the framework itself runs 5:56–37:25, and the player starts at 5:56."
+    - "His demos use LangGraph, a developer framework you don't need; this lesson translates each move into what you'd do in a chat app and in a coding agent."
+readAfter:
+  - label: "Anthropic — Effective context engineering for AI agents (Sep 2025)"
+    url: "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+    kind: article
+applyIt: |
+  Before you run the four moves on a live session, map them onto the tool you actually use, so
+  they become habits rather than theory. Five minutes: for each move, write one line naming the
+  concrete thing you'd do in your own setup, then circle the one you never do today.
+
+  - **Write** — where load-bearing decisions go (a notes doc, a Project's instructions, a plan
+    file).
+  - **Select** — how you hand over only the slice a step needs (one section, not the whole
+    handbook; a file path, not the repo).
+  - **Compress** — how you shrink a long run (a 10-line brief into a fresh chat, or your agent's
+    compaction command with a focus line).
+  - **Isolate** — where side research goes (a separate chat, a deep-research run, a subagent).
+
+  **If you don't code yet:** map them onto ChatGPT, Claude or Gemini: Projects, file uploads,
+  "give me a brief of this chat", a second chat.
+
+  Success: four one-line habits for your own assistant, with the move you skip most circled.
+
+  **If you code:** map them onto your coding agent: its rules file (AGENTS.md, or CLAUDE.md /
+  GEMINI.md), on-demand file reads, `/compact` or its equivalent, subagents.
+
+  Success: four one-line habits for your agent, with the move you skip most circled.
+toolkit: |
+  - **Keep your always-loaded instructions lean.** ChatGPT, Claude and Gemini custom instructions
+    and saved memories ride along on every chat. Keep them to the few standards that apply
+    everywhere and push job-specific detail into a Project or Gem for that job. That's Select
+    applied to your whole setup.
+  - **Make "write before you compress" a habit.** Before you start a fresh chat on a long piece of
+    work, ask the assistant for the decisions you can't lose and paste them into a notes file or
+    the Project's instructions. The new chat's brief can then drop the chatter without losing the
+    facts.
+  - **Give heavy research its own chat.** When a question would pull dozens of documents into your
+    main conversation, run it in a separate chat or a deep-research run and bring back only a
+    five-line answer. When you ask for a review, give that chat the draft and the goal, not your
+    own self-assessment.
+  - **Bake repeated context once.** If you paste the same preamble every week (your audience, your
+    tone, your course or product), move it into a durable home: a ChatGPT or Claude Project, a
+    Gemini Gem, a Custom GPT, or a saved snippet you paste with one shortcut.
+
+  **If you use a coding agent:**
+
+  - **Apply the four moves to the agent's setup.** Keep a global AGENTS.md or CLAUDE.md (or Cursor
+    and Copilot rules) to load-bearing standards with project specifics in per-project files
+    (→ claude-md-and-memory), write decisions to a plan file before `/compact`, and send big
+    searches to a subagent.
+recap:
+  - emoji: "🎯"
+    title: "Where the lever moved"
+    text: "The lever moved from phrasing one prompt well to controlling what fills the model's window. You engineer the context, not the sentence."
+  - emoji: "🩸"
+    title: "Why more isn't better"
+    text: "Every token competes for attention and a stuffed window rots. Spending that budget well, turn by turn, is the actual job."
+  - emoji: "📝"
+    title: "Move one: Write"
+    text: "Push state out of the window into files, notes, and memory so it survives long runs and compaction. The window is RAM; files are disk."
+  - emoji: "🎣"
+    title: "Move two: Select"
+    text: "Pull in the exact context a step needs at the moment it needs it, instead of pre-loading everything up front and hoping."
+  - emoji: "🗜️"
+    title: "Move three: Compress"
+    text: "Summarize the history and trim bloated tool output so the window keeps room for signal instead of drowning in transcript."
+  - emoji: "🧩"
+    title: "Move four: Isolate"
+    text: "Hand a messy subtask its own clean context and let only the distilled result come back. One window never has to hold it all."
+  - emoji: "♻️"
+    title: "The preamble you keep retyping"
+    text: "Context you supply over and over gets frozen into a durable asset, so you spend those tokens once and reuse them for free."
+task: |
+  In your longest-running AI session (a coding agent in your repo, or a long research or
+  writing chat you still rely on), run one deliberate curation pass, then act on it with
+  **Write-then-Compress**:
+
+  ```prompt
+  We're deep in this session. Before we continue, run a context-curation pass and output four
+  sections — don't change anything yet:
+  1) SELECT — which files, documents or tool results do you still need for the current task,
+     and which are stale context we can drop?
+  2) WRITE — the 2-3 decisions I can't afford to lose if this conversation is summarized,
+     written as durable lines for a notes file or the rules file (AGENTS.md or CLAUDE.md).
+  3) COMPRESS — a lean brief of everything above that I could start a fresh session from.
+  4) ISOLATE — any side investigation (a big search, a doc trawl) that belongs in its own
+     session or subagent instead of this one.
+  ```
+
+  Save the WRITE lines first, where a summary can't touch them. Then compress: in a coding
+  agent run `/compact` (or your tool's equivalent) with a focus line ("keep the data model +
+  current task; drop the raw file dumps and the dead end we abandoned"); in a chat app, start a
+  fresh chat from the brief. Afterwards, note one fact the summary still dropped that you had to
+  restore by hand.
+
+  Success: a four-part curation plan, the decisions saved before the compression, and one thing
+  you can name that the summary still lost.
+selfCheck:
+  - q: "Forty turns into a long session (a coding agent in your repo, or a chat where you're drafting a report) the assistant starts repeating work it already did and contradicting a decision you made early on. What do you reach for, and what's the wrong instinct?"
+    a: "Compress: the window is full and rotting. Write the load-bearing decisions somewhere durable first (a notes file, the project's instruction file), then summarize: `/compact` in a coding agent, or a short brief pasted into a fresh chat. The wrong instinct is to re-paste everything; a bigger context makes the rot worse, not better."
+  - q: "You're asking an assistant about one chapter of a 30-chapter handbook. You could upload all 30 chapters so it 'has everything', or give it the table of contents and paste chapters as it asks for them. Which is the context engineering choice, and why?"
+    a: "The second (Select, just-in-time). Loading all 30 spends window and attention on 29 irrelevant chapters and speeds up context rot; pulling the relevant chapter at the moment it's needed keeps every token in the window useful. Coding agents do the same when they search and read files on demand instead of loading the whole repo."
+  - q: "A research pass would drag 200 KB of docs into your main session. How do you keep that from poisoning the rest of the work?"
+    a: "Isolate it in a subagent with its own window: it burns that context on the search and returns only the distilled answer, so your main thread never holds the 200 KB. Isolation is a context-management tool, not just a parallelism trick."
+  - q: "You keep re-explaining your project's stack and writing style at the start of every session. What does 'bake the context once' tell you to do, and when is it worth it?"
+    a: "Promote that repeated context out of the prompt into a durable asset — the project's instruction file (CLAUDE.md, AGENTS.md, Cursor rules), a skill or saved prompt, or a ChatGPT/Claude Project — so it loads automatically and you never re-supply it. The signal that it's worth graduating a prompt: frequency × shared-context × reuse; a preamble you type weekly clears that bar easily."
+mcq:
+  - q: "You're about to move a long trip-planning conversation into a fresh chat, using a summary the assistant wrote. What should you do first?"
+    options:
+      - "Ask for the longest, most complete summary it can write"
+      - "Copy the whole old conversation into the new chat too"
+      - "Nothing more: a good summary keeps every key decision"
+      - "Save the must-keep decisions outside the chat first"
+    answer: 3
+    explain: "A summary can quietly drop a load-bearing fact, so write the decisions (dates, budget, bookings) to a note or the Project before you compress. Copying the old conversation across brings back the very clutter that made the chat drift."
+  - q: "You spend an hour in one chat explaining why your cover letter is strong, then ask that same chat for a tough critique. It's mostly praise. What's the better move?"
+    options:
+      - "Ask a new chat, giving it just the letter and the job ad"
+      - "Ask the same chat again to be brutally honest this time"
+      - "Paste your notes on its strengths so it has full context"
+      - "Ask the same chat again, with a more powerful model"
+    answer: 0
+    explain: "Your hour of reasoning sits in the window and steers the review toward agreement; isolating the critique in a clean chat with only the letter and the goal gets an honest read. Asking for brutal honesty in the same chat leaves the steering context exactly where it was."
+  - q: "A shop's support assistant runs on a 15-page instruction document. After a 16th page of rare edge cases is added, answers to everyday questions get worse. What's the most likely reason?"
+    options:
+      - "A model can only obey a fixed number of rules at once"
+      - "Rarely used rules dilute attention on every question"
+      - "The window is now full, so the first pages are dropped"
+      - "The document needs XML tags to be read reliably"
+    answer: 1
+    explain: "Every token competes for attention, so material irrelevant to most questions dilutes the signal even with plenty of room left. Sixteen pages is far from a modern window's limit, so nothing is falling off the edge; selecting the rules each question needs is the fix."
+  - q: "You're tidying the custom instructions that ride along on every chat you start. Which item has earned its place there?"
+    options:
+      - "The full notes from this month's biggest project"
+      - "Every report template you have ever used at work"
+      - "Your preferred tone and the language you write in"
+      - "The reading list for one course you take this term"
+    answer: 2
+    explain: "Always-loaded instructions should hold only what applies everywhere, and tone and language do. Project notes, a template archive or one course's reading list matter to one job, so they belong in that job's Project or Gem, loaded only when you're doing it."
+backupResources:
+  - label: "Beyond the basics with Claude Code — the context economy (Anthropic, May 2026)"
+    url: "https://www.youtube.com/watch?v=tuY2ChJIx48"
+    type: "video · official · context economy"
+  - label: "Context Engineering: 7 rules + meta-laws — Dr. Maryam Miradi"
+    url: "https://www.youtube.com/watch?v=wgDzOSPbTqg"
+    type: "video · named rules"
+  - label: "Harrison Chase (LangChain) on context engineering — Sequoia Training Data"
+    url: "https://www.youtube.com/watch?v=vtugjs2chdA"
+    type: "video · strategic framing"
+tags:
+  - context-engineering
+  - agents
+  - compaction
+  - memory
+  - claude-code
+---
+
+Prompt engineering was table stakes — the craft of phrasing one request well (that's the
+previous lesson, → prompting-in-2026). The skill that actually decides whether an *agent*
+succeeds over a long run sits one level up: **context engineering** — deciding what occupies the
+model's window at every single turn. Anthropic published its guidance for agents in September 2025
+(linked below), and it's the current foundation everything else stacks on.
+
+## From prompt to context
+
+A prompt is one message. **Context is everything the model sees when it generates the next
+token**: the app's hidden instructions, your custom instructions or instruction file
+(`CLAUDE.md`, `AGENTS.md`), the whole conversation so far, any files you attached, and the
+results of any searches or tools it ran. On a one-shot question the two are nearly identical.
+
+In plain terms: imagine briefing a brilliant temp who forgets everything the moment they leave
+the room. What's on their desk *right now* is all they have. A long chat to plan a trip, a
+research session with five uploaded PDFs, a 90-minute coding-agent session: in each, you write a
+handful of prompts, but the desk gets re-stacked dozens or hundreds of times as files, search
+results and old replies pile up. Engineer *that* and you're steering; polish the wording alone and
+you're rearranging one message inside a moving river.
+
+## Curate the tokens, every turn
+
+The core discipline is unglamorous: **treat the window as a finite budget you actively spend, turn
+by turn.** You already know *why* it's finite and why a stuffed window degrades — tokens, the
+window, and "lost in the middle" were the earlier lesson (→ tokens-and-context). Context
+engineering is what you *do* about it. Every token you add is a bet that it earns its attention;
+irrelevant tokens don't just cost money, they dilute the signal and drag the model toward the wrong
+thing ("context rot"). More context is routinely *less* intelligence. So each turn is subtraction as
+much as addition: keep the window dense with exactly what this step needs and nothing it doesn't.
+
+## Write, Select, Compress, Isolate
+
+Lance Martin's framework gives you four moves — the whole discipline factors into these, and each
+maps onto something you can do in a chat app or a coding agent:
+
+- **Write** — push state *out* of the window so it survives. Scratchpad notes, a plan file, the
+  TODO list, a rules file (`AGENTS.md`, `CLAUDE.md`) as durable memory. The window is working
+  memory; files are long-term memory. (Structuring that rules file → claude-md-and-memory.)
+- **Select** — pull the *right* context *in* at the moment you need it: read a file, search the
+  codebase, call a tool, load a skill. Retrieval on demand, not everything up front.
+- **Compress** — shrink what's already in the window while keeping the signal: summarize the
+  history, cut a 500-line tool dump down to the ten lines that mattered.
+- **Isolate** — split context across boundaries so no single window has to hold it all: hand a
+  subtask to a subagent with its own clean window.
+
+Martin demos this in LangGraph; ignore the framework and keep the moves. **In a chat app** they
+are: a notes doc or Project knowledge (Write), pasting only the section you need (Select), "give
+me a brief of this chat so far" before starting fresh (Compress), and a separate chat for a side
+research question (Isolate). **In a coding agent** (Claude Code, Cursor, Codex, Copilot) they are:
+instruction and plan files, on-demand file reads, `/compact` or its equivalent, and subagents.
+
+## Compaction: buy back the window
+
+**Compress** is the one you'll feel first. As a session runs, history fills the window; left alone,
+the oldest turns fall off the edge and the agent starts forgetting decisions and re-reading files it
+already saw. **Compaction** is the fix: summarize the run-so-far into a lean brief and continue from
+*that* instead of the raw transcript. Coding agents such as Codex and Claude Code do this
+automatically as you near the limit, and both let you force it with `/compact` — steer the summary
+so it keeps what matters:
+
+```prompt
+/compact keep the data-model and deploy decisions and the current task list; drop the raw file dumps and the dead-end we already abandoned
+```
+
+The trap: compaction can quietly summarize away a load-bearing fact. So **Write before you
+Compress** — promote the decisions you can't lose into a rules file (`AGENTS.md`, `CLAUDE.md`) or a
+plan file *first*, where the summary can't touch them.
+
+> 💡 **Try it:** next time a session feels like it's "getting dumber," don't re-explain everything
+> (that makes the window worse). **In a chat app:** ask "Write a 10-line brief of the goal, the
+> decisions so far and the open questions," open a new chat, paste the brief, and carry on.
+> **In a coding agent:** run `/compact` (or your tool's equivalent) with a focus line. Either way,
+> watch it get sharp again.
+
+## Just-in-time, not just-in-case
+
+The instinct to paste *everything* up front — "so the model has full context" — is the classic
+mistake. **Just-in-time retrieval** is the opposite, and it wins: keep lightweight references (file
+paths, function names, a table of contents) and let the agent pull the actual content only when a
+step needs it. Pre-loading thirty files spends your window and the model's attention on the
+twenty-nine irrelevant ones; loading by reference keeps every token live. This is why coding agents
+search and read on demand instead of ingesting your whole repo, and why a lean rules file
+(`AGENTS.md`, `CLAUDE.md`) that *points* to detail beats one that inlines all of it. Write + Select working together: persist state
+outside the window, then re-hydrate exactly the slice you need.
+
+## Isolation: a fresh window per subtask
+
+Some work is a context hazard — a research sweep that pulls 200 KB of docs, or a scan of fifty
+files. Run it in your main window and it poisons everything downstream. **Isolate** it: dispatch it
+to a subagent that gets its own clean context, burns *that* window on the mess, and returns only the
+distilled result. Your main thread stays dense; the subagent's 200 KB never touches
+it. That's the *context* reason subagents exist — separate from *how* you define and run them
+(→ subagents-and-agent-teams) and from the verifier role they can also play (→ harness-engineering).
+Here the point is one thing: **isolation is a context-management tool.**
+
+## Bake the context once
+
+The last move is about time, not one session. Some context you supply *over and over* — your stack
+defaults, an app's brand voice, the rules a task always needs. Re-typing it each session is the same
+waste as pre-loading files: pure overhead. **Bake it once** into a durable asset — a rules file such
+as `AGENTS.md` or `CLAUDE.md`, a skill, a Project — so it loads automatically and you never
+re-explain it. This is the capture →
+template → reuse loop from the prompting pillar, grown up: a prompt you use twice is worth *saving*;
+one you run weekly with the same loaded context is worth *graduating* into baked context. The signal
+to promote is **frequency × shared-context × reuse**. Your prompt library becomes your context
+library — the highest-leverage tokens you own, written down once and spent for free forever.
+
+## Common failure modes
+
+- **The assistant forgets a decision you made an hour ago** → it was only in the chat, and
+  the chat got summarized or scrolled away → write load-bearing decisions to a file or
+  Project before compressing.
+- **Answers get worse after you upload "everything"** → irrelevant material is competing for
+  attention → select: give it a table of contents and the one section that matters.
+- **A side question derails the main task** → the side research filled the window with noise
+  → isolate it in a separate chat or subagent and bring back a three-line answer.
+- **Every new session starts with ten minutes of re-explaining** → context you need every time
+  isn't stored anywhere durable → bake it into custom instructions, a Project, a Gem or an
+  instruction file.

@@ -1,0 +1,244 @@
+---
+title: "Fine-tuning fundamentals"
+subtitle: "When to tune vs RAG vs prompt"
+summary: "Decide whether a feature needs better prompts, retrieval or fine-tuning, and know what LoRA-style tuning really costs before you start."
+changeNote: "New: a worked example, a failure-modes list, and a focused task that runs one complete fine-tune in a free notebook."
+section: foundations
+pillar: applied-ai-engineering
+module: "Job-ready extras"
+order: 12
+level: intermediate
+estMinutes: 22
+taskMinutes: 35
+prerequisites: [rag-fundamentals, evals-and-testing]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "eC6Hd1hFvos"
+  published: "2023-10-01"
+  year: 2023
+  minutes: 28
+  title: "Fine-tuning Large Language Models (LLMs) | w/ Example Code"
+  channel: "Shaw Talebi"
+  why: "Shaw Talebi, a data scientist who teaches working engineers, explains what fine-tuning actually is (full tuning versus LoRA and QLoRA, and when it beats prompting), then walks through a worked example in code. It puts judgment ahead of hype, which is exactly this lesson's angle. The Hugging Face course chapter below is the current hands-on half: you fine-tune a model with the Trainer API in a free Colab, in a course maintained by the people who build the tooling."
+  notes:
+    - "Library APIs move fast, so treat the video's code as illustrative and take current code from the Hugging Face chapter below."
+readAfter:
+  - label: "Fine-tune a pretrained model — Hugging Face LLM Course, chapter 3"
+    url: "https://huggingface.co/learn/llm-course/chapter3/1"
+    kind: course
+applyIt: |
+  Take ten minutes to place one AI feature on the ladder: one you've built or plan to build, or
+  one of these if you have none (a support-reply drafter in a shop's brand voice, a classifier
+  that tags thousands of feedback messages a day into 12 fixed categories, a weekly
+  one-paragraph summary of a team's tickets). Split what it needs into two parts:
+
+  - **Knowledge:** facts that change or are private (this customer's order, this week's return
+    policy). These arrive through context, by retrieval or a lookup, never through tuning.
+  - **Behavior:** tone, format, task skill (brand voice, a strict reply shape). Prompting plus a
+    few examples usually handles it; tuning is the rung for cutting cost at volume, once an eval
+    set exists (→ evals-and-testing).
+
+  ```prompt
+  Here is an AI feature: [describe it]. Split what it needs into KNOWLEDGE and BEHAVIOR. For
+  each part, name the lowest rung that solves it (prompt, few-shot, RAG, fine-tune) and what
+  evidence would push it one rung higher.
+  ```
+
+  Write the verdict as one line you could put in a README: "we prompt because the knowledge is
+  per-customer and fresh; we'd tune only to shrink cost at scale".
+
+  Success: a written knowledge/behavior split for one feature, with a rung and a reason for each part.
+toolkit: |
+  - **Write the tune-vs-RAG-vs-prompt rule into your instruction file.** One line in
+    AGENTS.md (or CLAUDE.md / GEMINI.md for those agents), `.cursor/rules` or your Copilot
+    instructions ("fresh or per-user data goes through retrieval; fine-tune only to cut cost on
+    a narrow, high-volume task, and only once an eval set exists") guards against a premature
+    tune suggestion from your coding agent.
+  - **Treat saved prompts and skills as the "prompt until it hurts" layer.** Custom instructions,
+    a ChatGPT or Claude Project, a Gemini Gem or a saved skill shape behavior with instructions,
+    not weights: the free rung you exhaust before anyone spends a GPU.
+  - **Gate any tune on a committed baseline.** Keep your eval cases in a file next to the
+    feature and record the current score before trying a tuned model; tuning without evals is
+    spending money in a direction you can't measure.
+  - **Tag notes as behavior or knowledge.** In your project notes or memory file, mark which facts
+    are stable behavior (tone, format: tunable) and which are changing data (prices, user
+    records: retrieval only), so you never try to bake changing data into weights.
+recap:
+  - emoji: "🪜"
+    title: "Which rung first?"
+    text: "Prompt, then few-shot, then RAG, then fine-tune. Stop at the first rung that solves it; most problems never reach the top."
+  - emoji: "🧠"
+    title: "Two different gaps"
+    text: "RAG adds knowledge; fine-tuning shapes behavior. 'It doesn't know X' means retrieval; 'it doesn't act or sound right' means tuning."
+  - emoji: "📉"
+    title: "Facts in the weights?"
+    text: "Knowledge baked into weights goes stale the moment your data changes. Facts belong in the context window at request time."
+  - emoji: "🧩"
+    title: "Three flavors to name"
+    text: "SFT trains on input-to-ideal-output pairs; preference tuning (such as DPO) trains on 'this beats that'; both can run cheaply through adapters."
+  - emoji: "🪶"
+    title: "The cheap way to tune"
+    text: "LoRA freezes the base model and trains tiny low-rank adapters, a fraction of a percent of the weights, for most of the quality at a sliver of the cost."
+  - emoji: "💸"
+    title: "Where the money really goes"
+    text: "Not the GPUs: curating hundreds of clean examples, evals to prove it helped, and re-tuning on every base-model upgrade that a prompt gets for free."
+  - emoji: "⚖️"
+    title: "The practitioner's default"
+    text: "Prompt until it hurts. Tune when the math says so, usually to replace an expensive frontier model with a small tuned one on a narrow, high-volume task."
+task: |
+  Fine-tune a model once, end to end, so you know what the top rung actually involves. Open the
+  Hugging Face chapter's free Colab notebook (no setup beyond a Google account) and run the
+  cells in order, reading what each one does before you run it. As you go, write down four
+  things: the base model, how many labelled examples it trains on, how long training takes on
+  the free GPU, and what the evaluation score measures.
+
+  Then answer two questions in your notes: what would you need to collect to repeat this for a
+  feature of your own, and which rung below fine-tuning would you try first?
+
+  Success: a Colab run that finishes training and prints an evaluation score, plus four notes on what the tune took and one line on what your own version would need.
+selfCheck:
+  - q: "A support bot keeps quoting last quarter's return policy. A teammate proposes fine-tuning it on the new policy document. What do you say?"
+    a: "Wrong tool. This is a *knowledge* gap, and policies change: tuning would bake in a snapshot that goes stale again, and it doesn't reliably teach facts anyway. Put the current policy into the context at request time (retrieval or a lookup), and keep tuning for behavior."
+  - q: "A classifier tags 50,000 messages a day into 12 fixed categories using a frontier model. Quality is fine; the bill isn't. When is fine-tuning a small model the right move, and what must exist first?"
+    a: "This is the textbook case: narrow, stable task, high volume. First you need an eval set with the current model's baseline score and a few hundred to a few thousand labeled examples. Tune a small model, score it on a held-out set it never trained on, and switch only if it matches the baseline."
+  - q: "After fine-tuning, your model formats replies perfectly but handles unusual questions worse than the base model did. What probably happened, and what do you check?"
+    a: "The tune narrowed its behavior: the training data was too uniform or too small, or training ran too long. Check the data's coverage of unusual cases, compare scores per category against the baseline, and retry with more varied examples or fewer epochs, or go back to prompting."
+  - q: "What is LoRA in one sentence, and why is it the usual way to tune open models?"
+    a: "LoRA freezes the base model and trains small low-rank adapter matrices, so you get most of full fine-tuning's quality for a fraction of the compute and memory, and the adapters are small files you can swap per task."
+mcq:
+  - q: "A legal team wants its assistant to answer in their memo format every time: issue, rule, analysis, conclusion. A clear, well-written prompt gets the format right about 70% of the time. What's the next rung?"
+    options:
+      - "Fine-tune a model on the firm's past memos"
+      - "Add three example memos to the prompt"
+      - "Index the firm's memo archive for RAG"
+      - "Switch to a larger frontier model"
+    answer: 1
+    explain: "Format is behavior, and the rung after prompting is few-shot: show the model what a good memo looks like. Fine-tuning comes only if examples still fall short, and RAG adds knowledge, which isn't what's missing here."
+  - q: "You want to tune an open model with adapters, but the base model doesn't fit in your one GPU's memory. Which method fits?"
+    options:
+      - "QLoRA: adapters on a quantized base"
+      - "Full fine-tuning with a smaller batch size"
+      - "Preference tuning with DPO instead"
+      - "SFT, since it needs less memory than LoRA"
+    answer: 0
+    explain: "QLoRA trains the same small adapters on a quantized (compressed) base, which is what lets it fit on smaller GPUs. Full fine-tuning needs more memory than LoRA, not less, and SFT and DPO describe what you train on, not how cheaply you train."
+  - q: "Your tuned classifier scores 99% on its test set, far above the 91% of the prompted baseline. Then a teammate notices the test messages came from the same export as the training data. What do you suspect?"
+    options:
+      - "Fine-tuning simply beats prompting by that much"
+      - "The baseline prompt was badly written"
+      - "Test examples leaked into the training data"
+      - "The model overfit and will score lower in time"
+    answer: 2
+    explain: "Suspiciously perfect scores usually mean the model saw test items during training, so the score measures memory, not skill. Rebuild a held-out split that training never touches and rescore. A tune can beat a baseline, but only a score on unseen data shows it."
+  - q: "Six months after you tuned a small model, a much better version of its base model comes out. Your prompt-only features improved on their own. What does the tuned feature need?"
+    options:
+      - "Nothing, since adapters transfer to new bases"
+      - "A longer prompt to carry the old behaviors"
+      - "A switch back to the frontier model for good"
+      - "A re-tune and re-test on the new base model"
+    answer: 3
+    explain: "A tune is pinned to its base, so getting the upgrade means re-tuning and rerunning your evals, a maintenance cost prompts don't carry. Adapters are trained against one base's weights and don't carry over to a different model."
+backupResources:
+  - label: "Fine-tuning guide — OpenAI docs"
+    url: "https://platform.openai.com/docs/guides/fine-tuning"
+    type: "docs · official"
+  - label: "PEFT (LoRA & friends) — Hugging Face docs"
+    url: "https://huggingface.co/docs/peft/index"
+    type: "docs · official"
+  - label: "Finetuning Large Language Models — DeepLearning.AI short course"
+    url: "https://www.deeplearning.ai/short-courses/finetuning-large-language-models/"
+    type: "course · hands-on"
+tags:
+  - fine-tuning
+  - lora
+  - rag
+  - applied-ai
+---
+
+Every AI engineering interview eventually asks some version of **"would you fine-tune
+here, and why?"** It's a cheap way to test whether you understand what each technique
+actually changes. Most candidates hand-wave; this lesson gives you a method instead, and
+the same method saves real money on real projects.
+
+## The decision ladder
+
+Work upward, stopping at the first rung that solves the problem:
+
+1. **Better prompting.** Clearer instructions, structure, constraints. Free and instant.
+2. **Few-shot examples.** Show the model 3–10 examples of what good looks like.
+3. **RAG.** The model *doesn't know something* (your data, fresh facts). Retrieval puts
+   knowledge into the context window at request time (→ rag-fundamentals).
+4. **Fine-tuning.** The model *doesn't behave right* even with good prompts and examples:
+   wrong style, inconsistent format, weak at your niche task, or your prompt has grown so
+   long that every call is expensive.
+
+The one-liner worth memorizing: **RAG adds knowledge, fine-tuning shapes behavior.**
+Fine-tuning does not reliably teach facts, and any facts it does absorb go stale the moment
+your data changes. Keeping knowledge current is retrieval's job. The two also combine: a
+tuned model that writes in the right format can still answer from retrieved documents.
+
+## The three flavors you should be able to name
+
+- **SFT (supervised fine-tuning).** Train on input → ideal-output pairs. The workhorse for
+  tone, format and task skill.
+- **LoRA / QLoRA.** Not a different goal, a cheaper method. Freeze the model and train
+  small adapter matrices alongside it; QLoRA does the same on a quantized (compressed)
+  base so it fits on smaller GPUs. This is how most people fine-tune open models.
+- **Preference tuning (DPO, RLHF-style).** Train on "this answer beats that one" pairs to
+  shape judgment and style beyond what SFT captures.
+
+Hosted fine-tuning (offered by OpenAI, Google Cloud's Vertex AI and Mistral, among others)
+hides the mechanics: you upload examples and get back a tuned model ID. Which models can be
+tuned changes often, so check current docs. Open models, tuned with Hugging Face's
+libraries or tools like Unsloth, give you full control for less money and more work.
+
+## Worked example: one feature up the ladder
+
+Say you're building the classifier from the task: thousands of feedback messages a day,
+tagged into 12 fixed categories. Here's how the ladder plays out. The scores are
+illustrative, but the moves are the real ones.
+
+1. **Build the yardstick first.** Label 200 real messages by hand. Set aside 50 as a
+   held-out test set that nothing will ever be trained on.
+2. **Rung 1.** A prompt with a one-line definition of each category scores, say, 84% on the
+   held-out set. Most errors are two overlapping categories ("bug" vs "performance").
+3. **Rung 2.** Add two examples for each confusing pair and a sentence on how to tell them
+   apart: 91%. Your bar is 90%, so quality is solved here.
+4. **Skip rung 3.** Nothing is missing *knowledge*; the categories are all in the prompt.
+5. **Now the cost question.** At this volume the frontier model bill is large. That's the
+   one good reason left to climb: tune a small model with LoRA on a few thousand labeled
+   messages (labels can come from the frontier model, spot-checked by a human), then score
+   it on the same held-out 50.
+6. **Decide on evidence.** If the small model matches the bar at a fraction of the cost per
+   call, switch, and route low-confidence cases back to the frontier model. If it doesn't,
+   you've lost a few hours, not a quarter.
+
+Notice that fine-tuning entered for **cost**, not quality, and only after an eval set
+could prove it was safe.
+
+> 💡 **Try it:** In any chat assistant (ChatGPT, Claude, Gemini), ask it to classify five
+> messages into categories you make up, with no examples. Then repeat with two examples per
+> category. The jump you see is rung 2, and it's often what people think needs fine-tuning.
+
+## What fine-tuning really costs
+
+The GPU bill is the small part. The real costs are **curating hundreds of quality
+examples** (garbage in, confidently wrong out), **evals** to prove the tune helped, and
+**maintenance**: every base-model upgrade means re-tuning and re-testing, while a
+prompt-based system often just improves for free. That's why practitioners default to
+prompting until it hurts and tune when the math says so.
+
+## Common failure modes
+
+- **The tuned model states outdated facts confidently** → facts were trained into the
+  weights → move them into retrieval and tune only for behavior.
+- **Great on inputs like the training data, worse on everything else** → too few, too
+  uniform or too-long-trained examples → add varied examples, train for fewer epochs, and
+  compare against the baseline per category.
+- **Nobody can say whether tuning helped** → there was no baseline → build the eval set
+  and score the untuned model before training anything.
+- **Suspiciously perfect scores** → test examples leaked into the training data → keep a
+  held-out split that training never sees.
+- **A newer base model leaves your tune behind** → the tune is pinned to the old base →
+  budget for re-tuning, or keep a prompt-only path you can switch to.

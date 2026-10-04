@@ -1,0 +1,214 @@
+---
+title: "Mobile apps (iOS / Android) with AI"
+summary: "Choose a mobile stack and build an iOS and Android app with a coding agent, checking each change on a real device or emulator."
+changeNote: "New: a worked example that gets a first screen onto a real phone, what agents get wrong on mobile, a failure-modes list, device setup in the task, and a platform plan."
+section: foundations
+pillar: shipping-apps
+order: 6
+level: intermediate
+estMinutes: 16
+taskMinutes: 60
+shortPath: "About 40 min: read the breakdown and do the task's first part: get your app or a starter running on your phone or an emulator. Come back for the throwaway data screen and the 79-minute build video."
+prerequisites: [choosing-your-stack, frontend-with-ai, backend-database-with-ai]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "FNpQawHnIrI"
+  published: "2025-06-25"
+  year: 2025
+  minutes: 79
+  title: "Build Flutter Apps FASTER with Claude Code Opus 4 [Crash Course]"
+  channel: "Andrea Bizzotto (Code With Andrea)"
+  why: "Andrea Bizzotto is a long-established Flutter educator, and here he builds a real app (a voice timer with native permissions and speech recognition, the messy parts) with Claude Code. Most AI-coding demos stop at a pretty first screen; this one shows where the agent struggles and how he reviews its output, which is the skill that transfers. The all-caps 'FASTER' in the title is a hook; the value is in watching the review. For the Expo / React Native path, see the backups."
+  notes:
+    - "It runs on an older Claude model (Opus 4), but the one-codebase-plus-agent workflow it shows hasn't changed."
+applyIt: |
+  Before you write mobile code, settle the questions that block people later. Ten minutes, for
+  your own app or one you're planning:
+
+  1. **Which platforms does v1 need?** iPhone, Android, or both, and is a responsive web app
+     enough for now?
+  2. **Which machine builds each one?** iOS builds need a Mac with Xcode or a cloud build
+     service (EAS Build for Expo, a cloud CI service for Flutter); Android builds anywhere.
+  3. **Which real device will you test on,** and whose?
+  4. **Which native permissions will it ask for?** Camera, microphone, location, notifications:
+     each needs a declaration on each platform before the first test.
+
+  **If you code:** add the answers to your project's notes before the first build. **If you don't
+  code yet:** an Expo template previews on your phone with no Mac and no Android Studio.
+  Success: a short platform → build machine → test device list, plus every permission the app will request.
+toolkit: |
+  - **Keep platform gotchas where your agent loads them.** Paths with spaces breaking a build,
+    an SDK version pin, which machine can build iOS: write each one into the project's
+    instruction file (AGENTS.md, or CLAUDE.md / GEMINI.md for those agents; `.cursor/rules`) the
+    day you hit it, so no session rediscovers it.
+  - **Make the emulator your standing preview.** Pair the agent with a running emulator or
+    simulator and a screenshot of the target design; after each change, compare a fresh device
+    screenshot against it. That is instant visual QA, one widget at a time.
+  - **Reuse one backend everywhere.** If you also have a web app or admin page, point the
+    mobile app at the same backend project instead of forking it, and note the shared contract
+    (tables, auth, API) in your notes file so both stay in sync.
+  - **Log your framework's AI failure modes.** Watch where the agent struggles the way Bizzotto
+    does, and add each recurring mistake (wrong state-management pattern, deprecated API) to the
+    instruction file so it stops repeating them.
+recap:
+  - emoji: "🎯"
+    title: "What changed for mobile"
+    text: "You no longer need separate native teams or months of setup. One codebase plus AI can reach both iOS and Android."
+  - emoji: "📱"
+    title: "When native feel wins"
+    text: "Flutter: Dart, one rendering engine, a consistent polished UI, one codebase for Android and iPhone."
+  - emoji: "🔀"
+    title: "When web sharing wins"
+    text: "React Native + Expo: one TypeScript codebase for iOS, Android and web, with Expo handling previews, builds and native access."
+  - emoji: "🤖"
+    title: "What the agent drives"
+    text: "Claude Code, Cursor, Codex or Copilot generate screens, navigation and native-feature code; you review and engineer it, as the video does on Flutter."
+  - emoji: "🎙️"
+    title: "The app in the video"
+    text: "A voice timer, built with Claude Code: native permissions, speech recognition, the messy parts real apps hit."
+  - emoji: "🔎"
+    title: "The real lesson in the video"
+    text: "Watching an expert review the agent's output and catch where it breaks. The review pass matters more than the finished app."
+  - emoji: "♻️"
+    title: "What carries over"
+    text: "Your backend, spec, prompting and coding-agent skills. Mobile is the same workflow pointed at a new target."
+  - emoji: "⏳"
+    title: "An older model, still useful"
+    text: "The demo uses Opus 4, an older Claude model, but the Flutter + agent workflow it shows is unchanged. Watch the method, not the version."
+task: |
+  Run the core mobile loop yourself on one screen: real data in, real device out. The first wall
+  is rarely the code; it's getting a build onto a device and remembering how you did it. On a
+  scratch branch of your app, or in a fresh Flutter or Expo starter:
+
+  ```prompt
+  Help me get [my app, or a fresh Flutter / Expo starter] running on my own phone or an
+  emulator: Flutter with flutter run (iPhone builds need a Mac with Xcode, or a cloud build
+  service), or Expo with npx expo start and the Expo Go app. Go one step at a time and wait for
+  my result. Then build one throwaway screen that loads a list from my backend [or the free
+  public test API at https://jsonplaceholder.typicode.com/todos] with loading, error and empty
+  states, using the project's theme, and tell me exactly what I should see if the data loaded.
+  ```
+
+  **If you code:** run it in Claude Code, Cursor, Codex or Copilot inside the project. **If you
+  don't code yet:** start from an Expo template and let ChatGPT, Gemini or Claude walk you
+  through it. Each time something breaks, write the cause and fix into a "Build & run" section of
+  the project's instruction file (AGENTS.md, or CLAUDE.md / GEMINI.md for those agents) or
+  README. Take a screenshot on the device and check it against what the agent said you'd see.
+  If this is your first mobile setup, most of the time goes on installing tools, not the screen.
+  Success: the device shows the screen populated with real data, confirmed by your screenshot,
+  and every gotcha you hit is written down.
+selfCheck:
+  - q: "You're starting a new mobile app: when do you pick Flutter, and when Expo / React Native?"
+    a: "Flutter when native feel, one rendering engine and UI consistency come first, or when it's what you already know. Expo / RN when the product also needs a web app from the same TypeScript codebase or the team already lives in JavaScript; both reach both stores, so decide on code sharing and skills, not benchmarks."
+  - q: "A camera feature works on the Android emulator, but on an iPhone the app closes the moment the user taps \"Scan\". What's the first thing you check?"
+    a: "The iOS permission declaration: iOS ends an app that requests camera access without a usage description in `Info.plist`. Ask the agent to audit the permission entries for both platforms, then test again on a real device."
+  - q: "You're on Windows and want your app running on a friend's iPhone this week. What are your realistic options?"
+    a: "With Expo, the Expo Go app runs your project on the iPhone during development with no Mac, and EAS Build can produce iOS builds in the cloud. With Flutter you need macOS for iOS builds, so borrow a Mac or use a cloud CI service; installing a real build on someone else's iPhone also needs an Apple Developer account (TestFlight)."
+backupResources:
+  - label: "Build a Mobile App with AI! (Bolt + Expo + React Native) — Hustling Labs"
+    url: "https://www.youtube.com/watch?v=GmDYLq1Op48"
+    type: "video · the Expo/RN path"
+  - label: "Develop Mobile Apps for iOS & Android using Cursor AI (React Native + Expo) — The Metaverse Guy"
+    url: "https://www.youtube.com/watch?v=fSJj16UM990"
+    type: "video · code-first"
+  - label: "Expo — React Native docs (build for iOS + Android)"
+    url: "https://docs.expo.dev"
+    type: "docs · official"
+tags:
+  - shipping-apps
+  - mobile
+  - flutter
+  - ios
+  - android
+---
+
+This is the lesson for **building real iOS and Android apps.** The big shift is that you no
+longer need separate native teams or months of setup: one codebase plus AI can get you to both
+stores. What hasn't changed is that phones are fussier than browsers. Builds, permissions and
+devices are where mobile projects stall, so this lesson spends its time there.
+
+## One codebase, both platforms
+
+- **Flutter**: Dart, one rendering engine, a consistent and polished UI. One codebase produces
+  both Android and iPhone builds. Choose it when native feel and UI consistency are the
+  priority.
+- **React Native + Expo**: the alternative when **code sharing with web** is the goal. One
+  TypeScript codebase for iOS, Android *and* web, with Expo handling previews, builds and
+  native-feature access. The right tool when the product is web-first or the team lives in
+  JavaScript.
+
+The win either way: maximum reach for minimum duplicated work.
+
+## AI builds mobile too
+
+Everything from the web lessons transfers:
+
+- **Claude Code, Cursor, Codex or Copilot**: generate screens, navigation and native-feature
+  code, then engineer it properly. The primary video is exactly this loop on Flutter.
+- **Bolt (with Expo)**: scaffold a working React Native app from a prompt, then refine it.
+
+The genuinely mobile-specific knowledge is device setup, native permissions, store builds and
+testing on real hardware. That's what this lesson adds; AI handles the boilerplate around it.
+
+## Worked example: first screen on a real phone
+
+Here's the path from nothing to your own app on your own phone, for each stack.
+
+**Expo (fastest start, any computer):**
+
+1. Install Node.js, then create a project with `npx create-expo-app`.
+2. Run `npx expo start`. A QR code appears.
+3. Install **Expo Go** on your phone and scan it. Your app opens on the device, and each save
+   reloads it.
+4. Ask your agent for one screen (the task's list screen is a good first one) and watch it
+   appear on the phone.
+
+Expo Go covers a lot, but a library with its own native code needs a **development build**.
+When the agent suggests a package, ask whether it works in Expo Go.
+
+**Flutter:**
+
+1. Install the Flutter SDK, plus Android Studio for the Android tools (or Xcode, on a Mac).
+2. Run `flutter doctor`. It lists exactly what's missing. Fix those lines first; paste any you
+   don't understand to your agent.
+3. Plug in an Android phone with USB debugging on (or start an emulator) and run
+   `flutter run`.
+4. Same next step: one screen from the agent, checked on the device.
+
+Whichever path you take, write every snag into a "Build & run" section of the instruction file
+as you go. The task below asks for it, and it pays off the second time.
+
+> 💡 **Try it:** Already have Flutter installed? Run `flutter doctor` now and paste the output
+> to any assistant with "explain each warning and whether it blocks Android, iOS or neither".
+> On Expo, `npx expo-doctor` does a similar health check.
+
+## What agents get wrong on mobile
+
+Agents write mobile code fluently, but a few mistakes recur:
+
+- **Permissions.** Camera, microphone, location and notifications need platform declarations
+  (`Info.plist` on iOS, `AndroidManifest.xml` on Android) plus a runtime request. Code that
+  skips them may compile and then fail on a device.
+- **Mixed patterns.** Without a stated convention, the agent may use two state-management
+  approaches in one app. Name yours in the instruction file.
+- **Device realities.** The on-screen keyboard covering inputs, safe areas around notches,
+  slow networks. Emulators hide some of these, so test on a real phone.
+
+## Common failure modes
+
+- **A wall of build errors** (Gradle, CocoaPods, SDK versions) → toolchain mismatch → run
+  `flutter doctor` or `npx expo-doctor`, give the agent the full error, and record the fix.
+- **Works in the emulator, crashes on the phone** → missing permission declarations or real
+  hardware differences → audit permissions for both platforms and test on a device every time.
+- **A package won't run in Expo Go** → it includes native code → create a development build,
+  or pick a package that works in Expo Go.
+- **iOS seems impossible from Windows** → iOS builds need macOS → use Expo Go and EAS Build, or
+  a cloud CI service, and get Android working first.
+
+## Reuse what you've built
+
+Your **backend** from the last lesson (Supabase, Firebase) serves mobile *and* web, so you
+don't rebuild it. Your **spec**, **prompting** and **coding-agent** skills all apply. Mobile
+isn't a new world; it's the same workflow pointed at a new target. Next: making sure it
+actually works, with testing and QA.

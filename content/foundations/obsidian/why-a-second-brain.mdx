@@ -1,0 +1,309 @@
+---
+title: "Why a second brain"
+subtitle: "The system, not the app"
+summary: "Explain why a second brain is a habit rather than an app, and find the decisions and fixes you keep re-deriving from scratch."
+changeNote: "New: a no-code version of the repeat audit, a five-minute check of your own chat history, a common-failures list and updated plugin counts."
+section: foundations
+pillar: obsidian
+order: 1
+level: beginner
+estMinutes: 12
+taskMinutes: 30
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "DbsAQSIKQXk"
+  published: "2023-07-06"
+  year: 2023
+  minutes: 12
+  title: "Hack your brain with Obsidian.md"
+  channel: "No Boilerplate"
+  why: "Twelve minutes that argue for a second brain from a real idea, the extended-mind thesis, rather than productivity slogans, and show it inside Obsidian as he goes. Most second-brain videos sell a method or a template; this one explains why the approach works, which is the part you need before any setup. Tris Oaten pitches it at technical viewers, but the argument needs no code, and the full script is public on GitHub, written in Obsidian."
+  notes:
+    - "Watch all 12 minutes; the whole video is the argument."
+    - "It dates from July 2023, so several facts have drifted. Read the errata section in the breakdown before you act on any number, price or plugin name you hear."
+    - "When he calls backlinks 'a foreign key relationship for database nerds', that is a programmer's joke; you don't need it to follow along."
+    - "His screen shows raw YAML front matter. Since Obsidian 1.4 you get a Properties editor instead, so your screen won't match his."
+applyIt: |
+  Before you build anything, find out what a second brain would already have saved you. Most
+  people run a miniature one without naming it: a notes app, a project README, a folder of
+  lecture notes, a pile of old AI chats. Every decision (why you picked that framework, that
+  study method, that supplier) and every gotcha (the setting that broke your build, the formula
+  you always get backwards) is either captured once and findable, or re-derived from scratch the
+  next time it matters.
+
+  Spend five minutes in the place your work already leaves a trail. Write down three things you
+  have worked out more than once, and next to each the one-line note title that would have saved
+  you the repeat ("Sum one category per month", "Why we dropped the weekly survey").
+
+  **With a chat assistant (no code):** scroll your assistant's chat history for the last month
+  and look for questions you asked twice in different words.
+
+  Success: three repeats named, each with the note title that would have prevented it.
+
+  **With a coding agent:** skim your last 30 commit messages, or your agent's recent sessions,
+  for the same fix, setting or explanation turning up twice.
+
+  Success: three repeats named, each pointing at the commits or sessions where it recurred.
+toolkit: |
+  - **Run CODE on your assistant's memory, not just your notes.** You probably Capture already
+    (chat history, saved prompts); check whether anything gets Distilled. Once a month, boil the
+    corrections you keep repeating into one-line rules in ChatGPT's custom instructions, Claude's
+    profile preferences or Gemini's saved info, and delete stale entries from its memory.
+  - **Keep one decisions note per project.** One dated line per choice and its reason. Add it as
+    a file to that project's ChatGPT or Claude Project (or a Gemini Gem), so a new chat starts
+    from the history instead of you re-explaining it.
+  - **Use Express as the test.** If your saved prompts and notes never turn into output (a
+    better prompt, a write-up, a reusable template), you are hoarding. Pick one note a week and
+    make something from it.
+  - **Bet on plain files.** Assistants, plugins and apps churn; markdown on your disk doesn't.
+    Keep prompts, rules and notes as text files you own, so whichever assistant you use next
+    year can still read them.
+recap:
+  - emoji: "🧠"
+    title: "What happens to what you read"
+    text: "You consume books, talks, and shower ideas, then lose almost all of it within days. Biological memory was never built to be the storage layer."
+  - emoji: "🫀"
+    title: "A calculator as part of the mind"
+    text: "Clark & Chalmers' active externalism: a calculator or pen-and-paper is part of the thinking, not an aid to it — but only if it's constant, available, and automatically trusted. Open tabs fail that test; a vault is built to pass it."
+  - emoji: "📥"
+    title: "CODE, step one"
+    text: "Keep the ideas that strike you, fast and friction-free, into a trusted system that lives outside your head."
+  - emoji: "🗂️"
+    title: "Sorting by what, exactly?"
+    text: "Sort notes by what they're *for* — the project or output they serve — not into tidy topic categories you'll never reopen."
+  - emoji: "💧"
+    title: "The step most people skip"
+    text: "Boil each note down so future-you gets the point in seconds. This is the real work, and the step most people quietly skip."
+  - emoji: "🎨"
+    title: "What it is all for"
+    text: "Turn knowledge into output — that's the whole point. A brain that only stores is a hoarder; one that helps you create is a superpower."
+  - emoji: "📄"
+    title: "Choosing where notes live"
+    text: "Choose on data, not features. Notion's export hands back proprietary tags you can't read; markdown charges no exit tax. You're picking what survives the app — and what an agent can read later."
+  - emoji: "🔌"
+    title: "System or software?"
+    text: "CODE is the system; Obsidian just hosts it. Nail the habit and you can switch tools tomorrow without losing a thing."
+task: |
+  Audit the material you already have for things you keep re-deriving, then do the part the AI
+  can't: read its list and mark each item **keep** or **noise**. The ones you keep are your
+  vault's seed content. Lesson 2 builds the vault that holds them properly.
+
+  > 💡 Don't skip the marking. The AI finds repeats; only you know which ones actually
+  > cost you anything. That judgment is the whole skill this pillar teaches — an AI
+  > that files everything is a hoarder with better handwriting.
+
+  **With a chat assistant (no code):**
+
+  - Gather 5–10 documents you wrote recently: a semester of lecture notes, a month of meeting
+    notes, a project brief, or a long AI chat copied into a text file. You don't need Obsidian
+    yet.
+  - Open a new chat in ChatGPT, Claude or Gemini (the free tier is enough), upload the files,
+    and paste this:
+
+  ```prompt
+  Read the documents I've uploaded. Find the things I have clearly re-derived more than
+  once: a decision revisited, a problem hit twice, a formula, setting or fact I looked up
+  repeatedly, a rule I restated in different words. For each: name it, quote the exact
+  passage and the document it's in, and say in one line what note would have prevented the
+  repeat.
+
+  Rank by how much time the repeat cost me. Output one table, one item per row.
+
+  Success: 5–10 items, every one backed by a real quote I can go and check.
+  ```
+
+  - Open two of the quoted documents and find the quotes yourself. A quote you can't find is
+    the assistant guessing, and it tells you how far to trust the rest of the table.
+  - Copy the table into a new note in the notes app you already use (or a plain text file on
+    your desktop) and type **keep** or **noise** at the end of every row.
+
+  Success: a scratch note of 3–7 items marked keep, each a real repeat, with two of the quotes
+  checked against your own files.
+
+  **With a coding agent:**
+
+  - Open your agent (Codex, Claude Code, Cursor or Copilot agent mode) in the repo you work in
+    most, and run this:
+
+  ```prompt
+  Read this repo's README, any docs or notes files, and the last 60 commit messages. Find
+  the things I have clearly re-derived more than once: a decision revisited, a problem hit
+  twice, a command or setting I looked up repeatedly, a rule I restated in different words.
+  For each: name it, quote the evidence (file and line, or commit hash), and say in one line
+  what note would have prevented the repeat.
+
+  Rank by how much time the repeat cost me. Change nothing; output the table in chat only.
+
+  Success: 5–10 items, every one backed by a real quote I can go and check.
+  ```
+
+  - Copy its table into a scratch file outside the repo (`seed-notes.md` on your desktop is
+    fine), where personal notes can't get committed with the code.
+  - Mark every row **keep** or **noise**, and for each keeper open the file, line or commit it
+    cites and confirm it says what the agent claimed.
+
+  Success: a scratch file of 3–7 items marked keep, each one a real repeat you checked at its
+  source, and no file in the repo changed.
+selfCheck:
+  - q: "A friend has tried Notion, Evernote and Apple Notes, abandoned each within a month, and is now switching to Obsidian because 'this one will finally stick.' What do you tell them?"
+    a: "The app was never the problem. Each attempt failed on the habit: capture got skipped, nothing was distilled, nothing was turned into output. Obsidian is a fine host, but without a CODE loop it will become the fourth abandoned folder. Start with one small habit, such as a weekly distill of what you captured, before worrying about the tool."
+  - q: "You notice you've looked up the same spreadsheet formula (or the same terminal command) four times this month. Which CODE step failed, and what would have prevented the repeats?"
+    a: "Capture or Distill failed. Either you never wrote it down, or you saved it somewhere you can't find and don't trust. One short, findable note titled by the problem ('Sum one category per month') with the working formula would turn the fifth lookup into a two-second search."
+  - q: "Clark & Chalmers say an external store counts as part of your mind only if it's constant, immediately available, and automatically trusted. Which of the three does your current setup fail hardest?"
+    a: "Almost certainly *automatically trusted*. Your notes are probably constant (the files persist) and available (search is fast), but you don't reflexively believe them — so you re-Google, re-read the thread, re-derive the decision. Trust is what a note earns by being distilled and dated; that's why Distill is the load-bearing step, and why the weekly review in lesson 10 exists at all."
+  - q: "The video is confidently wrong about six things by 2026. What's the pattern, and what does it tell you to bet on?"
+    a: "Every claim that rotted was about a company, a price, or a plugin — the licence terms, the plugin count, the team size, Dataview. Every claim that held was about the file format: plain markdown on your disk, readable in any editor. Bet your system on the layer that doesn't churn; treat the tooling above it as replaceable, because it will be replaced."
+backupResources:
+  - label: "Obsidian.md: The Good Parts (No Boilerplate, part 2) — the systems-over-tools case, and 19 months fresher"
+    url: "https://www.youtube.com/watch?v=B0yAy2j-9V0"
+    type: "video · follow-up"
+  - label: "The script for the main video — public-domain markdown, written in Obsidian"
+    url: "https://github.com/0atman/noboilerplate/blob/main/scripts/29-obsidian.md"
+    type: "source"
+  - label: "Building a Second Brain — Tiago Forte's official book site (source of CODE)"
+    url: "https://www.buildingasecondbrain.com"
+    type: "reference"
+  - label: "The Extended Mind — Clark & Chalmers (1998), the source of active externalism"
+    url: "https://www.consc.net/papers/extended.html"
+    type: "paper"
+  - label: "Obsidian is free for work — the Feb 2025 licence change the video predates"
+    url: "https://obsidian.md/blog/free-for-work/"
+    type: "reference"
+tags:
+  - obsidian
+  - second-brain
+  - concept
+---
+
+Before a single keystroke in Obsidian, get the idea straight: a **second brain is
+a habit, not an app.** It's a trusted external system where you capture what
+matters and connect it, so your knowledge compounds instead of leaking away.
+
+## The problem it solves
+
+You read books, watch tutorials, have great ideas in the shower — and lose almost
+all of it within days. Your biological brain is for *having* ideas, not *storing*
+them. A second brain takes over the storing, so nothing good disappears and you
+can build on past-you's work.
+
+That isn't a productivity slogan. The video grounds it in **active externalism** —
+the position Andy Clark and David Chalmers argued in *The Extended Mind* (1998):
+that a pocket calculator, long multiplication worked out on paper, or counting on
+your fingers are genuinely part of the thinking, not just aids to it.
+
+Their test is the useful part. An external store only counts as part of your mind
+when it's **constant, immediately available, and automatically trusted**. That is
+precisely what 340 open tabs and a scrollback of old chats are *not* — you can't
+find anything in them, so you re-derive instead. A vault is the version that
+passes the test. The work of this pillar is getting your notes over that bar.
+
+## CODE — the system underneath
+
+Tiago Forte's framework is four moves:
+
+- **Capture** — keep what resonates, fast and friction-free.
+- **Organize** — sort by what it's *for*, not by tidy categories.
+- **Distill** — boil notes down to their essence so future-you gets it instantly.
+- **Express** — turn knowledge into output. This is the point: a second brain that
+  only hoards is a hoarder; one that helps you *create* is a superpower.
+
+The video never mentions CODE, and that's fine — it shows you the **substrate**,
+the place a second brain can live. CODE is the **habit loop** you run on top of
+it. Substrate without habit is a folder of dead notes; habit without substrate is
+what you have right now.
+
+> 💡 **Try it:** open the notes app you already use and find the last note you
+> wrote that you have *re-opened* since. Then find one you never re-opened. The
+> difference between them (a clear title? a link from somewhere? a reason to
+> return?) is the whole problem this pillar solves, in two notes.
+
+## Why Obsidian, specifically
+
+Any app can hold text. The case for Obsidian is about **data, not features**: a
+vault is a folder of plain `.md` files sitting on your own disk.
+
+- **You own it.** Obsidian is a deliberately tiny company. If it vanished tomorrow
+  your notes would still open in any editor on any machine, forever.
+- **The exports are honest.** Notion looks like markdown in the browser, then
+  exports proprietary tags and symbols you can't cleanly read back. Plain text
+  charges no exit tax.
+- **It's scriptable.** Files on disk are the whole reason you can later point a
+  coding agent (Claude Code, Codex, Gemini CLI) straight at your vault (lesson 9), or drag
+  any note into a chat with ChatGPT, Claude or Gemini without an export step. An API-locked
+  notes app can't be read either way.
+
+Strong reasons — and still secondary ones. Get the habit right and the software is
+just plumbing.
+
+## Errata — this video is from July 2023
+
+The argument has aged well. Six specific facts have not. Don't act on these:
+
+- **"Free for personal use"** → it's now **free for commercial use too**. The
+  commercial licence became optional in February 2025, so yes, you can use it at
+  work, no account required.
+- **"1,014 plugins"** → **well over 8,000** community plugins and more than 800 themes
+  in Obsidian's public
+  [plugin registry](https://github.com/obsidianmd/obsidian-releases) (counted October 2026).
+- **"The two-person company"** → the team has grown, though it remains deliberately
+  small.
+- **Dataview "should be built in"** → it effectively is. Obsidian 1.9 shipped
+  **Bases**, a *core* plugin that does the common Dataview job natively. Lesson 7
+  covers this; reach for Bases first.
+- **Raw YAML front matter on screen** → Obsidian 1.4 added a **Properties** editor,
+  so your screen won't match his.
+- **"GPT-3 Notes"** → a 2023 fossil. AI inside Obsidian is lesson 8, and it looks
+  nothing like that today.
+
+Read that list as the lesson, not the footnote. **Plugin ecosystems churn; file
+formats don't.** Every claim that rotted was about a company, a price, or a plugin.
+Every claim that survived was about plain text — which is exactly the argument for
+building on plain text.
+
+## Where this pillar ends up
+
+Tris built his vault by hand, and in 2023 that was the only option. It isn't now.
+
+In April 2026 Andrej Karpathy published an "idea file" for what he calls an
+[LLM wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): you
+curate raw sources and ask good questions, and an **agent** writes and maintains the
+notes — summaries, concept pages, cross-references, the index. His argument is that the
+tedious part of a knowledge base was never the reading or the thinking. It's the
+bookkeeping, and bookkeeping is exactly what a model doesn't get bored doing.
+
+That's where this pillar is going, and it changes the division of labour:
+
+- **Obsidian is the human side** — where you read, link, and catch what's wrong.
+- **The agent owns the files** — a coding agent (Codex, Claude Code, Gemini CLI or
+  similar) writes and maintains the notes on disk. The agent prompts in this pillar work
+  in any of them.
+- **No coding agent? The same split still works.** A chat assistant (ChatGPT, Claude or
+  Gemini) reads the notes you paste or upload and drafts the pages; you save them into the
+  vault. Every lesson gives you that path first, with the agent path beside it.
+
+Which is why plain markdown in a folder stopped being a nice-to-have. It's the only
+format an agent can read *and* write directly, with no API in the way.
+
+## Common failure modes
+
+- **You capture everything and never look at it again** → Capture without Distill →
+  schedule ten minutes a week to boil a few notes down (lesson 10 makes this a habit).
+- **You spend the first week on themes and plugins** → setup as procrastination → one
+  vault, default settings, real notes on day one.
+- **Notes pile up but never become anything** → no Express step → pick one note a week
+  and turn it into something: a summary, a post, a better prompt.
+- **You rebuild your system every time a new app trends** → the habit lives in the tool,
+  not in you → keep plain markdown files and a simple loop you could run anywhere.
+
+## What's next
+
+You'll watch Tris create a vault, type `[[links]]`, and open graph view — treat that as
+a trailer; lessons 2 and 3 do both properly. From lesson 2 you'll lay the vault out for
+an AI from day one, and every lesson after that adds one rung: capture, organise,
+connect, query, and finally the full ingest–query–lint loop. Each lesson hands you a
+prompt that only uses what you've learned so far, in two versions: one for a chat
+assistant, one for a coding agent. You never need the second to finish the pillar.
+
+But it all stands on this one idea: **offload your memory, connect your thinking, and
+create from it.**

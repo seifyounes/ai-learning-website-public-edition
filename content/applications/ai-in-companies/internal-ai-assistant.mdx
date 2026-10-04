@@ -1,0 +1,221 @@
+---
+title: "Internal AI assistant & knowledge base"
+summary: "Plan an internal assistant that answers from your organization's documents with citations, and fix the stale docs behind most wrong answers."
+changeNote: "New: a worked HR-policy assistant example, a common-failures list, a 10-minute grounding test, and a task that writes the assistant's grounding contract."
+section: applications
+pillar: ai-in-companies
+order: 3
+level: intermediate
+estMinutes: 14
+taskMinutes: 60
+shortPath: "About 40 min: read the breakdown down to Worked example: an HR policy assistant, then set up the bot over 5–10 docs with the grounding prompt. Come back for the video, the 10 questions and the audit."
+prerequisites: [rag-fundamentals]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "ZkMlWwgiFGw"
+  published: "2025-06-07"
+  year: 2025
+  minutes: 43
+  title: "Build 100% Local AI Agent to Chat with Your Files | Private AI Knowledge Base with MCP & RAG"
+  channel: "Venelin Valkov"
+  why: "A concrete build of a private assistant over your own documents using RAG and MCP, the two techniques from the applied AI engineering pillar, applied to company-style data. It runs on local models, so the documents never leave the machine, which is the right default for internal docs. It's code-heavy; if you don't code, the no-code enterprise option in the backups shows the same idea on a platform."
+applyIt: |
+  Test whether an assistant you already use stays inside its documents. Pick one that answers
+  from files: a ChatGPT or Claude Project, a custom GPT, a Gemini Gem, a notebook in Gemini
+  Notebook (formerly NotebookLM), or
+  a help-center bot at work. In ten minutes:
+
+  1. Ask one question the documents clearly answer, and check that it cites the right file or
+     section.
+  2. Ask one question the documents do NOT answer but that sounds like they might.
+  3. Note what happened: did it say "that isn't in the docs", or did it improvise a plausible
+     answer from general knowledge?
+
+  If it improvised, write the one-line fix: an instruction ("answer only from the files; if
+  they don't cover it, say so") or a document fix (the stale or missing page behind the answer).
+  **As a manager or consultant:** run the same two questions on any assistant before you trust it
+  with staff questions.
+
+  Success: two test questions run, and a one-line verdict on whether the assistant stays
+  grounded.
+toolkit: |
+  - **Your instructions and uploaded files are your personal knowledge base.** ChatGPT memory and
+    custom instructions, a ChatGPT or Claude Project's files, a Gemini Gem's knowledge or a
+    Gemini Notebook are what your assistant retrieves from. Garbage-in rules apply: a stale or
+    contradictory line makes it confidently wrong.
+  - **Audit the docs, not the model.** When your assistant improvises against your standards, the
+    fix is usually a documentation fix: reconcile the clashing rule, delete the stale one. Most
+    wrong answers are document problems, at personal scale too.
+  - **Turn on connectors read-only first.** Connecting your assistant to Drive, email or calendar
+    through its built-in connectors is the same "stop being a search box, start doing things"
+    move the video ends on. Let it read for a few weeks before you let it act.
+  - **Demand citations from your own assistant.** Add one line to your custom instructions:
+    "When you answer from my files, name the file and section." You'll catch stale sources the
+    first week.
+recap:
+  - emoji: "🔎"
+    title: "Where company knowledge hides"
+    text: "In Drive, Notion, email threads and someone's head. An internal assistant turns it into something every employee can simply ask."
+  - emoji: "⚙️"
+    title: "Four moves under the hood"
+    text: "Ingest and chunk your docs, embed the chunks into a vector store, retrieve the most relevant ones at question time, and let the model answer from them, not from what it 'knows'."
+  - emoji: "🔗"
+    title: "What earns staff trust"
+    text: "Citations. The model answers from retrieved chunks and names them, so staff can click through and verify instead of wondering whether the bot made it up."
+  - emoji: "🔒"
+    title: "Choosing where it runs"
+    text: "Match the build to the data: no-code is fastest, a RAG pipeline you control gives full data control, and local or self-hosted suits the most sensitive documents."
+  - emoji: "🗑️"
+    title: "The usual culprit"
+    text: "Most wrong answers are document problems, not model problems: contradictory or missing SOPs. Building the bot doubles as a documentation audit."
+  - emoji: "🤝"
+    title: "Beyond answering"
+    text: "Connect the assistant to tools via MCP and it can look up an order, file a ticket or draft a reply in context. That's when a search box becomes a teammate."
+task: |
+  Stand up a small KB bot over 5–10 real docs, give it a grounding contract, ask it 10 real
+  questions, then **audit** every answer against its source. Free options: Gemini Notebook
+  (formerly NotebookLM), which answers from uploaded sources with citations, or a local setup
+  such as AnythingLLM or Open WebUI with Ollama if the docs are sensitive. For docs, use your team's SOPs if you're allowed to
+  upload them; otherwise use public ones, such as your university's student handbook or a
+  company's public help-center pages.
+
+  First, set the bot's instructions (its system prompt, or the custom instructions your tool
+  allows). Whatever you build on, a no-code platform, a Project or custom GPT, or a RAG pipeline
+  you control, this is what forces the grounding:
+
+  ```prompt
+  You are [Organization]'s internal knowledge assistant. Answer staff questions ONLY from the
+  retrieved document chunks, never from prior knowledge. Cite every factual sentence as
+  [doc title, section]. If the chunks don't contain the answer, say "That isn't in the current
+  docs" and name the closest doc; never guess. When two chunks conflict, surface both and flag
+  the contradiction rather than picking one. Keep answers short and skimmable. If a question
+  needs an action (look up an order, file a ticket), say which connected tool you'd call and with
+  what arguments instead of pretending to do it.
+  ```
+
+  Then ask your 10 questions and grade each answer with this auditor in a separate chat:
+
+  ```prompt
+  You are a grounding auditor for a knowledge-base bot built over 5–10 documents
+  ([list them]). I'll give you a question, the bot's answer, and the
+  source chunk it cited. Judge the answer on three axes: supported (every claim traceable to the
+  cited chunk), cited (the citation actually contains it), and complete (nothing material
+  omitted). Return {verdict: pass|fail, unsupported_claims: [...], fix: "..."} where fix names
+  whether to repair the DOCUMENT or the RETRIEVAL. Flag any answer given from general knowledge
+  instead of the docs.
+  Success: 10 answers graded, each failure tagged as a document problem or a retrieval problem.
+  ```
+
+  Most failures will be document problems: fix the docs, not the model. **As a manager:** name a
+  document owner per source before any wider launch. **As a consultant:** deliver the contract
+  plus a document-cleanup list; the cleanup is often the part the client values most.
+selfCheck:
+  - q: "Staff report that the assistant says the remote-work policy allows three days a week, but HR says two. Name two likely causes and how you'd tell them apart."
+    a: "Check the cited source. If it cites an old handbook that really says three, it's a *document* problem: retire the stale version. If the cited chunk says two but the answer says three, the model isn't grounding properly: tighten the system prompt and test again."
+  - q: "A junior employee asks the assistant about a colleague's salary and gets an answer. What went wrong, and what's the fix?"
+    a: "Restricted documents were indexed for everyone, so retrieval ignored who was asking. Remove them from the shared index, or enforce per-user permissions at retrieval time so people only get chunks from documents they could already open."
+  - q: "Why does an internal assistant use retrieval instead of pasting every document into one big prompt?"
+    a: "Retrieval pulls only the relevant passages at question time, so answers stay grounded and citable, the system scales past the context window, and updating a document updates the answers without rebuilding a giant prompt."
+backupResources:
+  - label: "AI Knowledge Base for Companies: Secure Enterprise Chatbot — Digital Insight"
+    url: "https://www.youtube.com/watch?v=xixng5mgwU8"
+    type: "video · no-code option"
+  - label: "Build an AI Knowledge Base + Support Bot in 5 Minutes"
+    url: "https://www.youtube.com/watch?v=Ega3aGDHMAQ"
+    type: "video · quick start"
+tags:
+  - companies
+  - knowledge-base
+  - rag
+  - assistant
+---
+
+Every company runs on knowledge that lives in too many places: Drive, Notion, email threads,
+someone's head. An **internal AI assistant** turns that scattered knowledge into something every
+employee can simply *ask*. "What's our refund policy?" "How do we onboard a new client?" "Where's
+the latest pricing deck?" Answered in seconds, grounded in your real documents. This is the
+second-brain idea scaled from one person to a whole organization.
+
+## How it works: RAG over your docs
+
+The engine is **Retrieval-Augmented Generation** (→ rag-fundamentals). Instead of hoping the
+model "knows" your company, you:
+
+1. **Ingest** your documents and split them into chunks.
+2. **Embed** the chunks into a vector store so they're searchable by meaning.
+3. At question time, **retrieve** the most relevant chunks and hand them to the model along with
+   the question.
+4. The model **answers from those chunks and cites them.**
+
+That citation step is what makes it trustworthy: staff can click through and verify, instead of
+wondering whether the bot made it up. If you don't code, you don't have to build this pipeline
+yourself. Tools like Gemini Notebook (formerly NotebookLM), a ChatGPT or Claude Project, or a
+Gemini Gem with uploaded files do a version of it for you.
+
+## Privacy is a first-class decision
+
+Internal docs are sensitive: contracts, salaries, customer data. *Where the model runs* matters
+as much as how well it answers:
+
+- **No-code platforms**: fastest to stand up; check their data-handling and no-training terms.
+- **RAG pipeline you control**: more work, full control over where data goes.
+- **Local / self-hosted models**: nothing leaves your machines; the right call for the most
+  sensitive documents.
+
+Access matters as much as location. An assistant must not let someone read, through a chat
+window, a document they couldn't open directly. Either keep restricted documents out of a shared
+index, or make retrieval respect each user's permissions. The governance lesson goes deeper
+(→ governance-security); at minimum, don't paste confidential docs into a consumer chatbot to save
+an afternoon.
+
+## Garbage in, confident garbage out
+
+The hardest truth about knowledge-base bots: **most wrong answers are document problems, not
+model problems.** If two SOPs contradict each other, the bot may confidently pick one. If the
+policy was never written down, it can't retrieve it. Building the assistant doubles as an audit
+of your documentation, and that cleanup is half the value. Give every source a named owner and a
+review date, or the assistant will slowly drift out of date.
+
+## Worked example: an HR policy assistant
+
+A 40-person company wants staff to stop emailing HR the same ten questions.
+
+1. **Pick the sources.** The current handbook, the leave policy, the expenses policy, the
+   remote-work policy, and onboarding guides: eight documents. Salary bands stay out.
+2. **Clean before indexing.** You find two handbooks (2023 and current). The old one is
+   archived, not indexed. Each document gets an owner.
+3. **Chunk by heading.** Policies split on their section headings, so a citation points to
+   "Leave policy, 3.2 Carry-over" rather than a random paragraph.
+4. **Ask real questions.** Take ten questions HR actually received last month.
+5. **Grade every answer.** Supported by the cited chunk? Complete? Any answer from general
+   knowledge? Two answers fail: one because the expenses policy never mentions mileage (a
+   document gap), one because the question said "time off" and the policy says "leave" (a
+   retrieval gap, fixed by adding the common phrasing to the document).
+6. **Launch to one team**, with a feedback button, before the whole company.
+
+> 💡 **Try it:** Upload two documents to Gemini Notebook, a ChatGPT or Claude Project, or a
+> Gemini Gem, then ask a question the documents *don't* answer. Does it say so, or does it guess? Five
+> minutes tells you how much the grounding instruction matters.
+
+## Common failure modes
+
+- **Confident, wrong answers** → stale or duplicate documents in the index → archive old
+  versions and give each source an owner.
+- **"Not in the docs" when it is** → the question's wording doesn't match the document, or chunks
+  split the answer → chunk by heading and add the words people actually use.
+- **It reveals restricted information** → sensitive documents indexed for everyone → remove them
+  or enforce per-user permissions at retrieval.
+- **Nobody uses it** → launched with an email and no training → treat it as a rollout (next
+  lesson).
+
+## From answering to acting
+
+The next level is connecting the assistant to tools via **MCP** (→ mcp-deep) so it can *do*
+things, not just talk: look up an order status, file a ticket, draft a reply in context. Start
+with read-only access and add actions one at a time.
+
+## Next
+
+You've built real capabilities. None of it matters if people don't actually use it; rolling it
+out to humans is the hard part.

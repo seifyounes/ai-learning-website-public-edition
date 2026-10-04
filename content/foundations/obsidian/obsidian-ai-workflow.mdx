@@ -1,0 +1,405 @@
+---
+title: "The agent-maintained vault"
+subtitle: "Karpathy's LLM wiki"
+summary: "Have an AI compile your sources into a linked wiki you review, then query it and run a health check, with a coding agent or a chat assistant."
+changeNote: "New: a discernment check on AI output you used this week, a chat-assistant version of the full ingest, query and lint loop, and a 10-minute watch range."
+section: foundations
+pillar: obsidian
+order: 9
+level: advanced
+estMinutes: 16
+taskMinutes: 60
+prerequisites: [ai-inside-obsidian, zettelkasten-evergreen]
+reviewedOn: "2026-10-03"
+video:
+  videoId: "a1FDaoF8Jog"
+  published: "2025-09-11"
+  year: 2025
+  minutes: 14
+  start: 0
+  watchMinutes: 10
+  title: "Obsidian + AI: How to Do It The Right Way (Claude Code + Obsidian)"
+  channel: "Linking Your Thinking with Nick Milo"
+  why: "Most 'AI agent + Obsidian' videos show the automation; this one spends its time on the judgment half, which keeps an agent from replacing your thinking. Nick Milo, a long-time Obsidian teacher, builds a defensive perimeter first (his IDI framework: imagine, discern, integrate), then points a coding agent (Claude Code, in his case) at his vault. The key moment: he reads a conclusion about his own life and says on camera it isn't accurate, discernment shown, not preached. Parts of it promote his paid products."
+  notes:
+    - "Watch 0:00 to 10:11 and stop there. The discernment moment is at 6:06."
+    - "About 2.5 of its 13.7 minutes promote his paid products: a paid-workshop QR code at 9:47–10:09 and an archetype-quiz funnel at 12:50–13:26."
+    - "Two habits worth copying: he writes every AI output into a separate vault, deliberate friction against his own thinking, and he tells you to back up your notes first."
+    - "Errata (details in the breakdown): his 'no AI in Obsidian, not on the roadmap' line at 10:22 needs a correction, and at 9:58 he calls Bases 'new', though it has been core since 1.9 (2025)."
+    - "He's on macOS, but nothing in the workflow is platform-specific."
+readAfter:
+  - label: "LLM Wiki — Andrej Karpathy's idea file (the pattern this lesson teaches)"
+    url: "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f"
+    kind: article
+  - label: "kepano/obsidian-skills — Agent Skills for working a vault with an agent (Obsidian's CEO, personal repo — not an official product)"
+    url: "https://github.com/kepano/obsidian-skills"
+    kind: repo
+  - label: "Agent Skills specification — the open standard those skills follow"
+    url: "https://agentskills.io/specification"
+    kind: docs
+applyIt: |
+  Milo's middle step, *discern*, is the skill that transfers furthest. Run it on one piece of
+  AI output you actually used this week: a summary you forwarded, an explanation you studied
+  from, a draft you sent. Five to ten minutes.
+
+  Pick the one claim in it you leaned on hardest. Check it against its source (the document,
+  the data, your own memory of the meeting) and decide: **integrate** (true and yours now),
+  **correct** (fix it where you used it) or **reject**. Then write one line on what would have
+  caught it earlier.
+
+  **With a chat assistant (no code):** if the output came from a chat, ask the same chat "Which
+  claim in your answer are you least sure of, and what would confirm it?" and check that one
+  too.
+
+  Success: two claims checked against their sources, each marked integrate, correct or reject.
+
+  **With a coding agent:** pick a change an agent made this week that you merged, and check the
+  one assumption it rests on (a function's behaviour, a library's API, a config value) in the
+  code or docs themselves.
+
+  Success: one merged assumption confirmed or corrected at its source, with a line on how you'd
+  catch it next time.
+toolkit: |
+  - **Your Project instructions are the schema layer.** In a ChatGPT or Claude Project or a
+    Gemini Gem, the standing instructions are layer 3: conventions, page shape, what the assistant
+    may and may not do. Keep a copy in a vault note, and add a rule every time you correct it twice.
+  - **Upload an index with the files.** Give the Project an `index.md` with one line per page and
+    update it whenever you add a file. The assistant reads the catalog first, the same way the
+    agent does, instead of skimming everything.
+  - **Make every save leave a timeline.** Whenever you save an assistant's answer into your notes,
+    add a dated `ingest |` or `query |` line to `log.md`. Obsidian's search finds every entry with
+    that prefix, so you get a history instead of a growing blob.
+  - **Lint your own setup monthly.** Paste your custom or Project instructions and your index into
+    a fresh chat with the task's lint prompt: rules that contradict each other and decisions you've
+    since reversed are the cheapest quality win in any AI setup.
+
+  **If you use a coding agent:**
+
+  - **Keep the schema agent-agnostic.** Keep it in `vault-rules.md`, with each agent's own rules
+    file (AGENTS.md, or CLAUDE.md / GEMINI.md) pointing to it, and let the agent maintain
+    `index.md` and `log.md`. You can then switch agents without touching the vault.
+recap:
+  - emoji: "🗜️"
+    title: "The shift from lesson 8"
+    text: "RAG rebuilds an answer from raw chunks every time you ask. This pattern has the agent distil sources into pages once and keep them current, so knowledge accumulates instead of resetting."
+  - emoji: "🧱"
+    title: "Who owns what"
+    text: "Raw sources you curate and the agent never edits. A wiki the agent owns entirely. A schema — your `vault-rules.md` — telling it how both work. Layers, not folders you happen to have."
+  - emoji: "🔁"
+    title: "The three operations"
+    text: "Three operations. Drop a source and the agent files it across ten-plus pages. Ask the wiki, not the sources. Periodically health-check for contradictions, stale claims and orphans."
+  - emoji: "🗂️"
+    title: "index.md and log.md"
+    text: "`index.md` is the catalog the agent reads first and updates on every ingest. `log.md` is an append-only timeline of ingests, queries and lint passes. At this scale they replace a vector index."
+  - emoji: "🧑‍💻"
+    title: "Why human wikis die"
+    text: "The tedious part of a wiki was never the thinking — it was updating cross-references. Humans abandon wikis over maintenance cost. An agent doesn't get bored, so the wiki survives."
+  - emoji: "🔌"
+    title: "The bridge to Obsidian's formats"
+    text: "A small set of Agent Skills teaches an agent Obsidian's formats — markdown, Bases, JSON Canvas, the CLI, Defuddle. Written by Obsidian's CEO as a personal, MIT-licensed repo. Not an official product."
+  - emoji: "🧭"
+    title: "The reflex Milo shows"
+    text: "Milo's IDI loop — imagine, discern, integrate — and his rule of a walled AI zone. Watch him reject a wrong conclusion about his own life on camera. That reflex is the skill."
+  - emoji: "🛟"
+    title: "Before the first run"
+    text: "This loop touches ten to fifteen files per source. Make the agent show a plan or a diff before it edits anything that already exists, and back your vault up before the first run."
+task: |
+  Run the whole loop once: write the schema, ingest two sources, query the wiki and file the
+  answer back, then lint it. **Back up your vault first** (copy the folder, or commit it to a
+  private git repo): this edits more pages than anything you've run so far.
+
+  **With a chat assistant (no code):**
+
+  - **Schema.** Open Karpathy's gist (linked under the video), copy its text into a new note,
+    `sources/llm-wiki.md`, and upload it with `vault-rules.md` and `index.md` to a chat in
+    your Vault Project:
+
+  ```prompt
+  The file llm-wiki.md describes a pattern; vault-rules.md and index.md are my real vault.
+  Instantiate the pattern for THIS vault. Propose, as one markdown block I can paste, a schema
+  section for vault-rules.md: page naming, wikilink and property conventions, and the exact
+  steps for ingest, query and lint when I paste material into this Project. Flag anything in
+  my current structure that fights the pattern. Don't rewrite my existing rules.
+  ```
+
+  - Edit the section until you'd sign it, append it to `vault-rules.md`, paste the updated
+    file into your Project's instructions, and add a dated `schema |` line to `log.md`.
+  - **Ingest.** Upload `sources/first-source.md`, `index.md` and the `wiki/` pages it lists:
+
+  ```prompt
+  Ingest first-source.md, following my schema. First tell me the five takeaways you think
+  matter, and which existing wiki pages you would UPDATE rather than duplicate. Wait for my
+  go-ahead. Then give me: one summary page that links to the existing pages instead of
+  restating them, plus any new entity pages (people, tools, organisations, recurring
+  concepts), each as its own markdown block with the file name above it; for every existing
+  page you'd change, only the lines to add or replace, marked clearly; the new index.md lines;
+  and one log.md line starting `ingest |`. Never change the source's text.
+  ```
+
+  - Save each new block in `wiki/`, make the marked edits by hand, and add the index and log
+    lines. Then ingest a **second, different** source the same way (another course's notes, a
+    second project doc, an article you saved with the Web Clipper), re-uploading `index.md`
+    and any page you changed first, since the Project's copies are now stale.
+  - **Query, then lint.** Upload `index.md`, `log.md` and every `wiki/` page, and run the two
+    prompts below one after the other. Save the query's page into `wiki/` with its two lines,
+    and make only the lint fixes you pick, by hand.
+
+  Success: an approved schema in `vault-rules.md` and your Project's instructions, two sources
+  ingested with at least one existing page updated rather than copied, one cited answer saved
+  as a page, and a ranked lint report.
+
+  **With a coding agent:**
+
+  - Optional: if your agent supports Agent Skills (Claude Code, Codex, OpenCode), install
+    kepano's `obsidian-skills` by following the repo's README for your agent. The prompts below
+    work without them.
+  - **Schema**, at the vault root:
+
+  ```prompt
+  Read the LLM wiki pattern at https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f,
+  then my actual vault: vault-rules.md, index.md, wiki/, sources/, inbox/. Instantiate the
+  pattern for THIS vault. Propose, as a plan and writing nothing yet, the schema section to
+  append to vault-rules.md: page naming, wikilink and property conventions, and the exact
+  steps you will follow for ingest, query and lint. Flag anything in my structure that fights
+  the pattern. Wait for my approval; then append it and add one dated line to log.md, which
+  is append-only.
+  ```
+
+  - **Ingest:**
+
+  ```prompt
+  Ingest one source: sources/first-source.md. Tell me the five takeaways you think matter
+  before you write anything. Lesson 6 already split this file into atomic pages, so check
+  index.md first and tell me which pages you would UPDATE rather than duplicate. After I
+  confirm: write one summary page in wiki/ that links to the atomic pages instead of
+  restating them, create or update the entity pages it touches, add [[wikilinks]] in both
+  directions, list anything new in index.md, and append one dated line to log.md prefixed
+  `ingest |`. Show me a diff for any page that already existed. Never edit sources/.
+  Success: new wiki pages, an updated index, one log line, sources/ byte-identical.
+  ```
+
+  - Ingest a **second, different** source the same way, and watch it update pages the first
+    one created instead of duplicating them. Then query and lint with the two prompts below,
+    adding to the query: "File your answer as a new page in wiki/, link it from index.md, and
+    append a `query |` line to log.md."
+
+  Success: an approved schema in `vault-rules.md`, two sources ingested with at least one
+  existing page updated rather than copied, one cited answer saved as a page, and a ranked
+  lint report with no file changed without your say-so.
+
+  **The query and lint prompts (both routes):**
+
+  ```prompt
+  Query the wiki, not the sources: read index.md first, then only the pages it points to.
+  Answer: [a synthesis question about your material, e.g. "what themes run through this
+  course so far?" or "what keeps going wrong in our client onboarding?"], and where do my own
+  notes contradict each other? Cite every claim with the page it came from. If the answer
+  isn't in the wiki, say so and name the source I'd need to ingest. Then give me the answer
+  as one wiki page titled as a claim, plus its index.md line and a log.md line starting
+  `query |`.
+  ```
+
+  ```prompt
+  Lint the wiki. Using index.md, log.md and every wiki page, report only:
+  1. Contradictions between pages, quoting both sides.
+  2. Claims a newer source has superseded.
+  3. Orphan pages with no inbound links.
+  4. Concepts mentioned repeatedly that have no page of their own.
+  5. Cross-references you would add.
+  Rank the findings by how badly each would mislead me, and propose fixes as a numbered list.
+  Change nothing until I pick.
+  ```
+selfCheck:
+  - q: "Same vault, same question. Describe what RAG does versus what this pattern does — and name the word that separates them."
+    a: "RAG embeds your raw sources, retrieves the nearest chunks at query time, and generates an answer from them — from scratch, every single time. The wiki pattern has the agent read each source once, distil it into pages, and weave it into what's already there; a query then reads pages that already contain the synthesis. The word is **accumulation**. Retrieval re-derives and forgets; the wiki compiles and compounds, which is also why good query answers get filed back as pages instead of dying in the chat log."
+  - q: "Two weeks in, you've started fixing wrong wiki pages by hand, and you asked the agent to 'tidy up' a messy file in `sources/`. What's going wrong with the layers?"
+    a: "Both moves break ownership. You own `sources/` — curated, immutable, the agent reads but never edits it; lose that and your source of truth drifts under you with no way to check the wiki against anything. The agent owns `wiki/` entirely — you read it, it writes it; start hand-editing pages and you're back to being the maintainer, which is the exact job that kills every human wiki. You and the agent co-own the schema in `vault-rules.md` — it's the file that makes the agent a disciplined maintainer rather than a generic chatbot, and it should change as you learn what works."
+  - q: "A friend's agent rewrote 40 wiki pages in one ingest, and now they can't tell what changed or whether it's right. The loop is supposed to save work, so what two rules would have prevented this?"
+    a: "Plan first (show a plan or a diff before touching any existing page) and back up first. One ingest can touch ten to fifteen pages, and lint proposes changes across the whole wiki. A silent bulk rewrite of notes you can't reconstruct is the one failure this pattern can hand you, and it's exactly what a sound schema file should forbid — never delete or overwrite without asking. Plan-first costs one round trip; an unreviewed rewrite costs the vault. With a backup (a copy or a git commit), they could at least diff and restore."
+mcq:
+  - q: "You asked your wiki a synthesis question and got a well-cited answer comparing three of your projects. What should happen to that answer?"
+    options:
+      - "Leave it in the chat; you can ask the wiki again later"
+      - "File it as a wiki page, add it to the index and log it"
+      - "Save it in sources/ so later ingests can build on it"
+      - "Add it to vault-rules.md so every session starts with it"
+    answer: 1
+    explain: "Filing good answers back as pages is what makes the wiki compound; left in the chat, the synthesis is lost and has to be re-derived. sources/ holds raw material you curate, so putting AI output there blurs the record you check the wiki against, and the schema file holds rules, not content."
+  - q: "Your wiki has reached about 80 pages and answers are getting vague: the agent skims many pages for every question. What do you check first?"
+    options:
+      - "Whether to add a vector database for better retrieval"
+      - "Whether to split the wiki into smaller topic vaults"
+      - "Whether a lint pass would remove the orphan pages"
+      - "Whether index.md is current and the agent reads it first"
+    answer: 3
+    explain: "At this scale the index is the retrieval system: the agent reads the catalog first, then only the pages it points to. A stale or skipped index forces skimming. A vector database brings back the rebuild-from-chunks approach this pattern replaces, before you've tried the cheap fix."
+  - q: "You run the loop with a chat assistant. On your second ingest it proposes a new page for a person who already has one from the first ingest. What's the most likely cause?"
+    options:
+      - "The Project still holds the old index.md and pages"
+      - "Chat assistants can't spot duplicates; you need an agent"
+      - "The schema lacks a rule forbidding duplicate pages"
+      - "The second source should have gone straight into wiki/"
+    answer: 0
+    explain: "In the chat route the uploads are snapshots: after each ingest you re-upload index.md and every page you changed, or the assistant can't see what already exists. A chat assistant updates rather than duplicates when it sees current files, and a schema rule can't help if the page it should check isn't there."
+  - q: "A lint pass reports that two wiki pages disagree about when a project started, and proposes a fix. What do you do?"
+    options:
+      - "Let the agent apply its fix, since lint caught the issue"
+      - "Delete the older page so only the newer claim survives"
+      - "Check both claims against their sources, then pick a fix"
+      - "Leave both; contradictions are normal in personal notes"
+    answer: 2
+    explain: "Lint reports and you approve. The untouched sources/ layer exists so you can check the wiki against it, and discerning before you integrate is what keeps an agent from rewriting your record. Applying the fix unchecked skips that judgement, and the newer page isn't automatically the right one."
+backupResources:
+  - label: "Let Claude Automate Your Obsidian Notes: Second Brain AI Agent (MCP) — Zen van Riel"
+    url: "https://www.youtube.com/watch?v=VeTnndXyJQI"
+    type: "video · the MCP route (skills are the newer, lighter bridge)"
+  - label: "Model Context Protocol — official site"
+    url: "https://modelcontextprotocol.io"
+    type: "docs · official standard"
+  - label: "Defuddle — clean markdown out of web pages, one of the skills"
+    url: "https://github.com/kepano/defuddle"
+    type: "repo · tool"
+tags:
+  - obsidian
+  - ai
+  - claude-code
+  - agent-skills
+  - llm-wiki
+  - workflow
+---
+
+Lesson 8 gave you retrieval and then named its ceiling: every query re-derives the answer
+from raw chunks, so nothing accumulates. This lesson is the alternative, and it's the one
+the whole pillar has been walking toward.
+
+The shift is small to say and large to run. **Stop retrieving from your sources. Compile
+them.** Have an agent read each source once, distil it into pages, cross-link it against
+everything already there — and then keep those pages current as new material arrives. Ask
+a question and it reads pages that already hold the synthesis.
+
+## The source: an idea file, not a tool
+
+The pattern comes from a public gist by **Andrej Karpathy** — `llm-wiki.md`, April 2026.
+It is deliberately abstract. You don't install it; you paste it into your agent (or a chat
+assistant, along with your vault's rules) and work with it to instantiate a version that fits
+your material. That's the intended use, stated in the document itself.
+
+Two things the blogs around it get wrong:
+
+- **It is agent-agnostic.** The gist names Codex, Claude Code and OpenCode as equally valid
+  hosts, and its example schema files are `AGENTS.md` for Codex or CLAUDE.md for Claude Code.
+  It is not a one-vendor technique.
+- **Obsidian's role is human review.** He runs the agent on one side and Obsidian on the
+  other, browsing the results as they're written. His one-line summary: *"Obsidian is the
+  IDE; the LLM is the programmer; the wiki is the codebase."*
+
+Which is exactly this pillar's framing: **Obsidian is the human side, and the agent owns the
+files.**
+
+## Three layers
+
+You already have the folders from lesson 2. Now they get roles:
+
+- **Raw sources — `sources/`.** Articles, papers, transcripts, exports. You curate this; it
+  is **immutable**. The agent reads it and never writes to it, so you can always check the
+  wiki against it.
+- **The wiki — `wiki/`.** Summaries, entity pages, concept pages, comparisons. The agent owns
+  this layer *entirely*. You read it, follow its links, and catch what's wrong.
+- **The schema — `vault-rules.md`.** How pages are named, what the conventions are, what
+  workflow to follow when ingesting, answering or linting. This turns a general-purpose agent
+  into a disciplined wiki maintainer. Expect to rewrite it three times in the first month.
+
+The lesson-6 concept pages you already wrote are the seed of layer 2. From here, the agent
+grows it.
+
+## Three operations
+
+**Ingest.** You drop a source in and tell the agent to process it. It reads the source,
+talks the takeaways through with you, writes a summary page, updates the index, revises
+every entity and concept page the source touches, and appends to the log. One source
+routinely touches **ten to fifteen pages** — the work you would never do by hand.
+
+**Query.** You ask the wiki, not the sources. The agent reads the relevant pages and answers
+with citations. The move that makes this compound: **good answers get filed back into the
+wiki as new pages.** In a chat-only workflow they evaporate; here they become part of the
+base.
+
+**Lint.** A health check: contradictions between pages, claims a newer source has
+superseded, orphan pages, concepts mentioned everywhere but lacking a page, missing
+cross-references. Tonight's run is scoped to `wiki/` so you've seen the operation once;
+lesson 10 turns it into a weekly habit over the whole vault.
+
+## The two spine files
+
+**`index.md`** is a catalog of every page with a link and a one-line summary, grouped by
+category. The agent updates it on every ingest and reads it *first* when answering. At your
+scale this is the whole retrieval system: a table of contents plus a good reader beats an
+embedding index, with no infrastructure at all.
+
+**`log.md`** is chronological and append-only — ingests, queries, lint passes, each dated.
+Give every entry the same prefix and one Obsidian search for `ingest |` shows the last things
+that happened to your vault. It's how the AI knows what it already did.
+
+## Don't code? The same loop with a chat assistant
+
+The pattern needs the three layers and someone to do the file moves. With a chat assistant,
+that someone is you. `vault-rules.md` goes into a Project's or Gem's instructions, where it
+loads on every chat. For each ingest, upload `index.md` and the pages it lists, ask for new
+pages as separate markdown blocks and edits as marked lines, then save them and add the log
+line yourself. It's slower, and the uploads go stale unless you refresh them after each
+ingest; the layers, rules and review job are identical.
+
+## The bridge: kepano/obsidian-skills
+
+Karpathy's gist tells an agent *what* to build. It doesn't teach it Obsidian. That gap is
+filled by **`github.com/kepano/obsidian-skills`**, a small MIT-licensed set of Agent Skills.
+At the time of writing they cover Obsidian Flavored Markdown (wikilinks, embeds, callouts,
+properties), `.base` files (lesson 7), JSON Canvas, the Obsidian CLI, **Defuddle** (clean
+markdown out of a web page, which is how sources arrive) and **knap** (batches of similar
+pages from a template plus data). They follow the open **Agent Skills specification**, so they
+load in Claude Code, Codex or OpenCode alike (→ skills-and-plugins).
+
+Keep one thing straight: this is written by **Steph Ango (kepano), Obsidian's CEO — as a
+personal repository.** It is not an official Obsidian product, and there is no first-party AI
+feature in the app. Describe it that way when you recommend it.
+
+## The judgment half — and this video's errata
+
+Milo's contribution is the part the gist skips: what stops this from quietly replacing your
+own thinking. His **IDI** loop — *imagine, discern, integrate* — puts a mandatory human step
+between generation and belief, and at [06:06] he demonstrates the middle one honestly,
+rejecting a conclusion about his own last 45 days on camera. He also writes every AI output
+into a **separate vault**, so nothing generated slips into his own words without a decision.
+
+Corrections before you take anything from the video as current:
+
+- **[10:22] — "No AI in Obsidian, it's not on the roadmap."** Still broadly true of the
+  *app*: no first-party AI feature, and a plugin-driven, privacy-first strategy. But kepano
+  has since published `obsidian-skills` in his own capacity, so "no AI in the app" and "no
+  blessed path for agents" are now two different statements.
+- **[09:58] — Bases called "new."** Bases has been a **core** plugin since Obsidian **1.9
+  (2025)**.
+- **He's on macOS.** Nothing in the workflow is platform-specific, so ignore the shortcuts.
+
+And two things that are selling, not teaching: a **paid-workshop QR code at [09:47–10:09]**
+and an **archetype-quiz funnel at [12:50–13:26]**. Stop at **[10:11]**; the prompts in the
+task are the build he doesn't hand over.
+
+## Before you run it
+
+This loop edits more files than anything else in this pillar. Take Milo's advice literally:
+**back up your vault first.** Then hold two rules, both worth putting in `vault-rules.md` (and
+your Project's instructions) — never overwrite without asking:
+
+- **Plan first, or write alongside.** Any prompt that touches existing pages must show a plan
+  or a diff and wait. Any prompt that generates must write *new* files.
+- **Lint reports; you approve.** A lint pass proposes fixes. It never applies them.
+
+> 💡 **Try it:** before any ingest, ask your agent (or your Vault Project, with `index.md`
+> uploaded) one read-only question: "Read `index.md` and list the three wiki pages you would
+> update if I ingested an article about [a topic you study or work on]. Change nothing." If
+> its answer is sensible, your schema and index are doing their job; if not, fix
+> `vault-rules.md` before the first real ingest.
+
+When you've done ingest, query and lint on real sources, you own the loop — and lesson 10 is
+about keeping it alive.

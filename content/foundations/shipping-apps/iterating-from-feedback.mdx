@@ -1,0 +1,198 @@
+---
+title: "Iterating from user feedback"
+summary: "Turn user feedback and product data into one clear next change, and keep a ship, measure, learn loop running with AI."
+changeNote: "New: how to track a few events and read small numbers, a worked iteration cycle, a failure-modes list, one task joining numbers to feedback, and a signal plan."
+section: foundations
+pillar: shipping-apps
+order: 9
+level: intermediate
+estMinutes: 13
+taskMinutes: 40
+shortPath: "About 45 min: read the breakdown and do the task: 10 or more pieces of feedback clustered into themes, one change picked and written down. Come back for the 53-minute video on wiring analytics into an agent."
+prerequisites: [deploying-and-shipping]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "WK0bZrS8pVs"
+  published: "2026-02-24"
+  year: 2026
+  minutes: 53
+  title: "Claude Code + Analytics Masterclass: Automate Product Analytics (2026)"
+  channel: "Aakash Gupta"
+  why: "Aakash Gupta writes about product management, and here he connects a coding agent (Claude Code) to analytics through MCP and turns raw product data into decisions, which is exactly this lesson's move. It's taught from the product side, which complements the engineering view in the rest of this pillar. The same pattern works in any agent or assistant that can reach your data (Cursor, Codex, or a ChatGPT or Gemini project with a CSV export). A shorter primer on the feedback loop is in the backups."
+applyIt: |
+  Most apps collect more signal than anyone reads. Before you add any tool, spend ten minutes
+  deciding which few signals your own app (or the one you're planning) actually needs.
+
+  1. **Name three events:** the core action finished, the onboarding step people must pass, and
+     the step where you suspect they stall.
+  2. **Pick one home for words:** where every message, review and call note will land (a
+     `feedback.md`, a spreadsheet, a notes page).
+  3. **Set your small-numbers rule:** below how many people per step will you message individuals
+     instead of reading percentages?
+
+  **If you have users:** check which of the three events you already record. **If you have no
+  users yet:** write the plan for the app you'd build, or for a tool or process at work.
+  Success: three named events, one feedback home and a written threshold for when a number becomes a trend.
+toolkit: |
+  - **Centralize feedback in one place.** Pick one home (a `feedback.md` in the repo, a
+    spreadsheet, a notes page) and paste every message, review and call note into it, so an
+    assistant can cluster it in one pass instead of you hunting through five inboxes.
+  - **Connect analytics to your assistant.** Use your analytics tool's MCP server where one
+    exists (PostHog has one), a database MCP for an events table, or a weekly CSV export into a
+    ChatGPT, Claude or Gemini Project, so "what should I fix next?" is a question you can ask.
+  - **Write the roadmap into your project notes.** Log the clustered themes and the one change
+    you're making in the project's memory or notes file, so the ship → measure → learn loop has
+    a durable record across sessions.
+  - **Dogfood your own app.** You are its first user: keep a running friction log while you use
+    it, and let your coding agent turn the log into the next small fix.
+recap:
+  - emoji: "🏁"
+    title: "What a launch really is"
+    text: "The starting line. Your v1 is a guess about what people want; real usage tells you the truth, and the fastest iterators win."
+  - emoji: "📊"
+    title: "Signal one: actions"
+    text: "Analytics show what people actually do: where they drop off, what they use, what they ignore. Add a lightweight tool and watch."
+  - emoji: "🗣️"
+    title: "Signal two: words"
+    text: "Reviews, support messages and a one-line in-app form tell you why. Behavior locates the problem; voice explains it."
+  - emoji: "🔌"
+    title: "Hand the pile to AI"
+    text: "Scattered, overwhelming feedback is a perfect AI job. Connect your agent or assistant to the analytics and feedback, through MCP or an export."
+  - emoji: "🧵"
+    title: "From noise to a short list"
+    text: "Ask it to cluster everything into themes and name the top three things to fix or build next. A pile becomes a ranked roadmap."
+  - emoji: "🎯"
+    title: "How many changes at once?"
+    text: "One. Make a single high-impact change, watch the metric move, repeat. Focus beats a scattershot list of half-done tweaks."
+  - emoji: "🔁"
+    title: "The loop that wins"
+    text: "Ship → measure → learn → improve → ship. An app that improves every week beats a 'perfect' one that ships once and stalls."
+task: |
+  Pair the numbers with the voice and commit to one move. Gather 10 or more pieces of raw
+  feedback (messages from the people using your app, or, with no users yet, recent public reviews
+  of an app in your space), plus any usage data you have: an analytics dashboard, a database
+  events table or a CSV export.
+
+  ```prompt
+  Here is raw feedback: [paste messages, notes, reviews]. And here is usage data, if I have
+  any: [connect analytics through an MCP server, or paste an export]. Cluster the feedback into
+  themes and count how many separate people raised each one. In the data, look for onboarding
+  drop-off, ignored features and the step where people stall, citing the number behind each;
+  if fewer than a few dozen people are behind a number, call it individual behavior, not a
+  trend. Where behavior and voice agree is the real signal. Name the single highest-impact
+  change to make next, why it beats the runners-up, and the smallest version I could ship
+  this week.
+  ```
+
+  **If you have users:** run it in your coding agent or any assistant with the data attached.
+  **If you have no users yet:** run it on the public reviews of an app you'd compete with, or on
+  feedback about a tool or process at work; the ranking skill is the same. Write the themes and
+  the chosen change into your project's notes file.
+  Success: one change picked, backed by a cited signal, justified against the alternatives, and written down.
+selfCheck:
+  - q: "According to your analytics, a couple of your early users never open a particular feature, yet both tell you they like it. Which signal do you trust, and what do you do next?"
+    a: "With so few people, neither is a statistic; it's two individuals. Behavior is the stronger evidence, but \"I like it\" might mean occasional value or politeness, so ask each of them when they last used it and what they did instead before you cut or fix it."
+  - q: "Once real users have a build, one of them reports a bug the analytics can't see, while the data shows one other person dropping off at a step. Which ranks higher?"
+    a: "Usually the bug: it's a confirmed fact you can reproduce, while one drop-off could be a bug, a busy week or plain disinterest. Reproduce the bug first, then message the person who dropped off to find out which it was."
+  - q: "When does a funnel metric become worth optimizing directly, rather than talking to the people behind it?"
+    a: "When the sample is big enough that one person's odd week can't move the number (dozens of active users per step, not a handful) and the metric holds steady across weeks. Below that, use percentages to decide whom to talk to, not what to change."
+backupResources:
+  - label: "How to Leverage the Customer Feedback Loop for Your Product's Roadmap — WP Product Talk"
+    url: "https://www.youtube.com/watch?v=6bGQmErFtbQ"
+    type: "video · feedback loop"
+  - label: "PostHog — product analytics (open-source)"
+    url: "https://posthog.com"
+    type: "tool · reference"
+tags:
+  - shipping-apps
+  - feedback
+  - analytics
+  - iteration
+---
+
+Launching feels like the finish line. It's actually the starting line. Your v1 is a **guess**
+about what people want; real usage tells you the truth. The teams that win aren't the ones who
+plan perfectly. They're the ones who **iterate fastest** on real feedback.
+
+## Listen in two ways
+
+- **Behavior (analytics)**: what users actually *do*. Add a lightweight tool (**PostHog**,
+  **Plausible**, or your platform's built-in analytics) and watch where people drop off, what
+  they use and what they ignore.
+- **Voice (feedback)**: what users *say*. Reviews, support messages, a one-line in-app feedback
+  form. Collect it somewhere central.
+
+Behavior tells you *where* the problem is; voice often tells you *why*.
+
+## Track a few events, not everything
+
+You don't need a hundred events. You need the handful that describe your app's core action
+from start to finish. For a to-do app: *signed up*, *created first task*, *completed a task*,
+*came back on another day*. Four events give you a funnel and a retention signal; anything
+more, add only when you have a question it answers. Keep personal details (names, emails,
+the content people type) out of event data, and say in your privacy notice what you collect.
+
+## Small numbers: read people, not percentages
+
+With only a handful of early users, a funnel chart misleads by rounding. "50% drop-off at
+step 3" might be two people, and two people are two stories, not a trend. So change the unit
+of analysis: read each person's activity as a timeline (what they opened, where they stopped,
+what they came back to) and set it next to what that same person told you.
+
+When behavior and words disagree, behavior usually wins, but only after you ask why. "I love
+that feature" from someone who never opens it is politeness, not demand; the follow-up ("when
+did you last use it?") is the real data. A reproducible bug report outranks any small-sample
+percentage, because it's a fact rather than an inference.
+
+Treat every number as a prompt to talk to someone, not a verdict. Aggregate metrics start to
+earn trust once one person's odd week can no longer swing the line, which means dozens of
+active users rather than a handful. Until then, your best analytics tool is a message to the
+person behind the trace.
+
+## Worked example: one iteration cycle
+
+Imagine (hypothetically) a to-do app with fifteen early users after two weeks.
+
+1. **Behavior.** The four-event funnel shows most people created a first task, but few came
+   back on a second day.
+2. **Voice.** Twelve messages, clustered by an assistant: several people say they "forgot the
+   app existed"; two ask for dark mode; one reports that tasks vanish after editing.
+3. **Cross-reference.** "Forgot it existed" lines up with the missing return visits: behavior
+   and voice agree. Dark mode is two people and no behavior signal. The vanishing-task report
+   is a bug.
+4. **Decide.** Fix the bug first (it's a fact, and it destroys trust). Then make *one* change
+   aimed at return visits, such as an optional daily reminder. Dark mode goes on the later
+   list.
+5. **Define the check before shipping.** "Do more people come back on a second day over the
+   next two weeks? And what do the people who return say?"
+6. **Ship, wait, repeat.** One change, a fixed window, then the next cycle.
+
+> 💡 **Try it:** Paste ten real reviews of any app you use (from its store page) into an
+> assistant and ask: "Cluster these into themes, count how many separate people raised each,
+> and quote one line per theme." Then check two of the quotes against the originals.
+
+## Let AI synthesize it
+
+Feedback is scattered and overwhelming, which makes it a perfect job for AI. Point a coding
+agent (Claude Code, Cursor, Codex) that can use an **MCP** connector at your analytics and
+feedback, or paste an export into ChatGPT, Claude or Gemini, and ask: *"Cluster this into
+themes and tell me the top 3 things to fix or build next."* A pile of noise becomes a
+prioritized roadmap in minutes.
+
+## Common failure modes
+
+- **Building whatever the loudest person asks for** → voice without behavior → count distinct
+  people per theme and check whether usage backs it up.
+- **Dashboards nobody reads** → too many events and no question → track the core-action
+  events and ask one question per cycle.
+- **Three changes shipped at once** → you can't tell which one worked → one change per cycle.
+- **The AI summary invents a theme or a quote** → summarizers fill gaps plausibly → ask for
+  counts and verbatim quotes, and spot-check them against the source.
+
+## Close the loop
+
+The whole game is one loop run quickly: **ship → measure → learn → improve → ship.** An app
+that improves every week beats a "perfect" app that ships once and stalls. You've now taken an
+idea from spec to a tested app in real users' hands that gets better over time. One lesson
+left: put it *all* together in a capstone.

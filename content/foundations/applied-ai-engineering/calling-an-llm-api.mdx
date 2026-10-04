@@ -1,0 +1,290 @@
+---
+title: "Calling an LLM API"
+subtitle: "Your first request"
+summary: "Make your first model API call from code, read the usage and finish reason it returns, and keep your API key out of your repo."
+changeNote: "New: a worked example, a failure-modes list, OpenAI's Responses API alongside Chat Completions, and a quick check that your API key stays out of client code."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 1
+level: intermediate
+estMinutes: 14
+taskMinutes: 30
+shortPath: "About 40 min: read the breakdown and do the task: one API call, printed usage and finish reason, run at three temperatures. Come back to code along with the 74-minute workshop."
+prerequisites: [what-is-an-llm, tokens-and-context]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "r6cLANbds_I"
+  published: "2025-11-03"
+  year: 2025
+  minutes: 74
+  title: "Integrating LLMs Into Your Projects Using APIs"
+  channel: "LauzHack"
+  why: "A hands-on workshop that writes first API calls live, at a pace that suits someone who has never called a model from code. Provider quickstarts are shorter, but they assume you already know what the request and response fields mean; this explains them. It's long (74 minutes), so code along with your editor open. The OpenAI quickstart in the backups is the concise reference afterwards."
+applyIt: |
+  Take the key rule to a project you already have, in about ten minutes. An AI feature is often
+  the first secret in a project that spends money, so check where your secrets live today,
+  before you add a model call. In a repo you own, ask your coding agent (Claude Code, Cursor,
+  Codex, Copilot agent mode):
+
+  ```prompt
+  Search this repo's tracked files and git history for inlined API keys or tokens (sk-, AIza,
+  ghp_, any long string assigned to a *_KEY, *_SECRET or *_TOKEN). Check .env* is gitignored.
+  List file:line | key type | fix, with values masked. Don't change anything.
+  ```
+
+  **If a key turns up in history:** revoke and rotate it at the provider first; deleting the
+  line does not remove it from git history. **If you don't code yet:** check where your
+  automation tools (Zapier, Make, n8n, a shared spreadsheet) keep API keys, and move any key
+  sitting in a shared doc or a chat message into the tool's own credential store.
+
+  Success: you can say where every key you own lives, and none sits in tracked code, git history or a shared doc.
+toolkit: |
+  - **Write the key rule into your instruction file.** One line in AGENTS.md (or CLAUDE.md /
+    GEMINI.md for those agents), `.cursor/rules` or your Copilot instructions ("API keys live
+    in .env or the host's secret store; never inline them, never ship them to client code")
+    stops your coding agent from pasting a key into a component to make a demo work.
+  - **Add a secret scan before every commit.** A pre-commit hook running a scanner such as
+    gitleaks, or GitHub's push protection, catches a key before it leaves your machine, which
+    is far cheaper than rotating one afterwards.
+  - **Read every assistant as this one call.** Chat apps, coding agents and subagents are model
+    + system + messages + params under the hood. When one misbehaves, ask which of those four
+    was wrong instead of treating the failure as magic.
+  - **Log tokens and the finish reason from line one.** Any script you wire to a model should
+    print usage and stop reason, so a runaway loop shows up as a number and a reply truncated at
+    max_tokens never silently writes half a file.
+  - **Keep a "hello model" script as your template.** Your smallest working call (key from the
+    environment, one request, usage printed, retry on 429) is what you copy for every new
+    experiment and the fastest way to try a new provider or model.
+recap:
+  - emoji: "🔌"
+    title: "Why this one skill"
+    text: "Calling an LLM from your own code is the door from using AI to building it in. Every later feature is this call with more around it."
+  - emoji: "🧱"
+    title: "Three parts of a request"
+    text: "Which model, a system + user message pair, and parameters like temperature and max_tokens. Send it, get text back."
+  - emoji: "🌡️"
+    title: "Extraction vs. drafting"
+    text: "Use temperature near zero for extraction and classification, where you want repeatable output; go higher for drafting and brainstorming."
+  - emoji: "📊"
+    title: "Before you trust a reply"
+    text: "Check the finish reason is a natural stop, not a cut-off at max_tokens. Log token usage on every call, because it's your bill."
+  - emoji: "🔑"
+    title: "Where the key lives"
+    text: "In .env or a secret store, server-side only, never committed. Deleting a leaked key from code doesn't remove it from git history."
+  - emoji: "🔁"
+    title: "429s and 5xx errors"
+    text: "Rate limits, overloads and timeouts are routine. Retry transient errors with backoff and jitter, then fall back."
+  - emoji: "🔄"
+    title: "What the model remembers"
+    text: "Nothing, by default. Your code resends the full history on every call, so long chats cost more per turn."
+task: |
+  Write the smallest possible script that makes one real API call you own end to end. Any
+  provider works: a free-tier key from Google AI Studio is enough, and a local model through
+  Ollama needs no key at all.
+
+  ```prompt
+  Write the smallest script (Python or TypeScript) that loads an API key from .env, sends ONE
+  chat request (system: a concise, friendly support agent for a small online shop; user: "My
+  order #1042 is a week late and I want a refund.") and prints the reply plus the token usage
+  and the finish reason (or the status, if you use OpenAI's Responses API). Wrap the call in a retry with exponential backoff for 429 and 5xx
+  errors. Run it at temperature 0, 0.7 and 1.0 and show how the output changes. Keep the key
+  out of the code.
+  ```
+
+  **No-code path:** open a provider playground (Google AI Studio, the OpenAI Playground or the
+  Anthropic Console Workbench), paste the same system and user messages, and run them at the
+  three temperatures. Then let a chat assistant write the script and run it in a free Google
+  Colab notebook, with the key stored in Colab's Secrets panel instead of the code.
+
+  Success: it prints a reply, you can see usage + finish reason, and higher temperature visibly varies the text.
+selfCheck:
+  - q: "Your chatbot answers the second message as if the first exchange never happened (\"Escalate *what*?\"). The API call succeeds. What went wrong, and what's the fix?"
+    a: "The API is stateless, so your code didn't resend the history. Each request must carry the system message plus every earlier user *and* assistant turn, in order."
+  - q: "Some product summaries your script writes to a database end mid-sentence, with no error logged. What's the likely cause, and what check would have caught it?"
+    a: "The replies hit `max_tokens` and were truncated. Checking the finish reason on every call (natural stop vs. length cap) and treating a cap as a failure would have flagged them."
+  - q: "A teammate wants to call the model straight from your web app's front end \"to keep it simple\". What do you tell them?"
+    a: "Anything shipped to a browser or mobile app can be extracted, so the key would be public and anyone could spend on it. Route calls through a server endpoint that holds the key in an environment variable."
+mcq:
+  - q: "Your script loops over 2,000 product descriptions, sending one request each as fast as it can. After about a minute, most calls fail with HTTP 429. What's the right fix?"
+    options:
+      - "Check that the API key is loaded from the .env file"
+      - "Retry each failed call immediately until it succeeds"
+      - "Cap parallel requests and retry with backoff and jitter"
+      - "Raise max_tokens so each request does more of the work"
+    answer: 2
+    explain: "429 is a rate limit: the loop is simply sending too fast. Capping concurrency and retrying with exponential backoff plus a little random jitter spreads the load. Retrying immediately just hits the limit again, and a missing key shows up as a 401, not a 429."
+  - q: "You're extracting invoice totals and dates into a database, and the same invoice gives slightly different values on different runs. Which setting do you change first?"
+    options:
+      - "Set temperature near zero for repeatable output"
+      - "Raise max_tokens so the model has room to work"
+      - "Move the extraction rules into the user message"
+      - "Raise temperature so it explores better answers"
+    answer: 0
+    explain: "Extraction and classification want repeatable output, so temperature near zero is the first move. max_tokens only caps the length of the reply; it doesn't change how much the sampling varies, and a higher temperature makes the variation worse."
+  - q: "Your support chatbot's cost per reply keeps climbing as conversations get longer, even though each customer message is short. What explains it?"
+    options:
+      - "Providers charge more per token after many turns"
+      - "The model gets wordier, so output tokens keep growing"
+      - "The system message is billed again as output tokens"
+      - "The whole history is resent as input on every turn"
+    answer: 3
+    explain: "The API is stateless, so every request carries the system message and all earlier turns, and you pay for all of it as input tokens. The per-token price doesn't change mid-conversation; the growing resent history is what makes each turn of a long chat cost more."
+  - q: "You moved a script from OpenAI's Chat Completions to the Responses API. Your truncation check looks for finish_reason \"length\" and has stopped firing, even on replies that are clearly cut off. What happened?"
+    options:
+      - "Responses never truncate, so the check is now redundant"
+      - "It reports a status of incomplete instead of a finish_reason"
+      - "The output cap moved into the instructions, so it can't trip"
+      - "Truncation now raises an HTTP error that the retry hides"
+    answer: 1
+    explain: "The Responses API has no finish_reason. It returns a status, and a cut-off reply comes back as \"incomplete\" with the cause in incomplete_details, so the check must trust only \"completed\". Truncation still happens whenever max_output_tokens is reached; your old check just looks for a field that no longer exists."
+backupResources:
+  - label: "How To Build an API with Python (LLM Integration, FastAPI, Ollama) — Tech With Tim"
+    url: "https://www.youtube.com/watch?v=cy6EAp4iNN4"
+    type: "video · build it"
+  - label: "OpenAI — API quickstart (canonical reference)"
+    url: "https://platform.openai.com/docs/quickstart"
+    type: "docs · official"
+tags:
+  - api
+  - llm
+  - applied-ai
+---
+
+Everything so far has been *using* AI through someone else's app. This pillar is about
+**building AI into your own** software, and it starts with one skill: calling a model from
+code through its **API**. Every later lesson in this pillar (structured outputs, RAG, agents,
+evals) is this same call with more machinery around it, so it pays to understand it exactly.
+
+**You'll need:** basic Python or JavaScript (variables, functions, a loop), running a script from
+a terminal, and an API key kept in a `.env` file, with a spending limit set on the account first.
+If you don't code yet, do a free beginner course (freeCodeCamp's Python or JavaScript course is a
+good start) before this pillar, or use the no-code path in the task below to see the same call in a
+provider's web playground.
+
+## The anatomy of a request
+
+An API call to any major model carries the same three things:
+
+1. **The model**: which model and tier to use (picking one is covered in → models-and-effort).
+2. **The messages**: usually a `system` message (the standing rules) plus a `user` message
+   (the request). Your prompting skills live here.
+3. **The parameters**: `temperature` (how much the sampling varies), `max_tokens` (a hard cap
+   on output length) and a few others.
+
+You send that, you get the model's text back. The same pattern powers every AI feature you
+have used.
+
+## The model remembers nothing
+
+The single most useful fact for a beginner: by default the API is **stateless**. The model does
+not remember your previous call. A "conversation" is your code resending the whole history
+(system message, every earlier user turn and every earlier assistant reply) on each request.
+Two consequences follow. Long chats get more expensive per turn, because you pay for the
+resent history as input tokens. And if your code forgets to append the last assistant reply,
+the model answers as if that reply never happened. Some providers offer optional server-side
+conversation state, but you should still be able to explain what is in the context on every
+call.
+
+## What comes back (read more than the text)
+
+The response carries metadata that production code must read:
+
+- **Token usage**: input and output counts for this call. This is your bill per request, so
+  log it from day one.
+- **Finish (stop) reason**: *why* generation ended. A natural stop, the `max_tokens` cap (the
+  answer is cut off), a content filter, or a tool call. Check for a natural stop (`"STOP"` on
+  Gemini, `"stop"` on OpenAI's Chat Completions, `"end_turn"` on Anthropic) before you trust a
+  reply. OpenAI's newer Responses API reports the same thing differently (see the footnotes
+  below).
+- **Errors and timeouts**: real calls fail. Rate limits (HTTP 429), overloaded servers (5xx)
+  and network timeouts are routine. The minimum handling is a retry with backoff for transient
+  errors and a fallback path for the rest.
+
+## Worked example: one support reply, end to end
+
+Say you are adding an auto-reply to a small online shop's support inbox. Here is the whole
+flow, step by step.
+
+**Step 1, build the request.** In provider-neutral form:
+
+```json
+{
+  "model": "a-small-fast-model",
+  "max_tokens": 300,
+  "temperature": 0.2,
+  "messages": [
+    { "role": "system", "content": "You are a concise, friendly support agent for a small online shop. Never promise a refund; offer to escalate to a person." },
+    { "role": "user", "content": "My order #1042 is a week late and I want a refund." }
+  ]
+}
+```
+
+Low temperature for consistency; a modest `max_tokens` as a ceiling on length and cost.
+
+**Step 2, read the response.** You get the reply text, a usage block (input and output
+tokens) and a finish reason.
+
+**Step 3, decide whether to trust it.** If the finish reason is a natural stop, the reply can
+go into the agent's draft queue. If it hit `max_tokens`, the reply is truncated: don't send
+it; log it and retry with a higher cap or a "reply in under 80 words" instruction. Log the
+token counts either way.
+
+**Step 4, handle failure.** On a 429 or 5xx, wait and retry with exponential backoff (for
+example 1s, 2s, 4s, plus a little random jitter so many clients don't retry in lockstep). Stop
+after a few attempts and fall back to a fixed message: "Thanks, a person will reply shortly."
+
+**Step 5, the follow-up.** The customer writes back: "Fine, escalate it." Your next request
+must contain the system message, the first user message, the assistant's first reply and the
+new message, in order. Skip the assistant's reply and the model won't know what "it" refers to.
+
+That is a production-shaped call: bounded, checked, logged and resilient.
+
+> 💡 **Try it:** In any provider playground (Google AI Studio, the OpenAI Playground or the
+> Anthropic Console), set the maximum output to about 20 tokens and ask for a three-paragraph
+> story. Look at where the text stops and what the finish reason says. That is the truncation
+> your code must catch.
+
+**Streaming.** For anything a person watches, stream the reply: the first words appear sooner, and
+the usage and finish reason arrive in the final chunk.
+
+## Protect your key
+
+Your API key is a password that spends money. Load it from an **environment variable or
+`.env` file**; never hardcode or commit it (deleting it later doesn't scrub git history). In
+apps, keep it **server-side** and route calls through your own backend, never the browser or
+a mobile client.
+
+## Vendor-neutral by design (with a few footnotes)
+
+OpenAI, Anthropic and Gemini share this request shape, so switching is mostly endpoint, key
+and model name. Many providers and local runners (Ollama among them) also offer an
+OpenAI-compatible endpoint. Two differences bite on day one: **Anthropic takes `system` as a
+top-level parameter** and **requires `max_tokens`** on every request.
+
+**OpenAI has two interfaces.** The shape above is OpenAI's **Chat Completions**, which most
+tutorials and most "OpenAI-compatible" endpoints use, and which is still supported. For new
+work OpenAI now recommends its **Responses API**. The ideas are the same (a model,
+instructions, input, a cap on output), but the fields differ: the system message goes in
+`instructions`, the cap is `max_output_tokens`, and there is no `finish_reason`. Instead the
+response carries a `status`: trust a reply only when it is `"completed"`. An `"incomplete"`
+response says why in `incomplete_details` (the output cap or a content filter, for example).
+It can also keep the conversation on OpenAI's side if you ask it to. Field names change
+between versions, so check the current docs before you write against either interface.
+
+## Common failure modes
+
+- **401 or "invalid API key"** → the key isn't loaded (wrong `.env` path, variable name typo,
+  server not restarted) → print whether the variable is *set*, never its value.
+- **Replies cut off mid-sentence** → `max_tokens` too low and nobody checks the finish reason →
+  check it on every call and treat truncation as a failure.
+- **A burst of 429s when you process a list** → a tight loop with no backoff or concurrency
+  limit → add backoff with jitter and cap parallel requests.
+- **"It forgot what I just said"** → the history wasn't resent → append every turn, both
+  sides, to the messages you send.
+- **"Model not found" after months of working** → the model name was retired → keep the model
+  name in config, not scattered through code, and watch the provider's deprecation notices.
+
+Next, how to manage the *prompts* you send as the production assets they are
+(→ prompt-as-code).

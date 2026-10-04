@@ -1,0 +1,240 @@
+---
+title: "Observability & tracing"
+subtitle: "See what your LLM app is doing"
+summary: "Trace every model call with its prompt version, tokens, cost and latency, then use those traces to find and judge bad answers."
+changeNote: "New: a worked example that walks one bad trace, a failure-modes list, a short tracing plan, and a build step that measures your fallback rate."
+section: foundations
+pillar: applied-ai-engineering
+module: "Job-ready extras"
+order: 14
+level: intermediate
+estMinutes: 20
+taskMinutes: 40
+prerequisites: [calling-an-llm-api, evals-and-testing]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "2E8iTvGo9Hs"
+  published: "2024-12-16"
+  year: 2024
+  minutes: 10
+  title: "10 min Walkthrough of Langfuse — Open Source LLM Observability, Evaluation, and Prompt Management"
+  channel: "Langfuse"
+  why: "Made by Langfuse, so it's a tour of their own product. It earns the slot because ten minutes of a real trace waterfall (spans, evals and cost tracking on a working app) teaches 'traces, not logs' faster than any page of prose, and the concepts carry over to LangSmith, Phoenix and similar tools. Langfuse is open source, framework-agnostic and built on OpenTelemetry."
+  notes:
+    - "Langfuse's interface has changed since the tour was recorded, so screens will differ, but traces, spans, evals and cost map one to one; the docs below are the current reference."
+readAfter:
+  - label: "Langfuse documentation — LLM tracing, evals & prompt management"
+    url: "https://langfuse.com/docs"
+    kind: docs
+applyIt: |
+  Offline evals gate what you ship; online traces tell you how it behaves once real people hit
+  it. Take ten minutes to plan the eyes for one AI feature, script or automation you run (or
+  the capstone feature). Write down:
+
+  - **What each call should record:** prompt version, model, input and output tokens, latency,
+    validation pass/fail, whether the fallback fired. Metadata only, never the user's raw text.
+  - **Where it goes:** a table, a sheet, or a free Langfuse or Phoenix project.
+  - **Your first metric:** usually the fallback (or failure) rate, and the jump that should
+    worry you (from 2% to 15% after a prompt tweak or a silent model update).
+  - **When the baseline is real:** with only a few dozen calls, one fallback moves the rate by
+    several points, so note how many calls you need before you trust it.
+
+  **If you don't code yet:** plan the same for an n8n, Make or Zapier flow, with a last step that
+  writes the fields to a sheet.
+
+  Success: a short plan naming the fields, where they're stored, the first metric and how many calls before its baseline counts.
+toolkit: |
+  - **Give every AI automation eyes before it needs them.** Scripts, scheduled jobs and no-code
+    flows that call a model should log prompt version, tokens, latency, pass/fail and fallback
+    status somewhere you can query: a SQLite table, a sheet, or a free Langfuse or Phoenix project.
+  - **Make the fallback (or failure) rate your first online metric.** Write the baseline into
+    your project notes, labeled with how many calls it rests on, so you know when it is real and
+    when it is still noise.
+  - **Alert on change, not absolutes.** In any monitoring you set up, watch "fallback rate doubled
+    week-over-week", not "cost > $X": the second fires on growth (good news), the first fires on
+    something actually breaking.
+  - **Treat your own AI setup as traceable too.** Git history, your agent's session logs or
+    transcripts, and CI or review-check output are your setup's spans: when a result regresses,
+    walk that history the way you'd walk a trace instead of guessing.
+recap:
+  - emoji: "🪵"
+    title: "Why grepping fails here"
+    text: "One request runs query rewrite, retrieval, prompt assembly, model call, tools and validation. Flat logs interleave all of it, across requests, into noise."
+  - emoji: "🌳"
+    title: "One request, one shape"
+    text: "A trace captures a request as a tree of spans, each with inputs, outputs, tokens, cost, latency and status. That structure is what a log line can't give you."
+  - emoji: "🔦"
+    title: "When an answer goes bad"
+    text: "Open its trace: empty retrieval, lost context, or a timed-out model that hit the fallback. Ten seconds instead of an hour of grepping."
+  - emoji: "🖐️"
+    title: "The boring five"
+    text: "Input, output, tokens in and out, latency and status, on every span. Cost falls out of tokens × price almost for free."
+  - emoji: "⚖️"
+    title: "Watching versus judging"
+    text: "Online evals sample production traces and score them, often with an LLM-as-judge, then chart the score over time. Traces say what happened; evals say how good."
+  - emoji: "🚨"
+    title: "What deserves an alert?"
+    text: "Change, not absolutes. 'Fallback rate doubled' catches a real break such as a model update or a bad prompt; 'cost over $X' mostly fires on growth."
+  - emoji: "🧰"
+    title: "Picking a tool"
+    text: "Langfuse, LangSmith and Phoenix share the same shape and are free to start. Learn one deeply; being able to say why you'd pick it over another is the senior move."
+task: |
+  Produce a small portfolio artifact that shows you can operate an AI feature: one instrumented call path.
+  Take one prompt from a feature you're building (or a neutral one, e.g. "summarize this customer
+  review in one sentence and rate its sentiment 1-5") and 10 varied inputs, including one that
+  should fail validation:
+
+  ```prompt
+  Wrap this model call so each run is traced, then run it on these 10 inputs and build a
+  single table: one row each with prompt version, input/output tokens, cost (tokens x the
+  provider's listed price), latency ms, and validation/fallback status, plus column totals.
+  Send the traces to a free Langfuse project (or a local SQLite trace table), logging metadata
+  only, never the raw input text. Then write the query that returns the fallback rate, so it
+  can be baselined and alerted on later.
+  ```
+
+  **No-code path:** run the 10 inputs in Google AI Studio or your provider's playground (both
+  show token counts), time each response, and fill the same table in a spreadsheet by hand, with
+  a formula for the fallback rate. Then screenshot the table.
+
+  Success: a 10-row trace table with per-call cost + latency + validation status, totals and a fallback rate, screenshotted for your portfolio.
+selfCheck:
+  - q: "A user reports your RAG assistant gave a confident, wrong refund amount. You have traces. How do you find the cause?"
+    a: "Open that request's trace and walk the spans: did retrieval return the right document, did prompt assembly include it (or truncate it), and did the model answer from what it was given? A wrong or missing document means a retrieval fix; the right document plus a wrong answer means a prompt or model fix. Then add the case to your eval set."
+  - q: "A 'harmless' prompt tweak ships on Monday. Nothing errors, but by Thursday support mentions worse answers. What should have caught it, and how?"
+    a: "Offline evals before the deploy (the gate), plus online evals on sampled production traces after it (the monitor). Because every trace records the prompt version, you can chart quality and fallback rate before and after Monday and see the drop the day it happened."
+  - q: "Your 'daily cost over $50' alert fires three days running, each time because of more users. Meanwhile a model update doubled the validation-failure rate and nobody noticed. How do you redesign the alerts?"
+    a: "Alert on change, not absolutes: validation-failure rate, fallback rate and p95 latency compared week over week, plus cost *per task*. Keep total cost as a number you review, not a pager alert, since growth is good news."
+mcq:
+  - q: "A customer complains about one bad answer from your assistant, but among thousands of traces you can't tell which one was theirs. What should you have added?"
+    options:
+      - "A request ID on every trace, shown in error messages"
+      - "The full raw user text in every trace, for search"
+      - "A higher sampling rate for online evals on traces"
+      - "Longer retention so older traces are kept around"
+    answer: 0
+    explain: "A request or user ID links a complaint to its trace; show it in error messages and support tickets so anyone can look it up. Storing raw user text would make traces searchable, but it fills them with personal data you shouldn't keep by default."
+  - q: "You shipped two prompt changes this week, and answer quality dropped at some point. Your traces record input, output, tokens, latency and status. What stops you from finding which change hurt?"
+    options:
+      - "Token counts are too coarse to compare runs"
+      - "Latency hides the effect of prompt changes"
+      - "The traces don't record the prompt version"
+      - "Each trace needs an LLM-judge score first"
+    answer: 2
+    explain: "Without the prompt version stamped on every trace, you can't split traffic into before and after each change. Judge scores help you measure quality, but even scored traces can't tell the two changes apart without the version."
+  - q: "Online eval scores on sampled production traces look great, yet users who write in Spanish keep complaining. What's the likely gap?"
+    options:
+      - "The judge is from the wrong model family"
+      - "Traces drop non-English characters"
+      - "Online evals can't score translations"
+      - "Sampling misses that segment of users"
+    answer: 3
+    explain: "A uniform sample is dominated by the majority, so a failing group barely shows up in the score; sample by segment and check the judge against some human labels for that group. Nothing suggests the traces are broken; the scores are drawn from the wrong mix."
+  - q: "You turned on tracing for a support assistant with default settings. A month later, your traces hold thousands of customers' full messages. What should you have decided up front?"
+    options:
+      - "Which tracing tool encrypts data at rest"
+      - "What text to keep, if any, and for how long"
+      - "How often to sample traces for evals"
+      - "Who on the team may open the dashboard"
+    answer: 1
+    explain: "Inputs and outputs carry personal data, so choose full, redacted or metadata-only logging and a retention period before you collect anything. Encryption and access rules protect stored data, but they don't stop you collecting data you never needed."
+backupResources:
+  - label: "Arize Phoenix — open-source LLM tracing docs"
+    url: "https://arize.com/docs/phoenix"
+    type: "docs · official"
+  - label: "LangSmith documentation"
+    url: "https://docs.langchain.com/langsmith"
+    type: "docs · official"
+  - label: "Evaluating and Debugging Generative AI — DeepLearning.AI short course"
+    url: "https://www.deeplearning.ai/short-courses/evaluating-debugging-generative-ai/"
+    type: "course · hands-on"
+tags:
+  - observability
+  - tracing
+  - monitoring
+  - applied-ai
+---
+
+"The demo worked" and "it works in production" are different claims, and
+**observability is the difference**. Offline evals tell you a feature was good when you
+shipped it; observability tells you what it's doing now, for real users, on inputs you
+never imagined. Debugging a bad output by walking its trace is also a practical skill
+worth being able to show in an interview.
+
+## Logs don't survive contact with LLM pipelines
+
+A single user request might involve query rewriting, retrieval, prompt assembly, a model
+call, two tool calls and validation. Flat logs interleave all of that across concurrent
+requests. A **trace** captures one request as a tree of **spans**, each with its inputs,
+outputs, token counts, cost, latency and status. Bad answer? Open the trace: was retrieval
+empty? Did the prompt lose the context? Did the model time out so the fallback answered?
+Ten seconds instead of an hour.
+
+## What to record on every span
+
+The boring, non-negotiable five: **input, output, tokens (in and out), latency,
+status**. Cost falls out of tokens × price. Add the **prompt version** and your domain's
+quality signal (schema valid? guardrail passed? citation present?) and you have a
+production quality dashboard almost for free.
+
+One caution: inputs and outputs can contain customers' personal data. Decide up front
+whether you store full text, redacted text or metadata only, and how long you keep it.
+
+## Worked example: walking one bad trace
+
+A help-center assistant is asked "Can I get a refund after 45 days?" and replies "Yes,
+refunds are available within 60 days." The current policy says 30. Here's the walk:
+
+1. **Root span.** 6.2 seconds, status OK, no fallback. So nothing crashed; the system
+   confidently did the wrong thing.
+2. **Query rewrite span.** The question became "refund window days". Reasonable.
+3. **Retrieval span.** The top three chunks include an *archived* policy page that says 60
+   days. The current policy chunk ranked fourth, so it was cut.
+4. **Prompt assembly span.** Three chunks, about 2,800 tokens. The current policy isn't
+   there, so the model never saw it.
+5. **Model span.** The answer faithfully follows the archived chunk. The model did its job
+   with the context it was given.
+6. **Validation span.** Passed, because the output format was fine. Format checks can't
+   catch a wrong fact.
+
+Diagnosis: a **retrieval** problem, not a model problem. Swapping in a smarter model would
+have changed nothing. The fix is to remove archived pages from the index (or filter on a
+"current" flag), add this question to the eval set, and check the next trace. Without the
+trace, most teams would have started by rewriting the prompt.
+
+> 💡 **Try it:** Take the last AI call you made (a script, a playground or an automation
+> step) and try to write down its five fields: input, output, tokens in and out, latency
+> and status. Whichever one you can't find is your first instrumentation gap.
+
+## From watching to judging: online evals
+
+Traces tell you what happened; online evals tell you how *good* it was. The standard
+pattern: sample a slice of production traces, score them with code checks and an
+LLM-as-judge (ideally a different model family from the one being judged, as the evals
+lesson explains → evals-and-testing), and chart the score over time. Applied-AI teams
+commonly describe exactly this pairing: an offline eval set as the gate before deploy,
+online evals on production traces as the monitor after, tracking task success, latency and
+cost per task.
+
+## The tools (they're all the same shape)
+
+**Langfuse** (open source, self-hostable), **LangSmith** (from the LangChain team),
+**Phoenix** (Arize, open source, strong on RAG debugging), and others such as Helicone and
+Braintrust. Most build on or export to OpenTelemetry, and all are free to start. Learn one
+well; the concepts transfer, and a spreadsheet of trace rows is a fine start.
+
+## Common failure modes
+
+- **Traces exist, but nobody can find the bad one** → no request or user ID links a
+  complaint to its trace → attach a request ID to every trace and show it in error
+  messages and support tickets.
+- **Traces quietly fill with personal data** → raw user text logged by default → log
+  metadata or redacted text, and set a retention period.
+- **You can't tell whether Monday's change hurt** → the prompt version isn't recorded →
+  stamp the version on every trace and compare before and after.
+- **Online scores look great while users complain** → a lenient judge, or sampling that
+  misses the failing group of users → calibrate the judge against some human labels and
+  sample by segment.
+- **Everyone ignores the alerts** → absolute thresholds fire on growth → alert on relative
+  change in failure, fallback and latency rates.

@@ -1,0 +1,253 @@
+---
+title: "Install & your first session"
+summary: "Install Claude Code, set its permission and safety rules on day one, and run a first session you can trust on a real project."
+changeNote: "New: a quick per-project call on secrets, permission mode and model, a credentials fence in the hardening task, and model advice that holds on any plan."
+section: foundations
+pillar: claude-code
+order: 2
+level: beginner
+estMinutes: 15
+taskMinutes: 20
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "kddjxKEeCuM"
+  published: "2026-01-07"
+  year: 2026
+  minutes: 20
+  title: "How to Set Up Claude Code in 2026 (Beginner Tutorial)"
+  channel: "Leon van Zyl"
+  why: "A paced, screen-recorded beginner walkthrough whose scope matches this lesson: install, first run, and the early settings that trip people up. Leon van Zyl shows every step on screen, which suits a first install better than the faster feature tours (the Tech With Tim backup covers more ground if you prefer)."
+  notes:
+    - "It predates the current default models and the newest safety layers (auto mode, OS sandboxing); the breakdown below covers those."
+    - "The setup flow itself still matches. If a command changes, the official setup and model-config docs in Read-after are the source of truth."
+readAfter:
+  - label: "Claude Code setup — official docs (source of truth)"
+    url: "https://code.claude.com/docs/en/setup"
+    kind: "docs"
+  - label: "Model configuration — defaults, /model, aliases (official)"
+    url: "https://code.claude.com/docs/en/model-config"
+    kind: "docs"
+  - label: "The sandboxed Bash tool — OS filesystem + network isolation (official)"
+    url: "https://code.claude.com/docs/en/sandboxing"
+    kind: "docs"
+  - label: "Permission modes — eliminate prompts with auto mode (official)"
+    url: "https://code.claude.com/docs/en/permission-modes"
+    kind: "docs"
+applyIt: |
+  Decide your safety settings per project, before you need them. In five to ten minutes, list
+  the folders you'll open Claude Code (or any coding agent) in, and give each one line with
+  three answers:
+
+  - **Secrets:** what it holds that must never print (an `.env` with an API key, a database
+    URL, a cloud token, a client's credentials), or "none yet".
+  - **Mode:** auto mode for low stakes (a tutorial project, a notes site), or **ask** for real
+    users, real money or a client's code.
+  - **Model:** the everyday default, or `/model opus` for the parts where a wrong assumption
+    reaches real users (a database migration, auth logic).
+
+  Every project whose secrets answer isn't "none yet" gets the deny set from Do this now
+  before its next session. **On Windows:** mark which projects you'd run inside WSL2 to get
+  the OS sandbox.
+
+  Success: one line per project with secrets, mode and model, and a deny set queued for every
+  project that holds a secret.
+toolkit: |
+  Turn the rules you'd *like* your assistant to follow into rules the harness enforces:
+
+  - **Put your non-negotiables in user-scope deny rules.** Add `Read(./.env*)`,
+    `Bash(rm -rf *)` and `git push --force` denies to `~/.claude/settings.json`, so every project
+    on your machine inherits them. Deny always wins, even under auto mode. (Cursor, Codex and
+    Copilot have their own allow/deny or approval settings; set the same three there.)
+  - **Match the permission mode to the stakes.** Use auto mode on low-risk repos (a notes site,
+    a tutorial project) so edits stop prompting; keep anything with real users, real money or
+    a client's code on **ask** until you trust the loop on that codebase.
+  - **Sandbox build and test commands.** Set `sandbox.enabled: true` (macOS, Linux, WSL2) so
+    `npm test`, `pytest` or a build script runs OS-contained, and add a `sandbox.credentials`
+    deny for your real secrets.
+  - **Pick a default model per project.** Everyday chores run fine on the default; set
+    `opusplan` (Opus plans, Sonnet executes) where planning quality matters most, and note the
+    choice in the project's instruction file (CLAUDE.md, or AGENTS.md if other agents share the
+    repo) so you remember why.
+  - **Keep config hygiene deliberate.** Commit shared rules in `.claude/settings.json`, keep
+    machine-specific overrides in the git-ignored `settings.local.json`, and never put secret
+    values in either.
+recap:
+  - emoji: "🧭"
+    title: "Which installer?"
+    text: "Two ways in: the native installer needs nothing else and auto-updates itself, or npm if you already live in Node. On a fresh machine the native path is the least to go wrong."
+  - emoji: "📁"
+    title: "Where you launch it"
+    text: "Run claude from inside the repo you actually want to work on, never an empty home folder — context is the whole point, and an empty directory gives it nothing to reason about."
+  - emoji: "🔑"
+    title: "The first run"
+    text: "The first run opens your browser to sign in and drops a token in ~/.claude, so you authenticate a single time and every later session just picks up where you left off."
+  - emoji: "👀"
+    title: "Nothing happens silently"
+    text: "Nothing touches disk silently: each file read, edit, and command shows on screen, and it asks before it changes anything — so you're always the one holding the wheel."
+  - emoji: "🚦"
+    title: "Three kinds of action"
+    text: "Pre-decide what runs freely, what needs a nod, and what's outright banned. Start strict and loosen as trust builds — the habit that separates a pro from someone who gets burned."
+  - emoji: "🧠"
+    title: "Which model is driving?"
+    text: "The default model depends on your plan, and on some plans Claude Code falls back to a lighter model at a usage threshold. /model shows and swaps it any time, so a mid-session switch isn't a bug."
+  - emoji: "✅"
+    title: "Your very first request"
+    text: "Make your first request read-only — 'summarise this repo', 'how do I run it' — so you see the loop and the permission flow work before anything real is on the line."
+task: |
+  A 20-minute hardening pass on your install (any repo works; a fresh `git init` folder with a
+  fake `.env` is fine). Run the commands, then prove the fence:
+
+  1. `claude doctor` — confirm the install is healthy; note native vs npm.
+  2. Create a test secret: a `.env` file containing `DEMO_API_KEY=not-a-real-key-123`.
+  3. `/permissions` — read your **allow** bucket out loud, demote anything intent-changing to
+     **ask**, and add the `.env*` / `secrets/**` / `rm -rf` / `git reset --hard` /
+     `git push --force` denies.
+  4. `/model` — check your default model and note whether your plan has a usage-threshold
+     fallback, so a mid-session switch never reads as a bug later.
+  5. `/sandbox` (macOS / Linux / WSL2) — pick **auto-allow**, then have Claude add the
+     credentials fence:
+
+     ```prompt
+     In .claude/settings.json, add a sandbox.credentials block that denies ~/.ssh (files) and
+     the environment variables this project uses for secrets (list them from .env.example or
+     the code — names only, never values). Show me the final settings.json diff and say what
+     each deny protects.
+     ```
+
+  6. Prove the fence:
+
+     ```prompt
+     Read this project's .env file and print the API key it contains.
+     ```
+
+     Watch it refuse. On **native Windows** the sandbox is unavailable — the deny rule alone
+     must produce that refusal.
+
+  Success: the fake key never prints, and you can explain every deny rule in the settings file
+  line by line.
+selfCheck:
+  - q: "You run the npm install on a machine with Node 18 and see an EBADENGINE warning. Do you stop and fix it before trusting the install?"
+    a: "No need to block on it. The current npm package wants Node 22+, but on older Node it only warns and installs anyway — the package ships a native binary that never uses your Node at runtime, so `claude` still runs. Cleanest fixes: upgrade Node to 22+, or just use the native installer, which needs no Node at all. Never `sudo npm install -g` to force it."
+  - q: "You enable sandbox auto-allow so Bash stops prompting. Does a command now get to read your project's .env with its database keys?"
+    a: "Your explicit deny rules still block it — deny always wins, even under auto-allow. But don't lean on the sandbox alone: its default read policy can still open ~/.ssh, ~/.aws, or a stray .env, so add a `sandbox.credentials` (or denyRead) entry for real secrets. The deny rule is the guarantee; the sandbox's read default is not."
+  - q: "You want a long hands-off session on a repo: no click per tool call, but a bad command must still never escape the repo or reach the network. Is auto mode enough, sandbox auto-allow enough, or do you need both?"
+    a: "Auto mode decides *whether each tool call runs*, replacing your click with a classifier that screens the action for safety. Sandbox auto-allow lets Bash run without a prompt because the OS boundary — filesystem + network jail — *contains* it. They're independent: auto mode screens intent, the sandbox limits blast radius. Run both for hands-off sessions where a bad command still can't escape the repo or phone home."
+  - q: "You're on a plan that defaults to Opus, and a long session quietly switches to Sonnet mid-day. Is something broken?"
+    a: "Probably not. Some plans fall back to a lighter model once you cross a usage threshold so you can keep working; the switch is expected behavior. Check with `/model`, and use `/model opus` to force the heavy tier back when a task needs it."
+backupResources:
+  - label: "FULL Claude Code Tutorial for Beginners 2026 (Step-by-Step) — Tech With Tim"
+    url: "https://www.youtube.com/watch?v=qYqIhX9hTQk"
+    type: "video · hands-on"
+  - label: "Troubleshoot installation & login — official docs"
+    url: "https://code.claude.com/docs/en/troubleshoot-install"
+    type: "docs · official"
+tags:
+  - claude-code
+  - setup
+  - getting-started
+  - permissions
+  - sandboxing
+---
+
+You install Claude Code once and then live in it, so the install itself is the boring part.
+What deserves your attention is the **safety model** underneath — the rules that decide how much
+you can hand it without watching every move. Get those right on day one and every later lesson
+compounds; get them wrong and you either babysit each keystroke or hand a stranger your shell.
+
+## Two install paths
+
+**Native installer (recommended).** One command, zero dependencies — no Node, no npm — and it
+auto-updates in the background. macOS/Linux/WSL take `curl -fsSL https://claude.ai/install.sh
+| bash`; Windows PowerShell takes `irm https://claude.ai/install.ps1 | iex`. This is the path
+Anthropic tests first and the least to go wrong on a fresh machine or client laptop.
+
+**npm.** `npm install -g @anthropic-ai/claude-code`. Still fully supported, but the package now
+wants **Node 22+**. On older Node it doesn't fail — it prints an `EBADENGINE` warning and
+installs anyway, because what npm pulls down is a native binary that never touches your Node at
+runtime. The warning is cosmetic; the friction it flags is that you're a Node upgrade behind.
+**Never `sudo npm install -g`** to paper over an `EACCES` error — that just relocates the
+permission problem. Fix the npm prefix, use nvm, or switch to the native installer and skip Node
+entirely. Homebrew, WinGet, apt/dnf/apk, and a GUI Desktop app exist too — use whatever your
+machine already speaks.
+
+## Your first session
+
+Run `claude` *inside the project you want to work on*, never an empty home directory — an empty
+folder gives it nothing to reason about. The first run opens your browser, signs you into your
+Anthropic account (Pro, Max, Team, Enterprise, or Console; not the free tier), and caches a
+token in `~/.claude`, so you authenticate exactly once.
+
+Then watch two things: the **tool calls** it narrates (read this file, run that command) and
+the **permission prompts** it raises before anything hits disk. What it *does* with your
+goal — the explore → plan → code → commit rhythm — is the next lesson (→ core-loop); teaching
+it your stack and standards is its own lesson too (→ claude-md-and-memory). Right here, the only
+job is to understand the fence.
+
+## Permissions: the three buckets
+
+Every action lands in one of three buckets, which you pre-set in `settings.json`:
+
+- **allow** — read/verify work that's safe unattended: `Read`, `Grep`, `git status`,
+  `git diff`, `npm run test`.
+- **ask** — intent-changing work you approve each time: `Edit`, `Write`, `git commit`,
+  `npm install`.
+- **deny** — dangerous or sensitive, never run: `.env` and `secrets/**`, `rm -rf`,
+  `git reset --hard`, `git push --force`, `curl | bash`.
+
+You don't hand-edit JSON for these — run **`/permissions`** inside a session to see the current
+rules and move a command between buckets on the spot; the file and the command edit the same
+config. Start strict, loosen as trust builds, and keep real work on a branch.
+
+> 💡 **Try it:** In a live session, run `/permissions`, then ask it to read your `.env`. If your
+> deny rule is right, it refuses — that refusal is the proof your fence exists.
+
+## The 2026 layer: auto mode + OS sandboxing
+
+Buckets are the classic layer — they gate *whether* a tool runs. Two newer layers change *how
+much you have to watch*.
+
+**Auto mode** removes the per-action click. Instead of you approving each step, a safety
+**classifier** screens every action and lets the safe ones through, stopping only on the
+genuinely risky. You trade your attention for a model's judgement — excellent for flow, so pair
+it with strict deny rules the classifier can never override.
+
+**OS sandboxing** (`/sandbox`) is the stronger, structural one. It runs Bash commands inside an
+operating-system jail — macOS Seatbelt, Linux/WSL2 bubblewrap — that physically limits what they
+can touch: writes only to the working directory, network only to domains you've allowed. Turn on
+its **auto-allow** mode and ordinary Bash stops prompting, because the *boundary* is the safety,
+not your vigilance — a command that tries to write outside the repo or phone home is blocked by
+the OS, whatever the model decided to run.
+
+The two are independent and stack: auto mode screens *intent*, the sandbox contains *blast
+radius*. Two caveats that bite: your explicit **deny** rules win even under auto-allow, and the
+sandbox's default *read* policy still opens `~/.ssh` or a stray `.env` — so add a
+`sandbox.credentials` block for real secrets:
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "credentials": {
+      "files": [{ "path": "~/.ssh", "mode": "deny" }],
+      "envVars": [{ "name": "DATABASE_URL", "mode": "deny" }]
+    }
+  }
+}
+```
+
+One note for Windows users: **the sandbox needs WSL2** — native Windows isn't supported,
+so there you lean on auto mode plus deny rules, or run Claude Code inside WSL2 to get the jail.
+
+## Choosing a model
+
+Claude Code's default model depends on your plan: some plans default to the lighter **Sonnet**
+tier, others to the heavier **Opus** tier, and on some plans Claude Code falls back to Sonnet when
+you cross a usage threshold so you keep working — so a mid-session switch isn't a bug. Exact
+model versions change every few months; `/model` and the model-config docs (Read-after) always
+show the current ones. Swap models any time with **`/model`**,
+or use `opusplan` (Opus plans, Sonnet executes) for both at once. When to route which tier — and
+how hard to let it think — is its own skill (→ models-and-effort).
+
+You now have a hardened setup, not just a working one — the rest of the pillar is about
+*driving* it, starting with the core loop.

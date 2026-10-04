@@ -1,0 +1,250 @@
+---
+title: "Images, voice and live modes"
+subtitle: "Show it, say it, see it"
+summary: "Use photos, screenshots and voice with ChatGPT, Claude and Gemini, check what the model actually read, and keep faces and voices private."
+changeNote: "New lesson: use photos, screenshots and voice with any assistant, transcribe before you trust what it read, and rehearse out loud while keeping faces and voices private."
+section: foundations
+pillar: chat-assistants
+order: 7
+level: beginner
+estMinutes: 42
+taskMinutes: 30
+prerequisites: [big-three-compared, privacy-and-setup]
+reviewedOn: "2026-10-04"
+status: published
+video:
+  videoId: "EWvNQjAaOHw"
+  published: "2025-02-27"
+  year: 2025
+  minutes: 131
+  start: 4948
+  watchMinutes: 31
+  title: "How I use LLMs"
+  channel: "Andrej Karpathy"
+  why: "Andrej Karpathy (an OpenAI founding member and former Tesla AI director) spends this half hour of his longer tour on everything that isn't typing: dictation versus true voice, image input, image generation and pointing a phone camera at things. He has nothing to sell, uses several apps, and explains why voice and images behave as they do, where most tutorials only show the buttons. His habit of having the model transcribe what it sees before asking about it is the core of this lesson."
+  notes:
+    - "The player starts at 1:22:28; this lesson's section runs to 1:53:29 (about 31 minutes)."
+    - "Recorded in February 2025, so menus have moved: ChatGPT's newest voice option is now called Live, and camera and screen sharing sit in its older Advanced option on mobile."
+    - "From 1:33 to 1:37 he demos another app's voice personas, including an adult-themed one he cuts short; skip to his Gemini Notebook (formerly NotebookLM) segment at 1:37 if you prefer."
+readAfter:
+  - label: "OpenAI Help — ChatGPT Voice: the Live, Advanced and Standard options, and where camera and screen sharing work"
+    url: "https://help.openai.com/en/articles/20001274-chatgpt-voice"
+    kind: docs
+  - label: "Gemini Apps Help — Talk naturally with Gemini Live, including camera and screen sharing"
+    url: "https://support.google.com/gemini/answer/15274899"
+    kind: docs
+applyIt: |
+  Take one image you already have from real work and turn it into text you can trust, using the
+  two-step habit from the video: transcribe first, check, then ask.
+
+  ```prompt
+  Step 1 only: transcribe every piece of text and every number in this image into plain text (use a
+  table for tabular parts). Mark anything you can't read with certainty as [?]. Don't interpret
+  or summarise yet.
+  ```
+
+  Compare the transcription with the image, fix any errors yourself, and only then ask your real
+  question in the same chat ("Now, using the corrected text, …").
+
+  **If you study:** a photo of a whiteboard or your handwritten lecture notes; ask for clean notes
+  plus three quiz questions. **At work:** a chart or table screenshot from a report or slide; ask
+  for the figures as a table, then the one-sentence takeaway. **Otherwise:** a utility bill, a
+  timetable or a recipe card; ask what it means for your week.
+  Success: you checked every figure in the transcription against the image before using the answer, and you know which parts the model marked as unsure.
+toolkit: |
+  - **Save a "read it first" rule.** Add to your ChatGPT, Claude or Gemini custom instructions:
+    "When I send an image containing text or numbers, transcribe the relevant parts first, mark
+    anything unclear with [?], then answer." Misread figures then show up before they spread.
+  - **Turn on dictation everywhere.** Your phone keyboard, Windows (Win + H) and macOS all have
+    built-in voice typing that works in any app, so long prompts cost you thirty seconds of
+    talking instead of five minutes of typing. Type only names and jargon it mangles.
+  - **Keep a rehearsal brief ready.** Save the practice brief from this lesson's task in your notes,
+    or as a reusable assistant (→ build-your-own-assistant), so every voice session starts with
+    the scenario, the feedback method and "one question at a time".
+  - **Extend your never-paste line to cameras and screens.** Before you share a photo or your
+    screen: crop out faces, names and addresses, close other tabs, silence notifications, and stop
+    sharing when you're done (→ privacy-and-setup).
+recap:
+  - emoji: "🎙️"
+    title: "Two buttons, two jobs"
+    text: "The microphone icon turns your speech into an ordinary typed prompt. The voice-mode icon
+      opens a spoken, back-and-forth conversation. Same app, different tools."
+  - emoji: "⌨️"
+    title: "Why he stopped typing"
+    text: "Karpathy speaks about half his prompts, more on his phone, using a system-wide dictation
+      app on desktop. He still types product names and jargon that transcribe badly."
+  - emoji: "🔊"
+    title: "Fake audio, true audio"
+    text: "Dictation plus read-aloud wraps a text model. True voice modes turn sound into tokens the
+      model hears and produces directly, which is why they can change pace, accent and tone."
+  - emoji: "🧩"
+    title: "How a picture gets in"
+    text: "An image is cut into small patches and each patch becomes a token. The model handles text,
+      sound and pictures as one stream; only the encoders know the difference."
+  - emoji: "📋"
+    title: "Before you ask about it"
+    text: "With a label, a lab report or a formula, he first asks for the contents as text and checks
+      them. A misread number caught here can't poison the answer. Medical readings stay a first
+      draft for a real doctor."
+  - emoji: "🎨"
+    title: "Who draws the picture"
+    text: "At the time of recording, the chat model wrote a caption and a separate image model drew
+      it. He uses generated images for thumbnails and icons, not for facts."
+  - emoji: "📷"
+    title: "Point the phone"
+    text: "In mobile voice mode you can turn on the camera and talk about what it sees. It probably
+      samples still frames rather than watching continuously, and it's the easiest demo for
+      someone who never types prompts."
+task: |
+  Rehearse something you will actually say out loud this month (a job interview answer, a class
+  presentation, a conversation in a language you're learning, or a hard conversation at work)
+  with a voice mode in ChatGPT, Claude or Gemini (Gemini Live); free tiers include some voice
+  use. Set it up in text first, so the voice session starts briefed:
+
+  ```prompt
+  We're about to rehearse by voice. Scenario: [e.g. "a 20-minute interview for a junior data
+  analyst role" or "ordering food and asking for directions in Spanish at A2 level" or "a
+  5-minute presentation of my group project"]. Your role: [interviewer / waiter / audience
+  member]. Ask one question or say one line at a time, then wait for me. Don't correct me during
+  the run. When I say "stop", give feedback: three things that worked, three things to fix, and
+  any filler words or mistakes I repeated.
+  ```
+
+  Then switch to voice and run it for about ten minutes. Say "stop", read the feedback and the
+  transcript in text, and pick the one fix that matters most. Run the scenario a second time
+  with that fix. If your app offers a camera or screen-share mode, show it your slide or notes in
+  round two and ask whether they match what you said. Finally, open the chat history and decide
+  whether to keep or delete this recording's transcript.
+  Success: you completed two rounds and can name one concrete thing you said better in round two than in round one.
+selfCheck:
+  - q: "A student photographs a whiteboard of equations after class and asks an assistant to
+      explain it. The explanation is fluent, but one coefficient is wrong, which changes the
+      result. What went wrong, and how should they do it next time?"
+    a: "The model misread part of the photo and then reasoned confidently from the misreading.
+      Next time: retake the photo straight on in good light, crop to one section, ask for a
+      transcription first with unclear parts marked [?], fix it against the board or a
+      classmate's notes, and only then ask for the explanation."
+  - q: "You want to practise a job interview by voice on your commute. What do you set up before
+      you start talking, and what do you do after?"
+    a: "Before: a typed brief (the role, the kind of questions, one question at a time, a feedback
+      method such as STAR, no interruptions during the run) and headphones, and don't say anything
+      confidential in a public place. After: ask for feedback in text, read the transcript, pick
+      one fix, and run it again. Then decide whether to keep the transcript."
+  - q: "A colleague wants to share their screen with a live assistant to get help with a client's
+      spreadsheet. What should they check first?"
+    a: "Whether their organisation allows that tool for client data at all. If it does, share only
+      the window that's needed, with other tabs and notifications closed, and use a scrubbed copy
+      of the sheet if the problem doesn't need the real names. Stop sharing as soon as they're
+      done."
+  - q: "A small café asks an assistant for a realistic photo of 'our team behind the counter' for
+      its website. What's the problem, and what should it do instead?"
+    a: "It would show people and a place that don't exist as if they were real, which misleads
+      customers. Use a real photo of the real team (with their consent), or an image that is
+      clearly an illustration."
+backupResources:
+  - label: "Practice interviewing with Gemini Live — Grow with Google (Google's own 3-minute walkthrough)"
+    url: "https://www.youtube.com/watch?v=K8xmSTypSzQ"
+    type: "video · interview practice"
+  - label: "ChatGPT's new update is HUGE for language learners — Corinna Languages"
+    url: "https://www.youtube.com/watch?v=czyWvwEW_g0"
+    type: "video · language practice"
+tags:
+  - chat-assistants
+  - multimodal
+  - images
+  - voice
+  - privacy
+---
+
+Every assistant you use now takes more than typed text. You can photograph a whiteboard, paste
+a screenshot, talk instead of type, and in some apps point your phone camera at a problem and
+discuss it live. These inputs save real time, but they add a new way to be wrong (the model
+misreads what it sees) and a new way to overshare (a photo or a voice carries more than you
+meant). This lesson covers both.
+
+## When showing beats typing
+
+Reach for an image when describing the thing would take longer than showing it: a whiteboard
+after a lecture or meeting, a chart in a report, an error message, handwritten notes, a form
+you don't understand, a product label. Reach for voice when talking is faster or is the point:
+dictating a long prompt, rehearsing an interview or presentation, practising a language,
+thinking aloud on a walk. Live camera and screen sharing help when the problem is physical or
+on screen and you want to talk it through as you go.
+
+## How the big three differ
+
+All three read images you upload or paste. Beyond that they differ, and features move fast, so
+check the current docs:
+
+- **ChatGPT** reads images, generates them, and has dictation plus a voice mode with several
+  options. Its newest option, Live, doesn't do camera or screen sharing; the older Advanced
+  option does, in the mobile app.
+- **Claude** reads images but doesn't generate photos or illustrations; it can draw diagrams
+  and charts as interactive visuals. Its voice mode is in beta on all plans, on mobile, desktop
+  and web. Its help pages describe spoken conversation, not a live camera feed.
+- **Gemini** reads and generates images, and Gemini Live adds voice conversation with camera
+  and screen sharing in the mobile apps.
+
+Availability varies by plan and region; check current docs before you rely on a mode.
+
+## Worked example: a whiteboard photo you can trust
+
+1. **Take a good photo.** Straight on, in good light, cropped to the board. Glare, angle and
+   distance cause most misreadings.
+2. **Ask for a transcription only**, with unclear parts marked [?]. No summary yet.
+3. **Check it against the board.** Numbers, signs, subscripts and names are where models slip.
+   Correct anything wrong in the chat.
+4. **Now ask your real question**: clean notes, a worked explanation, practice questions.
+5. **Keep the corrected text**, not just the photo, in your notes.
+
+The same steps work for a chart: ask for the values as a table first. Models often estimate
+bar heights rather than read them, and may fill a blurry label with a plausible number. When
+you have the underlying spreadsheet or PDF, upload that instead (→ analyze-files-and-data).
+
+> 💡 **Try it:** screenshot a table or chart you've been sent this week, paste it into any
+> assistant and ask for every number as a table with unclear values marked [?]. Count how many
+> it got exactly right.
+
+## Voice for practice
+
+Voice mode turns an assistant into a patient rehearsal partner. Brief it in text first (the
+scenario, its role, one question at a time, how to give feedback) and then talk. After the run,
+read the feedback and transcript in text, where it's easier to see patterns. It works well for
+interview answers, presentations, and speaking practice in a language you're learning, where you
+can ask it to slow down, switch level or repeat a phrase. It's a practice partner, not a judge:
+its feedback can be generic, so ask for specifics quoted from what you said.
+
+## Generating images honestly
+
+Image generation suits illustrations, mock-ups, icons and slides. The rules are simple: never
+present a generated image as a real photo of a real person, place, product or event; don't
+create fake documents, receipts or screenshots; don't make someone's likeness without their
+consent; and check any text in the image, which is often misspelled. For brand work and
+consistency, see → images-brand-assets.
+
+## Privacy: photos and voices carry more than you think
+
+A photo can include faces, names on a whiteboard, an address on an envelope, or a phone
+notification. Screen sharing shows whatever is open. Voice sessions are usually saved as
+transcripts in your chat history. So crop before you upload, share one window rather than the
+whole screen, ask permission before including other people in a live session, and review or
+delete transcripts you don't need. The training and retention settings from → privacy-and-setup
+apply to images and audio too.
+
+## Common failure modes
+
+- **A number in the answer is wrong** → the model misread the image → transcribe first and check.
+- **Small text comes back invented** → resolution too low → crop to the region, or paste the text.
+- **Voice mode keeps cutting you off** → background noise or long pauses → use headphones or
+  push-to-talk where the app offers it.
+- **Practice feedback is vague** → no feedback method given → name one (STAR, three strengths
+  and three fixes) in the brief.
+- **A shared screen exposed a message** → notifications were on → silence them before sharing.
+
+## What not to use it for
+
+Don't treat a reading of a medical result, a medicine label or an electrical diagram as the final
+word; use it to prepare questions for a professional. Don't use a live camera during an exam or
+assessment that bans AI. Don't photograph or record people who haven't agreed, or try to
+identify strangers from photos. Seeing and hearing make the assistant more useful; they don't
+make it more reliable, so the checking habit from → verification-and-grounding still applies.

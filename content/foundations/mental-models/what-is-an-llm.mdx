@@ -1,0 +1,296 @@
+---
+title: "What an LLM actually is (no math)"
+summary: "Explain in plain words how a chat model produces an answer, why it invents facts it was never given, and what grounding and a fallback do about it."
+changeNote: "New: the third training stage behind thinking models, a token-by-token worked example, a common-failures list, and an 8-minute video if you want the quick version."
+section: foundations
+pillar: mental-models
+order: 1
+level: beginner
+estMinutes: 60
+taskMinutes: 25
+shortPath: "About 40 min: watch the 8-minute 3Blue1Brown explainer, read the breakdown and run both task experiments. Come back for Karpathy's hour-long talk, which fills in the training pipeline."
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "zjkBMFhNj_g"
+  published: "2023-11-22"
+  year: 2023
+  minutes: 60
+  title: "[1hr Talk] Intro to Large Language Models"
+  channel: "Andrej Karpathy"
+  short:
+    label: "Large Language Models explained briefly (3Blue1Brown)"
+    url: "https://www.youtube.com/watch?v=LPZh9BOjkQs"
+    minutes: 8
+  why: "Andrej Karpathy (a founding member of OpenAI and former head of AI at Tesla) walks through pretraining, fine-tuning, alignment and the 'LLM as an operating system' picture in one sitting, with no product to sell and no vendor favoured. Shorter explainers cover the same ground in ten minutes but skip the training pipeline, which is the part that explains why models hallucinate. It's an hour; the 8-minute 3Blue1Brown explainer above is the quick version."
+  notes:
+    - "It dates from late 2023, so the model names on screen are old; the mechanism it teaches hasn't changed."
+    - "It predates today's reasoning models, though its closing look at 'System 2' thinking and self-improvement points straight at them; this lesson adds that third training stage."
+readAfter:
+  - label: "Anthropic — Tracing the thoughts of a large language model"
+    url: "https://www.anthropic.com/research/tracing-thoughts-language-model"
+    kind: article
+applyIt: |
+  The point to carry into your own work isn't "models are dumb", it's *memory*: a model cannot
+  know anything about your project, your customers or your company unless it's in the context.
+  Feed it the facts and it grounds each line in them; leave one out and it invents a plausible
+  one just as fluently.
+
+  Five minutes: pick the job you use an assistant for most, and list the facts it would need to
+  do that job well (your audience, your course rules, your team's process, your product's
+  prices). Tick the ones you have actually given it, in a chat, a Project or your custom
+  instructions. Every unticked fact is a place it is guessing today. Pick the three that matter
+  most and decide where each will live.
+
+  **If you build software:** do the same for one AI feature's prompt: list the facts it quietly
+  assumes but never feeds. **At work or school:** start with your team's process or your course
+  rules.
+
+  Success: the facts your assistant needs listed, the unticked ones circled, and a home chosen for the top three.
+toolkit: |
+  - **Write the facts into your custom instructions, not your hopes.** ChatGPT, Claude and Gemini
+    all have a custom-instructions or memory page that is fed into every chat. Put the few facts the
+    model can't know (your role, your course or team, the tools you use) there, and add one line:
+    "If you don't have the information, say so instead of guessing."
+  - **Give each big job a Project, Gem or Custom GPT with the real documents.** A ChatGPT or Claude
+    Project, a Gemini Gem or a Custom GPT holds standing instructions plus files: the syllabus, the
+    style guide, the price list. The model then predicts from your documents instead of from what
+    such documents usually say.
+  - **Keep a one-page brief in a notes file.** Every chat starts blank. Keep a short brief of your
+    project or job (goal, audience, key facts, decisions so far) in your notes app and paste it at
+    the top of a new chat, so the next session starts from fact instead of a plausible guess.
+  - **Save a "check this" prompt next to it.** A snippet such as "List every factual claim above and
+    mark each one SUPPORTED by what I gave you, or GUESSED" turns spotting inventions into one paste
+    (the full discipline → verification-and-grounding).
+recap:
+  - emoji: "📦"
+    title: "Two files"
+    text: "Karpathy's frame: a model is just a big pile of parameters (patterns squeezed out of the internet) plus a little code to run them. No live database, no lookup — the knowledge is baked into the weights."
+  - emoji: "🗜️"
+    title: "What pretraining really does"
+    text: "Pretraining reads a huge slice of text and compresses it into those weights by playing one game — predict the next token — trillions of times. Good prediction forces a model of the world, which is why compression starts to look like understanding."
+  - emoji: "🎯"
+    title: "What happens when you hit Enter"
+    text: "Running the model is that same game forward: sample the next token, append it, repeat. It never retrieves an answer — it generates the most likely continuation. Every reply is a controlled dream of a plausible document."
+  - emoji: "🎓"
+    title: "From autocomplete to answers"
+    text: "A raw pretrained model only autocompletes documents. A cheaper second stage — supervised fine-tuning on curated example conversations — turns a document-completer into something that actually answers you."
+  - emoji: "👍"
+    title: "Why one model feels nicer"
+    text: "Then human-preference training rewards the answers people like better, teaching tone, helpfulness, and what to refuse. When one model feels nicer than another, you're feeling this alignment layer — not a smarter engine underneath."
+  - emoji: "📈"
+    title: "Where the magic came from"
+    text: "The punchline: quality climbs predictably as you add parameters and data — no new algorithm required. Most capabilities that feel like magic came from making it bigger and feeding it more."
+  - emoji: "🧠"
+    title: "Karpathy's closing analogy"
+    text: "Karpathy's closing image: treat the LLM as the CPU of an emerging computer — context window as its RAM, tools and code as peripherals. And because its behavior is learned, not coded, it can be jailbroken — so treat its output as untrusted by default. You're programming a fuzzy machine; this whole course is how."
+task: |
+  Watch prediction and hallucination in two short experiments, in any chat model (ChatGPT,
+  Claude, Gemini).
+
+  **1 · Feed vs assume.** Paste this:
+
+  ```prompt
+  You are the support assistant for a small online bookshop. The shop's ONLY written policies are:
+  1) "Orders over $40 ship free."
+  2) "Gift cards cannot be refunded."
+  A customer asks whether they can return a paperback they bought 45 days ago. In two
+  sentences, answer them and quote the shop's return policy.
+  ```
+
+  The shop never wrote a return policy. Many models will quote or invent one anyway — that's
+  *assume*, not *feed*. Others answer correctly that there's no return policy listed: that's
+  grounding working, because you fed it the full list. Either way, push harder:
+
+  ```prompt
+  Same shop. Draft the "Returns" section for our FAQ page, with the number of days customers have
+  to return an item and who pays return shipping.
+  ```
+
+  Asked to *write* something the facts don't support, most models fill the gaps with plausible
+  numbers ("30 days", "customer pays"). Add "if a detail isn't in the policies above, write
+  NOT IN OUR POLICIES" and re-run: the invented numbers disappear.
+
+  **2 · A false premise.** Feed a confident false premise, let it continue plausibly, then
+  re-ground it:
+
+  ```prompt
+  Summarize the key rulings of the 2019 Lisbon Protocol on urban cycling safety, then
+  list the three cities that adopted it first.
+  ```
+
+  It will likely invent a fluent, detailed answer for something that doesn't exist. Now paste:
+  "That protocol is fictional — I made it up. Explain what just happened in terms of next-token
+  prediction." Read its own diagnosis back to yourself. Then run the same first prompt in a second
+  assistant (whichever you didn't use), and once more with "If you're not certain this exists,
+  say so before answering" added. Note which runs hedged and which invented.
+  Success: you watched one instruction stop an invented policy, and can explain in a sentence why a model continued a false premise — and what made it hedge.
+selfCheck:
+  - q: "A small online shop's support chatbot tells a customer, confidently, that their order shipped yesterday. There is no such order. Is that a bug, or just how these models work?"
+    a: "Both. The mechanism explains it: the bot had no data for that order, so it completed the gap with the most plausible line, not a true one. But it's still a bug in your system, because a customer got a false answer. The fix isn't a sterner prompt; it's grounding (look up the real order and give the model that record) plus an 'I don't know' fallback for when there's nothing to look up, such as 'I can't find that order, I'll pass you to a person.' (More → verification-and-grounding.)"
+  - q: "You ask a chat assistant to summarize the chapter your professor assigned, without pasting or uploading it. You get a confident summary with a neat quote. What is really going on, and what do you do?"
+    a: "It has never seen your copy of the chapter, so it predicted what a chapter with that title usually says, and the quote may be invented. Upload or paste the chapter, ask it to answer only from that text and to quote the lines it used, then check one or two quotes against the book."
+  - q: "A colleague says 'the assistant already knows our team's style guide, no need to give it.' What's the precise correction?"
+    a: "It knows nothing specific to your team, only training-era patterns plus whatever is in the chat. If the style guide wasn't given, it will predict what a style guide usually says and present it as yours. Put the guide in the chat, a Project or the custom instructions. (For a developer it's the same with a database schema: feed it, don't assume it.)"
+  - q: "A friend switches to a 'thinking' mode to write a two-line thank-you email. It takes forty seconds and eats into their daily usage limit. Why, and when is that mode worth it?"
+    a: "Thinking models were trained to write out a long chain of working before they answer, and every one of those working tokens costs time and usage. That pays off on problems with steps that can go wrong (a tricky calculation, a schedule with constraints, a logic puzzle, a bug). A thank-you email has no hard step, so the fast mode does it as well."
+  - q: "Two assistants get the same request to write in your company's friendly house tone. One follows it and one goes generic. Both are 'just next-token predictors', so what actually differs?"
+    a: "The post-training, not the raw engine. Pretraining gives both a similar prediction ability; fine-tuning and preference training are what shape tone, instruction-following and refusals. 'Better-behaved' means better-trained to follow instructions, not fundamentally smarter."
+mcq:
+  - q: "A colleague at a small firm asks a chat assistant for last quarter's revenue without pasting any figures. It replies with a precise number. What's the right next move?"
+    options:
+      - "Paste the real figures and ask it to answer only from them"
+      - "Ask the same question again and keep it if both answers match"
+      - "Add 'do not make up numbers' to the start of the question"
+      - "Switch on thinking mode so it can work the figure out"
+    answer: 0
+    explain: "The model has never seen the firm's books, so the number is a plausible prediction, not a record; only feeding it the real figures fixes that. A matching second answer proves nothing, because a model can repeat the same likely-looking guess, and neither a sterner instruction nor extra thinking can add facts that were never in the context."
+  - q: "You add 'You are an expert on our school's 2026 exam regulations' to your custom instructions. Its answers about the regulations are still wrong. Why?"
+    options:
+      - "The role needs stronger wording, like 'world-leading expert'"
+      - "Custom instructions only take effect after a few chats"
+      - "A role line shapes style; it can't supply facts it never saw"
+      - "The rules are recent, so a bigger model would already know them"
+    answer: 2
+    explain: "An instruction can shift tone and behaviour but can't grant knowledge the weights never learned; the fix is to upload or paste the regulations. A bigger model doesn't help either, because one school's rules are unlikely to be in any model's training data, and they may have changed since."
+  - q: "You ask an assistant the same question in two fresh chats and get two differently worded answers. A classmate says one of them must be a glitch. What's the accurate reading?"
+    options:
+      - "It learned something new between your two questions"
+      - "The second answer is the corrected, more accurate one"
+      - "It noticed the repeat and varied its answer on purpose"
+      - "It samples each token, so some variation is by design"
+    answer: 3
+    explain: "Each next token is sampled from a spread of likely options rather than always taking the top one, so two runs can differ without either being broken. Nothing is learned between chats, so the second answer isn't a correction of the first."
+  - q: "You paste 40 expense lines from a spreadsheet and ask an assistant for the total. It answers instantly and confidently. What's the sound way to use that number?"
+    options:
+      - "Trust it, since every figure was right there in the chat"
+      - "Have it use a calculator tool, or check the total yourself"
+      - "Ask it to reply with only the total so it can focus on the maths"
+      - "Ask it in the same reply to say how confident it is in the sum"
+    answer: 1
+    explain: "The model reads numbers as tokens and predicts digits rather than computing them, so exact arithmetic can be confidently off even when every input is present. Having the figures in the chat fixes missing facts, not calculation; a tool or your own check does, and a confidence rating is just more predicted text."
+backupResources:
+  - label: "Large Language Models Explained! How LLMs Work for Beginners! — The Data and AI Guy"
+    url: "https://www.youtube.com/watch?v=RhPKBmeYNuI"
+    type: "video · shorter intro"
+  - label: "Andrej Karpathy — How I Use LLMs (practical companion)"
+    url: "https://www.youtube.com/watch?v=EWvNQjAaOHw"
+    type: "video · practical"
+tags:
+  - llm
+  - fundamentals
+  - next-token-prediction
+  - training
+  - mental-models
+---
+
+Everything in this course — every tool, every prompt, every hook — sits on top of one
+idea, so get it right once and the rest stops being mysterious. An LLM (large language
+model) is, at heart, a stunningly good **next-token predictor**. Give it some text and
+it predicts the most likely next chunk, then the next, then the next. That's the whole
+engine. The magic is entirely in the scale.
+
+## A sophisticated autocomplete
+
+The model learned by playing one game, trillions of times: *given this text, what comes
+next?* Do that over a large slice of the internet and something remarkable falls out —
+the same weights can write, summarise, translate, and code, because predicting the next
+token *well* requires quietly modelling how the world tends to be described. But the
+underlying move never changes: **predict the next token.** It isn't looking anything up
+in a database, and it isn't reasoning the way you do — it's sampling a plausible
+continuation.
+
+> 💡 **Try it:** Open any chat model and type `The capital of Australia is` — then stop.
+> It completes `Canberra` not because it queried a fact table, but because those tokens
+> are the overwhelmingly likely continuation. Now feed it a confident, invented premise
+> ("The 2019 Lisbon Protocol on urban cycling stated…") and watch it continue *that* just
+> as fluently. Same machine, no idea which one is true — you just watched prediction and
+> hallucination in one breath.
+
+## How it got smart (three stages)
+
+Three training stages turn raw autocomplete into an assistant you can actually use:
+
+- **Pretraining** — read an enormous corpus and get good at next-token prediction. This
+  is the expensive phase (huge GPU runs), and it's where raw knowledge and language
+  ability get compressed into the weights. The output is a **base model**: a
+  document-completer, not a chatbot. Hand it "How do I center a div?" and it might just
+  continue with *more questions*, because that's a plausible document.
+- **Post-training / alignment** — a second, far cheaper phase that reshapes behaviour.
+  First **supervised fine-tuning** on curated example conversations teaches it to answer
+  instead of ramble. Then **RLHF** (reinforcement learning from human feedback) rewards
+  the responses people prefer, tuning tone, instruction-following, and what it refuses.
+- **Reinforcement learning on verifiable rewards** — the newest stage, and the one behind
+  "reasoning" or "thinking" models (OpenAI's o-series and DeepSeek-R1 were early public
+  examples). The model attempts many problems whose answers a program can check: a maths
+  question with a known answer, a coding task with tests that pass or fail. Attempts that reach
+  the right answer are rewarded, so over many rounds the model learns habits that get there:
+  writing out its working step by step, checking a partial result, backing up when a path
+  fails. That's why a reasoning model "thinks" before it answers.
+
+The thinking isn't free. Every step of that working is more tokens the model has to generate,
+so a reasoning model takes longer (seconds to minutes) and costs more per answer, in money on
+an API and in usage limits in an app. It pays off on problems with steps that can go wrong
+(a calculation, a plan with constraints, a bug) and is wasted on a two-line email. It's still
+the same next-token machine underneath: the working is predicted text too, and it can be
+fluent and wrong. When to switch thinking on or off is a choice you make per task
+(→ models-and-effort).
+
+Hold onto the split: **pretraining is the knowledge; alignment is the manners; reasoning
+training is the habit of working things out.** It explains why two models with similar raw
+ability behave very differently, and why an instruction can shift behaviour but can't grant
+knowledge the weights never learned — only context you feed in (a pasted document, retrieved
+search results) adds facts.
+
+## Why it makes things up
+
+The mechanism falls straight out of prediction. The model emits the most *plausible*
+continuation, not the *true* one, and there's no built-in fact-checker — so when the
+patterns underdetermine the answer, it fills the gap with confident, well-formed text
+that can be flatly wrong. That's **hallucination**: not a bug bolted onto the side, but
+the same next-token machine running where it has no grounding. It's also why "just tell
+it not to hallucinate" fails — you can't prompt away the mechanism. What to *do* about it
+— grounding to sources, citing, saying "I'm not sure," treating every output as a claim
+to check — is a discipline of its own. → covered in **verification-and-grounding**.
+
+## Worked example: one answer, built a token at a time
+
+Ask a chat assistant "Suggest a name for a study group that meets on Sundays." Here is
+roughly what happens, step by step:
+
+1. Your message is wrapped in the app's hidden instructions and chopped into tokens (the
+   next lesson covers what those are).
+2. The model scores every possible next token. Something like `Sunday` scores high, `The`
+   a little lower, `Banana` near zero.
+3. One token is **sampled** from those scores, not simply the top one. A little randomness
+   is deliberate; it's why the same question twice gives two different answers.
+4. That token is appended, and the whole thing runs again with one more token of context.
+   `Sunday` → `Sunday Scholars` → … until the model predicts a stop.
+
+Nothing in that loop checks a fact. If you'd asked "What did our group decide last
+Sunday?", the same loop would run and produce a fluent, specific, invented answer, because
+it has never seen your group. That's the whole lesson in one example: the machinery that
+writes a good name is the same machinery that invents a meeting.
+
+## Common failure modes
+
+- **You use it like a search engine** → it states an outdated or invented fact → its
+  knowledge is frozen at training time and stored as patterns, not records. Paste the
+  source, or use a mode that searches the web and open the links it cites.
+- **You expect it to remember last week** → it acts as if you never met → each session
+  starts blank. "Memory" features work by quietly feeding saved notes back into the context.
+  Keep a project brief you can paste or attach.
+- **You ask it to count letters or do exact arithmetic** → small, confident errors → it
+  reads tokens, not characters or digits. Ask it to use a calculator or code tool, or check
+  the number yourself.
+- **You trust the tone** → a polished, wrong answer slips through → fluency is the one
+  thing it's always good at. Confidence in the wording tells you nothing about accuracy.
+
+## Why this is vendor-neutral
+
+Claude, GPT, Gemini, Llama, DeepSeek — same core idea. Once you internalise "next-token
+prediction, pretrained at scale, aligned, then trained to reason," you understand *every* one of
+them, and model releases stop being magic and start reading as deltas on a few dials: more
+scale, better data, sharper alignment, more reasoning training. That's why this lesson — not a tool tutorial — is lesson one.
+Everything downstream (context windows, prompting, harnesses, loops) is just *feeding and
+steering a predictor* you now understand from the inside.

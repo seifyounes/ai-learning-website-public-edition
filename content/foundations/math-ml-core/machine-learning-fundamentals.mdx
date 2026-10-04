@@ -1,0 +1,251 @@
+---
+title: "Machine learning fundamentals"
+subtitle: "The recipe every model follows (and when NOT to use an LLM)"
+summary: "Follow the recipe every model uses, judge generalization honestly, and know when classical ML beats an LLM for the job."
+changeNote: "New: a churn-prediction worked example, a failure-modes list, and a 10-minute exercise routing four ideas to classical ML or an LLM API."
+section: foundations
+pillar: math-ml-core
+order: 4
+level: intermediate
+estMinutes: 25
+taskMinutes: 25
+prerequisites:
+  - calculus-for-optimization
+  - probability-statistics-for-ai
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "Gv9_4yMHFhI"
+  published: "2018-11-26"
+  year: 2018
+  minutes: 13
+  title: "A Gentle Introduction to Machine Learning"
+  channel: "StatQuest with Josh Starmer"
+  why: "In about thirteen minutes Josh Starmer states the recipe this lesson is built on: fit on training data, judge on testing data, and prefer the model that predicts new data well over the one that fits the old data prettiest. It assumes no maths and avoids framework details that date quickly, so it stays current. Then do Google's Machine Learning Crash Course modules below ('Linear regression', 'Overfitting', 'Classification') for interactive, drag-it-yourself depth; the rest of MLCC maps to later lessons in this pillar."
+readAfter:
+  - label: "Machine Learning Crash Course — Google (interactive modules + exercises)"
+    url: "https://developers.google.com/machine-learning/crash-course"
+    kind: course
+applyIt: |
+  **The fundamentals decide which tool you reach for, and "classical ML vs an LLM API" is a
+  real-money call.** Structured columns → a boosted tree (cheap, fast, explainable); unstructured
+  language → a foundation model. Take four prediction or automation ideas from your own project,
+  job or studies and route each one before anyone writes code. No ideas yet? Use a small online
+  shop: predict which customers stop buying, write product descriptions, auto-tag incoming
+  support emails, forecast next month's orders.
+
+  ```prompt
+  My data looks like this: [the columns, or the kind of documents]. Route these four ideas to
+  classical ML or an LLM API: [idea 1], [idea 2], [idea 3], [idea 4]. One line each: the tool,
+  why (structured vs unstructured input, cost per prediction, explainability) and the baseline
+  it must beat.
+  Success: every row names the tool AND why, and every tabular prediction lands on classical ML.
+  ```
+
+  **At work:** bring the table to the next meeting where someone proposes "let's use AI for
+  this"; it reframes the conversation around data type and cost. **If you code:** save it as
+  `docs/ml-decisions.md` in your repo so your coding assistant reads it too.
+toolkit: |
+  - **Write the tool boundary into your custom instructions.** One line in ChatGPT, Claude or
+    Gemini custom instructions or a Project ("tabular predictions → classical ML first; LLMs for
+    unstructured language") stops an assistant from proposing an LLM on a dozen numeric columns.
+  - **Fit a baseline before anything clever.** In a spreadsheet, hold back a fifth of the rows,
+    fit a trend line or `LINEST` on the rest, and score it on the held-back rows. A free Google
+    Colab notebook with scikit-learn does the same for a real classifier in a few lines.
+  - **Keep your test cases out of your prompts.** The examples you save to evaluate a prompt must
+    never leak into its few-shot block or a saved prompt's examples. That's train/test
+    contamination in prompt-engineering clothes, and it turns your eval into a memory check.
+  - **Default to the cheapest tool that works.** Pick a smaller model over the flagship, a
+    checklist or formula over an agent, and prompting over a fine-tune. Foundation models already
+    ran the recipe at enormous scale, so spend your time adapting and evaluating, not training.
+recap:
+  - emoji: "🍳"
+    title: "What every model shares"
+    text: "Collect input→label pairs, define a loss for how wrong you are, and grind it down. A spam filter, a churn model and LLM pretraining are all this one recipe at different scales."
+  - emoji: "✂️"
+    title: "Where you grade a model"
+    text: "On data it never learned from: train on one split, judge on a held-out test split. Acing the training data proves nothing but possible memorization."
+  - emoji: "🎭"
+    title: "Pretty fit or good prediction?"
+    text: "Prefer the model that predicts new data well over the one that hugs the training points. A curve through every dot usually misses the next dot."
+  - emoji: "🌊"
+    title: "Two ways to be wrong"
+    text: "Underfitting is too rigid and bad on everything; overfitting chases the training set's noise and falls apart on new data. Every 'why is my model bad' starts by deciding which side you're on."
+  - emoji: "🗺️"
+    title: "Picking the tool"
+    text: "Structured columns → logistic regression or boosted trees: cheap, fast, explainable. Unstructured language → foundation models, and the cheapest thing that works is often not the LLM."
+  - emoji: "🚨"
+    title: "When a score becomes fiction"
+    text: "The moment test data leaks into training: duplicate rows, tuning on test, eval examples pasted into a prompt. Many embarrassing ML failures in industry are leakage stories."
+  - emoji: "📏"
+    title: "The first review question"
+    text: "'What's the baseline?' 94% accuracy on data that's 94% one class means a majority-class guesser ties the model."
+task: |
+  Compute the bar every model must clear before anyone trains one: the majority-class baseline.
+
+  Download a free tabular dataset with a yes/no label — the Titanic passenger list or the Telco
+  Customer Churn dataset on Kaggle both work, or use a spreadsheet from your own work with a
+  yes/no column (paid / unpaid, renewed / cancelled). Then:
+
+  ```prompt
+  Here are the column names and the first 20 rows of my dataset: [paste]. The label column is
+  [name]. Tell me how to count each class (a spreadsheet COUNTIF formula and a 3-line pandas
+  version), then explain the majority-class baseline: the accuracy I'd get by always predicting
+  the bigger class. Finally, name two columns that could leak the answer into a model (a column
+  that is only known AFTER the outcome) and should be dropped.
+  Success: I know which formula to run, what the baseline means, and which columns would leak.
+  ```
+
+  Run the count yourself (a spreadsheet is enough) and write the baseline in your notes.
+  Success: you have the two class counts, the majority-class baseline as a percentage, and one
+  leaky column you'd drop. That baseline is the "does the model beat guessing?" bar you'll
+  demand in every review.
+selfCheck:
+  - q: "A teammate trains a fraud model, reports 97% accuracy on the transactions it was trained on, and wants to ship. Which step of the supervised learning recipe is missing, and what do you ask for?"
+    a: "The held-out check. The recipe is input→label pairs, a loss that measures prediction error, and parameters adjusted to minimize it on training data, then a held-out set to confirm it generalizes instead of memorizing. Ask for the score on transactions the model never saw, ideally from a later period than the training data."
+  - q: "A teammate's churn model scores 99% on the test set on its first try. One of its input columns is `cancellation_reason`. What went wrong?"
+    a: "Leakage: that column is only filled in *after* a customer cancels, so the model reads the answer instead of predicting it. Drop every column that's only known after the outcome, re-split, and expect a lower but honest score."
+  - q: "Your manager wants 'an AI model' to forecast next month's orders from three years of daily sales in a spreadsheet. What do you propose first, and why?"
+    a: "A simple classical forecast as the baseline (same month last year, a moving average, or a regression on the history), because the data is structured numbers. Consider anything fancier, an LLM included, only if it clearly beats that baseline on held-out months."
+  - q: "Where do foundation models fit in the recipe, and what's different about how *you* use them?"
+    a: "They ran the same recipe at enormous scale (pretraining on next-token prediction). You usually skip training and adapt them at inference time with prompting, retrieval and tools, or lightly with fine-tuning. Your job becomes evaluation and adaptation, not training from scratch."
+mcq:
+  - q: "Your eval set accidentally contains 30 examples that also appear word-for-word as few-shot examples in the prompt. Your eval score is now:"
+    options:
+      - "Fine, because few-shot examples are not training data"
+      - "Deflated, because the duplicate rows confuse the model"
+      - "Inflated, since it partly scores answers it was shown"
+      - "Unaffected, as long as the temperature is set to 0"
+    answer: 2
+    explain: "This is train/test contamination in prompt-engineering clothes. An eval must measure performance on unseen inputs, and anything the model was shown, in its weights or its context window, counts as seen. Temperature doesn't change that. Dedupe eval sets against prompts the way ML engineers dedupe test sets against training data."
+  - q: "You need to predict which subscribers will cancel, from 14 structured columns (logins in the last 30 days, plan type, support tickets, payment history). What's the strongest first choice?"
+    options:
+      - "Gradient-boosted trees, checked against a simple baseline"
+      - "A deep neural network trained on all 14 columns"
+      - "A fine-tuned LLM that reads each row as a sentence"
+      - "K-means clustering to sort customers into churn groups"
+    answer: 0
+    explain: "On structured, tabular data, gradient-boosted trees routinely match or beat deep models while costing almost nothing per prediction and staying explainable ('risk driven by a drop in logins'). Logistic regression gives you a simple baseline to beat. A deep network usually needs far more data to beat trees on a table this size, and k-means ignores the cancel/stay labels you already have, so it groups customers without predicting churn. LLMs earn their cost on unstructured language, not on a dozen numeric columns."
+  - q: "A team ships a sentiment classifier with 94% accuracy. The dataset is 94% 'neutral'. What's the first question to ask?"
+    options:
+      - "Was it scored on a large enough test set?"
+      - "Is the learning rate tuned for this dataset?"
+      - "Does it hold up on longer, messier reviews?"
+      - "Does it beat always answering 'neutral'?"
+    answer: 3
+    explain: "A model that answers 'neutral' every time also scores 94%, so this classifier may have learned nothing. Always compare against the simplest possible baseline first; per-class precision and recall (→ evaluation-metrics) then show what accuracy hides. The other questions matter later, but none of them can rescue a model that doesn't beat guessing."
+  - q: "Few-shot prompting lifted your task from 70% to 85%. What actually changed in the model?"
+    options:
+      - "Its weights were nudged slightly by the examples"
+      - "Nothing: the context steers the frozen weights"
+      - "The examples were saved into its long-term memory"
+      - "The tokenizer adapted its vocabulary to your domain"
+    answer: 1
+    explain: "Prompting is inference-time conditioning: the examples in the context steer the same frozen model toward your task. Remove them and the gain vanishes. That's why it's instant and reversible, and why those example tokens are billed on every call, whereas fine-tuning bakes the behavior into the weights once."
+  - q: "Underfitting vs overfitting: which pairing is correct?"
+    options:
+      - "Underfit: great on train, poor on new · Overfit: poor on both"
+      - "Underfit: only with small data · Overfit: only with big models"
+      - "Underfit: poor on both · Overfit: great on train, poor on new"
+      - "Underfit: poor on new data · Overfit: poor on training data"
+    answer: 2
+    explain: "Underfitting means the model lacks the capacity or training to capture the pattern at all, so it's bad everywhere. Overfitting means it captured the noise of the training set instead of the pattern, so it's great on training data and falls apart on held-out data. Either can happen at any dataset or model size."
+backupResources:
+  - label: "StatQuest — Machine Learning playlist"
+    url: "https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF"
+    type: "course · concept-by-concept videos"
+  - label: "A visual introduction to machine learning (R2D3)"
+    url: "https://r2d3.us/visual-intro-to-machine-learning-part-1/"
+    type: "interactive · scroll-through decision trees"
+tags:
+  - math
+  - machine-learning
+  - fundamentals
+  - math-ml-core
+---
+
+**You need:** no new maths. The gradient-descent loop from → calculus-for-optimization and the
+noise-band idea from → probability-statistics-for-ai are enough; everything else here is
+counting and percentages.
+
+Before transformers, before RAG, there is one recipe, and every AI system you'll ever ship,
+including the LLM APIs you call, came out of it. Learn the recipe once and a hundred buzzwords
+collapse into three questions: *what's the data, what's the loss, does it generalize?*
+
+## The recipe
+
+**Supervised learning:** inputs → labels, a **loss** measuring wrongness, and an optimizer
+grinding the loss down (→ calculus-for-optimization). A spam filter, a churn model and LLM
+pretraining are all this recipe. Pretraining just uses huge amounts of text as data and "the
+next token" as the label, at a scale that turned the recipe into general capability.
+
+## Generalization is the only thing that matters
+
+A model that aces its training data has proven nothing; maybe it **memorized**. So we split:
+**train** (learn), **validation** (tune choices), **test** (touch once, at the end). The moment
+information from test leaks into training (duplicated rows, tuning on test, eval examples
+pasted into prompts) your score becomes fiction. Many embarrassing ML failures in industry are
+leakage stories.
+
+> 💡 **Try it:** in Google's MLCC overfitting widget, crank model capacity up on noisy data and
+> watch the curve contort itself through every point — then watch test error climb. You now
+> have a permanent mental picture of memorization vs learning.
+
+## Worked example: a churn model, start to finish
+
+A hypothetical subscription business has 1,000 customers; 150 cancelled last quarter. You want
+to predict who cancels next.
+
+1. **Baseline first.** Always predicting "stays" is right for 850 of 1,000: **85% accuracy**.
+   Any model has to beat that to be worth anything.
+2. **Split.** 800 customers to train, 200 to test, keeping the same 15% cancel rate in both
+   halves.
+3. **First model:** a deep decision tree. Training accuracy 99%, test accuracy 84%. It
+   memorized the training customers and is *worse* than the baseline on new ones. Overfitting.
+4. **A too-good second try.** Someone adds a `refund_issued` column and test accuracy jumps to
+   98%. Suspicious: refunds are issued *because* people cancel. The column leaks the answer.
+   Drop it.
+5. **Honest model:** logistic regression without the leaky column. Training 89%, test 88%. The
+   two numbers are close (no overfitting) and it beats the baseline by 3 points.
+6. **Is 3 points real?** At n = 200 the rough noise band is ±1/√200 ≈ ±7 points. So the gain is
+   promising, not proven. Get more test data or use cross-validation, and check how many actual
+   cancellers it catches, not just overall accuracy (→ evaluation-metrics).
+
+Nothing in that walk-through needed a large model. It needed a baseline, a clean split, a nose
+for leakage and the statistics from the previous lessons.
+
+## The map: classical ML vs foundation models
+
+- **Structured/tabular data** (columns, numbers, categories): logistic regression, random
+  forests, gradient-boosted trees. Cheap, fast, explainable, and still the industry workhorse.
+- **Unstructured data** (language, images, audio): foundation models, called via API or
+  fine-tuned. Training from scratch is a lab's job, not yours.
+- **Your role:** rarely *train*, constantly *adapt and evaluate*. Prompting, retrieval, tools and
+  fine-tuning are all ways to steer someone else's trained recipe. The judgment lives in
+  choosing the cheapest thing that works, which is often NOT the LLM.
+
+## Bias–variance in one breath
+
+Simple models err by being too rigid (**bias**, underfitting); flexible models err by chasing
+noise (**variance**, overfitting). More data reduces variance; more capacity reduces bias.
+Regularization tricks such as early stopping, dropout and weight decay are variance dials.
+
+## Common failure modes
+
+- **The test score is far better than real-world results** → leakage (a column known only after
+  the outcome, duplicates across splits, or a random split on time-ordered data) → drop
+  post-outcome columns, dedupe, and split by time when the data has dates.
+- **High accuracy, useless model** → it just predicts the majority class → compare against the
+  baseline every time and read per-class metrics.
+- **Great on training data, poor on test** → overfitting → simpler model, regularization or more
+  data.
+- **The test set slowly stops meaning anything** → you kept tuning against it, so it became
+  training signal → make choices on the validation set and touch test once.
+- **An LLM bill for a spreadsheet problem** → the tool boundary was skipped → try boosted trees
+  or logistic regression first and make the LLM beat them.
+
+## Why this pillar exists
+
+This is the boundary-drawing lesson: it tells you when an LLM is the wrong tool, why eval
+hygiene is non-negotiable, and what "the model learned" actually means. That judgment, not
+framework trivia, is what separates an applied AI engineer from an API consumer.

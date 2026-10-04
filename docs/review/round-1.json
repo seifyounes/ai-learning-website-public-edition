@@ -1,0 +1,166 @@
+{
+  "round": 1,
+  "scores": {
+    "1_content": 7.5,
+    "2_relevance": 7,
+    "3_learning_design": 7,
+    "4_onboarding": 8,
+    "5_navigation": 8,
+    "6_interactive": 8,
+    "7_visual": 8.5,
+    "8_mobile": 8.5,
+    "9_accessibility": 7.5,
+    "10_trust": 7.5,
+    "11_technical": 7.5
+  },
+  "overall": 7.7,
+  "evidence": {
+    "1_content": "The strongest lessons are excellent and accurate: /foundations/mental-models/what-is-an-llm (pretraining vs alignment, why hallucination follows from prediction, the fictional 'Lisbon Protocol' exercise), /foundations/claude-code/core-loop (plan mode, Shift+Tab modes, 'give it a check it can run'), /foundations/math-ml-core/evaluation-metrics (base rates, PR vs ROC under imbalance, LLM-judge bias, pass@k). Depth is very uneven, though. Average body length is about 960 words in claude-code and 1,055 in obsidian, but only 282 in shipping-apps, 284 in workflows-agents, 265 in building-products, 284 in marketing-content and 367 in applied-ai-engineering, the pillar the site positions as the career core. /foundations/workflows-agents/webhooks-and-apis has a five-paragraph breakdown that mostly restates the video. /foundations/applied-ai-engineering/rag-fundamentals is correct but skips current questions (long context vs RAG, agentic retrieval, eval tooling). Several dated claims carry no source, for example 'Addy Osmani named it (Jun 2026)' in loop-engineering.",
+    "2_relevance": "Leftovers from a private build still show. In big-three-compared: 'a gnarly Dart bug, a store-listing rewrite'. claude-md-and-memory has a self-check about 'the same Edge Function schema rule' and an example rules file for 'supabase/functions/**' 'Edge Function rules'. subagents-and-agent-teams asks 'what the payments webhook does on a restore'. iterating-from-feedback says 'Two of your four testers'. Eight lessons use internal pillar codes ('P1 context-engineering', 'P2'). There is a developer and job-hunt skew: 22 lesson files mention interviews, including pillars Start Here recommends to non-coders. Pillar 3 is titled 'Chat assistants, for engineers', yet Start Here sends students and 'no code needed' professionals there. Pillar 1 ('everyone starts with pillar 1') teaches through Claude Code sessions, /goal and Stop hooks (loop-engineering, harness-engineering). /path tells every visitor 'DO THIS ONE FIRST: Building products', whatever their goal; a non-coding professional is sent first to a track that builds on Claude Code and Applied AI engineering. The 'AI coding tools' pillar covers only Claude Code plus Codex (298 'Claude Code' mentions vs 116 'Cursor' and 94 'Copilot'), which undercuts the vendor-neutral promise. About does acknowledge this honestly. On the plus side, most Apply-it blocks now branch well ('As an employee / As a manager / As a consultant' in measuring-roi; 'If you don't code yet' in core-loop).",
+    "3_learning_design": "Good: the same 8-block anatomy in every lesson, goal-based routes on /start-here, cross-pillar previous/next links, and tasks with explicit 'Success:' criteria. Problems: (a) in the challenge quizzes the correct option is the longest one in 33 of 34 MCQs. In evaluation-metrics Q1 the right answer even contains its own justification ('always say clean already scores 98% accuracy here'), and distractors are throwaways ('78% of the code is plagiarized'). (b) The 'Video recap' says 'can you predict each idea before it flips?' but shows title and text together; nothing asks you to recall first (VideoRecap.tsx renders s.title and s.text at once). (c) Self-checks in the thinner pillars are recall-only ('API vs webhook — what's the difference?'). (d) No lesson states prerequisites; Math & ML lessons are 'intermediate' with no stated maths baseline. (e) Time estimates understate the work: backend-database-with-ai says 15 min while its own recap calls the Supabase video 'long on purpose'; most lessons say 13–17 min although Start Here says lessons take 15–60 and tasks alone take 15–45. (f) Levels jump inside 'everyone' Pillar 1 (lesson 7 loop-engineering is advanced, lesson 8 is beginner).",
+    "4_onboarding": "The home page (/) says 'The ultimate guide to learning AI & AI tools', 'near-beginner to applied AI engineer' and 'Free · no sign-up', with START HERE as the filled button, so a visitor knows what this is and where to click within 30 s. The 'who it's for' statement (students, developers, professionals who don't code) lives only on /about. The first pillar blurb a newcomer reads is jargon ('prompting ⊂ context ⊂ harness ⊂ loop engineering'), and 'Claude Code mastery' is pillar 2 on a 'vendor-neutral' course. /start-here 'Pick your route' is good and should be visible on the home page.",
+    "5_navigation": "Lesson pages have a pillar sidebar, an 'On this page' jump bar, Back, and previous/next that crosses pillars (measuring-roi → 'AI service offerings that sell'). Search works and syncs ?q=, and the level filters use aria-pressed. However, search indexes only the title, tags and first paragraph, with substring matching: 'prompt injection' finds 1 lesson while 4 discuss it, and 'rag' matches 'Pricing & monetization' via 'leverage'. About 75 lesson cross-references render as raw unlinked slugs, e.g. core-loop '(→ subagents-and-agent-teams)', '→ covered in verification-and-grounding' in what-is-an-llm, and '**models-and-effort**' / '**applied-AI**' in big-three-compared. linkLessonPointers misses 'covered in', bold slugs and the video 'why' field. At 320–375px, Get Hired, Progress, Search and About sit off-screen in a horizontally scrolling tab strip, with only a clipped 'APPLICA' as a hint.",
+    "6_interactive": "All of these worked: Mark complete persisted across reload (ai-learn:progress:v1); notes autosave and reload; the recap finishes with confetti and a 'Completed' state; self-check reveal/got-it/missed works; MCQ commit-then-explain works; the dashboard rank/XP/streak/badges update; Get Hired accordions and checkboxes work; export/import/erase have status messages and an erase confirm. Weak spots: the recap is passive click-through, not recall (see 3). Self-check answers and recap text render raw Markdown because they are printed as plain strings: 36 self-check items and 18 recap steps contain *emphasis* or `code`, e.g. what-is-an-llm's answer shows 'the most *plausible* line'. The MCQs can be gamed by picking the longest option. The dashboard briefly shows '0 / 106' and '—' before hydrating.",
+    "7_visual": "The 'Computation Pad' graph-paper and title-block style is distinctive and consistent across home, pillar, lesson, dashboard and get-hired, with clear block numbering. Prose is 17px/1.6 on a solid sheet. Nits: the lesson body measure is about 790px (roughly 90+ characters per line) at 1280px, longer than a comfortable reading line. The home page is a dense list of 12 equal-weight rows below a small hero. The quiz marks the correct answer with a red-pen double box, a colour most learners read as 'wrong'.",
+    "8_mobile": "I tested 11 key pages at 320px wide (home, start-here, foundations, a pillar, a math lesson with quiz, search, dashboard, get-hired, path, about, an Applications lesson). document scrollWidth was 320 on every one, the smallest text is 12px, and only the footer 'About this course' link is under 24px tall. Problems: the main nav hides 4 of 7 destinations off-screen in a scroll strip; on lessons the 8-button 'On this page' bar takes about a third of the first screen; on lesson pages the pillar sidebar isn't available on mobile, so only previous/next remain.",
+    "9_accessibility": "Present: skip link, header/nav[Main]/main/aside/footer landmarks, nav[aria-label] for course contents / on this page / lesson navigation, a :focus-visible 2px outline, prefers-reduced-motion that kills transitions and confetti, aria-pressed on Mark complete and the level filters, and good text contrast (muted #4e5566 on #e5eaf6 is about 6:1). Problems: the self-check 'Reveal' button and every MCQ option become disabled after use, so keyboard focus drops to <body>. The quiz 'Correct / Not quite' feedback and newly revealed recap steps are not in a live region, so screen readers aren't told. Reveal has no aria-expanded. Breakdown sub-headings are H2, siblings of block headings like 'Expert breakdown', which flattens the outline (evaluation-metrics outline: H2 'Expert breakdown', then H2 'The confusion matrix…'). Search result links have no concise accessible name (the whole card is read).",
+    "10_trust": "Strong: /about is candid ('drafted with AI assistance and checked against the sources'), states that there are no accounts, cookies or analytics, uses youtube-nocookie, credits creators and fonts, and every lesson shows a 'Reviewed' date and names the channel. Weak: superlatives and unverifiable claims: 'The ultimate guide', 'Every lesson is the best explanation on the internet', 'the single best beginner explanation of LLMs anywhere', 'millions of engineers learned ROC curves from this exact video', 'Recruiters engage far more with running code than with resumes', 'Referrals convert far better'. Asana's video on its own ROI framework is called 'vendor-neutral'. 96 of 106 lessons share 'Reviewed Jul 2026'. There's no author bio or credentials and no way to report an error or outdated lesson.",
+    "11_technical": "All 106 lessons return 200, and the whole site was crawled in about 1 s (static). The primary video of /foundations/workflows-agents/webhooks-and-apis (thiXatomlNU, which is also on the Get-Hired fast track) shows 'This video is private' in the embed; oEmbed returns 403. A backup video in ai-in-companies/governance-security (organYqUYHc) returns 404. https://zapier.com/learn/automation/ (automation-mindset) is 404. http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ returned 522. Every lesson's og:title and og:description are the site-wide 'AI Learning — from near-beginner to applied AI engineer', and meta description is a per-pillar template ('A free lesson in AI mental models & …'), so share cards don't show the lesson. There are no canonical tags. The 404 page is good (/foundations/claude-code/not-a-real-lesson → 'This page isn't in the course' plus search/start) but keeps the home <title>. metadataBase falls back to http://localhost:3100 and otherwise uses VERCEL_URL, which is the per-deployment hash URL, so sitemap/robots/og URLs won't be the real domain unless NEXT_PUBLIC_SITE_URL is set. Raw slugs and raw Markdown are visible (see 5 and 6)."
+  },
+  "fixes": [
+    {
+      "criterion": "11_technical",
+      "priority": "high",
+      "issue": "Primary video is private ('This video is private') on a fast-track lesson",
+      "where": "/foundations/workflows-agents/webhooks-and-apis (videoId thiXatomlNU)",
+      "fix": "Replace it with an embeddable API-vs-webhook explainer (verify with youtube.com/oembed returning 200). Add a CI/script check that oEmbeds every video.videoId and backup YouTube URL and fails the build on non-200."
+    },
+    {
+      "criterion": "11_technical",
+      "priority": "medium",
+      "issue": "Dead links: backup video organYqUYHc (404) and zapier.com/learn/automation/ (404); r2d3.us returned 522",
+      "where": "content/applications/ai-in-companies/governance-security.mdx; content/foundations/workflows-agents/automation-mindset.mdx; the math lesson linking r2d3",
+      "fix": "Replace the two dead URLs, re-check r2d3, and add a link-check script (curl -L, treat 4xx/5xx except known bot-block 403s as failures) to the pre-publish checklist."
+    },
+    {
+      "criterion": "2_relevance",
+      "priority": "high",
+      "issue": "Private-project residue reads as written for one person's app",
+      "where": "big-three-compared ('gnarly Dart bug, a store-listing rewrite'); claude-md-and-memory (self-check 'Edge Function schema rule' + 'supabase/functions/**' 'Edge Function rules' example); subagents-and-agent-teams ('payments webhook does on a restore', 'how the Edge Functions cache'); iterating-from-feedback ('your four testers'); 8 lessons using 'P1'/'P2'",
+      "fix": "Swap in generic examples ('a tricky bug in your codebase', 'an API route's validation rules', 'src/api/**' path-scoped rule, 'a handful of testers'). Replace every 'P1 x' with the lesson title, e.g. 'Context engineering (pillar 1)'. Add a grep gate for Dart|Edge Function|restore|testers|\\bP[1-8]\\b."
+    },
+    {
+      "criterion": "2_relevance",
+      "priority": "high",
+      "issue": "/path ranks 'Building products' first for everyone, and routes for non-coders pass through engineer-framed pillars",
+      "where": "/path; /start-here routes; pillar 3 title 'Chat assistants, for engineers'; pillar 1 lessons harness-engineering and loop-engineering",
+      "fix": "Make /path goal-driven (reuse the three Start Here goals; for 'AI at work, no code' put AI-inside-companies or Marketing first). Retitle pillar 3 to 'Chat assistants: use them like a pro' and add a non-coder lesson (e.g. everyday research and writing workflows). In Pillar 1 lessons 6–7, mark them 'optional for non-coders' or add a chat-assistant version of each Try-it (doer/checker with two chat windows)."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "high",
+      "issue": "MCQs are guessable: the correct answer is the longest option in 33 of 34 questions, often with its justification embedded",
+      "where": "content/foundations/math-ml-core/*.mdx (mcq)",
+      "fix": "Rewrite options so all four are about the same length and plausible (each a real misconception). Move the 'because…' clauses into explain. Add a lint that flags any MCQ whose answer option is more than 25% longer than the median option."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "medium",
+      "issue": "Recap promises prediction but reveals title and text together; no retrieval practice",
+      "where": "src/components/VideoRecap.tsx",
+      "fix": "Show only the step title (or a question) first, with a 'Flip' button that reveals the text, then 'Next idea'. Optionally add a 'Did you predict it? yes/no' tally."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "medium",
+      "issue": "Time estimates ignore video length; no stated prerequisites",
+      "where": "estMinutes on every lesson (e.g. backend-database-with-ai 15 min with a long freeCodeCamp video); math-ml-core lessons",
+      "fix": "Show 'Video X min · Reading Y min · Task Z min' (store videoMinutes in frontmatter). Add an optional 'Before this: [lesson]' line, rendered in the header, to math lessons, advanced lessons and capstones."
+    },
+    {
+      "criterion": "1_content",
+      "priority": "high",
+      "issue": "Breakdowns in five pillars are thin (~250–370 words) next to ~1,000 in Claude Code/Obsidian; recall-only self-checks",
+      "where": "shipping-apps, workflows-agents, building-products, marketing-content, applied-ai-engineering (e.g. webhooks-and-apis, rag-fundamentals)",
+      "fix": "Bring each to at least ~600 words with a worked example, a common-failure section and one 'Try it' callout. Rewrite self-checks as scenario questions like the ones in what-is-an-llm. For rag-fundamentals, add long-context vs RAG, agentic/iterative retrieval and how to evaluate retrieval (recall@k, groundedness)."
+    },
+    {
+      "criterion": "5_navigation",
+      "priority": "high",
+      "issue": "~75 cross-references render as raw, unclickable slugs",
+      "where": "src/lib/content.ts linkLessonPointers; e.g. core-loop '(→ subagents-and-agent-teams)', what-is-an-llm '→ covered in verification-and-grounding', big-three-compared '**models-and-effort**'",
+      "fix": "Extend the resolver to match '→ (covered in )?(\\*\\*)?slug(\\*\\*)?' and the 'see slug' forms, and run it on video.why, recap and selfCheck too. Add a build check that fails when a known slug appears as visible text outside a link."
+    },
+    {
+      "criterion": "5_navigation",
+      "priority": "medium",
+      "issue": "Search covers only title/tags/first paragraph and does substring matching",
+      "where": "src/app/search/page.tsx summary(); src/components/SearchView.tsx",
+      "fix": "Index headings plus the full body text (stripped), match on word boundaries, rank title > heading > body, and show the matching snippet. 'prompt injection' should return all 4 lessons and 'rag' should not match 'leverage'."
+    },
+    {
+      "criterion": "8_mobile",
+      "priority": "medium",
+      "issue": "At 320–375px, 4 of 7 main destinations are off-screen in a scroll strip; the lesson jump bar uses about a third of the first screen",
+      "where": "src/components/TopNav.tsx; LessonView 'On this page'",
+      "fix": "Below 640px, show Start Here / Foundations / Applications plus a 'More' or menu button for Get Hired, Progress, Search and About (or add a scroll-shadow affordance). Collapse the jump bar into a single 'Jump to…' select or a horizontally scrolling single row."
+    },
+    {
+      "criterion": "6_interactive",
+      "priority": "medium",
+      "issue": "Raw Markdown (*emphasis*, `code`) shows in self-check answers (36 items) and recap steps (18)",
+      "where": "src/components/SelfCheck.tsx ({item.a}), src/components/VideoRecap.tsx ({s.text})",
+      "fix": "Render these strings with the existing inline Markdown renderer (inline-only: em/strong/code/links), or strip the markers at build time."
+    },
+    {
+      "criterion": "9_accessibility",
+      "priority": "high",
+      "issue": "Focus is lost and results aren't announced after Reveal and MCQ answers",
+      "where": "src/components/SelfCheck.tsx, McqQuiz.tsx, VideoRecap.tsx",
+      "fix": "Don't disable the focused control. Use aria-disabled plus a no-op, or move focus programmatically to the revealed answer / feedback paragraph (tabIndex=-1). Wrap MCQ feedback and the new recap step in aria-live='polite'. Give Reveal aria-expanded and aria-controls."
+    },
+    {
+      "criterion": "9_accessibility",
+      "priority": "low",
+      "issue": "Breakdown sub-headings are H2 siblings of the block headings",
+      "where": "src/components/Markdown.tsx (h2 mapping inside lesson body)",
+      "fix": "Map Markdown ## to <h3> (and ### to <h4>) inside lesson blocks so each block heading owns its sub-sections. Give search result links an aria-label of just the lesson title."
+    },
+    {
+      "criterion": "10_trust",
+      "priority": "medium",
+      "issue": "Superlatives and unsourced claims undercut an otherwise honest site",
+      "where": "/ hero ('The ultimate guide', 'the best explanation on the internet'); video 'why' texts (what-is-an-llm 'single best … anywhere', evaluation-metrics 'millions of engineers'); /get-hired ('Recruiters engage far more…', 'Referrals convert far better'); measuring-roi calling an Asana video 'vendor-neutral'",
+      "fix": "Reword to defensible claims ('our pick for the clearest free explanation, compared against N alternatives'). Cite or soften the recruiting claims. Label vendor-made videos as 'from the vendor'. Link sources for dated attributions (e.g. the loop-engineering origin)."
+    },
+    {
+      "criterion": "10_trust",
+      "priority": "medium",
+      "issue": "No author context or feedback channel; review dates look batch-stamped",
+      "where": "/about; lesson header",
+      "fix": "Add a 2–3 line author note (background, how lessons are checked) and a 'Report an error / outdated lesson' link on every lesson (GitHub issue template or mailto). Show 'Reviewed' as a full date, and re-review the oldest lessons first so dates reflect real checks."
+    },
+    {
+      "criterion": "11_technical",
+      "priority": "medium",
+      "issue": "Lesson share metadata is generic; no canonical; 404 has the home title; metadataBase fallback is localhost:3100 / VERCEL_URL",
+      "where": "src/app/[section]/[pillar]/[slug]/page.tsx generateMetadata; src/app/layout.tsx; src/app/not-found.tsx",
+      "fix": "Per lesson, set openGraph/twitter title to the lesson title, description to the first sentence of the breakdown, alternates.canonical to the lesson URL, and ideally a per-lesson OG image (title + pillar). Give not-found a 'Page not found · AI Learning' title. Require NEXT_PUBLIC_SITE_URL in production (fail the build if it's missing) instead of falling back to VERCEL_URL/localhost."
+    },
+    {
+      "criterion": "4_onboarding",
+      "priority": "medium",
+      "issue": "The home page doesn't say who the course is for and leads with jargon",
+      "where": "/ (hero and pillar 1 blurb)",
+      "fix": "Add one line under the hero ('For students, developers moving into AI, and professionals who don't code') and put the three Start Here route cards on the home page. Rewrite the pillar 1 blurb in plain words ('How LLMs work and how to get reliable results from them'). Rename pillar 2 to 'AI coding agents (Claude Code in depth)'."
+    },
+    {
+      "criterion": "7_visual",
+      "priority": "low",
+      "issue": "Long reading line; correct quiz answer framed in red",
+      "where": "lesson body container; McqQuiz answer-frame",
+      "fix": "Cap lesson prose at about 70ch (max-width: 70ch on breakdown paragraphs and lists). Frame the correct option in the print/graphite ink and keep red only for the wrong pick."
+    }
+  ],
+  "verdict": "This is a genuinely useful, distinctive and well-built course: the lesson anatomy, the best lessons (LLM basics, the core loop, evaluation metrics) and the honest privacy and AI-drafting statements are well above typical free AI courses. It isn't at the ship bar yet. A private primary video, about 75 raw slug cross-references, raw Markdown in answers, guessable quizzes, thin breakdowns in five pillars and leftover private-project examples make it read as a strong personal course partly adapted for the public, rather than a polished public one."
+}

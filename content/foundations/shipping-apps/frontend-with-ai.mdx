@@ -1,0 +1,200 @@
+---
+title: "Building the frontend with AI"
+summary: "Build consistent, responsive UI with AI by working from a visual reference, shared components and small, scoped steps."
+changeNote: "New video: Traversy's plan-first build with a 28-minute watch segment, plus a task-card worked example, a failure-modes list, one combined build and a drift audit."
+section: foundations
+pillar: shipping-apps
+order: 4
+level: intermediate
+estMinutes: 14
+taskMinutes: 45
+prerequisites: [scaffold-with-ai, core-loop]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "L4g6GGLzAyo"
+  published: "2026-08-10"
+  year: 2026
+  minutes: 61
+  start: 968
+  watchMinutes: 28
+  title: "Stop Vibe Coding: There's A Better Way To Use AI"
+  channel: "Traversy Media"
+  why: "Brad Traversy has taught web development for well over a decade, and here he builds a small web app with a coding agent (Claude Code) using a plan-first, review-everything workflow instead of one-shot prompts. He prototypes the UI first, then builds one feature at a time: this lesson's reference, building blocks and scoped-steps sequence in practice. The title is a provocation; the video itself is a calm, careful workflow. The same workflow runs in Cursor, Codex or Copilot."
+  notes:
+    - "Watch 'Overview & Playwright', 'Prototyping The UI' and the first two feature chapters (from 16:08, about 28 minutes). Playwright is a browser-automation tool he adds to the setup."
+    - "The earlier planning chapters are covered in [Idea to spec](/foundations/shipping-apps/idea-to-spec), and the deploy chapter at the end features the video's sponsor."
+    - "A shorter workflow video is in the backups."
+applyIt: |
+  AI-built screens drift when nothing holds them to one set of building blocks. Spend ten minutes
+  auditing one existing screen for that drift: one of your own, or any app you use often.
+
+  1. **Count the variety:** how many different blues (or accent colors), card styles, button
+     shapes and spacing sizes does the screen use?
+  2. **Shrink it to 375px wide** (your browser's device toolbar, or a phone) and note what breaks:
+     horizontal scroll, clipped text, tap targets too small.
+  3. **Map each problem to a fix:** a design token, a shared component, or a stated criterion the
+     next AI request must meet.
+
+  **If you code:** do it on your own app and keep the list for your next agent session. **If you
+  don't code yet:** do it on a page you built in v0, Lovable or Bolt, or on a site you admire.
+  Success: three inconsistencies or breakages, each mapped to a token, a shared component or a criterion.
+toolkit: |
+  - **Feed your design system back in.** Point your coding agent at the files that define your
+    look (a `globals.css` or Tailwind config, a Flutter theme file, a `components/` folder) in
+    the project's instruction file, so new screens compose from them instead of one-off CSS.
+    That's the shadcn move in any stack.
+  - **Make "screenshot vs reference" your definition of done.** Hand the agent the mockup, say
+    "match this", then compare a real screenshot (browser, emulator or simulator) against it
+    until they agree. Visual input beats paragraphs, and the comparison is the gate.
+  - **Bake frontend success criteria into your instruction file.** "No horizontal scroll at
+    375px, keyboard-navigable, visible focus states": state it once in AGENTS.md (or CLAUDE.md /
+    GEMINI.md for those agents), `.cursor/rules` or Copilot instructions so every build inherits the checks AI otherwise
+    skips.
+  - **Save the scoped-iteration pattern.** Keep a short prompt like "change only [this
+    component]; list the files you touched" in your prompt library. Tight scope stops the
+    agent from refactoring the parts you liked.
+recap:
+  - emoji: "✨"
+    title: "Appearing vs being good"
+    text: "AI conjures a UI from a sentence, but conjured and good are different things. A repeatable workflow is what gets you reliably to good."
+  - emoji: "🧩"
+    title: "What size to build in"
+    text: "Components, not pages: a card, a form, one widget at a time, so each is easy to get right and reuse. Pages are assembled components."
+  - emoji: "🎨"
+    title: "Borrowed building blocks"
+    text: "A component library (shadcn/ui on the web, shared widgets plus a Material 3 theme in Flutter) keeps the whole UI coherent and maintainable."
+  - emoji: "🖼️"
+    title: "Beat a paragraph of description"
+    text: "Hand the AI a screenshot or a site you admire and say 'match this'. A visual reference beats paragraphs of description."
+  - emoji: "🔍"
+    title: "How big each request is"
+    text: "Small. Just this card; now just the mobile layout. Tight scope stops the AI from refactoring the parts you already liked."
+  - emoji: "👀"
+    title: "Let the agent see its work"
+    text: "Give the agent a browser tool (Playwright or a browser MCP server) so it can open the page and check it. If it can't, screenshot the result yourself and paste it back."
+  - emoji: "🛠️"
+    title: "Two tools, two jobs"
+    text: "v0 generates polished Next.js + Tailwind components fast; a coding agent wires them into your real app with state and data."
+  - emoji: "📐"
+    title: "What AI quietly skips"
+    text: "Mobile widths and accessibility. Give it criteria (no horizontal scroll at 375px, keyboard-navigable) and it will hit them."
+task: |
+  Build one real piece of UI the way good AI frontend work actually happens: a visual input, a
+  fixed set of building blocks, small scoped steps and a comparison gate at the end. Pick one
+  reusable component your app needs (a task card for a to-do app, a stat tile, a product card) and
+  a reference for it (your own mockup, a sketch photo, or a screenshot of an app you admire):
+
+  ```prompt
+  Build one reusable [card] component to match the attached reference. Use the project's
+  existing theme and components (on the web, Tailwind tokens plus shadcn/ui; in Flutter, the
+  ThemeData plus shared widgets; in React Native, the theme file plus shared components) and
+  don't invent new colors or one-off styles. Work in scoped steps and stop for my review after
+  each: 1) layout and structure only, 2) apply the theme tokens, 3) the text and number states
+  (empty, long text, large numbers). Then compare it against the reference (take a screenshot if
+  you can), list the visible differences and close them one at a time. Don't touch anything
+  outside this component.
+  ```
+
+  **If you code:** run it in Claude Code, Cursor, Codex or Copilot with the image attached.
+  **If you don't code yet:** upload the same reference to v0, Lovable or Bolt with the same
+  instructions, then iterate in its chat one difference at a time.
+  Success: the component matches the reference, uses only theme tokens (no hardcoded colors), is
+  reusable as-is, and has no horizontal scroll at 375px.
+selfCheck:
+  - q: "You ask your agent to \"make the settings button blue\" and the diff touches eight files, including a layout you'd already approved. What went wrong, and how do you prompt next time?"
+    a: "The request was unscoped, so the agent \"improved\" whatever it judged related. Name the one component or file, say what must not change, and ask it to list the files it touched before you accept."
+  - q: "After a week of AI-built screens, your app has four slightly different blues and three card styles. What's the root cause, and the fix?"
+    a: "Each screen was generated without a shared design system, so each one invented its own values. Define tokens and shared components once (Tailwind config plus shadcn/ui, or a Flutter `ThemeData` plus shared widgets), point the agent at them in the instruction file, and move the existing screens onto them."
+  - q: "How does the component-library rule translate to Flutter?"
+    a: "Reusable widgets plus a Material 3 theme are your shadcn: define colors, type and shape once, and build shared widgets (cards, buttons, list rows) that the AI composes screens from. Same payoff: a coherent UI instead of a pile of one-off pieces."
+backupResources:
+  - label: "My AI Frontend Workflow (reference, building blocks, scoped iteration) — AICodeKing"
+    url: "https://www.youtube.com/watch?v=iZrVB05QQM0"
+    type: "video · short workflow"
+  - label: "Building Frontend apps with AI | Complete Guide — Paras Madan"
+    url: "https://www.youtube.com/watch?v=FEUMxMpAgIA"
+    type: "video · complete guide"
+  - label: "shadcn/ui — component library AI tools use well"
+    url: "https://ui.shadcn.com"
+    type: "docs · reference"
+tags:
+  - shipping-apps
+  - frontend
+  - ui
+  - ai
+---
+
+The frontend is where AI feels like magic: describe a UI and watch it appear. But "appear" and
+"good" are different things. A good UI is consistent from screen to screen, works on a phone,
+and can be used with a keyboard. A repeatable workflow gets you there reliably.
+
+## The workflow
+
+1. **Start from components, not pages.** Build one piece at a time (a card, a form, a nav;
+   in Flutter, one widget at a time) so each is easy to get right and reuse.
+2. **Use a component library.** On the web that's often **shadcn/ui**; in **Flutter** it's
+   shared widgets plus a Material 3 theme. Either way the AI composes from consistent,
+   well-structured building blocks, so the whole UI looks coherent and stays maintainable.
+   shadcn/ui works especially well with AI because its components are copied into your
+   project as ordinary files, so the agent can read and edit them like the rest of your code.
+3. **Show, don't tell.** Hand the AI a **screenshot or a site you admire** and say "match
+   this". A visual reference beats paragraphs of description; it's few-shot prompting
+   (→ prompting-in-2026) applied to design.
+4. **Iterate in scoped steps.** "Just this card. Now just the mobile layout." Tight scope
+   (→ prompting-claude-code) keeps the agent from refactoring things you liked.
+
+## Tools
+
+- **v0**: prompt-to-UI in Next.js + Tailwind; quick for generating polished components.
+- **Claude Code, Cursor, Codex or Copilot**: wire those components into your real app, with
+  state and data.
+
+Many coding agents can now also *see* their own output, through built-in browser tools or a
+browser MCP server that takes screenshots. When yours can, let it compare its screenshot with
+your reference itself. When it can't, take the screenshot yourself and paste it back.
+
+## Worked example: one task card, four passes
+
+Say your to-do app needs a task card: title, due date, a checkbox, and a red "overdue" state.
+You have a screenshot of a card you like from another app.
+
+1. **Layout only.** Attach the reference and ask for structure and spacing, using the
+   project's existing components. Ignore colors for now. Review: is the hierarchy right?
+2. **Tokens.** "Apply the theme tokens; no hex values, no one-off colors." Then ask the agent
+   to search the component for hardcoded colors to prove it. If it finds any, they go.
+3. **States.** Real data is messy. Ask for the empty state, a 120-character title, a task due
+   today, an overdue task and a completed task, and render all five side by side. This is
+   where most AI-built cards break.
+4. **Constraints.** Check it at 375px wide (your browser's device toolbar does this), tab to
+   the checkbox with the keyboard, and confirm the focus ring is visible and the overdue
+   state isn't shown by color alone (add an icon or a word).
+
+Four short passes, each one reviewable. One giant "build me a beautiful task card" prompt
+would have produced something that looked fine in the default state and broke in the other
+four.
+
+> 💡 **Try it:** Open any page you've built (or any site) in your browser, open the device
+> toolbar, set the width to 375px, and press Tab a few times. If something scrolls sideways or
+> you can't see where the focus is, you've found your first two success criteria.
+
+## Common failure modes
+
+- **Every screen looks slightly different** → screens were generated without shared tokens or
+  components → define the theme once and tell the agent to compose only from it.
+- **Pretty on desktop, broken on a phone** → nobody checked narrow widths → add "no horizontal
+  scroll at 375px" to your definition of done and check it with the device toolbar.
+- **"Fix the button" rewrites the whole page** → the prompt didn't say what was off-limits →
+  name the component, say what must not change, and ask for a list of touched files.
+- **It looks right but a keyboard or screen-reader user can't use it** → the AI optimized
+  what's visible → run an accessibility audit (Lighthouse in Chrome DevTools, or the axe
+  browser extension) and hand the findings to the agent.
+
+## Don't skip the basics
+
+AI will happily make a pretty desktop UI that breaks on mobile. So always **check responsive
+widths** and accessibility, and write them into your definition of done. Give it success
+criteria ("no horizontal scroll at 375px", "keyboard-navigable") and it will hit them.
+
+You can now turn a spec into a real, good-looking frontend at speed. Next: the half that makes
+it actually *do* something, the backend and database.

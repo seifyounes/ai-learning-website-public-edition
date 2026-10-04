@@ -1,0 +1,274 @@
+---
+title: "Autonomy at scale"
+subtitle: "/goal, workflows, routines & headless"
+summary: "Decide when to let an agent run on its own for long stretches using goals, workflows, routines or headless mode, and how to check the result."
+changeNote: "New: a four-question go/no-go check before you let a job run unattended, a reusable headless review script in the task, and Codex, Copilot and Cursor equivalents."
+section: foundations
+pillar: claude-code
+order: 11
+level: advanced
+estMinutes: 17
+taskMinutes: 55
+prerequisites: [hooks-automation, subagents-and-agent-teams, loop-engineering]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "IMZa42k6L6M"
+  published: "2026-05-06"
+  year: 2026
+  minutes: 25
+  title: "What's new in Claude Code"
+  channel: "Claude"
+  why: |
+    Made by Anthropic (the official Claude channel), so it presents their own features. It's
+    here as the map, not the manual: one 25-minute pass over /goal, dynamic workflows,
+    routines, headless runs, /code-review and /usage, where third-party videos tend to cover
+    one lever each. It shows what each lever is and why it shipped; this breakdown adds the
+    operator judgment on top.
+  notes:
+    - "Watch it for the lay of the land, then come back here for how to run a fleet safely."
+    - "Its auto-mode and agent-teams moments are covered in their own lessons (→ install-first-session, → subagents-and-agent-teams)."
+readAfter:
+  - label: "What's new in Claude Code — the official weekly feature digest"
+    url: "https://code.claude.com/docs/en/whats-new"
+    kind: "docs"
+  - label: "Best practices — controlling Claude Code at scale (subagents, headless, verifiers)"
+    url: "https://code.claude.com/docs/en/best-practices"
+    kind: "docs"
+  - label: "Run Claude Code programmatically — headless -p, output formats, bare mode"
+    url: "https://code.claude.com/docs/en/headless"
+    kind: "docs"
+applyIt: |
+  Before you hand any job to an unattended run, check it against the four things autonomy
+  needs. Pick one recurring or long job from your own work (a dependency bump, triaging new
+  issues, a batch edit across many files, a weekly report) and answer each in a line:
+
+  - **Trigger:** who or what starts it: you, a schedule, or an event like a new pull request?
+  - **Verifier:** what pass/fail check proves it worked without you reading every line?
+  - **Fence:** what may it touch, and what must it never touch (secrets, `main`, production
+    data)?
+  - **Stop rule:** what condition ends it, and what caps the spend if it loops?
+
+  Any blank answer is a no-go for now: run that job supervised until you can fill it in. A job
+  with all four answered is your first candidate for `/goal`, a routine or a headless run.
+
+  **Not using Claude Code?** The same four questions decide whether to hand a job to Codex
+  (`codex exec`), GitHub's Copilot coding agent or Cursor's background agents.
+
+  Success: one real job with its trigger, verifier, fence and stop rule written down, and a
+  clear go or no-go.
+toolkit: |
+  - **Add a headless pre-push reviewer.** Commit the `claude -p` review script from Do this now and
+    call it from a git pre-push hook or a CI step (the Claude Code GitHub Action, or `codex exec`
+    in a workflow). Your most common mistakes become an enforced sensor instead of a doc you hope
+    agents read.
+  - **Make your Definition of Done the `/goal` condition.** Keep one copy-paste line in your
+    instruction file (CLAUDE.md, or AGENTS.md for other agents): "/goal: lint clean AND tests
+    green AND build passes." Back it with a Stop hook so the check is deterministic, not hoped
+    (→ hooks-automation).
+  - **Set up one routine.** Pick a boring recurring job: a weekly dependency bump that runs the
+    tests, or a "label and summarize new issues" agent on your repo. Start with a schedule
+    trigger; move to event triggers once it has proved itself.
+  - **Use a dynamic workflow only for real batch work.** When a job is dozens of near-identical
+    units (one per file, page or module), brief one orchestrator to fan out one subagent per
+    unit, each returning only its result, instead of launching them by hand.
+  - **Read `/usage` after every big run.** See which skill, subagent, plugin or MCP server spent
+    the tokens, and route the hot path down a tier (→ models-and-effort).
+recap:
+  - emoji: "🎯"
+    title: "Stopping on evidence"
+    text: "/goal hands Claude a completion condition and lets it work across turns until that condition actually holds — so the run stops on evidence, never on 'looks done.'"
+  - emoji: "🕸️"
+    title: "Briefing an orchestrator"
+    text: "Dynamic workflows have Claude write a script that fans work out to dozens or hundreds of subagents and gathers the results — you brief an orchestrator instead of spawning helpers by hand."
+  - emoji: "⏰"
+    title: "Who starts the run?"
+    text: "Routines fire cloud agents on a schedule, a GitHub event, or an API call — the trigger becomes the world changing, not you typing, and a push pings your phone when it's done."
+  - emoji: "🖥️"
+    title: "No chat window at all"
+    text: "Headless claude -p drops the chat and prints a result, so it slots into CI, git hooks, and shell pipelines — JSON output and pre-approved tools make it a build step, not a conversation."
+  - emoji: "🔦"
+    title: "Delegating the checking"
+    text: "/code-review reads your diff with fresh eyes; ultrareview escalates to a cloud swarm of bug-hunters that report back — you delegate the verifying, not just the coding."
+  - emoji: "📊"
+    title: "Where the limit went"
+    text: "/usage attributes your burned limits to the exact skill, subagent, plugin, or MCP server that spent them — so a runaway agent shows up as a line item, not a mystery."
+  - emoji: "⚖️"
+    title: "Before you walk away"
+    text: "Before a fleet runs unattended it needs a check it can't skip and a fence it can't cross — a verifier and a bounded blast radius. No verifier, no autonomy."
+task: |
+  Take one real, multi-step change on a repo with tests (your own, or a starter app you clone;
+  45–60 minutes) and run it self-stopping:
+
+  ```prompt
+  /goal Complete this change: [describe it]. Completion condition: the linter is clean AND the
+  full test suite passes (including a new test for this change). Keep working across turns
+  until both hold — don't stop at "looks done".
+  ```
+
+  Watch it keep working past its first "done" until the condition holds. When it finishes, run
+  `/usage` and read which subagent, plugin, or MCP server actually spent your tokens. Then give
+  the project a reviewer that runs without a chat:
+
+  ```prompt
+  Write scripts/ai-review.sh (or .ps1 on Windows) that pipes `git diff main` into
+  claude -p "Review this diff for [the 2-3 mistakes that hurt this project most, e.g. 'a
+  database query without input validation, or a pricing change without a test']. Report
+  file:line then the issue, nothing else." --output-format json --allowedTools "Read", and
+  exits non-zero on any finding, so I can run it before a push or in CI.
+  ```
+
+  Run the script once on your change. **Not using Claude Code?** `codex exec` gives you the same
+  headless mode for the reviewer.
+
+  Success: a change that stopped on green, a `/usage` readout you can explain, and a committed
+  review script that ran once with no chat open.
+selfCheck:
+  - q: "You want a workflow that keeps going until the work is genuinely finished, not until it looks finished. What do you hand it — and what separates a good completion condition from a useless one?"
+    a: "Give it `/goal` with a *checkable* condition: tests green + typecheck clean, a script that exits 0, a reviewer that finds no bugs. A useless one is a vibe ('make it good') a machine can't grade — if nothing can decide it's met, /goal can't either. For a hard guarantee, back the condition with a deterministic Stop hook."
+  - q: "You fan a dynamic workflow out to ~80 subagents in auto mode and leave for lunch. What two things must be true before you walk away — and why does the number 80 make them non-negotiable?"
+    a: "One, the run can verify itself (a /goal condition + a reviewer fleet), or 'autonomous' just means every mistake waits for a user who isn't there. Two, the blast radius is bounded — deny rules + sandbox — because all 80 agents inherit your permissions, so fan-out multiplies both spend and the damage a single bad command can do."
+  - q: "You want Claude Code to review every PR diff as an automated CI gate, no human in the loop. Interactive session or headless — and how do you make the verdict something the pipeline can act on?"
+    a: "Headless: pipe the diff into `claude -p`, and use `--output-format json` (optionally `--json-schema`) so CI branches on a structured result instead of scraping prose. Add `--bare` for a reproducible run across machines and `--allowedTools` to pre-approve what it needs. A `/code-review` or ultrareview pass is the reviewer you wire in."
+  - q: "A big workflow run just drained most of your plan limit. What tells you where it went, and what do you do with that answer?"
+    a: "`/usage` attributes the spend by skill, subagent, plugin, and MCP server, so a runaway agent or a chatty MCP shows up as a line item. Then route the hot, mechanical path to a cheaper tier (Haiku/Sonnet) or fix the agent that's looping — attribution first, then the cost decision."
+backupResources:
+  - label: "Building a GitHub-lifecycle agent, end to end — Owain Lewis"
+    url: "https://www.youtube.com/watch?v=zdeZGePZMuE"
+    type: "video · applied autonomy"
+  - label: "Agent SDK — run Claude Code programmatically (CLI / Python / TypeScript)"
+    url: "https://code.claude.com/docs/en/agent-sdk/overview"
+    type: "docs · official"
+tags:
+  - claude-code
+  - autonomy
+  - dynamic-workflows
+  - headless
+  - code-review
+---
+
+You can drive one loop — explore → plan → code → commit (→ core-loop) — and you can make its
+rules law with hooks (→ hooks-automation). This lesson is the next altitude: when the unit of
+work stops being the **turn** and becomes the **run** — an autonomous stretch that spans many
+turns, fans out across dozens of subagents, and sometimes fires on a machine you're not sitting
+at. Claude Code now has a dedicated lever for each part of that. Here's the
+survey — and, more importantly, the judgment for when to hand over the wheel and when to keep
+both hands on it.
+
+## `/goal` — a stop rule that outlives the turn
+
+Left alone, Claude stops when the work *looks* done — and "looks done" is the weak signal you
+learned to distrust in the core loop. **`/goal`** replaces it. You give Claude a completion
+condition and it keeps working across turns — planning, editing, re-checking — until that
+condition actually holds. It's the runnable-check habit promoted to a first-class loop: the
+stop-rule is explicit, and it gets re-tested after every turn instead of you eyeballing the diff.
+
+The whole trick is the *condition*. A good one is checkable — "all tests green and typecheck
+clean," "the script exits 0," "the reviewer finds no correctness bugs." A bad one is a vibe —
+"make it good," "fix the UX." If a machine can't decide whether it's met, `/goal` can't either,
+and you're back to hoping. For a hard guarantee, back the condition with a deterministic **Stop
+hook** (→ hooks-automation) so the turn literally can't end red.
+
+> 💡 **Try it:** Start a change with `/goal` and a condition you'd accept in a PR — "the test
+> suite and the linter both pass" — then watch it iterate past its first "done." The theory
+> behind trigger → topology → verifier → stop-rule lives in the Loop engineering lesson
+> (→ loop-engineering); `/goal` is where the stop-rule lives inside the tool.
+
+## Dynamic workflows — one script, a fleet of agents
+
+A subagent runs a scoped job in its own context and hands back a summary (the mechanics are →
+subagents-and-agent-teams). **Dynamic workflows** are what happens when you stop spawning them
+by hand: Claude *writes a script* that orchestrates dozens to hundreds of subagents — fanning
+work out, collecting results, deciding what runs next. Subagents can even spawn their own
+subagents a few levels deep, so a single instruction becomes a whole
+org chart of agents.
+
+This is the leap from *assistant* to *orchestrator*. One prompt — "add a missing test file for
+every module in src/" — becomes an orchestrator that dispatches one agent per module, each isolated so its
+reading never floods the main window, each returning only its result. The orchestrator owns the
+**topology** (who runs, in what order, merging into what); you own the **verifier** and the
+**stop-rule**. And mind the multiplier: fan-out scales throughput *and* blast radius in the same
+breath. Every one of those hundred agents inherits your permission rules, so your deny rules and
+sandbox (→ install-first-session) are the only thing between a runaway workflow and your whole
+filesystem.
+
+## Routines — agents that run when you're not there
+
+A **routine** is a templated cloud agent that fires on a **schedule, a GitHub event, or an API
+call** — running on Claude Code on the web, so it doesn't need your terminal open. This is the
+*trigger* half of a loop made real: the run no longer starts when you type — it starts when the
+world changes. A nightly dependency-bump-and-test agent (schedule). A "triage and label every new
+issue" agent (event). A "review every PR to `main`" agent (event). When one finishes or gets
+stuck, a mobile push notification pings you — you supervise a fleet from your phone instead of
+babysitting a terminal. (Same idea elsewhere: GitHub's Copilot coding agent and Cursor's
+background agents also run in the cloud on a task you assign, then open a pull request.)
+
+Routines are where autonomy leaves your desk, which raises the stakes on everything above: an
+agent that runs unattended, on a trigger you didn't watch fire, *must* carry its own verifier and
+a bounded blast radius, because there's no human in the loop to catch it.
+
+## Headless — Claude Code as a Unix citizen
+
+`claude -p "..."` runs Claude Code non-interactively: no REPL, it prints the result and exits.
+Because it reads stdin and writes stdout, it composes like any command-line tool — which is how
+Claude Code becomes a build step, a git hook, a linter, a CI job.
+
+```bash
+# A project-specific reviewer you can drop into CI
+git diff main | claude -p "Review this diff for correctness bugs. \
+Report file:line then the issue. Nothing else." \
+  --output-format json --allowedTools "Read"
+```
+
+The flags that make it operator-grade: **`--output-format json`** returns `result`,
+`session_id`, and `total_cost_usd` with a per-model breakdown — structured output a script can
+branch on (pin the exact shape with `--json-schema`). **`--allowedTools "Read,Edit,Bash"`**
+pre-approves tools so nothing blocks on a prompt. And **`--bare`** skips auto-discovery of hooks,
+skills, plugins, MCP, and CLAUDE.md so CI gets the *same* result on every machine — the
+recommended mode for scripts. (Same idea elsewhere: `codex exec` is Codex's non-interactive
+mode, and Gemini CLI takes a `-p` prompt too.) Building full agents *in code*
+against the Agent SDK is its own lesson (→ build-agent-in-code); here, headless is simply Claude
+Code wearing a Unix hat.
+
+## Fleets that check the work: `/code-review` and ultrareview
+
+At scale you can't read every diff, so you delegate the reading. **`/code-review`** runs a
+fresh-context reviewer over your changes and reports correctness bugs — the independent second
+sensor from harness engineering (→ harness-engineering), separate from the context that wrote the
+code so it isn't rubber-stamping its own reasoning. **`/ultrareview`** (and **`claude
+ultrareview`** for CI and scripts) escalates that to a *fleet* of bug-hunting agents running in
+the cloud; findings land back in your CLI or Desktop automatically.
+
+The move is to make verification itself a fleet you don't personally run. The least-biased
+version puts a *different provider* on the diff — cross-provider review with Codex, which is its
+own lesson (→ codex-inside-claude-code).
+
+## `/usage` — the bill for autonomy
+
+The instant one command fans out to a hundred agents, "where did my limit go?" becomes a real
+question. **`/usage`** answers it: it breaks down what's driving your plan limits by **skill,
+subagent, plugin, and MCP server**. It's the attribution layer for a fleet — the readout that
+tells you a single runaway subagent, or a chatty MCP server, ate your afternoon.
+
+Read it *after* a big workflow run. If a hot path is burning the budget, that's your cue to route
+it down a tier — Haiku or Sonnet for the mechanical legs (→ models-and-effort) — or to fix the
+agent that's looping.
+
+## The judgment: when to let go of the wheel
+
+Every lever above hands more of the loop to the machine, and the skill is knowing *how much* is
+safe. Auto mode (what it is → install-first-session) at fleet scale is a cost **and** a safety
+decision, and it comes down to two questions.
+
+First: **can the run verify itself?** A `/goal` condition, a Stop hook, a reviewer fleet — some
+independent check that returns pass/fail. Without one, "autonomous" just means "unsupervised,"
+and every mistake waits for a user who isn't watching. Second: **is the blast radius bounded?**
+Deny rules and sandboxing so a hundred agents — or a routine that fires at 3am — physically can't
+escape the repo or exfiltrate a key.
+
+And the ceiling: fan-out multiplies spend as fast as it multiplies output. Auto mode plus a fleet
+plus no stop-rule is exactly how you wake up to a broken branch and a startling bill. So the rule
+for every autonomous run is the same — a verifier it can't skip, and a boundary it can't cross.
+The full theory (trigger → topology → verifier → stop-rule) is → loop-engineering; this lesson
+is the surface those levers sit on. Wire them together and you cross the line from *using* Claude
+Code to *operating* it.

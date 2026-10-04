@@ -1,0 +1,235 @@
+---
+title: "Neural networks"
+subtitle: "Layers, activations & where the GBs and dollars go"
+summary: "Explain what a neural network layer computes, and estimate how much memory and money a model needs to run or fine-tune."
+changeNote: "New: a worked example, a failure-modes list, a 5-minute local-versus-cloud call for your own machine, and a task table that includes a model you want to run."
+section: foundations
+pillar: math-ml-core
+order: 5
+level: intermediate
+estMinutes: 20
+taskMinutes: 20
+prerequisites:
+  - linear-algebra-for-ai
+  - calculus-for-optimization
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "aircAruvnKk"
+  published: "2017-10-05"
+  year: 2017
+  minutes: 19
+  title: "But what is a neural network? | Chapter 1, Deep learning"
+  channel: "3Blue1Brown"
+  why: "It builds a network visually, neuron by neuron, on real handwritten digits, so 'layers learn features' stops being a slogan and becomes something you can watch. It gives you the picture before any framework code, which is the order this lesson needs, and it opens a free series whose gradient-descent chapter you already watched in the calculus lesson, so the notation carries straight over."
+applyIt: |
+  **Before you download a local model for private, offline or free experimenting, size it in one
+  multiply against the machine you actually own.** Weights ≈ parameters × bytes/param: 7B at fp16
+  ≈ 14 GB (needs a serious GPU), quantized to 4-bit ≈ 3.5 GB (runs on a laptop). That single
+  estimate is the whole local-vs-cloud call.
+
+  Make the call for one real use of yours (summarizing private documents, prototyping a feature,
+  studying offline) in five minutes:
+
+  1. Look up your memory. On Windows, Task Manager → Performance shows GPU memory; on a Mac,
+     "About This Mac" shows the chip and its unified memory.
+  2. Pick one model you're curious about and multiply its size in billions by 0.5 (4-bit) and by
+     2 (fp16) to get GB.
+  3. Leave a few GB of headroom for the context, then write one line in your notes: "Local at
+     4-bit: yes / no. Otherwise: a cloud API, or a smaller model."
+
+  Success: a go/no-go on running that model locally, with the two numbers that decided it.
+toolkit: |
+  - **Build one layer in a spreadsheet.** Inputs × weights + bias, then `=MAX(0, cell)` for
+    ReLU. Add a second layer, then delete the ReLU columns and check that two layers without it
+    can be rewritten as one. A free Google Colab notebook does the same with a few lines of NumPy.
+  - **Multiply by about four before you agree to a fine-tune.** Training holds weights, gradients
+    and optimizer state (about 4× the weights at one precision, more with mixed precision, before
+    activations). Note that next to your machine's memory, and reach for LoRA, QLoRA or a hosted
+    fine-tune before buying hardware.
+  - **See model tiers as a network-size choice.** Bigger model = bigger matrices = more compute
+    per token = higher price and latency. Whether it's Claude Opus vs Sonnet vs Haiku, a GPT
+    flagship vs its mini, or Gemini Pro vs Flash, route by task difficulty (→ models-and-effort).
+  - **Cut waiting with the real levers.** The wait you feel grows with output tokens, so ask for
+    shorter answers (save "answer in 5 bullets" as a snippet) or use a smaller model; trimming
+    the prompt mostly saves money, not time.
+recap:
+  - emoji: "🔵"
+    title: "Strip the mystique"
+    text: "3Blue1Brown builds it neuron by neuron on handwritten digits. Underneath, a network is matrix multiplies separated by simple nonlinear functions."
+  - emoji: "➗"
+    title: "Inside one layer"
+    text: "output = activation(W·x + b): a matrix multiply, then a nonlinearity that bends the result. W holds the learned numbers; the bend is what makes depth mean anything."
+  - emoji: "🧱"
+    title: "Delete the bends and…"
+    text: "Stacked layers collapse into a single matrix, so a 96-layer network equals a 1-layer one. All the expressive power of depth lives in the nonlinearities."
+  - emoji: "🪜"
+    title: "What depth buys you"
+    text: "Early layers learn simple patterns and later layers compose them into abstractions: edges → shapes → objects. Reusing lower features is why deep beats wide."
+  - emoji: "💾"
+    title: "Sizing a model, one multiply"
+    text: "Memory to load a model ≈ parameters × bytes per parameter. 7B at fp16 is ~14 GB; 4-bit quantization cuts it to ~3.5 GB, which is what moved capable models onto laptops."
+  - emoji: "🏋️"
+    title: "Why training needs more"
+    text: "Inference stores the weights; training also stores gradients, optimizer state and activations for backprop. That's why a full fine-tune of a 7B needs far more than the one card inference needs."
+  - emoji: "⏱️"
+    title: "Where latency comes from"
+    text: "Each generated token flows through every layer's matmuls, so a bigger model means more compute, latency and price per token. Model tiers are, quite literally, network sizes."
+task: |
+  Turn the sizing rule into a table you can rerun, with your own machine in it.
+
+  ```prompt
+  Write a small script (Python, standard library only) that prints a weight-memory table for
+  three model sizes — 3B, 7B, 70B — plus one model I name [e.g. an 8B model I want to try], at
+  fp16 (params × 2 bytes) and 4-bit (params × 0.5 bytes). Take my machine's memory as an input
+  [e.g. 16 GB GPU, or 16 GB unified memory] and, for every cell, flag whether it fits with a few
+  GB of headroom for context, and whether it needs an 80 GB data-center card.
+  Success: the table runs and makes clear which models are laptop-runnable at which precision.
+  ```
+
+  **No-code path:** build the same table in a spreadsheet (one formula: params in billions ×
+  bytes per param = GB), add a column for the model you want and a row for your machine's memory,
+  and shade the cells that fit with headroom. You've just reproduced the sizing conversation
+  every AI team has regularly.
+  Success: a table that shows the largest model your own machine can run, and at which precision.
+selfCheck:
+  - q: "What does one layer of a neural network compute, and why is the activation function non-negotiable?"
+    a: "output = activation(W·x + b): a matrix multiply plus a nonlinearity. Without the nonlinearity, stacked layers multiply into ONE linear map (W₂(W₁x) = (W₂W₁)x), so a 100-layer network would equal a 1-layer one."
+  - q: "You want to run a 13B model on a laptop GPU with 8 GB of memory. Does it fit at fp16? At 4-bit? What else needs room?"
+    a: "fp16: 13B × 2 bytes ≈ 26 GB, so no. 4-bit: 13B × 0.5 ≈ 6.5 GB, which barely fits the weights and leaves little room for the context's KV cache, so expect short contexts, a spill into slower system RAM, or a move to a smaller model."
+  - q: "Your fine-tune crashes out of memory on a GPU that runs the same model for chat without trouble. Explain why, and name two fixes."
+    a: "Training also stores gradients, optimizer state (Adam adds about two values per trainable weight) and activations for backprop, several times the weight memory. Fixes: LoRA or QLoRA (train small adapters only), gradient checkpointing, or a smaller batch."
+mcq:
+  - q: "Remove every activation function from a 96-layer plain feed-forward network (no attention). The network is now equivalent to:"
+    options:
+      - "A 96-layer network with slightly lower accuracy"
+      - "A network that can still learn curves, just slower"
+      - "A network that outputs random noise for any input"
+      - "A single linear layer: one matrix plus one bias"
+    answer: 3
+    explain: "Linear after linear is still linear: W₂(W₁x) = (W₂W₁)x, however many layers you stack, and the biases fold in the same way. So the network can only draw straight boundaries, no matter how long it trains. All the expressive power of depth comes from the nonlinearities between the matmuls."
+  - q: "A 7B-parameter model at fp16 uses 2 bytes per parameter. Roughly how much memory do you need just to load the weights, and what does 4-bit quantization change?"
+    options:
+      - "~14 GB at fp16; about 3.5 GB at 4-bit"
+      - "~7 GB at fp16; about 3.5 GB at 4-bit"
+      - "~28 GB at fp16; 4-bit only changes speed"
+      - "~14 GB at fp16; 4-bit only changes speed"
+    answer: 0
+    explain: "7B × 2 bytes = 14 GB at fp16; 7B × 0.5 bytes ≈ 3.5 GB at 4-bit (real files run a little larger, since some parts stay at higher precision). Quantization stores fewer bytes per weight, which is what moved capable models from server rooms onto laptops, with a modest quality cost. You'll use this directly when running models locally (→ local-open-models)."
+  - q: "Why do deep networks usually beat equally sized shallow-but-wide ones on complex data like images or language?"
+    options:
+      - "Deep networks have far fewer parameters in total"
+      - "Wide layers can't be parallelized well on GPUs"
+      - "Layers reuse simpler features to build complex ones"
+      - "Extra depth adds memory, so the network recalls more"
+    answer: 2
+    explain: "Early layers learn simple patterns and later layers compose them: edges → shapes → objects, characters → syntax → meaning. Reusing lower features lets depth represent functions a single flat layer would need vastly more neurons for. The comparison here holds parameter count equal, and wide layers parallelize perfectly well."
+  - q: "Your fine-tune job runs out of memory on a GPU that easily runs the same model for inference. Where is the extra memory going?"
+    options:
+      - "The tokenizer's vocabulary table, copied per batch"
+      - "Gradients, optimizer state and saved activations"
+      - "The whole training dataset, loaded into GPU memory"
+      - "A second copy of the weights kept for evaluation"
+    answer: 1
+    explain: "Training needs the weights plus a gradient for every trainable weight, optimizer state (Adam keeps about two more values each) and the activations saved for backprop. That's several times the weight memory, which is why LoRA (gradients and optimizer state only for tiny adapters) and gradient checkpointing are the standard escape hatches. Data is streamed in batches, not loaded whole."
+  - q: "A big enough network can approximate almost any function (universal approximation). Why doesn't that make architecture irrelevant?"
+    options:
+      - "Modern networks are too deep for the theorem to apply"
+      - "It needs infinite data, so it never applies in practice"
+      - "A fit existing doesn't mean training will find it"
+      - "It only covers classification, not text generation"
+    answer: 2
+    explain: "The theorem says a good fit exists. It says nothing about whether gradient descent will find it, with how much data, or at what size. Architectures build in assumptions (inductive biases) that make the right functions findable with feasible data and compute; transformers won largely because attention and parallel training made that practical."
+backupResources:
+  - label: "Neural networks — full playlist (3Blue1Brown)"
+    url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi"
+    type: "course · chapters 2–7 continue the story"
+  - label: "TensorFlow Playground — train a network in your browser"
+    url: "https://playground.tensorflow.org/"
+    type: "interactive · watch layers learn live"
+tags:
+  - math
+  - neural-networks
+  - deep-learning
+  - math-ml-core
+---
+
+**You need:** matrix-times-vector from → linear-algebra-for-ai and the gradient-descent loop
+from → calculus-for-optimization. The memory maths is one multiplication.
+
+Strip the mystique: a neural network is **matrix multiplies separated by simple nonlinear
+functions**, trained by gradient descent. What makes it worth a lesson is the *systems
+consequences*: where the gigabytes, the milliseconds and the dollars come from.
+
+## The unit: matmul + nonlinearity
+
+One layer: `output = activation(W·x + b)`. The matrix W holds the learned numbers; the
+**activation** (ReLU and friends) bends the output so stacked layers don't collapse into one
+linear map. Stack dozens to hundreds of these and you have every network in production,
+including the transformer blocks inside every LLM you call.
+
+## Worked example: one layer by hand, then a sizing call
+
+**The forward pass.** Input x = (1, 2). Weights W has rows (1, −1) and (0.5, 0.5); bias
+b = (0, 1). Activation: ReLU, which turns negatives into 0.
+
+1. **Multiply:** W·x = (1×1 + (−1)×2, 0.5×1 + 0.5×2) = (−1, 1.5).
+2. **Add the bias:** (−1, 1.5) + (0, 1) = (−1, 2.5).
+3. **Bend:** ReLU(−1, 2.5) = **(0, 2.5)**.
+
+Step 3 is the whole point. Without it, a second layer W₂ would compute W₂(W·x), which equals
+(W₂W)·x: one matrix again. A model is billions of these three steps.
+
+**The sizing call.** You want an 8B model on a laptop with a 16 GB GPU.
+
+1. **fp16:** 8B × 2 bytes = 16 GB. It doesn't fit: nothing is left for the context.
+2. **8-bit:** 8B × 1 byte = 8 GB. Fits, with room for a decent context.
+3. **4-bit:** 8B × 0.5 bytes = 4 GB (real files run a little larger). Fits easily, at a small
+   quality cost you should test on your own tasks.
+
+Pick 8-bit if quality matters most, 4-bit if you want long contexts or a second model loaded.
+
+## Depth = hierarchy
+
+Early layers detect simple patterns; later layers compose them into abstractions. Composition
+is the superpower: features learned once get reused by everything above them. That's why
+"deep" beats "wide", and why early layers of a language model tend to handle surface patterns
+such as spelling while later layers track meaning.
+
+> 💡 **Try it:** open TensorFlow Playground (backup resources), pick the spiral dataset, and
+> try to fit it with zero hidden layers — then add two. Watch the decision boundary go from a
+> straight line to a spiral. That's the entire "why depth" argument in 60 seconds.
+
+## Where the memory goes (the money question)
+
+- **Inference:** weights ≈ params × bytes/param. 7B fp16 ≈ 14 GB; 4-bit ≈ 3.5 GB.
+  Quantization = fewer bytes per parameter, the trick that put real models on laptops.
+- **Training:** weights + gradients + optimizer state + activations: several times more (about
+  4× if everything is stored at the same precision, more with mixed-precision copies, before
+  activations). That's why full fine-tunes need big GPUs while LoRA runs on one card.
+- **Speed:** every generated token flows through every layer's matmuls. Bigger model → more
+  FLOPs → more latency → higher price per token. Model tiers ARE network sizes.
+
+## Parameters learn; activations flow
+
+Two memories people confuse: **parameters** (the learned weights, fixed at inference) and
+**activations** (the per-request values flowing through, alive only during a pass). The
+KV cache (→ transformers-attention) is activation-side: it scales with YOUR prompt and output
+length, not with model size alone.
+
+## Common failure modes
+
+- **A local model loads but runs painfully slowly** → it didn't fit in GPU memory and spilled
+  into system RAM → pick a smaller quantization or a smaller model.
+- **Out of memory only on long prompts** → the KV cache grows with context → lower the context
+  setting or leave headroom when you size the model.
+- **A fine-tune OOMs where chat ran fine** → training's memory multiplier → LoRA or QLoRA,
+  gradient checkpointing, or a smaller batch.
+- **Answers get noticeably worse after quantizing** → too few bits per weight for your task →
+  step back up to 4-bit or 8-bit and compare on your own examples.
+
+## Why this pillar exists
+
+You'll never hand-code a layer, but every sizing, pricing, latency and local-vs-API decision
+you make is this lesson's arithmetic. "7B at 4-bit fits my laptop" is a sentence that closes
+architecture debates, and now you can derive it, not just repeat it.

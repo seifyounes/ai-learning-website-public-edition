@@ -1,0 +1,131 @@
+{
+  "round": 3,
+  "scores": {
+    "1_content": 9.0,
+    "2_relevance": 8.7,
+    "3_learning_design": 8.7,
+    "4_onboarding": 9.2,
+    "5_navigation": 8.8,
+    "6_interactive": 9.1,
+    "7_visual": 8.8,
+    "8_mobile": 9.2,
+    "9_accessibility": 9.0,
+    "10_trust": 9.0,
+    "11_technical": 8.4
+  },
+  "overall": 8.9,
+  "evidence": {
+    "1_content": "Read in full (rendered and source): mental-models/tokens-and-context, mental-models/context-engineering, mental-models/what-is-an-llm (frontmatter and apply-it), claude-code/hooks-automation, chat-assistants/big-three-compared, math-ml-core/transformers-attention (with the challenge quiz), applied-ai-engineering/rag-fundamentals, applications/ai-in-companies/governance-security, applications/agency-freelance/pricing-ai-work, obsidian/obsidian-ai-workflow and markdown-and-linking. The teaching is accurate and current for 2026 and goes deep. Hooks has the right exit-code semantics, permissionDecision and stop_hook_active. RAG covers long context vs RAG, agentic retrieval, recall@k/MRR vs groundedness, and a worked stale-policy diagnosis. Transformers covers prefill vs decode, the KV cache and prompt caching with a worked 3,000+1,000+300-token example, and the Ollama --verbose no-code path is correct. Pricing covers who pays for model usage after go-live. Lessons are honest about older videos (Opus 4 in mobile-apps-with-ai, 2023 Karpathy talk). Nits: tokens-and-context shows 'unbelievable -> un · believe · able', but tokens are substrings, so 'believe' (extra e) cannot be one. what-is-an-llm's apply-it says 'Watch the model quote or invent one anyway', but a current frontier model given 'The shop's ONLY written policies are…' will often answer correctly, which leaves the beginner without the promised effect and with no fallback.",
+    "2_relevance": "No private or personal leftovers: I grepped content and src for names, private apps, TODOs and local paths, and the only hits are the deliberate author credit on /about and in the footer. Most apply-it and toolkit blocks have explicit 'If you code / If you don't code yet' branches (tokens-and-context, context-engineering, transformers-attention, big-three-compared). Remaining skew: (a) the route for 'understand AI and use it well' (students, newcomers) sends people to pillar 4 Obsidian, whose apply-its lead with a terminal agent at the vault root ('Run it from a terminal at the vault root in Claude Code, Codex or Gemini CLI', CLAUDE.md conventions). The chat path is a one-line fallback ('No terminal agent?') in markdown-and-linking, or a closing section in obsidian-ai-workflow. (b) Pillar 2 is Claude Code only; Cursor and Copilot users get side notes, and 'Codex inside Claude Code' is a niche plugin workflow. (c) big-three-compared, a beginner lesson, lists a developer doc ('Google AI Studio — structured output (responseSchema)') as its first read-after item.",
+    "3_learning_design": "The structure is strong. Every lesson has a 'Do these first' box (e.g. hooks: Install & your first session · The core loop), a pillar position (8 / 13), separate video, read and task times, previous/next, routes by goal on /start-here and /path, and modules on the applied-AI pillar page. The math quizzes are genuinely application-level: commit-then-explain with distractors that test judgment. Gaps: (a) the very first lesson everyone is told to begin with is an 84-minute block built on a 60-minute 2023 talk, while the shorter explainer is buried in the backups. (b) Pillar 6 'Applied AI engineering' never says it assumes basic programming (Python or JS, a terminal, .env files). calling-an-llm-api's prerequisites are only what-is-an-llm and tokens-and-context, so a non-coder can walk straight into a wall. (c) Outside the math pillar, all checking is self-graded reveal cards (3–4 per lesson) with no committed-answer check.",
+    "4_onboarding": "Home at 1280 and 320: the H1 'Learn AI and AI tools, one studied lesson at a time', a one-line who-it's-for, the 'Free · no sign-up' box, Start Here as the single filled CTA, then 'Pick your route' with three goal routes. You can tell what this is, who it's for and where to start in well under 30 s. /start-here repeats the routes, explains the one-lesson-per-sitting rhythm and lists the full course.",
+    "5_navigation": "Top nav, a sidebar with every pillar and the current pillar's lessons with completion ticks, a per-lesson 'On this page' tab strip (Watch → Notes) and a mobile 'Jump to a section'. Prev/next and back-to-pillar work. Search syncs ?q= to the URL, has an aria-live result count, a helpful empty state and level filters (search?q=agent + Advanced gives 16 results). Weaknesses: there is no typo tolerance (search?q=obsidain gives 0 lessons). The level filter isn't kept in the URL. With no query the list starts with 'Calling an LLM API', not course order. Some snippets leak raw slugs ('…into a vector ( embeddings-vector-databases)'). Lesson pointers stay unlinked raw slugs in claude-code/mcp-servers (written '→ **`mcp-deep`**', '→ **`skills-and-plugins`**', '→ **`hooks-automation`**', which the linkLessonPointers regex doesn't match) and in self-check questions (hooks-automation: '…Harness engineering lesson, → harness-engineering').",
+    "6_interactive": "Tested on foundations/mental-models/tokens-and-context. The recap runs 0/6 → 6/6 with an 'I had it / Not yet' flow and a remembered 'Last time you recalled 6 of 6'. Self-check reveal has aria-expanded plus 'I got it / I missed it'. A typed note shows 'Saved at …' and survives a reload. Mark complete sets aria-pressed, ticks the sidebar and survives a reload. The transformers-attention challenge quiz gives a correct answer ✓ with an explanation and a wrong answer a struck-through ✗ with 'Not quite' and an explanation. /dashboard updates rank, XP, streak and the Liftoff badge. /path?goal=work reorders the tracks. The empty-note writing bug is fixed (NotesBox only writes non-empty values). Export (code review, not clicked, because a download needs the user's approval) calls URL.revokeObjectURL synchronously right after a.click() on a detached anchor. That works in Chromium but is a known way to lose the download in some Safari and Firefox versions.",
+    "7_visual": "The 'Computation Pad' ruled-sheet look is distinctive and coherent. Archivo labels, Atkinson Hyperlegible body text, mono numbers in title blocks, comfortable measure and a clear block hierarchy (numbered section boxes, prompt cards, 'Try it now' callouts). Text contrast is good (pencil #4E5566 on the sheet is about 6.2:1, the footer about 5:1). The real defect is the desktop header between 760 and about 1050px wide. At 768 the page scrollWidth is 1003 against a 758 viewport (iframe sweep, page minus viewport: 760→253px, 800→213, 900→113, 1000→13, 1050→0), so every iPad-portrait or narrow laptop window scrolls sideways and the Search/About tabs and streak chip sit off-screen.",
+    "8_mobile": "At 320 I checked /, /start-here, /foundations, /foundations/applied-ai-engineering, /search?q=rag, /dashboard, /get-hired, /path?goal=build, /about, math-ml-core/evaluation-metrics, agency-freelance/pricing-ai-work and the 404. All have scrollWidth = clientWidth, and only code blocks scroll internally. The menu button opens a full-width list, has aria-expanded, closes on Escape and returns focus to the button. The only targets under 24px are inline text links (allowed). At 375 the lesson header stacks into a 2-column title block and the text is readable. Tablet widths (760–1050) overflow; see 7_visual and 11_technical.",
+    "9_accessibility": "There is a skip link that becomes visible on focus. Landmarks: header, nav 'Main', main#main, aside, nav 'Course contents', nav 'On this page', nav 'Lesson navigation', footer. Headings run H1 > H2 sections > H3 subsections in order. Global :focus-visible styles and a prefers-reduced-motion block are in place. The notes textarea has an aria-label. MCQ options sit in a role=group with aria-pressed and an aria-live explanation, the recap is an aria-live list, and right and wrong are shown with ✓/✗ and strike-through, not colour alone. The file input has an aria-label. Gap: the 404 page sends an empty <body> from the server (the 'This page isn't in the course' content exists only in the RSC payload), so without JS, or before hydration, assistive tech and crawlers get a blank page.",
+    "10_trust": "/about explains how videos are picked, says the lessons were 'drafted with AI assistance and checked against the sources each lesson links', defines what a review covers, states the privacy model (no accounts, cookies or analytics, local storage only, youtube-nocookie) and credits the author and fonts. Every lesson names the channel and year with a 'Why this one' that admits weaknesses (e.g. obsidian-ai-workflow flags the creator's paid-product segments and an on-camera error with timestamps). There is a prefilled 'Report it on GitHub' issue link on each lesson. I checked all 106 primary videos and 136 YouTube backups via oEmbed and all are live, and all 163 other external links resolve. Illustrative figures are labelled as such (pricing-ai-work). Credibility nits: all 106 lessons show 'Reviewed 3 Oct 2026', today's date. /about pre-empts it, but a skeptical learner may read a whole-course stamp as automatic. Also, every lesson loads the YouTube iframe on page load, so a third-party request happens before any click, which softens the 'no tracking' framing.",
+    "11_technical": "Every sitemap URL (126) returns 200. Lesson HTML is about 27 KB gzipped and returns in about 20–40 ms. Lesson canonical, OG and Twitter cards with per-lesson generated images are set. robots.txt and the sitemap are wired to the site URL (localhost before launch, as expected), the 404 sends noindex, and the console has no app errors (only YouTube-iframe noise). Problems: (1) the header overflows between 760 and about 1050px (see 7_visual), the most visible defect left. (2) The 404 body isn't server-rendered. (3) /search-index.json is 866 KB and `next start` serves it uncompressed even with Accept-Encoding: gzip; Vercel will compress it, but it's still heavy for a phone. (4) Every lesson mounts a full YouTube iframe (lazy, but above the fold), which costs about 1 MB of third-party JS per lesson view."
+  },
+  "fixes": [
+    {
+      "criterion": "11_technical",
+      "priority": "high",
+      "issue": "From 760px to about 1050px wide the desktop header (7 nowrap tabs + streak chip + logo, about 1003px total) is wider than the viewport, so the whole page scrolls sideways on iPad portrait and narrow laptop windows.",
+      "where": "src/components/TopNav.tsx (nav 'hidden min-w-0 flex-1 … min-[760px]:flex', parent 'flex-wrap … min-[760px]:flex-…'); every page",
+      "fix": "Move the desktop-nav breakpoint up to about 1080px (show the Menu button below it), or let the tab row wrap or scroll inside its own overflow-x:auto container, and/or shrink the tab padding and font at 760–1080. Add an automated check: for w in 760, 800, 900, 1024, require scrollWidth <= clientWidth."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "medium",
+      "issue": "Pillar 6 (and the code paths of pillars 2 and 7) never state the programming baseline they assume, so a non-coder following 'Calling an LLM API' (prereqs: what-is-an-llm, tokens-and-context) hits code, terminals and .env files without warning.",
+      "where": "/foundations/applied-ai-engineering pillar header; content/foundations/applied-ai-engineering/calling-an-llm-api.mdx",
+      "fix": "Add a short 'You'll need' line on the pillar page and the first lesson's header (basic Python or JavaScript, running a script from a terminal, an API key with a spending limit), with one linked free primer for people who don't code yet."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "medium",
+      "issue": "The lesson everyone is told to start with is 84 minutes built on a 60-minute 2023 talk. The short explainer is hidden in the collapsed backups, so a newcomer's first sitting is the heaviest.",
+      "where": "/foundations/mental-models/what-is-an-llm; /start-here 'Begin with'",
+      "fix": "Under the video's 'Why this one', add a visible 'Short on time? Watch [short explainer] (≈10 min) now and come back for the full talk' option. Alternatively, make the short explainer the primary and keep Karpathy as the deep watch."
+    },
+    {
+      "criterion": "2_relevance",
+      "priority": "medium",
+      "issue": "The 'understand AI and use it well' route (students and newcomers) sends people to the Obsidian pillar, whose apply-its lead with a terminal coding agent and CLAUDE.md conventions. The chat-assistant path is a one-line fallback.",
+      "where": "content/foundations/obsidian/*.mdx (e.g. markdown-and-linking applyIt: 'Run it from a terminal at the vault root in Claude Code, Codex or Gemini CLI'); home and start-here route 1",
+      "fix": "Give every Obsidian apply-it and task an equal-weight 'With a chat assistant' path, using the same 'If you code / If you don't code yet' pattern as the mental-models lessons. Alternatively, mark which Obsidian lessons are optional for no-code learners on the route card."
+    },
+    {
+      "criterion": "1_content",
+      "priority": "medium",
+      "issue": "The first lesson's apply-it promises 'Watch the model quote or invent one anyway', but current frontier models often answer the bookshop prompt correctly, so the demo can fail and leave a beginner unsure what they were meant to see.",
+      "where": "content/foundations/mental-models/what-is-an-llm.mdx applyIt",
+      "fix": "Make the demo robust: drop 'ONLY' and ask for a 'policy summary for our FAQ', or add a second, harder prompt (a specific figure the docs don't contain). Add one line: 'If it refuses correctly, that's grounding working; now remove the policy list entirely and ask again.'"
+    },
+    {
+      "criterion": "5_navigation",
+      "priority": "medium",
+      "issue": "Some lesson pointers render as raw slugs: '→ **`slug`**' isn't matched by linkLessonPointers (mcp-servers ×3), and self-check questions are deliberately unlinked, so '→ harness-engineering' shows verbatim (hooks-automation).",
+      "where": "src/lib/content.ts linkLessonPointers regex; content/foundations/claude-code/mcp-servers.mdx lines 209/219/222; hooks-automation.mdx selfCheck q4",
+      "fix": "Extend the regex to accept a '**`slug`**' wrapper (e.g. (\\*\\*`|\\*\\*|`)?…(`\\*\\*|\\*\\*|`)?). For self-check questions, swap the slug for the lesson's plain title (no link) instead of leaving it raw. Make scripts/check-public.js fail on any rendered '→ [a-z]+-[a-z-]+' that matches a lesson slug."
+    },
+    {
+      "criterion": "5_navigation",
+      "priority": "low",
+      "issue": "Search has no typo tolerance ('obsidain' gives 0), the level filter isn't kept in the URL, the no-query list isn't in course order, and snippets show stripped pointers ('( embeddings-vector-databases)').",
+      "where": "src/components/SearchView.tsx; src/app/search-index.json/route.ts",
+      "fix": "Add simple fuzzy matching (edit distance 1–2 on terms ≥5 chars, or a 'Did you mean' from lesson titles and tags). Sync &level= to the URL. Order the empty-query list by section/pillar/order. Replace '→ slug' with the lesson title when building the index."
+    },
+    {
+      "criterion": "9_accessibility",
+      "priority": "low",
+      "issue": "The 404 page's server HTML has an empty <body>; the message and links exist only in the RSC payload and appear after hydration.",
+      "where": "src/app/not-found.tsx (any unknown URL, e.g. /nope, /foundations/mental-models/nope)",
+      "fix": "Make sure not-found renders on the server: avoid client-only wrappers or Suspense boundaries without fallback content around it, and confirm with curl that 'This page isn't in the course' is in the raw HTML."
+    },
+    {
+      "criterion": "7_visual",
+      "priority": "low",
+      "issue": "Header overflow at tablet widths breaks the otherwise clean sheet layout (see the high-priority fix). The lesson header also hides the PILLAR cell on mobile, so you lose the 'where am I' cue except for 'Back'.",
+      "where": "TopNav; lesson TitleBlock at <760px",
+      "fix": "Fix the header breakpoint as above. On mobile, change 'Back' to '← AI mental models' (the pillar name) so the cell carries both jobs."
+    },
+    {
+      "criterion": "10_trust",
+      "priority": "low",
+      "issue": "All 106 lessons show 'Reviewed 3 Oct 2026', and every lesson loads a YouTube iframe on page load. Both are explained on /about but can read as automatic and as a quiet third-party request.",
+      "where": "lesson header REVIEWED cell; src/components/YouTubeEmbed.tsx",
+      "fix": "Link the Reviewed cell to the /about 'What a review covers' anchor. Use a click-to-load thumbnail facade so no YouTube request happens until the learner presses play, and say so on /about."
+    },
+    {
+      "criterion": "11_technical",
+      "priority": "low",
+      "issue": "/search-index.json is 866 KB uncompressed from next start, and a full YouTube iframe mounts on every lesson.",
+      "where": "src/app/search-index.json/route.ts; YouTubeEmbed",
+      "fix": "Trim the index: store per-lesson plain-text bodies capped at about 2–3 KB, or build a compact term index. Lazy-fetch it on first keystroke. Use the click-to-load video facade, which also cuts about 1 MB of third-party JS per lesson."
+    },
+    {
+      "criterion": "6_interactive",
+      "priority": "low",
+      "issue": "Export revokes the object URL synchronously after clicking a detached anchor, which can cancel the download in some Safari and Firefox versions.",
+      "where": "src/components/ProgressBackup.tsx exportData",
+      "fix": "Append the anchor to document.body, click it, remove it, and call URL.revokeObjectURL inside setTimeout(…, 1000)."
+    },
+    {
+      "criterion": "1_content",
+      "priority": "low",
+      "issue": "The token example 'unbelievable -> un · believe · able' is impossible, because tokens are substrings of the text. It reinforces the misconception that tokens are morphemes.",
+      "where": "content/foundations/mental-models/tokens-and-context.mdx (breakdown code block and recap step 2)",
+      "fix": "Use a real split from the OpenAI tokenizer (e.g. 'unbelievable' → 'un' · 'belie' · 'vable' or whatever the tool shows) and add 'splits differ by tokenizer'. Link the tokenizer inline in the 'Try it' callout instead of 'in the backups'."
+    },
+    {
+      "criterion": "2_relevance",
+      "priority": "low",
+      "issue": "Beginner chat lesson's first read-after is a developer API doc (Gemini structured output).",
+      "where": "content/foundations/chat-assistants/big-three-compared.mdx readAfter",
+      "fix": "Put Zapier's comparison first and label the AI Studio doc 'If you build software'."
+    }
+  ],
+  "verdict": "This is a genuinely good free course. The content is accurate, current and deep, every lesson credits its source and is candid about its weaknesses, onboarding is clear, and phone layouts are clean at 320–375. What keeps it below 9 is one real layout bug (horizontal scroll on every page between about 760 and 1050px), unstated coding prerequisites and a heavy first lesson for true beginners, the agent-first Obsidian pillar on the beginner route, and a handful of rough edges (raw slug pointers, search without typo tolerance, a 404 that isn't server-rendered)."
+}

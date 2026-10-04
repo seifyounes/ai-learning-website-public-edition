@@ -1,0 +1,230 @@
+---
+title: "Calculus for optimization"
+subtitle: "Gradients, learning rates & what training actually does"
+summary: "Read a loss curve, choose a sensible learning rate, and explain what gradient descent and backprop actually do during training."
+changeNote: "New: a worked example, a failure-modes list, and a 10-minute check of one saved prompt on three inputs it was never tuned on."
+section: foundations
+pillar: math-ml-core
+order: 3
+level: intermediate
+estMinutes: 20
+taskMinutes: 15
+prerequisites:
+  - linear-algebra-for-ai
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "IHZwWFHWa-w"
+  published: "2017-10-16"
+  year: 2017
+  minutes: 21
+  title: "Gradient descent, how neural networks learn | Chapter 2, Deep learning"
+  channel: "3Blue1Brown"
+  why: "You SEE the loss landscape and the step downhill as animation, so the update rule reads as a picture instead of a formula to memorize. It works on a real digit-recognition network rather than a one-variable toy, which is the bridge this lesson needs between 'slope' and 'training a model'. Chosen over lecture-style course videos for clarity per minute. It's chapter 2 of the Deep Learning series; chapters 3–4 (backpropagation) are the natural follow-up and are linked as backups."
+applyIt: |
+  **The overfitting curve you just learned has a daily analogue: tuning a prompt until it aces
+  the few examples you built it around.** Train-loss down, real quality flat, and the fix is the
+  same as in training: a held-out set you never tuned against. Pick one prompt you reuse (a saved
+  prompt, a custom GPT, a Gemini Gem, a Project's instructions) that turns rough input into
+  structured output, such as meeting notes into action items or a lecture into flashcards.
+
+  Run a 10-minute check. Find three real inputs you did NOT use while writing or tuning it, run
+  the prompt on each, and judge every output against the two or three things a good output must
+  do ("every action item has an owner and a date; nothing invented"). Then write one line in your
+  notes: held up, or overfit, and on which input.
+
+  **If you code:** keep those inputs in a file next to the prompt and rerun them after every edit.
+  **If you don't code yet:** keep them in a doc beside the prompt.
+
+  Success: three unseen inputs run, and a one-line verdict on whether the prompt generalizes.
+toolkit: |
+  - **Run gradient descent in a spreadsheet.** One row per step: weight, loss, gradient, and new
+    weight = weight − learning rate × gradient. Change the learning-rate cell and watch training
+    crawl, settle or blow up. A free Google Colab notebook does the same in a few lines of Python.
+  - **Set up a chat assistant as a calculus tutor.** In a ChatGPT or Claude Project or a Gemini
+    Gem, add the standing instruction "Ask me to attempt each step before telling me; when I'm
+    wrong, point at the line, not the answer." Bring it a chain-rule step or a loss curve.
+  - **Keep a held-out set for every prompt you rely on.** Tuning a saved prompt, Custom GPT or
+    Gem until it aces the handful of cases you keep is the train-loss-down / real-quality-flat
+    trap. Store 5–10 inputs you never tune against and rerun them after edits.
+  - **Save the four-pattern cheat-sheet in your notes.** Loss flat → learning rate too small or
+    data broken; oscillating to NaN → too big; train ↓ while validation ↑ → overfitting, stop
+    early; both plateau high → capacity or data. Add one more line: before paying for a
+    fine-tune, check whether better prompting, a few examples or retrieval already wins.
+recap:
+  - emoji: "📉"
+    title: "Where training starts"
+    text: "Score how wrong the model currently is as a single number: the loss. Everything else is machinery for driving that number down."
+  - emoji: "🧭"
+    title: "Which way is downhill?"
+    text: "The gradient points in the direction of steepest increase, so you step the opposite way, scaled by the learning rate. That's 3Blue1Brown's ball rolling into the valley."
+  - emoji: "🔁"
+    title: "The whole game, one line"
+    text: "w ← w − learning_rate × ∇loss. Step downhill and repeat; every training run you'll ever pay for is this line in a loop."
+  - emoji: "🎚️"
+    title: "The first knob to check"
+    text: "The learning rate. Too small and training crawls while costs climb; too big and steps overshoot, oscillate and blow up to NaN."
+  - emoji: "⛓️"
+    title: "Backprop, demystified"
+    text: "One backward pass runs the chain rule from the loss back through every layer. It yields the gradient for every weight for roughly the cost of one more forward pass."
+  - emoji: "🎲"
+    title: "Why skip the full dataset?"
+    text: "A small batch gives a cheap, noisy but unbiased estimate of the gradient, so you get far more steps per GPU-hour. The noise even helps escape bad regions."
+  - emoji: "📈"
+    title: "Four curves, four fixes"
+    text: "Flat from the start means LR too small or broken data; oscillating means LR too high. Train falling while validation climbs means overfitting, and both stuck high means a capacity or data problem."
+task: |
+  Do one gradient descent by hand — 10 minutes, no framework. Take f(w) = (w − 3)² (a toy loss
+  with minimum at w = 3). Derivative: f'(w) = 2(w − 3). Start at w = 0, learning rate 0.1, and
+  apply w ← w − lr·f'(w) for 5 steps on paper or in a Python one-liner loop. Then redo it with
+  lr = 1.1 and watch it diverge. No Python? A spreadsheet works: put w in column A, the update
+  formula in the next row, and fill down. You have now personally experienced the single most
+  important hyperparameter in machine learning.
+  Success: with lr = 0.1, w climbs toward 3 (0.6, 1.08, 1.46…); with lr = 1.1, it swings past 3
+  with growing amplitude, and you can say why.
+selfCheck:
+  - q: "Partway through a training run, the loss stops falling and starts jumping up and down, with some steps making it worse. Using what the gradient tells the optimizer, what's the likely cause and your first fix?"
+    a: "The gradient (the partial derivatives of the loss for every parameter) points toward the steepest *increase*, and each step moves the opposite way, scaled by the learning rate. Steps that are too big overshoot the valley and land higher on the far side, so the loss bounces. Lower the learning rate, or add a schedule that decays it, first."
+  - q: "A fine-tune you started shows a perfectly flat loss for its first 2,000 steps, not even a small dip. Name two likely causes and how you'd tell them apart."
+    a: "A learning rate far too small, or broken data (labels shuffled, masked out or empty, so there's nothing to learn). Run a short trial with the LR ten times higher: if the loss starts moving it was the LR; if not, inspect a few training examples and the loss mask."
+  - q: "Your saved prompt aces the five examples you tuned it on, but people using it report vague results. Which loss-curve pattern is this, and what's the fix?"
+    a: "Train loss down while validation stays flat or worsens: overfitting to the cases you could see. Keep a held-out set of real inputs you never tune against and judge every edit on those."
+  - q: "Why can't we just solve for the best weights directly instead of iterating?"
+    a: "The loss surface of a neural network is non-convex across billions of parameters, so there's no closed-form solution. Iterative descent with mini-batches is the practical option, which is why training is gradual and expensive."
+mcq:
+  - q: "You start a fine-tune. The loss plummets, then oscillates wildly and shoots up to NaN. What's the most likely culprit?"
+    options:
+      - "The dataset is too large for this many training steps"
+      - "The learning rate is too high, so steps overshoot"
+      - "The GPU ran short of memory and corrupted the weights"
+      - "The model is too small to fit the training data well"
+    answer: 1
+    explain: "This is the classic divergence signature: each oversized step lands on a steeper wall, producing a bigger gradient and a bigger step, a feedback loop that ends in NaN. First move: cut the LR by 3–10× or add warmup. Running out of memory crashes the job rather than making the loss oscillate, and a too-small model plateaus instead of exploding."
+  - q: "Backpropagation is 'just the chain rule'. What does one backward pass actually hand you?"
+    options:
+      - "The best possible weights for the current batch"
+      - "The model's accuracy on the held-out validation set"
+      - "The loss value for every training example at once"
+      - "The loss gradient for every weight, in one sweep"
+    answer: 3
+    explain: "The forward pass computes the loss; the backward pass applies the chain rule layer by layer to get ∂loss/∂w for every weight, reusing intermediate results so it costs roughly one more forward pass. It tells you which way to move, not where the best weights are; the optimizer still takes the step. Validation accuracy is a separate measurement."
+  - q: "In LoRA fine-tuning the base weights are frozen. Beyond storing fewer new weights, why does this slash GPU memory during training?"
+    options:
+      - "Gradients and optimizer state exist only for A and B"
+      - "The forward pass can skip the frozen layers entirely"
+      - "Frozen weights are compressed automatically on load"
+      - "Activations no longer need storing for backprop at all"
+    answer: 0
+    explain: "Training memory ≈ weights + gradients + optimizer state (Adam keeps about two extra values per trainable parameter) + activations. Freezing the base removes the gradient and optimizer copies for nearly all parameters. The frozen layers still run in the forward pass, and activations are still stored, because gradients must flow back through those layers to reach the adapters."
+  - q: "Train loss keeps falling. Validation loss fell for a while, then started climbing. What's happening, and what's the right move?"
+    options:
+      - "Underfitting: the model needs more epochs to learn"
+      - "The validation set is corrupt and should be dropped"
+      - "Overfitting: stop near the validation-loss minimum"
+      - "The learning rate is too low to reach the minimum"
+    answer: 2
+    explain: "Diverging train and validation curves are the overfitting signature: the model keeps improving on what it has memorized while getting worse on what it hasn't seen. Early stopping at the validation minimum is the cheapest fix; more data or regularization are the others. Underfitting would show both curves stuck high, and dropping the validation set just hides the problem."
+  - q: "Why does nearly everyone train with mini-batches instead of computing the exact gradient over the whole dataset each step?"
+    options:
+      - "Full-dataset gradients point in the wrong direction"
+      - "Noisy small-batch steps are far cheaper per update"
+      - "Mini-batches guarantee finding the global minimum"
+      - "GPU memory caps any batch at a few dozen examples"
+    answer: 1
+    explain: "An exact gradient over millions of examples costs a fortune and moves you once. A batch of a few hundred gives a noisy but unbiased estimate for a tiny fraction of the cost, so you take thousands of steps in the same budget, and the noise acts as a mild regularizer. Full gradients aren't wrong, nothing guarantees a global minimum here, and batch size is a compute/noise trade, not a hardware law."
+backupResources:
+  - label: "Backpropagation, intuitively | Chapter 3 (3Blue1Brown)"
+    url: "https://www.youtube.com/watch?v=Ilg3gGewQ5U"
+    type: "video · the natural next chapter"
+  - label: "Backpropagation calculus | Chapter 4 (3Blue1Brown)"
+    url: "https://www.youtube.com/watch?v=tIeHLnjs5U8"
+    type: "video · the chain-rule details"
+tags:
+  - math
+  - calculus
+  - optimization
+  - fine-tuning
+  - math-ml-core
+---
+
+**You need:** the idea of slope from high-school algebra, and vectors from
+→ linear-algebra-for-ai. Derivatives and the chain rule help, but this lesson rebuilds the only
+two you need.
+
+If you've met derivatives and the chain rule, this lesson is the AI re-read; if not, the one
+idea you need is "slope". Either way: **training is calculus in a loop**, and the three knobs on
+every fine-tune dashboard are direct consequences of it.
+
+## The derivative you already know, renamed
+
+A model's **loss** is one number measuring how wrong it currently is. Every weight has a
+partial derivative: *if I nudge this weight, how does the loss move?* Collect all of them and
+you have the **gradient**, the direction of steepest increase. Training's entire idea:
+
+```
+w ← w − learning_rate × ∇loss(w)
+```
+
+Step downhill. Repeat a few billion times. Everything else is engineering around this line.
+
+## Worked example: train a one-weight model by hand
+
+A model predicts `prediction = w × x`. You have one training example: x = 2, the right answer
+y = 6 (so the perfect weight is 3). Use squared error as the loss: `loss = (w × x − y)²`.
+
+1. **Chain rule for the gradient.** The loss is (something)², and that something is w × x − y.
+   The derivative of the outside is 2 × (something); the derivative of the inside with respect
+   to w is x. Multiply them: `gradient = 2 × (w × x − y) × x`. With x = 2 and y = 6, that's
+   `8w − 24`.
+2. **Start at w = 0, learning rate 0.05.** Gradient = −24, so w becomes 0 − 0.05 × (−24) =
+   **1.2**. Next step: gradient = 8 × 1.2 − 24 = −14.4, so w = 1.2 + 0.72 = **1.92**. Then
+   **2.35**, then about **2.61**. Each step closes 40% of the remaining gap to 3.
+3. **Now try learning rate 0.3.** Gradient = −24, so w jumps to **7.2**, past 3. Next gradient
+   = 33.6, so w = 7.2 − 10.08 = **−2.88**. Then about 11.2. The error grows by 1.4× every step,
+   flipping sign each time. That's the "loss exploded to NaN" story at the size of one number.
+
+For this loss each step multiplies the error by (1 − 8 × lr), so anything above lr = 0.25
+diverges. Real models have billions of weights and no tidy formula, which is why learning-rate
+choice is found by trial runs and schedules rather than solved.
+
+## The learning rate is the whole game
+
+Too small → crawling, and training costs explode. Too large → overshoot, oscillate, NaN.
+Schedules (warmup, decay) exist because the right step size changes as you descend. When a
+fine-tune misbehaves, **LR is the first suspect**.
+
+> 💡 **Try it:** sketch a U-shaped valley on paper. Draw the update steps for a small LR (short
+> hops down one wall) and a huge LR (leaping across the valley to a HIGHER point on the other
+> wall, then higher again). You've just drawn every "my loss exploded" incident ever filed.
+
+## Backprop = chain rule, industrialized
+
+A network is a giant composition of functions. The **chain rule** lets you peel derivatives
+through a composition, exactly as in step 1 above. Backpropagation applies it from the loss
+backwards through every layer, reusing intermediate results so the whole gradient costs about
+one extra forward pass. No magic; the only surprise is that it's *cheap*.
+
+## Reading loss curves like an engineer
+
+- Loss flat from the start → LR too small, or data/labels broken.
+- Loss oscillates or explodes → LR too high.
+- Train ↓ while validation ↑ → overfitting; stop early or regularize.
+- Both plateau above target → model/data capacity problem, not an optimizer problem.
+
+## Common failure modes
+
+- **Loss turns NaN after a few hundred steps** → LR too high, often with no warmup → cut the
+  LR 3–10×, add warmup, and turn on gradient clipping if your tool offers it.
+- **Loss never moves** → LR far too small, or the labels are missing or masked out → run a short
+  LR sweep, and print five training examples exactly as the model sees them.
+- **The fine-tune "worked" but the model got worse at everything else** → too high an LR or too
+  many epochs on narrow data, so it overwrote general skills → lower the LR, run fewer epochs,
+  use LoRA, or mix some general data back in.
+- **A run that worked breaks after you change the batch size** → the effective step size changed
+  → retune the learning rate whenever you change batch size.
+
+## Why this pillar exists
+
+You will probably never implement backprop, but you WILL set learning rates, read loss
+curves, choose epochs, and explain to a stakeholder why fine-tuning costs what it costs.
+Optimization is where the money meets the math.

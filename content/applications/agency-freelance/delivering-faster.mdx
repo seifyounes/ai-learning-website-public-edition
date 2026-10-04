@@ -1,0 +1,195 @@
+---
+title: "Delivering client work faster with AI"
+summary: "Map your client delivery pipeline, start every job from templates, automate the glue, and keep a human quality check on each deliverable."
+changeNote: "New: a worked example of a monthly client report, a common-failures list, and a 10-minute exercise that maps your delivery pipeline and picks the stage to fix."
+section: applications
+pillar: agency-freelance
+order: 3
+level: intermediate
+estMinutes: 13
+taskMinutes: 30
+prerequisites: [productized-services, first-automation]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "u31bvNZVA9Y"
+  published: "2025-02-19"
+  year: 2025
+  minutes: 48
+  title: "AI Agency Service Delivery - A COMPLETE Guide (2026)"
+  channel: "Carson Reed"
+  why: "A current, end-to-end walkthrough of systematizing service delivery in an AI agency, which is this lesson's skill: delivering client work faster without dropping quality. The title's 'COMPLETE Guide' is marketing; what earns its place is the walkthrough itself. It's long (48 minutes), so watch it in two sittings. Jordan Platten's delivery guide in the backups covers the same ground for one service type, lead generation."
+applyIt: |
+  Find where your time actually goes before you speed anything up. Take one kind of work you do
+  repeatedly (a client service, or a recurring deliverable at your job such as a monthly report
+  or a new landing page) and spend ten minutes mapping it:
+
+  1. Write the stages: intake, plan, draft/build, review, deliver, follow-up.
+  2. Next to each, put a rough time from your last job and an **L** where AI could do the labor
+     or a **J** where your judgment is the work.
+  3. Circle the slowest **L** stage. That's the one to speed up first, with a starter template, a
+     small automation or the reviewer in **Do this now**.
+
+  **If you code:** keep the map with your starters in a template repo your coding agent (Claude
+  Code, Cursor, Codex) can clone. **If you don't:** keep it in Google Docs, Notion or your notes
+  app, ready to duplicate.
+
+  Success: a one-page pipeline map with times, and the one stage you'll speed up first. Never
+  ship unchecked AI output: the review stage stays yours.
+toolkit: |
+  - **Save your pipeline map as the reference you clone.** Keep it next to your templates so
+    every new job starts from the same intake → build → review → deliver flow.
+  - **Build a reusable QA reviewer.** A saved prompt, a Custom GPT, a Gem or a Project that holds
+    your quality checklist and checks a deliverable against it catches problems before the client
+    does.
+  - **Write "AI drafts, you decide" into your instructions.** Add a line to your custom
+    instructions or that Project's instructions: every client-facing output gets flagged for human
+    review, with the specific things to check.
+  - **Automate the kickoff glue.** Wire an intake form → project folder created → kickoff email
+    sent flow in Zapier, Make or n8n so coordination stops eating your hours
+    (→ first-automation).
+
+  **If you use a coding agent:**
+
+  - **Make the QA reviewer a subagent.** Give it your checklist and the same "flag for human
+    review" rule in your rules file (AGENTS.md, or CLAUDE.md / GEMINI.md for those agents), and
+    run it on every deliverable before you hand it over.
+recap:
+  - emoji: "🗺️"
+    title: "Before you speed anything up"
+    text: "You can't speed up a process you haven't drawn. Lay out intake → plan → build → review → deliver and find where AI does the labor."
+  - emoji: "📄"
+    title: "The slowest part of any job"
+    text: "The blank page. Templates plus AI first drafts start every project at 60%, so your time goes on judgment and polish."
+  - emoji: "🔗"
+    title: "The invisible hours"
+    text: "Folder creation, kickoff emails, file moves: coordination overhead is pure waste. Wire it up so it runs on its own."
+  - emoji: "🛡️"
+    title: "Who signs off"
+    text: "Never ship unchecked AI output to a client. Your review is what separates a professional from someone forwarding chatbot output."
+  - emoji: "⚡"
+    title: "Where saved time goes"
+    text: "On fixed-price work, every hour shaved off delivery is profit you keep, plus a faster turnaround clients notice."
+task: |
+  Build one reusable asset for the delivery stage that eats the most time:
+
+  ```prompt
+  Write instructions for a QA reviewer for [type of deliverable, e.g. a client blog post, an
+  automation handoff doc, a landing page]. It takes a deliverable and checks it against a
+  fixed standard before it reaches a client: list 8-10 pass/fail criteria (accuracy, tone,
+  completeness, formatting, anything the client explicitly asked for), and output a table of
+  criterion → pass/fail → the exact line or spot to fix.
+  Success: the reviewer flags at least one issue on a real deliverable before I ship it.
+  ```
+
+  Save the instructions as a custom GPT, a Claude Project, a Gemini Gem, or a subagent in your
+  coding agent (Claude Code, Cursor, Codex). Run it once on a real piece of recent work and note
+  the time it took versus checking by hand.
+  Success: a saved reviewer, one real deliverable checked, and the issues it caught written
+  down.
+selfCheck:
+  - q: "Fixing your AI-drafted client articles takes longer than writing them yourself would. What's the most likely cause, and what do you change first?"
+    a: "The input is too thin: no brief, no voice samples, no sources, so the draft is generic and needs rewriting. Fix the intake stage (a questionnaire plus two examples of the client's voice and the facts to use), then time a draft again."
+  - q: "A client spots a statistic in your report that turns out to be made up. Which stage of your pipeline failed, and what do you add?"
+    a: "The review stage. Add a QA criterion that every number traces to a named source, check it before delivery, and keep a named human (you) signing off. AI drafts; you decide."
+  - q: "Why does faster delivery matter so much on fixed-price work?"
+    a: "On a fixed price, profit is the gap between the price and your delivery cost. Cutting delivery time raises your effective hourly rate without raising the price, frees capacity for more clients, and shortens turnaround."
+backupResources:
+  - label: "Full AI Lead Gen Agency Service Delivery Guide (2026) — Jordan Platten"
+    url: "https://www.youtube.com/watch?v=7Bpz3eOh3Lc"
+    type: "video · lead-gen delivery"
+  - label: "11 Best AI Tools Every Freelancer Should Use in 2025"
+    url: "https://www.youtube.com/watch?v=ydJaG3zO7Sk"
+    type: "video · tools"
+tags:
+  - agency
+  - delivery
+  - fulfillment
+  - productivity
+---
+
+The profit in a service business hides in **delivery speed.** On fixed-price and productized
+work, every hour you shave off fulfillment is margin you keep, and every project that ships
+faster is a client more likely to refer you. This lesson is about building a **delivery
+pipeline** where AI does the heavy lifting and you do the judgment, so client work ships fast
+*and* stays high-quality. The same thinking applies if you deliver internally: a recurring report
+or campaign at your job is a pipeline too.
+
+## Map your fulfillment
+
+You can't speed up a process you haven't drawn. Lay out how a typical project actually flows:
+**intake → plan → draft/build → review → deliver → follow-up.** Then walk each stage and ask:
+*where does AI do the labor, and where do I add the judgment?* Usually the labor (first drafts,
+research, scaffolding, formatting) takes most of the clock, and it's exactly what AI compresses.
+Judgment (what the client really needs, whether it's right, what to cut) is what they pay you
+for.
+
+## Never start from zero
+
+Speed comes from two habits:
+
+1. **Templatize the repeatable parts.** Onboarding questionnaires, project scaffolds, report
+   layouts, email scripts. Every new project should start at 60%, not a blank page. Keep them in
+   one notes system you actually use (the second-brain pillar uses Obsidian; Notion or Google
+   Docs work too).
+2. **AI for the first draft, you for the final call.** Let AI produce the rough version quickly
+   (the article, the automation, the proposal, the code), then spend your time editing,
+   correcting and raising it. The blank page is what's slow; AI removes it.
+
+The quality of the draft depends on what you feed in. A good intake stage (client goals, voice
+samples, facts to use, things to avoid) is what turns a generic AI draft into one that needs a
+light edit.
+
+## Automate the glue
+
+Beyond the creative work, a lot of delivery time is *coordination*: creating folders, sending
+kickoff emails, moving files, updating the client. Wire that up with the workflows pillar:
+intake form submitted → project created → workspace set up → kickoff email sent, all
+automatically, in Zapier, Make or n8n. Coordination overhead is pure waste; automate it away.
+
+## The quality guardrail
+
+One non-negotiable rule: **AI drafts, you decide.** Speed must never mean shipping unchecked
+output to a client. Your review is what separates a professional using AI from someone forwarding
+chatbot output. Clients are paying for *your* judgment, accelerated by AI. Make the review
+concrete with a checklist, so it doesn't shrink when you're busy. And check your client contracts
+and your AI tools' data terms before pasting client material in (→ governance-security).
+
+## Worked example: a monthly client report
+
+Say you produce a monthly marketing report for a client. Here's the pipeline, rebuilt:
+
+1. **Intake (automated).** A form on the 1st of the month asks the client for anything notable
+   (a launch, a sale, a site outage). Answers land in the project folder.
+2. **Data pull (automated).** An automation exports last month's numbers from the analytics
+   tool into a sheet in a fixed layout.
+3. **Draft (AI).** A saved prompt receives the sheet, the client's notes and last month's report,
+   and drafts the commentary: what moved, likely reasons, and three suggested actions, with
+   every figure quoted from the sheet.
+4. **Review (you).** Your QA checklist: every number matches the sheet, every "likely reason"
+   is plausible and labelled as a hypothesis, the actions fit the client's goals, the tone
+   matches previous reports.
+5. **Deliver and follow up.** Send, then log any client questions as improvements to next
+   month's template.
+
+Time the old way and the new way for one cycle. The point isn't a specific number; it's knowing
+which stage still eats your hours, so you fix that one next.
+
+> 💡 **Try it:** Pick one deliverable you made recently and write down, from memory, how many
+> minutes each stage took. Circle the biggest number. That's your first stage to speed up.
+
+## Common failure modes
+
+- **AI drafts need heavy rewriting** → the brief is thin → improve intake: goals, two voice
+  samples and the facts to use go in before any drafting.
+- **Quality varies from client to client** → review lives in your head → turn it into a written
+  checklist or a saved QA reviewer you run every time.
+- **An automation fails and nobody notices** → no error alert → add an error branch that emails
+  or messages you when a step fails.
+- **The client recognizes "AI tone"** → generic prompts with no style guide → give the drafting
+  prompt the client's own past writing and a short list of words to avoid.
+
+## Next
+
+You deliver fast and well. Now charge for the *value* you create, not the (now much smaller)
+hours it takes you.

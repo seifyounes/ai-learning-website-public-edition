@@ -1,0 +1,278 @@
+---
+title: "Prompting Claude Code"
+subtitle: "Write work orders, not wishes"
+summary: "Turn a vague request into a work order with a clear goal, scope and pass or fail success criteria that a coding agent can execute."
+changeNote: "New: a quick audit of which work-order slot you usually skip, a hardening task on a fragile spot in your own code, and a no-code path for non-programmers."
+section: foundations
+pillar: claude-code
+order: 4
+level: beginner
+estMinutes: 14
+taskMinutes: 30
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "luqKnexhpFs"
+  published: "2025-09-15"
+  year: 2025
+  minutes: 35
+  title: "Agentic Prompt Engineering with Claude Code (For you, your team, and your AGENTS)"
+  channel: "IndyDevDan"
+  why: "Most prompting videos teach prompting a chat window; this one is about prompting Claude Code as an agent that edits a repo, which is this lesson's scope. IndyDevDan runs a specialist agentic-coding channel, and he gives you one reusable structure (Input → Workflow → Output) plus a ladder from throwaway asks to reusable prompts you run like tools."
+  notes:
+    - "It's long (35 minutes) and from September 2025, so some on-screen features are older than today's; the method doesn't depend on them."
+    - "Treat the official best-practices docs in Read-after as the source of truth if a command differs."
+readAfter:
+  - label: "Best practices for Claude Code — official docs (prompting section)"
+    url: "https://code.claude.com/docs/en/best-practices"
+    kind: "docs"
+applyIt: |
+  Score your own habits against the five slots. Scroll back through the last three requests
+  you sent an AI assistant or coding agent (any tool, any task) and tick which slots each one
+  actually filled: **Input** (what to read first), **Workflow** (the steps), **Output** (the
+  exact shape back), **Scope** (what not to touch) and **Success** (a pass/fail you can check).
+
+  Most people find the same gap every time, usually Scope or Success. Name yours, then take the
+  weakest of the three requests and rewrite it with every slot filled: two minutes, no need to
+  run it.
+
+  **If you don't code yet:** the same audit works on chat prompts for a report, an email or a
+  spreadsheet; Scope becomes "don't change the figures" or "keep the headings as they are".
+
+  Success: the slot you most often skip, named, and one past request rewritten as a full work
+  order.
+toolkit: |
+  Build yourself a reusable work-order template so every prompt starts from the skeleton:
+
+  - **Save the Input → Workflow → Output skeleton where you'll reach for it.** Put it in a
+    custom slash command (`.claude/commands/work-order.md`), a skill, a text-expander snippet,
+    or a saved prompt in Cursor, Copilot or ChatGPT. Five labeled slots: Input, Workflow,
+    Output, Scope, Success.
+  - **Make the scope fence mandatory.** Have the template always include a `Scope:` line with a
+    "do NOT touch" clause, even as a `[fill in what's off-limits]` slot. The negative boundary is
+    the single highest-leverage line for an agent, so your template should never let you skip
+    it.
+  - **Require a Success condition, not just a method.** "Run the tests" is a method; "the new
+    test passes and the full suite is green" is a condition you can check. That's the
+    runnable-check habit from → core-loop, baked into every prompt you send.
+  - **Keep the sections as composable blocks.** Store role, context, workflow, output and
+    verification as separate snippets, so a per-project variant (one for your web app, one for
+    a data script) reuses the shared skeleton and only swaps the project block. (Packaging
+    variants as skills → skills-and-plugins.)
+  - **Stop one rung below meta.** A template that formats *one* good prompt is the goal here;
+    prompts that generate and dispatch other prompts to agents belong to → autonomy-at-scale.
+recap:
+  - emoji: "🧾"
+    title: "Not a chat message"
+    text: "You're not chatting — you're issuing a spec an agent executes literally. Vague order in, vague diff out, so under-specification is the real cause of most 'it's dumb' moments."
+  - emoji: "🎯"
+    title: "Three clamps"
+    text: "Three clamps turn a wish into an order: the outcome you want, the files it may touch, and the observable pass/fail you'll both read. The goal it can guess; scope and success it cannot."
+  - emoji: "🔀"
+    title: "The three-slot skeleton"
+    text: "IndyDevDan's skeleton made mechanical: name the context going in, number the steps to run, pin the exact shape to hand back. Fill three slots and the clamps come with them."
+  - emoji: "🚧"
+    title: "The highest-leverage line"
+    text: "The highest-leverage line is often the negative one — the files to leave alone — so a scoped fix can't 'helpfully' refactor the rest of the repo behind your back."
+  - emoji: "⏱️"
+    title: "When to correct it"
+    text: "Watch the first step. A one-sentence nudge while it's still on step one is free; unwinding twenty steps of wrong work costs your evening."
+  - emoji: "🧱"
+    title: "Never start from scratch"
+    text: "Role, input, workflow, output-format, verification are swappable sections. You don't write prompts from scratch — you assemble trusted blocks and swap the one part that changed."
+  - emoji: "🪜"
+    title: "How a prompt grows up"
+    text: "The same prompt grows: ad-hoc ask → structured order → parameterized template → one-key tool → a prompt that dispatches agents. Match the rung to the stakes and the reuse."
+task: |
+  Take your next real Claude Code request (or a small change to any starter repo) and write it
+  as a work order before you hit enter, then run it twice and compare (about 30 minutes). A
+  fragile spot shows the difference best: the code that saves user data, retries a network
+  call, or handles sign-up. Fill this skeleton:
+
+  ```prompt
+  Input: [the exact files/data Claude may read first]. Read them — change nothing.
+  Workflow: 1) write a test proving [the behavior that must hold] → 2) run it → 3) only if it
+  fails, implement the smallest fix → 4) show the diff.
+  Output: [the exact artifact, e.g. "a plan first, then the test, the diff and green test output"].
+  Scope: do NOT touch [what's off-limits, e.g. "the auth flow or the database schema"].
+  Success: [the observable pass/fail you'll both read], and the full test suite is green.
+  ```
+
+  Run it on a branch and commit the result. Then go back to the starting point on a second
+  branch, open a fresh session, run the same task the way you'd normally phrase it, and compare
+  the two results: diff size, files touched, whether it verified itself.
+
+  **If you don't code yet:** ask Claude Code for a small script that renames the files in a
+  folder, once as a filled work order and once as a one-liner, each in its own scratch folder.
+
+  Success: two results side by side and one sentence naming what the structure bought you.
+selfCheck:
+  - q: "You tell Claude 'clean up the checkout flow' and it refactors three unrelated components you never wanted touched. Which part of the work order did you skip?"
+    a: "Scope — specifically its negative half, the 'don't touch' fence. Name the files it may change and the ones to leave alone; an unbounded agent treats every nearby file as fair game and will burn context breaking code that was already fine."
+  - q: "You keep pasting nearly the same 15-line prompt to generate weekly reports, tweaking two values each time. What's the upgrade, and where does the how-to live?"
+    a: "Climb the ladder: promote the repeated prompt into a parameterized, reusable block, then into a one-key command so you fill in the two variables instead of retyping. The prompt craft is this lesson; packaging it as a skill/slash command is → skills-and-plugins."
+  - q: "Your prompt has a crisp goal and scope, but the result comes back as prose when you wanted a table to paste into a PR. Which slot of Input → Workflow → Output failed?"
+    a: "Output. You specified the goal but not the artifact, so it picked its own format. Pin the exact shape — a markdown table with these columns, a diff, a JSON block — as the Output slot; leave it open and you inherit the model's default."
+  - q: "You're about to fill in all five work-order slots just to reword one log message. Is the full work order worth it here?"
+    a: "No — a one-line ad-hoc ask is the right rung when the entire diff fits in one sentence and is throwaway: a rename, a log line, a quick question. The ladder isn't 'always climb to the top'; it's 'match the rung to the stakes and the reuse.' Over-structuring a trivial ask wastes as much time as under-structuring a big one."
+mcq:
+  - q: "You're adding validation to a sign-up form. Which Success line gives the agent a real finish line?"
+    options:
+      - "Make sure the form works well on phones and desktops"
+      - "Run the tests once you've finished making the change"
+      - "An empty email shows an error; the suite is green"
+      - "Follow best practices for validating user input"
+    answer: 2
+    explain: "A success criterion is an observable pass/fail you can both read. 'Run the tests' is a method with no stated result, and 'works well' or 'best practices' leave the agent to decide for itself when it's done."
+  - q: "Claude's first edit heads toward rewriting the whole data layer, when you wanted a one-function fix. What's the cheapest move?"
+    options:
+      - "Stop it now with a one-sentence correction"
+      - "Let it finish, then revert the parts you don't want"
+      - "Let it finish, then ask it for a smaller diff"
+      - "Open a new session and send the same prompt again"
+    answer: 0
+    explain: "A nudge on step one is free; unwinding twenty steps of wrong work costs far more. Re-sending the same prompt in a new session just re-rolls the under-specified order that caused the drift, so add the missing scope fence as well."
+  - q: "Claude keeps jumping straight to a fix and calling it done without running the tests. Which slot of the work order fixes this?"
+    options:
+      - "Input: attach more files so it understands the code"
+      - "Output: ask for a shorter answer with only the diff"
+      - "Scope: list the files it is not allowed to touch"
+      - "Workflow: numbered steps that end with the tests"
+    answer: 3
+    explain: "Numbered steps are how you stop the agent skipping the boring middle or declaring victory early. More input helps it understand the code but doesn't change the order it works in, and scope limits where it edits, not whether it verifies."
+  - q: "Your prompt is just 'speed up the search page'. You have time to add one line. Which adds the most?"
+    options:
+      - "Goal: make searching feel faster for the people using it"
+      - "Success: results load in under 300 ms on the test data"
+      - "Role: you are a senior web performance engineer"
+      - "Tone: be thorough and careful with every change"
+    answer: 1
+    explain: "The agent can usually infer the goal, but it can't guess your pass/fail; a measurable success line gives it a check to run and a point to stop. A restated goal or a role adds little that 'speed up the search page' didn't already say."
+backupResources:
+  - label: "Claude Code best practices | Code w/ Claude — Anthropic"
+    url: "https://www.youtube.com/watch?v=gv0WHhKelSE"
+    type: "video · official"
+  - label: "How To Prompt Claude Code Better Than 99% of People — Michele Torti"
+    url: "https://www.youtube.com/watch?v=5Pcsqx-CbQY"
+    type: "video · Claude Code specific"
+tags:
+  - claude-code
+  - prompting
+  - work-orders
+  - scope
+  - reusable-prompts
+---
+
+The AI mental models pillar gave you the generic five-part brief — role, task, context,
+format, constraints (→ prompting-in-2026). This lesson is the layer bolted on top: how that
+brief changes when the reader is an **agent editing your repo**, not a chat window. One shift drives
+everything — an agentic prompt is a **work order, not a wish.** Claude Code does
+*exactly* what you set it up to do, so most "Claude Code is dumb" moments are really
+under-specified orders. You're not asking; you're dispatching.
+
+## From wish to work order
+
+Four moves turn a wish into an order — the CC-native spin on the brief:
+
+1. **Goal** — the outcome in plain terms, one sentence.
+2. **Scope** — which files/areas it may touch, and *explicitly what to leave alone.*
+3. **Success criteria** — the observable pass/fail you'll both read: a test passes, no
+   horizontal scroll at 375px, the bug is gone.
+4. **Explore first** — read the real code before proposing changes, so it acts on facts,
+   not guesses (this is the loop's Explore step wearing a prompt → core-loop).
+
+Miss any one and the agent fills the gap with a guess. The goal it can usually infer;
+scope and success it cannot.
+
+## The skeleton: Input → Workflow → Output
+
+The strongest agentic prompts share one shape — **Input → Workflow → Output.** It's the
+work order made mechanical:
+
+- **Input** — everything that goes *in*: the files, the error text, the data, the
+  `CLAUDE.md` (or `AGENTS.md`) it should lean on. Name it; don't make it hunt. (*Which*
+  tokens to feed and how to keep the window clean is its own discipline
+  → context-engineering — here you just name the inputs.)
+- **Workflow** — the ordered steps you want run, not just the end state. "Read X → tell
+  me the root cause → fix only Y → run the tests → show the diff." Numbering the steps is
+  how you stop it skipping the boring middle or declaring victory early.
+- **Output** — the exact artifact and shape you want back: a plan, a diff, a JSON block,
+  a markdown table you can paste into a PR. Leave it open and you inherit the model's
+  default format.
+
+```prompt
+Input: src/checkout/*, the failing test in checkout.test.ts, our CLAUDE.md.
+Workflow:
+1) read them, change nothing
+2) tell me the root cause
+3) fix ONLY the total calc
+4) run the test suite
+Output: the root-cause line, then the diff, then the passing test output.
+```
+
+The same skeleton scales from a one-line fix to a multi-file feature, and filling the
+three slots already covers the four moves above — Input carries "explore first," Output
+carries your success criteria.
+
+> 💡 **Try it:** take a request you'd normally type as one line and split it across three
+> labels — Input / Workflow / Output. The gaps you're forced to fill are exactly the
+> guesses you were about to outsource to the model.
+
+## Fence what it must NOT touch
+
+The highest-leverage line in an agentic prompt is often the **negative** one. An
+unbounded agent treats every nearby file as fair game: you ask it to fix the total calc
+and it "helpfully" reformats the whole module, renames a shared type, and breaks two
+call sites you never mentioned. A one-line fence — "change only `cart.ts`; do not touch
+the checkout UI or the shared types" — kills the surprise refactor, keeps the diff
+reviewable, and stops it burning context on code that was already fine. This is the
+CC-specific reliability lever generic prompting never needs, because a chat model can't
+reach into your repo. Yours can.
+
+> 💡 **Try it:** add one clause to your next prompt — "change only these files, leave
+> everything else untouched" — and watch how much smaller and more reviewable the diff
+> comes back.
+
+## Iterate early, not late
+
+Watch the first move. If the plan or the first edit heads the wrong way, stop and correct
+*immediately* — a one-sentence nudge on step one is free; unwinding twenty steps of wrong
+work costs your evening. This is why the loop front-loads Plan Mode (→ core-loop): you
+approve the approach while a correction is still cheap. Cheap-early beats expensive-late,
+every time.
+
+## Weak vs strong, side by side
+
+- Weak: *"make the dashboard better."*
+- Strong: *"On the dashboard the charts overflow on mobile. **Input:** `Dashboard.tsx` +
+  its CSS. **Workflow:** read them, propose a layout-only fix, implement it. **Output:**
+  the diff. **Scope:** don't touch desktop or the data layer. **Success:** no horizontal
+  scroll at 375px."*
+
+Same model, different league — and the strong one is just the skeleton filled in. No
+clever wording, only structure.
+
+## Build from reusable blocks — the ladder
+
+Notice those sections are **composable**: a role block, an input block, a workflow block,
+an output-format block, a verification block. You don't write prompts from scratch; you
+*assemble* them from blocks you already trust, swapping only the part that changes.
+That's IndyDevDan's core move — and it sets up a **ladder of prompt formats** you climb
+as reuse grows:
+
+1. **Ad-hoc ask** — a one-liner. Right when the whole diff fits in a sentence.
+2. **Structured order** — goal + scope + success in one message.
+3. **Input → Workflow → Output** — the labeled skeleton above.
+4. **+ worked example** — an input→output pair to lock a pattern (few-shot mechanics
+   → prompting-in-2026).
+5. **Parameterized template** — the same skeleton with `{variables}`, saved to a file,
+   run across many inputs.
+6. **Prompt-as-tool** — that template promoted to a one-key command (packaging
+   → skills-and-plugins).
+7. **Self-dispatching prompt** — a prompt that writes or fans out prompts to agents
+   (→ autonomy-at-scale).
+
+Match the rung to the stakes: don't climb to level 6 for a rename, and don't stay at
+level 1 for the thing you run every week. The craft isn't always reaching the top rung —
+it's knowing which rung a task deserves, and building the reusable blocks so climbing is
+cheap when it's worth it.

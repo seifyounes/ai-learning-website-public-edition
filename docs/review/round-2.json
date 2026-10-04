@@ -1,0 +1,145 @@
+{
+  "round": 2,
+  "scores": {
+    "1_content": 8.3,
+    "2_relevance": 8.0,
+    "3_learning_design": 8.3,
+    "4_onboarding": 8.8,
+    "5_navigation": 8.6,
+    "6_interactive": 8.7,
+    "7_visual": 8.7,
+    "8_mobile": 7.8,
+    "9_accessibility": 8.5,
+    "10_trust": 8.4,
+    "11_technical": 8.8
+  },
+  "overall": 8.45,
+  "evidence": {
+    "1_content": "Read in full or near full: what-is-an-llm, big-three-compared, hooks-automation, rag-fundamentals, evaluation-metrics, pricing-ai-work, governance-security, models-and-effort, loop-engineering (intro). Breakdowns are accurate, specific and well structured (worked example + failure modes in every one I read). The arithmetic in evaluation-metrics checks out (450/550 = 82%, 98.5% vs 98.8% accuracy, 95.7% guardrail accuracy). The hooks details are correct (exit 2 feeds stderr back, stop_hook_active, permissionDecision). RAG covers long context vs RAG, agentic retrieval, recall@k vs groundedness and a staged diagnosis. Model names are kept generic, so the lessons will date slowly. The weak spots are the primary videos and a few currency gaps. Several primaries come from low-reputation or vendor-marketing channels: choosing-models-providers (CodeLucky, 4 min), privacy-and-setup (PromoAmbitions), verification-and-grounding (a core pillar-1 lesson whose video is 'How to Reduce AI Hallucinations with a Claude Skill' from 'The GenAI Nerd Channel'), social-media-with-ai (a Vista Social promo titled '10x Faster'), email-and-funnels (GetResponse), content-workflow and automation-mindset (Pabbly), analytics-reporting (kulbinder dio), agent-frameworks (S3CloudHub), deploying-and-shipping (DevVibe) and frontend-with-ai (AICodeKing). Some primaries are impractically long: business-recipes is 507 min, capstone-concept-to-app 183, backend-database-with-ai 176, evals-and-testing 154, rag-fundamentals 153. what-is-an-llm teaches a two-phase pipeline (pretraining, then SFT + RLHF) and never mentions the RL-on-verifiable-rewards and reasoning-model training that defines 2026 models. Its first self-check says a fabricated order reply is 'Not a bug ... You don't file it', which is wrong product advice: it is a defect in your system's grounding. governance-security says Article 50 rules 'are set to apply from 2 August 2026', which is future tense for a date that has passed. pricing-ai-work never covers who pays the model/API usage costs, a core part of pricing AI work.",
+    "2_relevance": "The apply-it prompts are well generalised, with placeholders and 'If you code / If you don't' branches (rag-fundamentals, big-three-compared, pricing-ai-work). The 'Upgrade your AI setup' block is still coding-agent-centric: 81 of 106 toolkit blocks reference CLAUDE.md, AGENTS.md, hooks or subagents. That includes all 10 Obsidian lessons, 4 AI-in-companies lessons and 3 marketing lessons. Lesson 1, what-is-an-llm, is labelled beginner and 'no math', yet its setup block talks about CLAUDE.md, .cursor/rules, typechecks and 'a second-model review for a diff'. Its self-check is framed entirely for builders ('A support chatbot you built', 'our database schema'), so a non-coding professional gets nothing to act on there. Traces of one author's system remain: 'This lesson owns the second' (capture-daily-notes self-check), '→ The core loop ... owns that doctrine' (hooks-automation body), 'an index file (a MEMORY.md ...)' (para-method toolkit). rolling-it-out turns a company-rollout lesson into a personal-setup checklist ('the rollout failure at personal scale').",
+    "3_learning_design": "This is strong overall. Every lesson has the same anatomy and states its prerequisites ('DO THESE FIRST' on hooks-automation and evaluation-metrics). Level and time are split into video, read and task. The recall-first recap cards end with a tally. Self-checks are self-graded, and the Math lessons add commit-then-explain MCQs with good explanations. Pillar pages show 'NEXT UP'. The problems are path coherence and load. 'Everyone starts with pillar 1', but pillar 1 ends in harness-engineering (95 min, intermediate) and loop-engineering (146 min, advanced), which a non-coder doesn't need first. /path?goal=work ('no code needed') makes 'AI inside companies' the first track and says it 'builds on' Applied AI engineering (17 coding lessons). The agency track builds on Claude Code, Shipping apps and Applied AI engineering, while the home page sends freelancers down the no-code route. Start Here says 'most take 40–90 minutes', yet the get-hired fast track lists 205, 206 and 227-minute lessons. Some MCQ correct answers echo the lesson's slogan word for word: evaluation-metrics Q4 option C reads 'Position bias: swap the order and re-measure'.",
+    "4_onboarding": "On the home page a newcomer gets in seconds: the headline, a one-line audience statement (students, developers, non-coding professionals), 'free, no sign-up, progress local', three goal routes with pillar chips, a Start Here CTA, and an 8-step 'How every lesson works'. Start Here offers a single 'Begin with' button. Two things cause friction. Foundations are numbered 1–8 and Applications restart at 1–4, so 'Your Applications track' and 'pillar 1' are ambiguous. And 12 pillars plus 106 lessons on the home page is a lot before the first click.",
+    "5_navigation": "The top nav, the desktop sidebar with the current pillar expanded and aria-current, back-to-pillar, previous/next lesson (crossing pillar boundaries), the jump-to-section chips and the pillar list with ticks and 'NEXT UP' all work. Full-text search returns ranked snippets ('RAG' puts rag-fundamentals first). Level filters work (23/65/18) with aria-pressed, the URL keeps ?q=, and the empty state is helpful. Gaps: the lesson sidebar never shows which lessons are complete; only the pillar page does. Search has no stemming or typo tolerance: 'hallucination' finds 4 lessons, 'hallucinate' 6 (10 lessons contain the stem), and 'embeding' finds 0. On mobile the lesson page has no in-pillar lesson list, only Back and previous/next.",
+    "6_interactive": "Tested on /foundations/mental-models/what-is-an-llm and evaluation-metrics. Mark complete persists across reload, and the streak, XP, rank and 'Liftoff' badge update on /dashboard. The recap flips cards, tallies 'had it / not yet' and moves focus to Replay at the end. Self-check reveal sets aria-expanded and offers 'I got it / I missed it'. The MCQ shows correct and picked answers with an explanation in an aria-live region, scores 4/5 and stores the best score. Notes autosave and survive reload. Export, import and erase are implemented, and erase asks for confirmation. Bugs: just opening a lesson writes an empty note and shows 'Saved at 4:24:50 PM · this browser only' while nothing was typed (seen on what-is-an-llm and obsidian/weekly-review). /dashboard renders '0 / 106' and an empty rank, and /get-hired shows 'Loading your progress…', before hydration swaps in the real numbers. Answered MCQ options stay as enabled buttons with no disabled or aria-disabled state.",
+    "7_visual": "The 'computation pad' graph-paper look is distinctive and consistent: titled cells, ruled boxes, condensed headings and mono numbers, applied across home, lesson, pillar, dashboard and 404. Hierarchy is clear: numbered section headers, Try-it callouts and copyable prompt cards. Body text is about 17px with a ~60ch measure on sheet panels, comfortable for long reading. Nits: very long lesson titles (evaluation-metrics, linear-algebra-for-ai) fill most of the first screen at 320px. In the mobile header grid the LEVEL value sits bottom-aligned while TIME sits at the top. Inconsistent title style (some titles carry an em-dash tagline, others don't) makes lists look ragged.",
+    "8_mobile": "Most pages are excellent at 320 and 375: scrollWidth equals viewport width on home, start-here, foundations, the pillar pages, search, dashboard, get-hired, path and about, and in 97 of 106 lessons. There are no undersized tap targets and no text under 12px. Prompt cards wrap with pre-wrap. 9 lessons scroll sideways because unwrapped code or pre blocks overflow, with document width at 375px given in brackets: verification-and-grounding (822px, a pad-box pre using white-space:pre), claude-md-and-memory (466), subagents-and-agent-teams (416), webhooks-and-apis (410, inline-code URLs), hooks-automation (391, settings.json block), plus mcp-deep, skills-and-plugins, testing-qa-with-ai and deploying-and-shipping (a 'Reveal' label) at 320. The whole page shifts when panned (the video caption was cut off on the left in a screenshot).",
+    "9_accessibility": "Good fundamentals. There is a skip link (visible on focus), header/nav/main/aside/footer landmarks, and one h1 with an h2/h3 order that follows the lesson structure. The YouTube iframe has a title, and visible focus outlines appear in the sidebar and controls. The menu has aria-expanded and aria-controls, quiz feedback sits in aria-live, and focus moves to feedback or Replay. Lowest measured text contrast is 4.98:1 (footer), and prefers-reduced-motion is honoured (confetti off). Gaps: the 9 lessons that scroll sideways fail WCAG 1.4.10 Reflow at 320px. The mobile Menu has no Escape-to-close (no handler in TopNav.tsx). Answered MCQ buttons expose no state to assistive tech beyond text. Keyboard users must tab past about 25 sidebar links on every lesson if they skip the skip link.",
+    "10_trust": "The About page is candid. It says lessons were 'drafted with AI assistance and checked against the sources', states the privacy model (no accounts, cookies or analytics; youtube-nocookie), credits fonts and creators, and names the author. Video 'why' notes are refreshingly honest about caveats ('It's a small channel', 'promotes its own scheduler', 'filmed in July 2025'). Every lesson has a pre-filled 'Report it on GitHub' link (correctly wired, 404 until publish as briefed). What undercuts it: all 106 lessons show the identical 'Reviewed 3 Oct 2026', which reads as a bulk stamp rather than real per-lesson review, including lessons built on a 2023 video. About claims videos are picked on 'the creator's track record', yet several primaries come from small or vendor-promo channels with hype titles ('Make Claude Code 10x Better', '10x Faster in 2026'). Get Hired makes unsourced authoritative claims ('The six topics 2026 interview loops actually probe', '10 quality applications a week').",
+    "11_technical": "All main routes return 200 in under 20 ms, and made-up URLs return a real 404 with noindex and a helpful page (Search / Start Here). Each lesson has canonical, OG and Twitter tags and a generated 1200x630 OG image. Sitemap and robots are present (localhost absolute URLs, as briefed). A lesson page transfers about 256 KB, YouTube loads only on demand, and the console is clean apart from YouTube's 'web-share' warnings. No private leftovers were found in content or src: there is no TODO, local path or private project name; 'Seif Younes' appears only as the credited author. Issues: on a 404 inside a dynamic segment (/foundations/mental-models/nope) the document title flips from 'Page not found' to the home title after hydration. Lesson meta descriptions are the first body sentence, e.g. what-is-an-llm's 'Everything in this course — every tool, every prompt, every hook — sits on top of one idea…', which doesn't describe the lesson. There are hydration flashes of zeroed progress on dashboard and get-hired."
+  },
+  "fixes": [
+    {
+      "criterion": "8_mobile",
+      "priority": "high",
+      "issue": "9 lessons overflow horizontally at 320–375px because code blocks and long inline code don't wrap or scroll inside their box.",
+      "where": "verification-and-grounding, claude-md-and-memory, subagents-and-agent-teams, webhooks-and-apis, hooks-automation, mcp-deep, skills-and-plugins, testing-qa-with-ai, deploying-and-shipping; src/components/Markdown.tsx + globals.css",
+      "fix": "Give every non-prompt <pre> 'overflow-x:auto; max-width:100%' (or pre-wrap, like the prompt cards) and give the pad-box wrapper min-width:0. Add 'overflow-wrap:anywhere' to inline <code> in prose. Then add a CI check that loads every lesson at 320px and fails if documentElement.scrollWidth > 320."
+    },
+    {
+      "criterion": "2_relevance",
+      "priority": "high",
+      "issue": "The 'Upgrade your AI setup' block assumes a coding-agent user in 81/106 lessons (CLAUDE.md/AGENTS.md/hooks), including beginner, Obsidian, marketing and company lessons.",
+      "where": "toolkit frontmatter across content/**; e.g. what-is-an-llm, para-method, rolling-it-out, seo-with-ai",
+      "fix": "In every beginner lesson and every Applications/Obsidian lesson, lead the toolkit with chat-assistant setup (custom instructions, Projects/Gems/Custom GPTs, saved prompts, notes). Move coding-agent items under an 'If you use a coding agent' sub-label. Keep at most one such item per non-coding lesson."
+    },
+    {
+      "criterion": "2_relevance",
+      "priority": "medium",
+      "issue": "Beginner self-checks are framed for people who build software, and author-internal phrasing remains.",
+      "where": "what-is-an-llm selfCheck (support chatbot you built, database schema); capture-daily-notes ('This lesson owns the second'); hooks-automation ('owns that doctrine'); para-method ('MEMORY.md')",
+      "fix": "In beginner lessons, make at least half the self-check questions non-technical (study, office work). Replace 'owns' wording with 'is covered in'. Drop MEMORY.md as the example index name or pair it with a generic one."
+    },
+    {
+      "criterion": "1_content",
+      "priority": "high",
+      "issue": "Several primary videos are weak or vendor promos, which contradicts the 'best explanation' promise; a core pillar-1 lesson relies on a small channel's Claude-Skill demo.",
+      "where": "verification-and-grounding, choosing-models-providers, privacy-and-setup, social-media-with-ai, email-and-funnels, content-workflow, automation-mindset, analytics-reporting, agent-frameworks, deploying-and-shipping, frontend-with-ai",
+      "fix": "Re-run the video gate on these 11 lessons and prefer reputable, vendor-neutral explainers (official docs talks, university or conference talks, established educators). Where no strong video exists, pick the best short one and say so. Never let a product-promo video be the primary."
+    },
+    {
+      "criterion": "1_content",
+      "priority": "medium",
+      "issue": "Primaries of 2.5–8.5 hours break the one-sitting lesson model.",
+      "where": "business-recipes (507 min), capstone-concept-to-app (183), backend-database-with-ai (176), evals-and-testing (154), rag-fundamentals (153)",
+      "fix": "Embed with a start time (YouTube ?start=) on the chapter that matches the lesson and list 'watch chapters X–Y (~25 min)'. Count only that segment in the header time, and move the full course to backups."
+    },
+    {
+      "criterion": "1_content",
+      "priority": "medium",
+      "issue": "The LLM primer leaves out reasoning-model training; one self-check answer gives wrong product advice; one regulatory date reads as future; the pricing lesson ignores usage costs.",
+      "where": "what-is-an-llm ('How it got smart (two phases)' + self-check Q1); governance-security (Article 50 sentence); pricing-ai-work",
+      "fix": "Add a third stage to what-is-an-llm: RL on verifiable rewards, which produces reasoning models, and why they 'think' before answering. Rewrite Q1 to 'It is the mechanism, and it is still a bug in your system: fix grounding and add a fallback'. Change 'are set to apply' to 'have applied since 2 August 2026 (check for later amendments)'. In pricing-ai-work, add a section on passing through or capping model/API usage costs in fixed prices and retainers."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "high",
+      "issue": "The no-code route contradicts itself: the first recommended track and the agency track 'build on' coding pillars, and 'everyone' must do advanced harness and loop engineering first.",
+      "where": "/path?goal=work, /start-here, home route cards, src/lib/routes.ts, mental-models pillar",
+      "fix": "Make 'builds on' goal-aware: for the no-code goal, list only mental models 1–6, chat assistants and workflows, and label Applied AI engineering as optional. Mark mental-models lessons 7–8 as 'builders: do now; everyone else: come back later' on the pillar page and in Start Here."
+    },
+    {
+      "criterion": "3_learning_design",
+      "priority": "medium",
+      "issue": "Stated sitting length (40–90 min) contradicts lesson times of 146–227 min, and some MCQ answers echo the lesson's slogan.",
+      "where": "/start-here 'One lesson per sitting'; get-hired list; evaluation-metrics Q4",
+      "fix": "Fix the long lessons (see the video fix) or say 'some lessons span two sittings' and show a split marker. Reword MCQ options so the correct one doesn't reuse the lesson's catchphrase, and give each question at least two plausible distractors."
+    },
+    {
+      "criterion": "4_onboarding",
+      "priority": "low",
+      "issue": "Foundations (1–8) and Applications (1–4) share a numbering scheme, so 'pillar 1' and 'Your Applications track' are ambiguous.",
+      "where": "home, /start-here, /path",
+      "fix": "Prefix the Applications tracks with letters (A–D) or 'Track 1–4', and name the actual track on the route chip once a goal is chosen."
+    },
+    {
+      "criterion": "5_navigation",
+      "priority": "medium",
+      "issue": "Search has no stemming or typo tolerance, and the lesson sidebar doesn't show completion.",
+      "where": "/search (src/components/SearchView.tsx), src/components/Sidebar.tsx",
+      "fix": "Add light stemming or prefix matching ('hallucinat*') plus 1-edit fuzzy matching for terms of 5+ characters, or use a small library such as MiniSearch. Render the same tick mark used on pillar pages next to completed lessons in the sidebar."
+    },
+    {
+      "criterion": "6_interactive",
+      "priority": "medium",
+      "issue": "Opening a lesson writes an empty note and shows 'Saved at …' though nothing was typed. Progress views flash zeros or 'Loading…' before hydration.",
+      "where": "src/components/NotesBox.tsx; /dashboard; /get-hired",
+      "fix": "Only write and show 'Saved at' after a user edit, and skip the save when the value equals the stored value. Render skeleton placeholders, not real-looking zeros, until localStorage has been read."
+    },
+    {
+      "criterion": "9_accessibility",
+      "priority": "medium",
+      "issue": "There is no Escape-to-close on the mobile menu, answered MCQ options have no state, and the 9 overflowing lessons fail Reflow.",
+      "where": "src/components/TopNav.tsx; src/components/McqQuiz.tsx",
+      "fix": "Add an Escape handler that closes the menu and returns focus to the Menu button. After an answer, set aria-disabled='true' on all options and aria-pressed or a visually-hidden 'your answer / correct answer' label on the relevant two. Apply the mobile overflow fix."
+    },
+    {
+      "criterion": "10_trust",
+      "priority": "high",
+      "issue": "Every lesson shows the same 'Reviewed 3 Oct 2026', which looks like a bulk stamp and doesn't tell the learner what was actually checked.",
+      "where": "reviewedOn in all 106 lessons; lesson header",
+      "fix": "Set reviewedOn per lesson only when a person actually rechecked its facts and links. Show 'Video from <year>' next to it. Add an About note saying what a review covers (facts, links, video currency)."
+    },
+    {
+      "criterion": "10_trust",
+      "priority": "low",
+      "issue": "Get Hired makes unsourced authoritative claims.",
+      "where": "/get-hired phase intros (src/lib/career.ts)",
+      "fix": "Soften to 'Common in 2026 loops, in our reading of public interview guides' and link 2–3 sources, or turn them into advice ('aim for about 10 tailored applications a week')."
+    },
+    {
+      "criterion": "11_technical",
+      "priority": "low",
+      "issue": "The 404 page inside lesson routes loses its title after hydration, and lesson meta descriptions are the first body sentence rather than a summary.",
+      "where": "/foundations/mental-models/nope; generateMetadata for lesson pages",
+      "fix": "Export metadata from the segment's not-found.tsx, or set the title in the not-found component. Add a short 'summary' frontmatter field (about 150 characters) and use it for description, og:description and search snippets."
+    },
+    {
+      "criterion": "7_visual",
+      "priority": "low",
+      "issue": "Very long lesson titles dominate the first mobile screen, the mobile header cells are misaligned, and title styles are inconsistent.",
+      "where": "math-ml-core titles; lesson TitleBlock at 320px",
+      "fix": "Split titles into a short title plus a subtitle (render the subtitle smaller), top-align the LEVEL value with TIME, and apply one title convention across all lessons."
+    }
+  ],
+  "verdict": "This is a genuinely good, distinctive free course. The lesson writing is accurate and practical, the lesson anatomy is consistent, the interactive pieces work, and the site is fast, private and honest about how it was made. It is not yet at a 9 because: 9 lessons scroll sideways on phones; the 'Upgrade your AI setup' block and some beginner self-checks still assume a coding-agent user; a dozen primary videos are weak or promotional and several run for hours; the no-code route contradicts itself; and the identical review date on all 106 lessons weakens the freshness promise."
+}

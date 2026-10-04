@@ -1,0 +1,255 @@
+---
+title: "Capstone: improve your AI setup"
+subtitle: "Ship a real, measurable improvement with a coding agent"
+summary: "Ship one measurable improvement to your own AI setup or project by running the full spec, build, verify and commit cycle end to end."
+changeNote: "New: a 10-minute baseline and after-check to prove your build helped, a task that leaves a lasting test or hook behind, and a scope-creep scenario to judge."
+section: foundations
+pillar: claude-code
+order: 13
+level: intermediate
+estMinutes: 180
+taskMinutes: 120
+shortPath: "Two sittings. First, about 45 min: watch the video, read the breakdown, pick your build and run the kickoff prompt to an approved spec. Next time: build phase by phase to a green check, add one sensor, and write your three lessons learned."
+prerequisites: [core-loop, claude-md-and-memory, plan-mode-spec-driven]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "DlTCu_pNDHE"
+  published: "2026-05-06"
+  year: 2026
+  minutes: 32
+  title: "Live coding session with Boris Cherny and Jarred Sumner"
+  channel: "Claude"
+  why: "Made by Anthropic (the official Claude channel), and it shows Claude Code's creator, Boris Cherny, driving the tool live and unscripted next to Bun's creator, Jarred Sumner. Polished build tutorials (two are in the backups) edit out the dead ends; this session keeps them, so you see how an experienced operator keeps context lean, when he delegates, and how he lets checks verify the work instead of hovering."
+  notes:
+    - "It's a long session: watch for the operating rhythm (how little he types, how much he lets the tool carry), not a checklist."
+    - "You're not copying their app; the build you ship in the task is your own."
+readAfter:
+  - label: "Best practices for Claude Code — official docs"
+    url: "https://code.claude.com/docs/en/best-practices"
+    kind: "docs"
+  - label: "Claude Code: Best practices for agentic coding — Anthropic Engineering"
+    url: "https://www.anthropic.com/engineering/claude-code-best-practices"
+    kind: "article"
+applyIt: |
+  Before you build, make "measurable" concrete. Spend ten minutes choosing your capstone and
+  writing down how you'll know it helped:
+
+  - **Pick the branch** that fixes a real annoyance: the routine you still run by hand (skill),
+    the rule you keep repeating (hook), the review you eyeball (subagent), or a feature you or
+    your users actually want (app feature).
+  - **Write the baseline now:** how often the annoyance happens or how long it takes today,
+    e.g. "I paste the review checklist about five times a week" or "the export request has sat
+    in the backlog for a month".
+  - **Write the after-check:** the observable difference that would prove it worked a week
+    later, e.g. "zero pasted checklists" or "the export used on real data twice".
+
+  **If you don't have an app yet:** pick the skill, hook or subagent branch; they run the same
+  motion on your setup in one evening.
+
+  Success: one build chosen, a written baseline, and an after-check you'll actually look at in
+  a week.
+toolkit: |
+  This capstone's deliverable can *be* your AI setup. Pick one and actually ship it, not a
+  throwaway demo:
+
+  - **A skill:** the routine you still run by hand before every commit (run the checks, review
+    the diff, write the message) packaged as one command, so it runs itself
+    (→ mechanics in `skills-and-plugins`). In Cursor or Copilot, the same routine becomes a
+    saved command or prompt file.
+  - **A hook:** promote a "never do X" line in your instruction file into a **PreToolUse**
+    block-hook in `~/.claude/settings.json`, so it guards every project at once
+    (→ `hooks-automation`).
+  - **A subagent:** a fresh-context **reviewer** that checks a change against your project's
+    `CLAUDE.md` and Definition of Done before you open a PR, replacing the eyeball pass you do
+    by hand (→ `subagents-and-agent-teams`).
+  - **An app feature:** one real feature in a project you own, through the whole motion.
+  - **Whichever you pick, close by recording it.** Have the agent write the decision and the
+    next step into the right `CLAUDE.md` and a committed `DECISIONS.md` or `MEMORY.md`, so the
+    capstone improves the system *and* leaves a record that it did.
+recap:
+  - emoji: "🎬"
+    title: "What the tape is for"
+    text: "The tape isn't a tutorial — it's the person who built Claude Code driving it live, dead ends and all. The lesson is the rhythm: how little he types, how much he lets the tool carry."
+  - emoji: "🧠"
+    title: "The first beat"
+    text: "Nothing good happens if the agent starts blind. A current CLAUDE.md means it begins inside your stack, commands, and conventions — the first beat is memory, not a prompt."
+  - emoji: "📐"
+    title: "Before any code"
+    text: "Plan mode turns the idea into a contract — goal, acceptance criteria, files touched — and reading that spec is the cheapest place to kill a wrong approach."
+  - emoji: "🔁"
+    title: "Phase by phase"
+    text: "Explore → plan → code → commit, phase by phase. Approve the plan before code; when reality contradicts it, stop and re-plan instead of letting it freelance."
+  - emoji: "✅"
+    title: "Who decides it's done?"
+    text: "Hand it a check that returns pass/fail — tests, a build, a screenshot diff — and make green the finish line, not your eyeballs. An agent that verifies itself corrects itself."
+  - emoji: "⚙️"
+    title: "When a win will recur"
+    text: "The moment a win will recur, lift it into the harness — a hook, a skill, a subagent — so the next build starts ahead of this one instead of retyping the same setup."
+  - emoji: "🚢"
+    title: "The last beat"
+    text: "Clean commit, PR, merged. Intent and proof you can point to at every stage — a loop that doesn't end in a commit never actually closed."
+  - emoji: "🎛️"
+    title: "What the pillar built"
+    text: "Feed context, drive the loop, make it prove its own work, wire the win in. That operator's reflex — not any single trick — is what the whole pillar was building toward."
+task: |
+  Ship the build you chose end to end this week — the smallest surface that's still real.
+  Confirm the project's `CLAUDE.md` (or `AGENTS.md`) is current, then kick off with the whole
+  motion baked in:
+
+  ```prompt
+  We're shipping [the build] — smallest real surface. Plan mode only first: read the files it
+  touches and the relevant CLAUDE.md, edit nothing, and write a spec to docs/specs/[name].md —
+  goal, acceptance criteria (each one testable), and the exact command that proves it. I
+  approve the spec before any code. Then build phase by phase, running that command green after
+  each phase, plus [one extra check that fits, e.g. "a screenshot of the new screen at mobile
+  and desktop width" or "a manual run on real sample data"], and end with clean
+  type: description commits on a branch.
+  ```
+
+  Leave one new sensor behind (a test that fails if this breaks, or a hook that runs it), so
+  the next build starts further ahead. The skill / hook / subagent paths fit one evening; an
+  app feature takes 2–4. Finish with three lines on what you'd do differently next time, and
+  ask the agent to record the decision in your project's memory or decisions file.
+
+  Success: four artifacts you can point to (the spec, the approved plan, the green check, the
+  merged commit), one new sensor, and three lines of lessons learned saved in the repo.
+selfCheck:
+  - q: "You finish the build and the app 'seems to work.' Which four artifacts must exist before you call the capstone done — and what does a missing one mean?"
+    a: "The spec, the plan you approved, the runnable check that went green, and the commit that shipped it. A missing one means you vibe-coded that stage: no spec = nothing to verify against; no plan = drift you can't audit; no green check = 'looks done' is your only signal; no commit = the loop never closed. Intent and proof at every stage is exactly what separates engineering from prompt-and-hope."
+  - q: "You pick the 'new skill' build over the 'app feature' build to keep it to one evening. Are you still doing a real capstone?"
+    a: "Yes — the point is running the whole motion, not the size of the surface. A /command skill still gets specced (trigger + output), built through the loop, verified (it fires and produces the right thing), and committed. The app feature just runs the same motion over more phases. Size the surface to your evening; never skip a beat."
+  - q: "Halfway through, you realize the win generalizes past this one repo. What do you do differently from a normal feature?"
+    a: "Lift it a layer. A thing you'll do again isn't a one-off edit — it's a skill, a hook, or a user-level CLAUDE.md rule. That's the 'automate' beat: build the reusable version once so every future session inherits it, then record the decision in your memory or decisions file so it's captured, not just the code."
+  - q: "Midway through your app-feature build, the agent proposes changing a shared helper that three other features use. Your spec never mentioned it. What do you do?"
+    a: "Stop and re-plan before any edit. Either rule it out of scope (add a 'do not touch' line and find another route) or bring it in on purpose: update the spec with criteria and tests that cover the three other callers. Silently letting it freelance into shared code is how a one-feature capstone breaks three features."
+mcq:
+  - q: "You plan to build a reviewer subagent as your capstone 'to save time'. What should you write down before you start?"
+    options:
+      - "A list of every feature the subagent might get later"
+      - "Which larger model it should run on for deeper reviews"
+      - "How long reviews take now, and what will show it helped"
+      - "Nothing yet: whether it helps will be obvious once built"
+    answer: 2
+    explain: "'Measurable' needs a baseline and an after-check you'll actually look at a week later; without them, 'it helped' is a feeling, not a result. Waiting to see whether it's obvious skips the one number that would tell you."
+  - q: "Your capstone feature is merged and its check went green. Which leftover puts the next build furthest ahead?"
+    options:
+      - "A test that fails if this feature ever breaks"
+      - "A long README section describing the feature"
+      - "A screenshot showing the feature working today"
+      - "The full chat transcript, saved in the repo"
+    answer: 0
+    explain: "A sensor keeps working after the session ends: the next change that breaks this feature goes red without anyone remembering to look. A description or a screenshot only records that it worked once, and a raw transcript is noise a future session would have to wade through."
+  - q: "One acceptance criterion in your capstone spec reads 'the export feels fast and reliable'. What's wrong with it?"
+    options:
+      - "It should list the files the change will touch"
+      - "Acceptance criteria get written after the code"
+      - "Nothing; the agent can judge 'fast' on its own"
+      - "No check can say whether it passes or fails"
+    answer: 3
+    explain: "Each criterion has to be testable so the build has a green to aim for, such as 'exports 10,000 rows in under 5 seconds'. Leaving 'fast' to the agent's judgement means it stops when the work looks done, the exact gap a runnable check exists to close."
+  - q: "You're about to start the capstone and notice the project's CLAUDE.md still lists a test command you replaced months ago. What do you do?"
+    options:
+      - "Ignore it; plan mode reads the real code anyway"
+      - "Update it before you plan or build anything"
+      - "Delete it so the agent starts without any bias"
+      - "Fix it in the final commit, after you've shipped"
+    answer: 1
+    explain: "Memory is the first beat: the agent should start inside your current commands and conventions, and a stale test command can point its verifier at the wrong check. Plan mode reads the code, but the instruction file is where it learns how you build and test."
+backupResources:
+  - label: "How to Build a CRM App with Claude Code in Next.js (Full Tutorial 2026) — AyyazTech"
+    url: "https://www.youtube.com/watch?v=htwOu6wNuLc"
+    type: "video · full watch-along build"
+  - label: "Build and deploy a full app with Claude Code in 2026 (full tutorial) — No Code MBA"
+    url: "https://www.youtube.com/watch?v=sKBuSaaoN1Y"
+    type: "video · build + deploy"
+tags:
+  - claude-code
+  - capstone
+  - project
+  - workflow
+  - ai-setup
+---
+
+You've learned the parts one at a time. The capstone is where they collapse into a single
+**motion** — and this time the thing you build isn't a throwaway demo, it's a **real
+improvement to your own system**. That's the whole design of this lesson: you'll re-walk every
+stage of the pillar, but as a checklist of *pointers*, not a re-teach. If a beat needs
+refreshing, the lesson that covers it is one link away.
+
+The video models it well. Not a scripted tutorial — the person who *built* Claude Code driving
+it live, next to Bun's creator. Watch for the operating rhythm: how lean he
+keeps context, when he delegates, how he lets the harness verify instead of hovering. That
+rhythm is everything below, in motion.
+
+## The motion: six beats, each covered in its own lesson
+
+Run these in order, on one real change. Each is a single beat here; the mechanics live where
+they were taught.
+
+1. **Memory** — start from a project that already knows itself. Confirm the `CLAUDE.md` is
+   current so the agent begins inside your standards, not guessing them (→ `claude-md-and-memory`).
+2. **Spec** — in plan mode, turn the idea into a written contract: goal, acceptance criteria, the
+   files it touches. Read it critically — the cheapest place to kill a wrong approach
+   (→ `plan-mode-spec-driven`).
+3. **Loop** — explore → plan → code → commit, phase by phase; approve the plan before code, and
+   re-plan on drift instead of letting it freelance (→ `core-loop`).
+4. **Verify** — hand it a check that returns a hard pass/fail and make *green* the stop condition,
+   not your eyeballs (→ the runnable-check habit in `core-loop`; the theory in
+   `verification-and-grounding`).
+5. **Automate** — wire the repeat into the harness so the next build starts ahead: a hook, a
+   skill, or a delegated subagent (→ `hooks-automation`, `skills-and-plugins`,
+   `subagents-and-agent-teams`).
+6. **Ship** — clean `type: description` commit, PR, merged. A loop that doesn't end in a commit
+   didn't close (→ `core-loop`).
+
+That's the pillar in one breath. Designing *around* the verifier and the stop-rule — treating the
+loop, not the prompt, as the unit of work — is the core idea of the Loop engineering lesson made
+concrete (→ loop-engineering).
+
+## Pick your build
+
+The deliverable is a real improvement to your **AI setup** — the instruction files, skills, hooks,
+and agents you operate every day — or to **a project you own**. Pick one; each exercises the full
+motion.
+
+- **A new skill.** Package a routine you keep retyping into a `/command` — the first entry in
+  your own command library. Small surface, whole motion: spec the trigger and output, build, verify it
+  fires, ship.
+- **A hook.** Turn a rule you *hope* holds into one the harness *runs* — a PreToolUse secret-block,
+  a lint-on-edit, a Stop hook that gates on your Definition of Done. Deterministic control, shipped
+  in an evening.
+- **A subagent.** Stand up a specialized delegate with its own context — a fresh-eyes reviewer, a
+  research fan-out, a visual-QA checker — and feel real work come back as a summary instead of
+  flooding your window.
+- **An app feature.** The heaviest option: one genuinely useful feature for the people who use
+  your app (even if that's only you), spec-first, phases verified green against your test suite
+  and the design, merged. This is the 2–4 evening path.
+
+> 💡 **Try it:** kick any of them off with the whole motion baked into the first prompt.
+
+```prompt
+We're shipping <the build>. Plan mode only first: read the files this touches
+and the relevant CLAUDE.md — don't edit anything. Then write a spec — goal,
+acceptance criteria, the files you'll change, and the exact command that proves
+it works. Wait for my approval before any code.
+```
+
+## What "done" looks like
+
+Done isn't "it seems to work." Done is: you can point to the **spec**, the **plan** you approved,
+the **check** that went green, and the **commit** that shipped it — intent and proof at every
+stage. If any of those four is missing, you vibe-coded it; you didn't engineer it.
+
+Close the session by asking the agent to write the decision and the next step into the right
+`CLAUDE.md` and a committed `MEMORY.md` or `DECISIONS.md`. The capstone should improve the system *and* leave a record that it did — otherwise
+the next session relearns what this one already figured out.
+
+## Where this goes next
+
+Nothing here was Claude-Code-specific trivia. Context, specs, verification, automation, the loop —
+they reappear in *Applied AI engineering* and *Shipping apps*, and because so much of it is open
+standard, in every rival tool. You've stopped using Claude Code like an autocomplete and started
+operating it like a system. That operator's reflex — feed it context, drive it through a loop,
+make it prove its own work, wire the win into the harness — is the foundation the entire rest of
+the course stands on. 🎈

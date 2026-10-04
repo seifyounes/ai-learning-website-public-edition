@@ -1,0 +1,250 @@
+---
+title: "Local & open models"
+subtitle: "Ollama and when local wins"
+summary: "Run an open model on your own machine with Ollama, judge what fits your hardware, and know where local models hold up or break."
+changeNote: "New: what fits on your machine, a worked example that redacts data locally, a failure-modes list, and a quick decision on where a local model wins."
+section: foundations
+pillar: applied-ai-engineering
+module: "Job-ready extras"
+order: 16
+level: intermediate
+estMinutes: 20
+taskMinutes: 45
+prerequisites: [calling-an-llm-api, choosing-models-providers]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "Wjrdr0NU4Sk"
+  published: "2024-05-03"
+  year: 2024
+  minutes: 24
+  title: "host ALL your AI locally"
+  channel: "NetworkChuck"
+  why: "NetworkChuck sets up Ollama plus a web interface from scratch on camera and explains why local AI matters (privacy, cost, control) with an energy that makes the first install feel approachable. Watch the video for the why, and follow the official Ollama quickstart below for the how. The title oversells it: this lesson's point is that local wins for some jobs, not that you should host all your AI yourself."
+  notes:
+    - "The tooling has moved on since it was recorded, so on-screen commands may differ: follow the official Ollama quickstart below for current steps on Windows, macOS and Linux."
+readAfter:
+  - label: "Ollama quickstart — run open models locally (official docs)"
+    url: "https://docs.ollama.com/quickstart"
+    kind: docs
+applyIt: |
+  Take ten minutes to decide where a local model would earn its place in your own work. List
+  the AI calls in a project you build, or the AI tasks you do at work each week, and tag each
+  one on two axes:
+
+  - **Quality needed:** frontier (subtle tone, long reasoning) or narrow (tagging, extraction,
+    redaction, a first draft).
+  - **Data:** fine to send to a cloud API, or must stay on your machine (contracts, HR notes,
+    client data, anything under an NDA).
+
+  Anything narrow, or anything whose data must stay local, is a candidate. Pick one to try
+  first. **If you code:** check whether your model call reads its base URL and model name from
+  config or environment variables; if it does, pointing it at Ollama's OpenAI-compatible
+  endpoint (http://localhost:11434/v1) is a two-value change, and if it doesn't, that's the
+  first thing to fix. **If you don't code yet:** note which documents you've avoided pasting
+  into a cloud chatbot; those are your local-model candidates.
+
+  Success: a tagged list of your AI calls or tasks with one local candidate chosen, and the reason.
+toolkit: |
+  - **Point your dev loop at a local model.** While iterating on scaffolding, parsing or
+    validation code, swap the cloud model for a localhost OpenAI-compatible endpoint (Ollama or
+    LM Studio): zero API cost, no rate limits, works offline. Swap the real model back in only
+    for quality checks.
+  - **Write the tiering split into your project notes.** For each AI call you have or plan, note
+    whether it needs frontier quality (subtle tone, long reasoning) or is a narrow task (tagging,
+    extraction, redaction) a small local model can win on cost, and let your eval set confirm it.
+  - **Draft cheap, finish expensive.** Rough out first drafts, summaries or lint passes on a free
+    local model and spend frontier tokens only on the final pass: the same easy-90%/hard-10%
+    tiering, applied to your own workflow.
+  - **Keep a local option for sensitive data.** Add a line to your instruction file
+    (AGENTS.md, CLAUDE.md, `.cursor/rules`, Copilot instructions) saying which data must
+    never go to a cloud API and which local model handles it. "Runs fully local, no data leaves the machine" is also
+    a real selling point for client or enterprise work.
+recap:
+  - emoji: "🔒"
+    title: "Two sentences you'll hear"
+    text: "'We can't send this to an API' and 'this is too high-volume for frontier pricing'. Open models answer both, with privacy and control as a bonus."
+  - emoji: "📥"
+    title: "Getting one running"
+    text: "One installer, then `ollama run <model>` downloads a quantized open model and serves it. No GPU cluster; a normal laptop runs a small one."
+  - emoji: "🔁"
+    title: "Why your code barely changes"
+    text: "Ollama exposes the standard chat-completions shape on localhost, so switching between a local model and a cloud API means changing a base URL and a model name."
+  - emoji: "⚖️"
+    title: "Where small models hold up"
+    text: "3–8B models are genuinely good at narrow tasks like classification, extraction and redaction, and clearly weaker at long reasoning, subtle tone and reliability."
+  - emoji: "🪜"
+    title: "Splitting the traffic"
+    text: "Route the easy majority of calls to a small, cheap model and escalate the hard ones to a frontier model. Your own eval set decides where the line sits."
+  - emoji: "🗜️"
+    title: "How 7B fits a laptop"
+    text: "Quantization stores weights at about 4 bits instead of 16, shrinking memory and speeding inference at a small quality cost."
+  - emoji: "🌐"
+    title: "The families to recognize"
+    text: "Llama, Gemma, Qwen, Mistral, DeepSeek, from about 1B to 100B+ parameters. Check a live leaderboard, then let your eval set make the call."
+task: |
+  Spend one evening running an open model locally and learning where it breaks.
+  Install Ollama (or LM Studio for a no-terminal GUI), pull a small model (a 3-4B fits a normal
+  laptop), and send it two prompts. One narrow: "Extract the customer name, order number and
+  complaint category from this email as JSON" plus a messy made-up email. One hard: "Reply to
+  this angry customer in a calm, warm brand voice and offer one concrete next step." Then run
+  the SAME two prompts against a free cloud model (ChatGPT, Claude or Gemini):
+
+  ```prompt
+  Compare these two answers to the same prompt [paste both]. Judge JSON validity, accuracy of
+  the extracted fields, and tone. Which would you ship, and why?
+  ```
+
+  Note the tokens/second you got locally (Ollama prints it with `ollama run <model> --verbose`;
+  LM Studio shows it under each reply). Write two sentences on the quality gap per prompt and
+  one on speed. **If you code:** point the smallest script you have (for example the one from
+  → calling-an-llm-api) at the local model by changing only its base URL and model name, and
+  check the response parses the same way.
+
+  Success: you can state where the local model holds up, where it breaks, and its tokens/sec — "I've run open models locally and know where they break" is now true.
+selfCheck:
+  - q: "A law firm wants contract summaries but insists nothing leaves its office network. It has one workstation with a decent GPU. Sketch your approach and the main risk."
+    a: "Serve an open model on that workstation (Ollama, LM Studio or a server like vLLM) behind an OpenAI-compatible endpoint, sized to fit its GPU memory at 4-bit. Build a small eval set from sample contracts. The main risk is quality on long, subtle documents, so narrow the task (extract parties, dates, renewal clauses) and keep a lawyer reviewing the output."
+  - q: "Your JSON extraction prompt is perfect on a cloud model, but a local 3B model returns broken JSON about one time in five. What do you try before giving up on local?"
+    a: "Turn on schema-constrained output if the runtime supports it (Ollama does), simplify the schema, add one or two examples, and validate with one retry. If it still fails your eval set, try a larger model or a less aggressive quantization."
+  - q: "You moved your dev loop to a local model and every test passes. In production, on the cloud model, parsing fails on one field. What went wrong?"
+    a: "The two models format output differently, and the dev loop only proved the plumbing. Run your eval or contract tests against the production model before each release, and keep validating outputs in code whichever model is behind the call."
+  - q: "What does quantization trade, and why does it matter for local models?"
+    a: "It stores weights at lower precision (for example 4-bit instead of 16-bit), cutting memory and speeding inference at a small quality cost. It's why a 7B model fits on a normal laptop, and why the same model name can behave slightly differently at different quantization levels."
+mcq:
+  - q: "You load a 32B open model at 4-bit on a GPU with 12 GB of memory. It runs, but at about two tokens per second. What's happening?"
+    options:
+      - "4-bit quantization slows inference a lot"
+      - "Weights spill past GPU memory onto the CPU"
+      - "The context length is set too low for it"
+      - "Ollama throttles models above a size cap"
+    answer: 1
+    explain: "At about half a byte per parameter, a 32B model needs roughly 16 GB for weights alone, more than the GPU holds, so part of it runs on the CPU and slows to a crawl. Quantization speeds inference up rather than slowing it; pick a smaller model or a more aggressive quantization."
+  - q: "You ask a local model to list every deadline in a 60-page contract. It finds the ones on the first pages and misses the rest, with no error. What do you check first?"
+    options:
+      - "How hard the model is quantized"
+      - "How much GPU memory is free"
+      - "Whether the prompt asks for JSON"
+      - "The runtime's context length setting"
+    answer: 3
+    explain: "Local runtimes often default to a modest context length, and text that doesn't fit is dropped, so set the length explicitly or chunk the document. Heavy quantization lowers quality across the board; it doesn't make the model lose only the later pages."
+  - q: "A small business wants AI-drafted replies to customer emails, but personal details must not reach a cloud provider, and tone matters. Which design fits?"
+    options:
+      - "Redact locally, then draft in a frontier model"
+      - "Draft every reply with the local model alone"
+      - "Send to the cloud with a no-training setting"
+      - "Fine-tune a local model on past reply emails"
+    answer: 0
+    explain: "Each model does what it's best at: the local one keeps personal details in-house on a narrow redaction task, and the frontier one handles tone, the part small models do worst. A no-training setting still sends the data out, and a small local model alone is weakest exactly where tone matters."
+  - q: "A 7B open model ranks well on a public leaderboard, but your 4-bit build of it does clearly worse than expected on your extraction eval. What's the right reading?"
+    options:
+      - "The leaderboard was wrong about the model"
+      - "Your eval set must have a bug in it"
+      - "It was ranked on other tasks at other precision"
+      - "Small models never handle extraction well"
+    answer: 2
+    explain: "Leaderboards test other tasks, and your quantization level differs, so trust your own eval set and try a less aggressive quantization or a larger model. Small models are genuinely good at narrow extraction, so the task type isn't the problem."
+backupResources:
+  - label: "Ollama — GitHub (models, API reference)"
+    url: "https://github.com/ollama/ollama"
+    type: "docs · official"
+  - label: "LMArena — live crowd-ranked leaderboard (includes open models)"
+    url: "https://lmarena.ai"
+    type: "tool · live comparison"
+  - label: "Artificial Analysis — open & proprietary models: quality, price, speed"
+    url: "https://artificialanalysis.ai/models"
+    type: "tool · live comparison"
+  - label: "LM Studio — GUI alternative to Ollama"
+    url: "https://lmstudio.ai/"
+    type: "tool · desktop app"
+tags:
+  - open-source
+  - ollama
+  - local-models
+  - applied-ai
+---
+
+Frontier APIs are the default, but "we can't send this data to an API" and "this task is
+too high-volume for frontier pricing" are sentences you will hear at real organizations,
+and **an open model is often the answer both times**. Knowing when it is (and when it
+isn't) is a cheap, practical differentiator.
+
+## What Ollama actually does
+
+One installer, then `ollama run <model>` downloads a quantized open model and serves it
+locally, with an **OpenAI-compatible API** on localhost. That last part is the engineering
+win: your app code doesn't care whether it's talking to a local 3B model or a frontier
+API, because the request shape is the same. LM Studio does the same job with a desktop
+interface and no terminal; llama.cpp is the engine underneath many of these tools; and
+servers like vLLM are what teams use when many users share one GPU.
+
+## What fits on your machine
+
+A rough rule of thumb: at 4-bit quantization, weights take about half a byte per
+parameter. So an 8B model needs around 4–5 GB just for weights, plus room for the context;
+a 70B model needs 40 GB or more. A model that doesn't fit in GPU memory spills onto the
+CPU and slows to a crawl. Laptops with plenty of unified memory (such as recent Apple
+silicon Macs) run surprisingly large models; a typical office laptop is happiest at 1–4B.
+
+## The honest quality picture
+
+Small local models (3–8B) are genuinely good at narrow tasks such as classification,
+extraction, summarizing short text and redaction. They are noticeably weaker than frontier
+models at long multi-step reasoning, subtle tone and reliability on odd inputs. The pro
+pattern is **tiering**: route the easy majority of calls to a small, cheap model and
+escalate the hard ones to a frontier model, with evals telling you where the line sits
+(→ choosing-models-providers covers the cost side).
+
+## Worked example: a local redaction step
+
+Say a small business wants AI-drafted replies to support emails, but the emails contain
+names, phone numbers and addresses it would rather not send to a cloud provider. A hybrid
+design:
+
+1. **Local first.** A small model on the office machine rewrites each email with personal
+   details replaced by placeholders (`[NAME]`, `[PHONE]`).
+2. **Belt and braces.** A plain regular expression also catches phone numbers and email
+   addresses, because a single miss is a leak, and code is more reliable than a model at
+   fixed patterns.
+3. **Cloud second.** Only the redacted text goes to a frontier model, which drafts the
+   reply in a careful tone (the part small models do worst).
+4. **Put it back.** Your code swaps the placeholders back in before a human reviews and
+   sends the reply.
+5. **Measure it.** Write 20 made-up emails stuffed with personal details and count misses.
+   The number that matters is how many details slip through, not how fluent the output is.
+
+Each model does what it's best at: the local one keeps data in-house on a narrow task, and
+the frontier one handles judgment and tone.
+
+> 💡 **Try it:** Check your machine's RAM (and GPU memory, if you have a GPU). Apply the
+> half-a-byte-per-parameter rule and write down the largest 4-bit model you could run
+> comfortably. That number tells you which families and sizes are worth downloading.
+
+## The model landscape in 30 seconds
+
+Open-weight families you'll see everywhere: **Llama** (Meta), **Gemma** (Google),
+**Qwen** (Alibaba), **Mistral** and **DeepSeek**. Sizes run from about 1B to 100B+, and
+4-bit quantization is the usual way to make them fit. Don't memorize benchmarks: check a
+live leaderboard when choosing, then let *your* eval set make the final call, because a
+leaderboard rank isn't your task.
+
+## Common failure modes
+
+- **Painfully slow responses** → the model is too big for GPU memory and spills to the
+  CPU → pick a smaller size or a more aggressive quantization, and watch tokens per second.
+- **Broken JSON** → small models are less reliable at strict formats → use
+  schema-constrained output, validate, and retry once.
+- **Details from long documents go missing** → local runtimes often default to a modest
+  context length → set the context length explicitly, or chunk the document.
+- **Dev passes, production fails** → your dev loop used a different model from production
+  → run evals against the production model before release.
+- **Quality worse than the leaderboard suggested** → leaderboards test other tasks, and
+  your quantization level differs → score candidates on your own eval set.
+
+## Where this fits your career
+
+For an applied-AI engineer, local models are less about ideology and more about three
+practical wins: **privacy** for clients and enterprises, **cost** at volume, and a **free
+dev loop** while you build. Being able to say "I ran the same eval set against a local
+model and a cloud one; here's the quality gap and the cost difference" is a strong
+portfolio point that takes one evening.

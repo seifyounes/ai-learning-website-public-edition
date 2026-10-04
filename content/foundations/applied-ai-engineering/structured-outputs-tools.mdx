@@ -1,0 +1,258 @@
+---
+title: "Structured outputs & tool/function calling"
+summary: "Get model output that parses into a schema every time, wire up tool calling, and check the values the schema can't guarantee."
+changeNote: "New: a worked example, a failure-modes list, a field-by-field checklist of what each output value means, and a build step that checks values against the source."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 3
+level: intermediate
+estMinutes: 15
+taskMinutes: 45
+shortPath: "About 40 min: read the breakdown and build the task's first half: a schema-forced reply, parsed in code, with the verbatim-quote check. Come back for the tool-calling half and the 63-minute video."
+prerequisites: [calling-an-llm-api]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "4rFVLMBwjGY"
+  published: "2025-03-25"
+  year: 2025
+  minutes: 63
+  title: "Python + AI: Function calling & structured outputs"
+  channel: "Microsoft Reactor"
+  why: "One session that covers both halves of this lesson, structured outputs and function calling, with working Python code you can follow line by line. Most videos cover only one half or stop at a toy demo. It's made by Microsoft's developer channel, so the demos run on Microsoft-hosted models, but the request shapes and the tool loop carry to any provider. OpenAI's structured-outputs docs in the backups are the precise reference."
+applyIt: |
+  Schema-valid isn't correct: a flawless JSON envelope can still carry an order number nobody
+  placed or a "quote" the customer never wrote. Take ten minutes to list the meaning checks for
+  one structured output you rely on: an AI call in your project, a no-code flow that returns
+  fields, or a planned one such as a ticket-triage call returning {category, priority, summary,
+  quote}. For each field, write one line:
+
+  - **What could be valid but wrong?** (an invented id, a quote that isn't in the source, a date
+    in the past, a priority that contradicts the text)
+  - **The check that catches it** (exists in our data, verbatim substring, within bounds, not on
+    a denylist)
+  - **What happens on failure** (a deterministic safe result, a retry, a human review)
+
+  **If you code:** ask your coding agent to list which of those checks your code already runs
+  after parsing, without changing anything. **If you don't code yet:** ask a chat assistant to
+  turn five real emails (strip anything private) into JSON {sender, intent, deadline}, then check
+  every field against the email by hand and count how many were valid JSON but wrong.
+
+  Success: a field-by-field list of meaning checks for one real output, with the failure path for each.
+toolkit: |
+  - **Demand a fixed shape wherever you'll act on the answer.** When a subagent, a custom GPT or
+    an automation step hands back something you'll parse, specify a JSON schema (or a fixed
+    template) and parse the envelope. Never regex prose.
+  - **Recognize MCP and plugin tools as function calling in the wild.** Every tool your
+    assistant uses (in Claude Code, Cursor, Copilot agent mode or ChatGPT connectors) is this
+    loop: the model returns a call plus arguments, the host runs it. When a tool misfires, read
+    the arguments it sent first (→ mcp-deep).
+  - **Add a "check the letter" rule to your instruction file.** One line in your rules file,
+    AGENTS.md (or CLAUDE.md / GEMINI.md for those agents), such as "before acting on structured
+    output, verify that ids and paths exist and that quotes appear in the source" turns the
+    semantic guardrail into a standing habit for your coding agent.
+  - **Keep approvals on for tools that write.** Permission prompts in Claude Code, Cursor and
+    Copilot agent mode are human argument validation: approve reads freely, but read the
+    arguments before any write, delete or send.
+recap:
+  - emoji: "🧩"
+    title: "Prose meets a parser"
+    text: "Humans love prose; parsers choke on it. Once AI is inside an app, you need output your program can trust and parse."
+  - emoji: "📐"
+    title: "Three strengths of JSON"
+    text: "Asking in the prompt, JSON mode (valid syntax only), and schema-enforced output (your exact fields). Production wants the last one."
+  - emoji: "🛠️"
+    title: "Who runs the function?"
+    text: "Your code does. The model only returns a function name and arguments as JSON; you execute it and send the result back."
+  - emoji: "🔁"
+    title: "Repeat that exchange"
+    text: "Request a tool, run it, feed the result back, until the model answers. That loop is what an agent is under the hood."
+  - emoji: "⚠️"
+    title: "What a valid schema hides"
+    text: "Invented arguments, the wrong tool, or a flawless quote nobody wrote. The schema checks the envelope, not the letter."
+  - emoji: "🔍"
+    title: "Before you act on it"
+    text: "Validate meaning after shape: ids exist, quotes appear in the source, values are in range. Check tool arguments before anything writes or sends."
+  - emoji: "🧱"
+    title: "Room to say no"
+    text: "Give every schema a legal \"unknown\" or null option. Without one, the model invents something to fill the slot."
+task: |
+  Build the structured-output move end to end on a mock support email, then guard the meaning
+  and add the acting half. Use your own repo or a single new script:
+
+  ```prompt
+  Write a script that sends a mock customer email to a model and FORCES the reply into a fixed
+  schema {category: "shipping" | "refund" | "other", priority: 1-3, summary: string, quote:
+  string} using the provider's structured-output feature (response_format / responseSchema / a
+  tool schema), then parses it in code with no regex on prose. After parsing, run a semantic
+  check: the quote must be a verbatim substring of the email, else fall back to a safe default
+  result. Next, define ONE callable tool, get_order_status(order_id) -> string, backed by a
+  small dict of fake orders; describe it to the model and show it return a structured tool call
+  with arguments instead of prose. Validate the arguments before running the tool and return a
+  short structured error when they fail. Print the parsed object and the tool-call JSON. Finally,
+  feed in a parsed result with an invented quote, and ask about an order id that isn't in the
+  dict, and show what your code does with each.
+  ```
+
+  **No-code path:** Google AI Studio's free playground has structured output and function
+  calling as settings: paste a JSON schema and run the email, then declare get_order_status and
+  watch the model return a call instead of text. Check the quote against the email by hand.
+
+  Success: the reply parses straight into the schema, an invented quote is rejected for the fallback, the model emits a valid get_order_status call you could execute, and the unknown id is handled instead of crashing.
+selfCheck:
+  - q: "Your invoice extractor uses schema-enforced output and never fails to parse, yet some records show due dates that aren't in the invoice at all. What's going on, and what two changes fix it?"
+    a: "The schema forces a date into the slot, so when there isn't one the model invents it. Make the field nullable (a legal \"none\"), then add a semantic check that the extracted date actually appears in the source."
+  - q: "Your support agent calls `refund_order` with an order id that belongs to a different customer. The JSON was valid. Where should this have been stopped?"
+    a: "In your code, before execution: validate tool arguments against real data and permissions (the id exists *and* belongs to this customer). Write actions should also need a human approval or a hard rule."
+  - q: "What actually happens in tool calling, and who executes the function?"
+    a: "You describe tools (name, description, argument schema). The model returns a tool name plus JSON arguments; *your* code runs the function and sends the result back so the model can continue."
+  - q: "Your model never uses the `search_docs` tool you gave it and answers from memory instead. What do you check first?"
+    a: "The tool's description, since it's all the model sees: does it say what the tool covers and when to use it? You can also force a tool call with the API's tool-choice setting when a step must use it."
+mcq:
+  - q: "You switched on JSON mode. Replies always parse now, but some come back with \"prio\" instead of \"priority\", and your code crashes. What do you change?"
+    options:
+      - "Add 'use the exact field names' to the prompt"
+      - "Lower the temperature so field names stay stable"
+      - "Parse with a regex that accepts both spellings"
+      - "Use schema-enforced output with your fields"
+    answer: 3
+    explain: "JSON mode guarantees valid syntax, not your fields; schema-enforced output constrains generation to your exact shape. A prompt line or a low temperature makes drift rarer but guarantees nothing, and a regex patch chases each new variant."
+  - q: "Your classifier's schema is {answer, reasoning}. Accuracy on hard cases is poor, and the reasoning often argues against the answer it follows. What's a cheap change?"
+    options:
+      - "Remove the reasoning field to save tokens"
+      - "Put the reasoning field before the answer"
+      - "Make the answer field a free-text string"
+      - "Ask for the reasoning in a second API call"
+    answer: 1
+    explain: "Models generate fields in order, so with the answer first, the reasoning is written after the commitment and can only rationalise it. A short reasoning field placed first gives the model room to work before it answers."
+  - q: "Your schema-enforced extractor occasionally throws a parse error, always on very long documents. What's the most likely cause?"
+    options:
+      - "The reply hit max_tokens and was cut off"
+      - "Schema enforcement turns off for long input"
+      - "The model chose a different schema mid-reply"
+      - "Long documents need JSON mode instead"
+    answer: 0
+    explain: "A reply truncated at max_tokens stops mid-object, so even schema-constrained output won't parse. Check the finish reason before parsing and treat a cap as a failure. Schema enforcement doesn't switch off with input length, and JSON mode is weaker, not stronger."
+  - q: "Your get_order_status tool raises an exception when an order isn't found, and the whole conversation crashes. What's the better design?"
+    options:
+      - "Retry the tool until it finds an order"
+      - "Remove the tool and answer from memory"
+      - "Return 'order not found' as the tool result"
+      - "Catch it and end the chat with an apology"
+    answer: 2
+    explain: "Returned as the tool result, the error is something the model can read and recover from, for example by asking the customer to check the number. Ending the chat throws that chance away, and answering from memory means inventing a status."
+backupResources:
+  - label: "OpenAI Function Calling | LLM Tools Essentials — Code with Irtiza"
+    url: "https://www.youtube.com/watch?v=I1qOfbNVur0"
+    type: "video · OpenAI focus"
+  - label: "OpenAI — Structured Outputs (docs)"
+    url: "https://developers.openai.com/api/docs/guides/structured-outputs"
+    type: "docs · official"
+tags:
+  - structured-outputs
+  - function-calling
+  - tool-use
+  - applied-ai
+---
+
+Free-text answers are great for humans and terrible for code. The moment you build AI into an
+app, you need outputs your program can **trust and parse**, and you need the model to **do
+things**, not just talk. Structured outputs and tool calling are the two techniques that make
+a model a real software component.
+
+## Structured outputs: JSON you can rely on
+
+Ask a model for "the sentiment and topics" and you get a paragraph, different every time.
+Instead, demand a **schema**: `{ "sentiment": "positive", "topics": ["billing"] }`. There are
+three levels of strength, and it pays to know which one you're using:
+
+- **Asking in the prompt** ("reply in JSON"): usually works, sometimes doesn't. Fine for a
+  prototype, not for production.
+- **JSON mode**: the API guarantees syntactically valid JSON, but not *your* fields.
+- **Schema-enforced output**: you pass a JSON Schema and the provider constrains generation so
+  the reply matches it. OpenAI calls this Structured Outputs, Gemini uses a response schema,
+  and on any API with tool calling you can get the same effect by defining one tool whose
+  input schema is your output shape.
+
+In code, you usually define the shape once with a validation library (Pydantic in Python, Zod
+in TypeScript) and let it produce the schema and parse the reply.
+
+**Schema design is prompt design.** Use enums instead of free strings where the set is known
+(`"shipping" | "refund" | "other"`). Give the model a legal way to say "I don't know" (a
+nullable field or an `"unknown"` value), or it will invent something to fill the slot. Field
+order matters too: models generate fields in order, so a short `reasoning` field placed
+*before* the `answer` field gives the model room to work before it commits.
+
+## Tool / function calling: the model acts
+
+You describe functions the model may use, each with a **name, a description and a JSON
+Schema for its arguments**, for example `get_order_status(order_id)`. When the model decides
+it needs one, it returns the **function name and arguments as JSON**. It does *not* run the
+function. **Your code does**, then sends the result back as a tool message so the model can
+continue.
+
+That loop (model requests a tool, you run it, feed the result back, repeat until it answers)
+is how **agents** work under the hood. The no-code agent from the workflows pillar
+(→ build-a-practical-agent) is this pattern with a visual wrapper.
+
+Three practitioner details. The tool **description is a prompt**: say when to use the tool
+and when not to, because that's all the model sees. You can control the choice with a
+"tool choice" setting (let the model decide, force a tool, or forbid tools). And when a tool
+fails, return the error *as the tool result* ("order not found") instead of crashing, so the
+model can recover or ask the user.
+
+## Worked example: triage, then look up the order
+
+A customer writes: "Where is order 4471? It was due Monday."
+
+1. **Classify with a schema.** First call, schema-enforced:
+   `{category: "shipping" | "refund" | "other", priority: 1-3, order_id: string | null}`.
+   The reply parses straight into an object: shipping, priority 2, order `"4471"`.
+2. **Validate meaning.** Before trusting `order_id`, check it appears in the email text. It
+   does, so continue. (If the model had returned `"4417"`, valid JSON, you'd stop here.)
+3. **Offer a tool.** Second call, with the email and a `get_order_status` tool. The model
+   replies with a tool call: `{"name": "get_order_status", "arguments": {"order_id": "4471"}}`.
+4. **Run it yourself.** Your code checks the id exists in your data, calls your database and
+   gets `"in transit, delayed at depot"`.
+5. **Return the result.** You append the tool call and its result to the messages and call
+   again. The model now writes the reply using a real status, not a guess.
+
+Every arrow in that flow is structured, so every step can be logged, tested and checked.
+
+> 💡 **Try it:** In any chat assistant, paste a short email and ask: "Return only JSON with
+> keys sender, intent, deadline (ISO date or null)." Then send an email with *no* deadline and
+> see whether it returns null or invents a date. That's why the null option matters.
+
+## What the schema does NOT guarantee
+
+Structured output guarantees the **shape**, not the **sense**. Three problems survive a
+perfectly valid schema:
+
+- **Hallucinated arguments**: the model calls `get_order_status("ORD-12345")` with an id it
+  invented. Valid JSON, wrong world.
+- **Wrong tool choice**: it confidently picks `send_email` when the task needed
+  `create_draft`.
+- **Schema-valid nonsense**: a support bot returns a flawless `{answer, quote}` where the
+  "quote" is something the customer never wrote. Production systems add a
+  **must-appear-verbatim check on top of the schema**. The schema checks the envelope; the
+  guardrail checks the letter.
+
+Rule: validate **meaning** after you've validated shape, and validate tool arguments **before**
+you execute anything that writes, deletes or sends.
+
+## Common failure modes
+
+- **Parsing crashes on some replies** → prompt-only JSON, or a reply truncated at `max_tokens`
+  → use schema-enforced output and check the finish reason before parsing.
+- **Fields filled with plausible inventions** → no legal "unknown" value in the schema → make
+  fields nullable or add an explicit unknown option.
+- **The model never calls your tool, or calls it at the wrong time** → a vague tool
+  description → state what the tool does, when to use it and when not to.
+- **One bad lookup kills the whole conversation** → tool errors raised as exceptions → return
+  them as tool results the model can read and react to.
+
+Together, tool calling lets the model *act* and structured outputs make every step
+**machine-readable**. That's the backbone of every serious AI feature, and of the agent you'll
+build in code later in this pillar (→ build-agent-in-code). Next: giving the model *your*
+data with RAG (→ rag-fundamentals).

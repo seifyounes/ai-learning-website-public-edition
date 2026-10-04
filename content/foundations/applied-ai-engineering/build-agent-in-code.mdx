@@ -1,0 +1,247 @@
+---
+title: "Building a simple agent in code"
+summary: "Write a bare agent loop in plain code, with whitelisted tools and a step cap, and decide when a fixed workflow beats an agent."
+changeNote: "New: when to build an agent and when a plain workflow is enough, a worked example, a failure-modes list, and a build that validates tool arguments before they run."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 6
+level: advanced
+estMinutes: 16
+taskMinutes: 45
+prerequisites: [calling-an-llm-api, structured-outputs-tools]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "Q3Gb7Rjre3U"
+  published: "2025-09-30"
+  year: 2025
+  minutes: 32
+  title: "How AI Agents Actually Work (Explained in One Python File)"
+  channel: "Dave Ebbelaar"
+  why: "Strips an agent down to a single Python file, so you see the real loop with no framework hiding it. Many agent tutorials start inside LangChain or CrewAI, where the loop is invisible; this one makes it the subject, which is exactly what this lesson needs. A slower beginner build-along (Tech With Tim) is in the backups, and the Anthropic workshop under 'read after' shows how a production SDK wraps the same loop (made by Anthropic, so it presents their own SDK)."
+readAfter:
+  - label: "Claude Agent SDK [Full Workshop] — Thariq Shihipar, Anthropic (AI Engineer)"
+    url: "https://www.youtube.com/watch?v=TqC1qOfiVcQ"
+    kind: course
+applyIt: |
+  A single model call is right for one scoped job; an open-ended question ("where do things
+  stand and what should I do next?") needs a loop, and when you build the loop yourself you own
+  the guardrails. Take ten minutes to set them on paper for an agent over your own project (or
+  over a support agent for a small online shop):
+
+  - **Tools:** name 2-3 read functions you already have that could become tools, and any write
+    action that must stay out (or behind a human).
+  - **Limits:** a max-turns number and a per-run token budget, with a one-line reason for each.
+  - **Fallback:** the exact answer the agent returns when it hits a limit.
+  - **Bad arguments:** what the model sees when a tool gets an id that doesn't exist.
+
+  **If you don't code yet:** open a multi-step agent you've built in n8n, Zapier or Make and find
+  where each guard lives: is there a step or iteration limit, what reaches the model when a tool
+  errors, and which steps could change something irreversibly?
+
+  Success: four written guards for one agent, and no write action reachable without a person.
+toolkit: |
+  - **See the loop you already drive.** Claude Code, Cursor's agent, Codex and Copilot agent mode
+    are model + tools + iterate-until-done. Write a bare agent once and their behaviour becomes
+    debuggable: when one goes in circles, it's a loop with no signal that it's done.
+  - **Treat permission settings as argument validation.** Allow and deny rules (Claude Code's
+    permissions, Cursor's auto-run allowlist, Copilot's tool approvals) are "validate before
+    executing". Allow reads broadly; require approval for deletes, pushes and sends.
+  - **Put a human gate on irreversible actions.** Hooks, a pre-push check or a required PR review
+    are the "runaway side effects" defense for your own agents: nothing ships at machine speed
+    without a look.
+  - **Hand a spiraling agent a short error, then cap it.** When an agent chokes on a raw stack
+    trace, give it the one line that matters and the next step, and stop a run that's past its
+    useful turns instead of letting it grind tokens.
+recap:
+  - emoji: "🔄"
+    title: "What an agent is, in code"
+    text: "A loop around tool calling: send messages plus tools, run whatever tool the model requests, feed the result back, repeat until it answers."
+  - emoji: "📄"
+    title: "Where its memory lives"
+    text: "In the messages list. Every tool result is resent next turn, so keep results short and trim old turns on long runs."
+  - emoji: "🧢"
+    title: "The loop's exit condition"
+    text: "Loop while turns < MAX_TURNS and return a fallback when the cap hits. A confused model can request tools forever."
+  - emoji: "🌀"
+    title: "When the steps are known"
+    text: "Use a fixed workflow, not an agent: cheaper, faster, easier to test. Agents earn their cost when the path can't be planned."
+  - emoji: "👻"
+    title: "Valid JSON, wrong world"
+    text: "Hallucinated arguments. Validate every argument before executing, and fail with a clear error."
+  - emoji: "💬"
+    title: "After a tool fails"
+    text: "Return a short structured error the model can act on, like 'order not found; ask for the number', never a raw stack trace."
+  - emoji: "🧯"
+    title: "Tools that write"
+    text: "Start read-only. Anything irreversible gets a human approval gate, or the agent makes a mess at machine speed."
+  - emoji: "🪄"
+    title: "Then pick a framework"
+    text: "Once you've written the loop, LangGraph, CrewAI and the vendor SDKs are conveniences over it, and you know where guards and logging go."
+task: |
+  Write the loop by hand once and the magic evaporates: one file, about 30 lines, in your own
+  repo or a new folder.
+
+  ```prompt
+  Build a tiny agent in a single file, no framework: a loop that calls a model with ONE tool,
+  get_order_status(order_id) -> {status, eta}, backed by a dict of 3-4 fake orders. Run the tool
+  when the model asks, feed the result back, and repeat until the model gives a final answer.
+  Validate the order_id before the tool runs and feed back a short structured error if it isn't
+  known. Cap it with `while turns < MAX_TURNS` (never while True) and return a loud fallback if
+  the cap hits. Print each turn so I can watch: model asks -> tool runs -> result fed back. Then
+  set MAX_TURNS to 1 and show the fallback fire.
+  ```
+
+  **No-code path:** let a chat assistant write the file and run it in a free Google Colab
+  notebook, with a free-tier API key in Colab's Secrets panel; you only change the question.
+
+  Success: it answers "which arrives first, order 1042 or order 1077?" by calling the tool for both, an unknown order id comes back as a short error, and the cap visibly bounds the loop.
+selfCheck:
+  - q: "Overnight, one agent run used 200 turns and a large share of your monthly budget. Its logs show the same search tool called with slightly different queries again and again. What went wrong, and which guards would have stopped it?"
+    a: "A wandering loop with no stop signal: the model never got what it needed and nothing ended the run. A max-turns cap, a per-run token or cost budget, and a fallback answer when either hits would have bounded it."
+  - q: "A colleague wants an agent that, for every new invoice, extracts the fields, checks them against the purchase order and files the result. Would you build an agent? Why or why not?"
+    a: "Probably not: the steps are known and fixed, so a workflow of individual model calls is cheaper, faster and easier to test. Keep an agentic step only for the part whose path really varies, such as investigating a mismatch."
+  - q: "After a tool returns a 2,000-line error trace, your agent starts calling unrelated tools and never recovers. What do you change?"
+    a: "Catch tool errors and return a short, structured message the model can act on (what failed and what to do next). Keep all tool results trimmed, so one bad result can't flood the context."
+  - q: "In code terms, what is an agent, and how does it relate to tool calling?"
+    a: "Tool calling is one step: the model asks for a tool with JSON arguments. An agent is the *loop* that runs that step repeatedly, feeding results back, until the model answers or a cap hits."
+mcq:
+  - q: "Your agent's get_customer(id) tool is sometimes called with ids that are well-formed but don't exist, and the tool crashes. What's the right fix?"
+    options:
+      - "Use a stricter JSON schema for the tool's arguments"
+      - "Validate the id before running and return a short error"
+      - "Raise MAX_TURNS so the model can retry until it works"
+      - "Add a line to the system prompt telling it not to guess"
+    answer: 1
+    explain: "The JSON is valid; the id just doesn't exist in your world, so no schema can catch it. Your code checks the argument before executing and hands back a short error the model can act on, such as asking the user for the right id. A prompt line reduces guessing but guarantees nothing."
+  - q: "You're asked for an assistant that investigates why a customer's sync job failed. Depending on what it finds, it may need the logs, then the config, then a recent deploy. What do you build?"
+    options:
+      - "A fixed pipeline that runs all three lookups in order"
+      - "One model call with every log and config pasted in"
+      - "An agent loop with read-only tools and a turn cap"
+      - "A multi-agent setup with one agent per data source"
+    answer: 2
+    explain: "The next step depends on what the last one found, which is exactly when an agent earns its cost. A fixed pipeline fits when the path is known; here it fetches everything every time and still can't follow a lead. Extra agents add cost and coordination without adding the loop's judgment."
+  - q: "Late in long runs, your agent's answers get worse and each turn costs more. Every tool returns the full 5,000-line JSON from your API. What's the first change?"
+    options:
+      - "Return only the few fields that matter from each tool"
+      - "Switch to a model with a larger context window"
+      - "Lower MAX_TURNS so long runs stop sooner"
+      - "Move the tool results into the system message"
+    answer: 0
+    explain: "Every tool result is appended to the messages and resent each turn, so verbose output inflates cost and buries the thread. Trimming results to the fields that matter (and summarising old turns) fixes the cause; a bigger window only lets you pay for more noise, and a lower cap cuts off runs that need the turns."
+  - q: "Your agent can now issue refunds through a tool. In testing, it once refunded the wrong order. What guard belongs on that tool?"
+    options:
+      - "A lower temperature so the model picks orders reliably"
+      - "A max-turns cap so a run can't issue many refunds"
+      - "A log of every refund so mistakes can be reversed"
+      - "Human approval before any refund actually executes"
+    answer: 3
+    explain: "An irreversible write needs a human gate: the agent proposes, a person approves. A log tells you what went wrong after the money has moved, and a turn cap limits how many mistakes fit in one run but doesn't stop the first one."
+backupResources:
+  - label: "Build an AI Agent From Scratch in Python - Tutorial for Beginners — Tech With Tim"
+    url: "https://www.youtube.com/watch?v=bTMPwUgLZf0"
+    type: "video · beginner build"
+  - label: "OpenAI — Agents SDK / building agents (docs)"
+    url: "https://platform.openai.com/docs/guides/agents"
+    type: "docs · reference"
+tags:
+  - agents
+  - python
+  - applied-ai
+  - hands-on
+---
+
+If you built a no-code agent in the workflows pillar (→ build-a-practical-agent), you've seen
+an agent from the outside. Now you'll build one **in code**, and discover it's surprisingly
+small. An agent is not a mystery; it's a **loop** around the tool calling you already learned
+(→ structured-outputs-tools).
+
+## The entire idea, in pseudocode
+
+```python
+messages = [system, user_request]
+turns = 0
+while turns < MAX_TURNS:                 # the cap is not optional
+    turns += 1
+    response = model(messages, tools=my_tools)
+    if response.wants_a_tool:
+        result = run_tool(response.tool, response.args)   # YOUR code runs it
+        messages.append(response)        # what the model asked
+        messages.append(result)          # what the tool returned
+    else:
+        return response.text             # final answer
+return fallback_answer()                 # budget exhausted: fail loudly, not forever
+```
+
+That's a real agent: **model + tools + loop, with a cap.** The uncapped `while True` version is
+the classic agent bug. A confused model can request tools forever, burning tokens until your
+bill notices before you do. Everything else (memory, multiple agents, planning steps) is an
+embellishment on this skeleton.
+
+Notice what "memory" is here: the `messages` list. Every tool result is appended and resent on
+the next turn, so a long run grows its context, its cost and its chance of losing the thread.
+Real agents keep tool results short (return the three fields that matter, not a 5,000-line
+JSON dump) and summarise or drop old turns when a run gets long.
+
+## Agent or workflow?
+
+Before you build an agent, ask whether you need one. If the steps are known in advance
+(classify the email, look up the order, draft a reply), a **fixed workflow** of model calls is
+cheaper, faster and far easier to test. An agent earns its cost when the path **can't be known
+in advance**: open-ended questions, investigations, tasks where the next step depends on what
+the last one found. Many production "agents" are workflows with one agentic step inside.
+
+## Worked example: "Which arrives first, 1042 or 1077?"
+
+One tool, `get_order_status(order_id) -> {status, eta}`, and `MAX_TURNS = 5`. A trace:
+
+1. **Turn 1.** The model gets the question and the tool schema. It replies with a tool call:
+   `get_order_status("1042")`. (Many APIs let it request both lookups at once as parallel
+   tool calls; your loop should run every call in the response.)
+2. **Your code** validates the id, runs the lookup and appends
+   `{status: "shipped", eta: "Thu"}`.
+3. **Turn 2.** The model asks for `get_order_status("1077")`. Your code returns
+   `{error: "order not found"}`: a short, readable error, not a stack trace.
+4. **Turn 3.** The model replies in text: "Order 1042 arrives Thursday. I couldn't find order
+   1077; could you check the number?" No tool requested, so the loop returns.
+
+Three turns, one graceful failure, and a cap that was never needed. Log every turn (tool,
+arguments, result size, tokens) so that when a run *does* take 40 turns you can see why
+(→ observability-tracing).
+
+> 💡 **Try it:** Give any agent you can watch (ChatGPT with search, Claude Code, Cursor's
+> agent, Gemini) a question that needs two lookups, such as "compare the latest release notes
+> of two tools you use". Open the steps or tool-call view and count the turns: request, result,
+> request, result, answer.
+
+## Common failure modes
+
+- **The run never finishes, or ends at a huge bill** → wandering loop with no stop signal →
+  a max-turns cap, a per-run token or cost budget, and timeouts on each tool.
+- **Tool calls against ids or paths that don't exist** → hallucinated arguments → validate
+  arguments before executing and return a clear error.
+- **The agent spirals after one tool fails** → a raw stack trace (or nothing) went back to the
+  model → return short, structured errors it can act on ("order not found; ask the user for
+  the order number").
+- **Quality drops late in long runs** → context stuffed with verbose tool output → trim tool
+  results and summarise old turns.
+- **A mess made at machine speed** → write-access tools with no gate → start read-only, and put
+  human approval on anything irreversible (→ reliability).
+
+## Why write it yourself
+
+Frameworks such as LangGraph, CrewAI, the OpenAI Agents SDK and the Claude Agent SDK are
+useful, but if you start there, agents feel like magic and you can't debug them. Write the loop
+once and you'll *see* that the model simply keeps asking for tools until it's done, and you'll
+know exactly where guardrails, logging and cost caps belong (→ orchestration-frameworks).
+Testing an agent also differs from testing one call: you check the final answer *and* the path
+(did it call the right tools, in a sensible number of turns?) (→ evals-and-testing).
+
+## Pulling the pillar together
+
+This loop ties the pillar together: the **API call** (→ calling-an-llm-api), **tool calling**
+(→ structured-outputs-tools), and **RAG** (→ rag-fundamentals) as one of the tools the agent
+can use. Next, the open standard that lets your tools work across many AI apps: MCP, in depth
+(→ mcp-deep).

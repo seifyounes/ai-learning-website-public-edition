@@ -1,0 +1,200 @@
+---
+title: "Choosing your stack (web + mobile)"
+summary: "Pick a web and mobile stack you can defend layer by layer, favouring popular, well-documented tools that AI assistants handle well."
+changeNote: "New: a layer-by-layer stack guide, a fitness-studio worked example, a failure-modes list, a ten-minute decision trail, and AGENTS.md named first for rules files."
+section: foundations
+pillar: shipping-apps
+order: 2
+level: intermediate
+estMinutes: 13
+taskMinutes: 20
+prerequisites: [idea-to-spec]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "3c4UyGRBnmM"
+  published: "2025-08-26"
+  year: 2025
+  minutes: 47
+  title: "Breaking down my current tech stack"
+  channel: "Theo - t3.gg"
+  why: "Theo runs his own developer products and walks through the stack he actually uses, layer by layer, with the trade-off behind each pick and what he changed his mind about. That reasoning is what lasts; any list of tools ages within months. It's long and opinionated, so watch for how he justifies each choice rather than copying the choices. Shorter alternatives are in the backups: a decision-process explainer and a current-options roundup."
+applyIt: |
+  Every stack is a set of decisions, but most projects never write the reasons down, so the next
+  person (or the next AI session) re-argues them from scratch. Spend ten minutes capturing yours:
+
+  ```prompt
+  From this project's README and dependency files, write docs/decisions.md: one line per layer
+  (frontend, backend/database, auth, hosting, any paid service) saying what it beat and why.
+  Where no reason is documented, write "reason unknown — ask me" instead of guessing.
+  ```
+
+  **If you have a project:** run it in your coding agent (Claude Code, Cursor, Codex, Copilot)
+  on that repo, then fill in the "ask me" lines yourself. **If you're still at the idea stage:**
+  paste your spec (→ idea-to-spec) into ChatGPT, Gemini or Claude and have it propose the same
+  one-line-per-layer table for the stack you're leaning toward, with the alternative each pick
+  beat.
+  Success: a per-layer decision trail a future session can trust without re-deciding.
+toolkit: |
+  - **Write your stack defaults down, with the reason.** Add your default web and mobile stack
+    to your global instruction file (AGENTS.md, or CLAUDE.md / GEMINI.md for those agents; Cursor
+    user rules, ChatGPT custom instructions) plus one sentence on why: popular, well-documented tech gets far better AI
+    help. The rule then outlives the current tool list.
+  - **Keep a decisions file per project.** A `docs/decisions.md` with one line per layer (what
+    you picked, what it beat, why) gives every new session the trail instead of a vibe, and
+    makes a later pivot a recorded decision rather than a mystery.
+  - **Make "argue against my pick" a standing step.** Before committing to a stack, have a
+    separate chat, a subagent, or a different model attack your choice. Advisor, not decider:
+    you make the call.
+  - **Flag off-default stacks as a cost.** When a project pulls you onto a niche framework,
+    note in its instruction file that AI help will be weaker there, so it's an explicit
+    trade-off chosen on purpose.
+recap:
+  - emoji: "🧠"
+    title: "What outlasts the tool list"
+    text: "Theo walks his real stack layer by layer. The specific tools age in months; the way he justifies each pick is what lasts."
+  - emoji: "🏗️"
+    title: "More than a logo collection"
+    text: "A stack is a set of decisions. Go layer by layer and defend each choice against its trade-offs."
+  - emoji: "🌐"
+    title: "The boring web default"
+    text: "Next.js + Tailwind for most web apps (or the mainstream framework you already know): huge ecosystem, good docs, and AI generates it fluently."
+  - emoji: "📱"
+    title: "The mobile fork in the road"
+    text: "Flutter when native feel and UI consistency win; Expo when you also want a web app from one TypeScript codebase. Decide by code-sharing needs."
+  - emoji: "📚"
+    title: "Why popularity pays off"
+    text: "The more public code and docs a framework has, the better AI tools build with it. 'Boring and proven' is a multiplier now, not a compromise."
+  - emoji: "🔄"
+    title: "When to switch a layer"
+    text: "When the evidence changes, as Theo's did. Switching mid-project for a recorded reason is a decision, not a failure."
+  - emoji: "🧭"
+    title: "Who makes the final call"
+    text: "You do. Let AI lay out trade-offs and argue both sides, then decide on your skills, the project and how well AI supports the tech."
+task: |
+  Pressure-test your next stack pick by making AI the adversary, not the decider. Use any
+  assistant; a fresh chat (or a subagent) works best, so it isn't anchored on your reasoning:
+
+  ```prompt
+  I'm about to pick [stack] for [app + one-line spec]. Argue AGAINST this choice: where it
+  will fight me as the app grows, how its AI training-data coverage compares with the most
+  popular option for each layer, the migration cost if I'm wrong, and one boring-but-better
+  alternative. Steel-man that alternative in a short table (my pick vs alternative, per
+  layer). Then give the single strongest objection in one line.
+  ```
+
+  No app planned? Use a hypothetical: a booking app for a small fitness studio, web plus
+  mobile. Decide afterwards, in writing, whether you keep your pick or switch.
+  Success: you can name the best reason NOT to use your pick — then keep or change it on purpose.
+selfCheck:
+  - q: "You're planning a booking app for a small fitness studio: clients book from their phones, and the manager checks the day's schedule between classes. Do you need a native mobile app for v1?"
+    a: "Probably not. A responsive web app serves both users from one codebase and needs no store review; add Flutter or Expo later if you need something the web does poorly, such as deep device features or a store presence, and record that as a decision."
+  - q: "Your coding agent keeps writing code for an older version of your framework, and the build fails on APIs that no longer exist. What's the likely cause, and the fix?"
+    a: "The framework changed after much of the model's training data, and nothing in the project says which version you use. Pin the version in the instruction file and give the agent current docs (pasted, or through a docs MCP server) before it writes code."
+  - q: "For one app on web, iOS and Android, how do you choose between Flutter and React Native / Expo?"
+    a: "Flutter (Dart, one rendering engine, consistent native-feeling UI) when polish and consistency come first; Expo (one TypeScript codebase that can also target web) when sharing code with a web app matters most. Your team's existing skills often settle it."
+backupResources:
+  - label: "How to pick the right tech stack EVERY time — Arjay McCandless"
+    url: "https://www.youtube.com/watch?v=P1kmr0XH6MM"
+    type: "video · decision process"
+  - label: "Tech Stack for App Development - 2026 — Shah Wali"
+    url: "https://www.youtube.com/watch?v=iNHf4J8Wy7s"
+    type: "video · current options"
+  - label: "Expo — React Native for web + iOS + Android (docs)"
+    url: "https://docs.expo.dev"
+    type: "docs · official"
+tags:
+  - shipping-apps
+  - tech-stack
+  - mobile
+  - nextjs
+---
+
+With a spec in hand, you choose what to build it on. Don't chase the newest framework.
+Choose deliberately, and bias toward tech that AI knows well, because AI is now your
+co-builder and its strengths become your strengths.
+
+## The layers you're actually choosing
+
+A "stack" sounds like one decision. It's really five or six small ones:
+
+- **Frontend**: what the user sees (a web framework, a mobile framework, or both).
+- **Backend and database**: where data lives and server-side logic runs.
+- **Auth**: how people sign in. Usually bundled with the backend.
+- **Hosting**: where the web app runs, or how mobile builds reach the stores.
+- **Third-party services**: payments, email, analytics, AI model APIs.
+
+Decide them in that order, because each one narrows the next. If you don't code yet, your
+"stack" is mostly the builder you pick (Lovable, Bolt, Replit and similar). The one question
+that matters there is whether you can export the code and take it elsewhere later.
+
+## Web
+
+For most apps: **Next.js + Tailwind.** It's a common default for good reasons: a large
+ecosystem, good docs, and AI tools generate it fluently. It's not the only sensible choice.
+SvelteKit, Remix / React Router, Django or Rails are all fine if you already know one well,
+because the stack you know beats the stack you're learning while also learning to ship.
+Pair it with a simple backend (→ backend-database-with-ai).
+
+## Mobile (iOS + Android)
+
+Two strong cross-platform routes:
+
+- **React Native / Expo**: one TypeScript codebase that can target **web, iOS and Android**.
+  The most code sharing if you also have a web app.
+- **Flutter**: Dart, one rendering engine, a polished and consistent UI on both platforms.
+
+Choose by priorities: maximum code sharing with web → Expo; the most consistent, polished
+native feel → Flutter. And ask first whether v1 needs to be a store app at all. A responsive
+web app often covers it.
+
+## The AI-era rule: pick boring, popular tech
+
+Here's what's new: **the more popular a framework, the better AI is at it.** Next.js,
+React Native and Flutter have huge amounts of public code and documentation, so Claude Code,
+Cursor, Codex, Copilot and v0 produce far better results with them than with an obscure new
+framework. "Boring and proven" isn't a compromise; it's a multiplier on your AI help. The
+same logic says *pin your versions*. A framework that changed last month may be newer than
+much of what the model learned from.
+
+## Worked example: the fitness-studio booking app
+
+Take the task's hypothetical: clients book classes, the studio manager checks the day's
+schedule. Walk the layers.
+
+1. **Frontend.** Clients book from their phones; the manager glances at a schedule. Both work
+   in a responsive web app, so v1 is **web-only**. Native apps are a non-goal until there's a
+   reason, such as a store presence or device features the web handles poorly.
+2. **Backend.** Accounts, bookings and class capacity mean a real database with per-user
+   access rules. A backend-as-a-service such as Supabase or Firebase covers database, auth and
+   storage in one place.
+3. **Auth.** Bundled with the backend. Email magic links keep sign-up short.
+4. **Hosting.** Vercel, Netlify or Cloudflare Pages: push to GitHub and it deploys.
+5. **Services.** Payments via a mainstream provider (Stripe is the usual default), if the
+   studio wants online payment at all. Ask before you build it.
+
+Write each choice as one line in `docs/decisions.md`: what you picked, what it beat, why.
+That file is what stops the next session from quietly swapping your database.
+
+> 💡 **Try it:** Ask any assistant: "For [your app in one line], list the layers of the stack
+> and, for each, the most popular option and one serious alternative, with one sentence on
+> when the alternative wins." Compare its picks with yours. Any layer where you can't say why
+> you chose differently is a decision you haven't made yet.
+
+## Common failure modes
+
+- **AI-generated code uses APIs that no longer exist** → the framework moved faster than the
+  model's training data, or the project never states its version → pin versions in the
+  instruction file and feed the agent current docs.
+- **Building web *and* native apps for v1** → two targets double the work before anyone has
+  used the product → ship one target first and make the second a recorded later decision.
+- **Picking by benchmark or hype** → speed charts rarely decide whether a small app succeeds →
+  weigh your skills, AI support and ecosystem first.
+- **A layer swapped mid-build with no record** → the change happened in a chat → write it into
+  the decisions file with the reason, so future sessions don't revert it.
+
+## Decide with AI, not by AI
+
+Ask an AI to lay out trade-offs and even argue against your pick; it's good at catching blind
+spots. But the decision is yours: weigh your skills, the project's needs and how well AI
+supports the tech. With the stack set, you can scaffold the whole thing in minutes.

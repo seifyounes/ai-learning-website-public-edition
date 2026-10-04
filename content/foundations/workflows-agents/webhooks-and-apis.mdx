@@ -1,0 +1,229 @@
+---
+title: "Webhooks, APIs & connecting anything"
+summary: "Connect any app to your automations by calling its API or receiving its webhooks, and keep those webhooks verified and duplicate-free."
+changeNote: "New video: Postman's three-minute webhook-versus-API demo, plus a payment-webhook worked example, a failure-modes list and one task that covers both."
+section: foundations
+pillar: workflows-agents
+order: 5
+level: intermediate
+estMinutes: 13
+taskMinutes: 45
+prerequisites: [first-automation]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "NCQj2dBVUCQ"
+  published: "2025-04-16"
+  year: 2025
+  minutes: 3
+  title: "Webhooks vs REST APIs: Which is Right for Your Project?"
+  channel: "Postman"
+  why: "Made by Postman, who build an API platform, so the demos run in their own tool, but the concepts are tool-neutral. In about three minutes it shows a live REST call and a live webhook firing side by side, then covers webhook security, which most short explainers skip. n8n's official APIs-and-webhooks lesson is in the backups for the automation-specific view."
+applyIt: |
+  Find out which apps in your own stack can call you, and plan one webhook properly. Ten minutes
+  with each app's settings or docs open.
+
+  1. **Check two or three apps you use** (a payment provider, a form tool, a calendar, a code
+     host): does each offer webhooks, or only an API you'd have to poll?
+  2. **Pick one event worth listening to,** such as a new payment, a form response or a cancelled
+     booking, and say what it should record or trigger.
+  3. **Write its register row:** the event, where it goes, how you'll check it's genuine (a
+     signature or shared secret) and which ID you'll use to skip duplicates.
+
+  **At work:** ask whoever owns the integration whether these four answers already exist.
+  **On your own:** do it for the form tool you used in the first build.
+  Success: one complete register row, including how the event is verified and de-duplicated.
+toolkit: |
+  - **Save a test payload next to every webhook flow.** Keep one sample JSON per event type in a
+    notes file, so you can re-fire it after any change and prove the flow still works end to end.
+  - **When a tool has no connector, call its API.** In n8n, Make or Zapier that's an HTTP Request
+    step. Keep a saved prompt that turns an app's API docs page into the exact URL, method,
+    headers and body to paste into that step.
+  - **Prefer webhooks over polling for triggers.** When a source can push events, use that instead
+    of a timer that asks "anything new?" every five minutes. Faster, and it wastes no runs.
+  - **Keep a webhook register.** One row per webhook in a spreadsheet: which app sends it, the
+    production URL it points at, where its secret lives and what it triggers. When something stops
+    arriving, the register is the first place you look.
+recap:
+  - emoji: "🙋"
+    title: "The request model"
+    text: "API: you send a request, it returns a response, so you initiate. An HTTP step lets your automation call any app's API directly."
+  - emoji: "📞"
+    title: "The mirror image"
+    text: "Webhook: the other app POSTs the event to your URL the instant it happens. You don't ask; it announces."
+  - emoji: "🔕"
+    title: "The one-line summary"
+    text: "'Don't call us, we'll call you' captures the whole difference. A webhook pushes; an API waits to be asked."
+  - emoji: "⚡"
+    title: "Why triggers love them"
+    text: "Webhooks are event-driven and instant — the payment provider pings the moment a charge lands. Perfect fuel for a trigger."
+  - emoji: "🐌"
+    title: "The old way"
+    text: "Polling means repeatedly asking 'anything new yet?', which is slower and wasteful. Prefer a webhook whenever the source supports one."
+  - emoji: "🔌"
+    title: "What this unlocks"
+    text: "With APIs and webhooks, no app is off-limits — even one with no native connector. That's how 'easy stuff' becomes your entire stack."
+task: |
+  Do both directions, then wire the most common real-world shape: **a service sends a webhook →
+  your flow receives it → something gets recorded.**
+
+  1. **Webhook (it tells you):** in n8n add a Webhook trigger (Make's equivalent is the "Custom
+     webhook" module). Copy its test URL and send it a request with any small JSON body, using
+     curl or a free API client such as Hoppscotch or Postman. Watch the data arrive in the editor.
+  2. **API (you ask):** add an HTTP Request node that calls a public endpoint that needs no key,
+     for example `https://api.github.com/repos/n8n-io/n8n`, and pick one field (like the star
+     count) out of the response.
+  3. **Make it record something.** A webhook that's *set up* is not one that *works*: the
+     receiving side can fail quietly on a wrong URL or a payload it didn't expect. So exercise it
+     end to end:
+
+  ```prompt
+  Walk me through extending my n8n Webhook trigger: an AI node classifies each incoming JSON event
+  (test | purchase | cancellation | billing_issue) and summarises it in one line as strict JSON,
+  then a Google Sheet "Events log" gets one row per event, with billing_issue events branched to a
+  "needs attention" tab. Give me a sample JSON payment event for each type that I can POST to the
+  webhook URL to test it.
+  ```
+
+  **If you code:** point a real provider's test mode at the webhook URL instead of the sample
+  payloads. **If you don't code:** a form tool that supports webhooks (Tally does) fires real
+  events at it with no code.
+  Success: your test JSON shows up in the webhook node, the HTTP node returns a field you chose, and each posted event lands in the right row.
+selfCheck:
+  - q: "API vs webhook — what's the difference?"
+    a: "An API is request→response: YOU ask, it answers (you initiate). A webhook is the reverse: the other app notifies YOU automatically when an event happens (it initiates). 'Don't call us, we'll call you.'"
+  - q: "Your n8n webhook flow caught every test event all afternoon, but since you closed the editor, nothing arrives. What's the likely cause?"
+    a: "The provider is still pointed at the test URL, which only listens while the editor is waiting for a test event. Register the production URL with the provider and activate the workflow."
+  - q: "Your events sheet shows the same payment three times. What probably happened, and how do you stop it?"
+    a: "The provider didn't get a quick success reply, so it retried and delivered the same event again. Reply 200 straight away, then de-duplicate on the event's unique ID before writing the row."
+  - q: "Anyone who finds your webhook URL could POST fake 'payment succeeded' events. How do you defend against that?"
+    a: "Verify each request: most providers sign their webhooks with a shared secret, so check the signature (or at least a secret header) and reject anything that doesn't match. Treat an unverified event as untrusted input."
+mcq:
+  - q: "Your webhook flow runs a 20-second AI summary step and only then answers the provider. Rows are being written, but the provider's dashboard marks most deliveries as failed. What do you change?"
+    options:
+      - "Raise the timeout in the provider's settings to 30 seconds"
+      - "Drop the webhook and poll the provider's API every minute"
+      - "Send 200 right away, then run the AI step after replying"
+      - "Swap the AI step to a faster model so it finishes sooner"
+    answer: 2
+    explain: "Providers expect a quick success reply; a slow one counts as a failed delivery and triggers retries. Acknowledge first, then do the slow work (and still de-duplicate on the event ID). A faster model shrinks the gap but keeps your reply hostage to the AI step's worst day."
+  - q: "Your flow loops over 500 contacts and calls an API for each. After about 60 calls, every request comes back 429. What's the right fix?"
+    options:
+      - "Pace the calls in batches and retry with a growing delay"
+      - "Generate a new API key, since the old one has been blocked"
+      - "Retry each failed call at once until it finally succeeds"
+      - "Split the loop into parallel branches so it finishes faster"
+    answer: 0
+    explain: "429 means too many requests: you're over the rate limit, not unauthorized (that's 401/403). Slow down with batches, a wait, and backoff on retry. Instant retries and parallel branches send requests even faster, so they make the 429s worse."
+  - q: "A niche CRM you use has a documented API but no webhooks and no ready-made connector. You need new contacts copied to a sheet within the hour. What do you build?"
+    options:
+      - "Nothing yet; wait until a native connector is released for it"
+      - "A Webhook trigger, with its URL pasted into the CRM's settings"
+      - "A weekly CSV export that you upload into the sheet by hand"
+      - "A scheduled flow that fetches new contacts with an HTTP step"
+    answer: 3
+    explain: "With no webhook to push events, polling is the right fallback: a timer runs every so often and an HTTP Request asks the API for contacts created since the last run. A Webhook trigger is useless here because the CRM has nothing that can call it, and waiting for a connector ignores that the API already works."
+  - q: "You need to change the phone number on contact 42 through an app's API. Which request fits?"
+    options:
+      - "POST /contacts with the full contact and its new phone"
+      - "PATCH /contacts/42 with the new phone in a JSON body"
+      - "GET /contacts/42 with the new phone as a query value"
+      - "DELETE /contacts/42, then POST it again with the phone"
+    answer: 1
+    explain: "Updating an existing record is PUT or PATCH on that record's URL, with the new data in the body. POST to the collection creates a second contact rather than editing the first. Delete-and-recreate gives the contact a new ID and breaks anything that pointed at the old one."
+backupResources:
+  - label: "n8n Beginner Course — Introduction to APIs and Webhooks — n8n (official)"
+    url: "https://www.youtube.com/watch?v=y_cpFMF1pzk"
+    type: "video · official"
+  - label: "n8n — HTTP Request & Webhook node docs"
+    url: "https://docs.n8n.io"
+    type: "docs · official"
+tags:
+  - webhooks
+  - apis
+  - automation
+  - integrations
+---
+
+Pre-built integrations are great until the app you need isn't on the list. **APIs**
+and **webhooks** are the two primitives that let you connect *anything* to
+*anything* — and they're simpler than they sound.
+
+## API: you ask, it answers
+
+An **API** is how one app lets others talk to it. You send a **request** ("create a
+contact with this email"), it sends a **response** ("done, here's the ID"). You
+initiate. In automations, an **HTTP Request** step lets you call any app's API
+directly — even one with no native connector.
+
+Every request has the same four parts, and once you can read them, any API's docs make sense:
+
+- **Method** — what you want to do: `GET` (read), `POST` (create), `PUT`/`PATCH` (update),
+  `DELETE`.
+- **URL** — which thing: `https://api.example.com/contacts/42`.
+- **Headers** — who you are and what you're sending, usually including an API key or token.
+- **Body** — the data, usually JSON, for creates and updates.
+
+The response comes back with a **status code** and usually a JSON body. Learn five codes and
+you can debug most failures: `200` OK, `401`/`403` your key is missing or lacks permission,
+`404` wrong URL or ID, `429` too many requests (slow down), `500` the other side broke.
+
+## Webhook: it tells you
+
+A **webhook** is the mirror image: instead of you asking, the other app **notifies
+you** the instant something happens. It POSTs the event to a URL you provide. The
+classic line: *"don't call us, we'll call you."*
+
+## Why this matters for triggers
+
+- **Webhook trigger** — real-time. The payment provider pings your URL the moment a
+  payment lands. Instant, efficient.
+- **Polling** — the old way: your automation repeatedly asks "anything new?" Slower
+  and wasteful. Prefer webhooks when the source supports them.
+
+## Worked example: a payment webhook, end to end
+
+Say a payment provider should tell your n8n flow every time someone pays. Here's what actually
+happens, in order.
+
+1. **You create the receiver.** Add a Webhook node. n8n gives you two URLs: a **test URL** that
+   only listens while you click "listen for test event", and a **production URL** that works once
+   the workflow is active.
+2. **You register the URL.** In the provider's dashboard, add the URL and pick the events you
+   want (say, "payment succeeded"). Most providers show a **signing secret** here; save it in
+   your tool's credential store.
+3. **An event fires.** Someone pays. The provider sends a `POST` to your URL with a JSON body:
+   an event type, a unique event ID, the amount, the customer reference.
+4. **You reply fast.** Your endpoint should answer `200` within seconds. If it doesn't, many
+   providers assume delivery failed and **retry**, which is why the same event can arrive twice.
+5. **You verify, then act.** Check the signature against your secret, look up the event ID to
+   skip duplicates, then write the row, notify the team, or hand it to an AI step.
+
+**If you don't code:** steps 1–5 are all clicks in n8n, Make or Zapier ("Catch Hook" in Zapier,
+"Custom webhook" in Make). **If you code:** the same five steps are an API route in your backend.
+
+> 💡 **Try it:** Open a free request inspector such as webhook.site, copy the unique URL it gives
+> you, and send it a request (from a form tool's webhook setting, or with curl). You'll see the
+> raw method, headers and JSON body: exactly what your automation receives.
+
+## Common failure modes
+
+- **Worked in testing, silent in production** → the provider still points at the test URL, or
+  the workflow isn't active → test and production URLs differ → register the production URL
+  and activate.
+- **Duplicate records** → the provider retried because your reply was slow or failed →
+  webhooks are delivered "at least once" → reply 200 first, de-duplicate on the event ID.
+- **Fake events accepted** → anyone with the URL can POST to it → no verification → check the
+  provider's signature or a secret header.
+- **`401` or `403` from an API** → missing, expired or wrongly placed key → credentials pasted
+  by hand → store them in the credential manager and match the header format in the docs.
+- **`429` errors in a loop** → you're calling faster than the rate limit → no pacing → batch
+  requests, add a wait, and retry with a growing delay.
+
+## The "connect anything" superpower
+
+Once you're comfortable with these, no app is off-limits. A niche tool with an API
+but no Zapier integration? Call it over HTTP. Need instant reactions? Hand out a
+webhook URL. This is what turns "I can automate the easy stuff" into "I can wire up
+my *entire* stack." Next, we level up from fixed workflows to **agents** that decide
+the steps themselves (→ intro-to-agents).

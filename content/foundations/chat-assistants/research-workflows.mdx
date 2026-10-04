@@ -1,0 +1,226 @@
+---
+title: "Research workflows"
+subtitle: "Trustworthy answers fast"
+summary: "Research a question with cited AI answers, then check the few claims you will rely on against their sources before they reach your work."
+changeNote: "New: when to use quick search, deep research or your own sources, a worked example of checking a statistic, and the common ways cited answers go wrong."
+section: foundations
+pillar: chat-assistants
+order: 2
+level: beginner
+estMinutes: 12
+taskMinutes: 30
+prerequisites: [verification-and-grounding]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "YoWdogtZRw8"
+  published: "2024-09-17"
+  year: 2024
+  minutes: 10
+  title: "Learn 80% of Perplexity in under 10 minutes!"
+  channel: "Jeff Su"
+  why: "Ten hands-on minutes that teach the citation-first workflow on a real tool: search modes, focus settings, and chasing each claim back to its source. Longer research tutorials spend most of their time on features; this one is short and keeps returning to the habit that matters, opening the citations and reading them. It demonstrates Perplexity only, so treat the tool as one example. The '80% in under 10 minutes' title is the creator's shorthand, not a measurement."
+  notes:
+    - "What the video covers is Perplexity's core search, focus and citation features, not the whole product."
+    - "Run the same open-the-citation habit in the search and research modes of ChatGPT, Gemini or Claude; the lesson body covers them."
+    - "Recorded in 2024, so Perplexity's menus and mode names may have moved since; the habit of opening and reading each citation hasn't changed."
+applyIt: |
+  Before you research anything new, find the facts you're already relying on without having
+  opened their source. Five to ten minutes: open a document or notes file you'll lean on this
+  month and find three facts that came from an AI answer, a search snippet or someone else's
+  summary. Mark each `(unverified)`, then rank them by how much a wrong one would change a
+  decision. The top one is the first claim you check in the task.
+
+  **If you study:** a rule from your course or department handbook, or a statistic you plan to
+  cite. **If you code:** a library's license terms or an API's current rate limits. **At work:**
+  a regulation, policy or figure going into a document someone else will read.
+
+  Success: three facts marked `(unverified)` and ranked, with the one to check first chosen.
+toolkit: |
+  - **Bake "give me the source for each claim" into your setup.** Put it in your ChatGPT, Claude or
+    Gemini custom instructions and in your saved research prompt, so a sourceless answer reads as
+    a hypothesis by default.
+  - **Keep a source-grounded notebook for big projects.** For a thesis, a long report or a client
+    project, load your key sources into a tool that answers only from them, such as Gemini
+    Notebook (formerly NotebookLM), a Claude or ChatGPT Project with uploaded files, or a Gemini
+    Gem with files, so answers come with references you supplied.
+  - **Mark unverified facts in your notes.** When an assistant hands you a fact you haven't checked
+    (a pricing tier, a policy, a statistic), save it with a marker like `(unverified)` until you've
+    opened the source, so future-you treats it as a hypothesis, not a standard.
+  - **Treat deep-research reports as the broad pass, not the truth.** Research modes in ChatGPT,
+    Gemini and Claude, and Perplexity, fan out and cite; keep a three-row "claim · what the source
+    says · match?" table template in your notes and fill it for the few claims you'll act on.
+recap:
+  - emoji: "🔍"
+    title: "Which tools to trust for facts"
+    text: "Perplexity and the research modes cite every claim and link it. When facts matter,
+      refuse any tool that hides where the answer came from."
+  - emoji: "🎯"
+    title: "Aim before you search"
+    text: "Most of Jeff's ten minutes are search modes and focus settings — aim the tool at academic,
+      web, or your own files so the sources actually fit the question."
+  - emoji: "🔗"
+    title: "The one habit that carries"
+    text: "Open the citation and read it. A link you never click is decoration, not evidence."
+  - emoji: "⚠️"
+    title: "A real link, a wrong claim"
+    text: "AI can cite a real page that doesn't actually support the claim, or summarize it wrong.
+      Citations make verification possible, not unnecessary."
+  - emoji: "🪜"
+    title: "Speed and trust together"
+    text: "Broad cited overview first, then drill only into the handful of claims you'll act on and
+      verify those sources directly."
+  - emoji: "🗣️"
+    title: "Even in an ordinary chat"
+    text: "Append 'give me the source for each claim.' No source means hypothesis to check, not
+      fact to use."
+  - emoji: "🧪"
+    title: "What eval teams call it"
+    text: "Comparing an answer to its source by hand is what evaluation teams call faithfulness or
+      groundedness — the same check, run by a person."
+task: |
+  Start from the fact you ranked first in Apply it, or any real question you need answered this
+  month — a rule for your course or job, a statistic for a report, a pricing or policy detail —
+  and hunt the gap between the summary and the source:
+
+  ```prompt
+  [Your question, e.g. "What do official surveys say about how many workers in [country] use AI
+  tools at work?" or "What does [university or company] policy say about using AI in assessed
+  work?" or "What are the current free-tier limits of [a service]?"]
+  Answer with a source link for every claim, ranked most to least authoritative. Mark any claim
+  you could not tie to a source as UNSOURCED.
+  ```
+
+  Run it in a citation-first tool (Perplexity or a research mode), open and read the top 3
+  sources, and fill in a three-row table: claim · what the source actually says · match /
+  partial / no match. Then ask the same question in a second tool and note whether it cited the
+  same sources.
+  Success: you can point to one concrete place where the summary and the source differ, or you have confirmed three claims against their sources line by line.
+selfCheck:
+  - q: "A research tool tells you '62% of small businesses now use AI' and links a respected
+      news site. You're about to put the number in a report. What do you do in the next five
+      minutes?"
+    a: "Open the link and find the number. News articles often cite a survey, so follow it to the
+      original survey and check who was asked, when, and how 'use AI' was defined. If the number
+      isn't there, or the survey is narrower than the claim, either cite it precisely or drop it."
+  - q: "You ran a deep-research report on a topic for a presentation. It's 12 pages with 40
+      citations, and you have an hour. How do you make it trustworthy without checking all 40?"
+    a: "Two passes: keep the report as the broad overview, then list the 3–5 claims your
+      presentation actually rests on (numbers, dates, anything a listener might act on) and verify
+      only those against their sources. Skim the rest, and don't present a claim you haven't
+      checked as fact."
+  - q: "Two research tools give you different answers to the same factual question, each with
+      citations. How do you decide which to believe?"
+    a: "Neither by default. Compare the sources, not the summaries: prefer the primary or official
+      source over a blog or aggregator, check dates (one may be outdated), and read what each
+      source actually says. Often both summaries are partly right and the source settles it."
+backupResources:
+  - label: "How To Avoid Hallucinations Using Perplexity AI — SmartMoneyTutorials"
+    url: "https://www.youtube.com/watch?v=qXzFU3tQIa4"
+    type: "video · hallucination angle"
+  - label: "Perplexity AI — citation-first research assistant (tool)"
+    url: "https://www.perplexity.ai"
+    type: "tool · research"
+tags:
+  - chat-assistants
+  - research
+  - perplexity
+  - verification
+---
+
+Research is the AI use case where a wrong answer costs the most. Quote an invented statistic in
+an essay, a client report or a team meeting and your credibility takes the hit, not the
+model's. The good news: the tools have got much better at **sourcing**, and a simple workflow
+gives you research that's both fast *and* trustworthy. The skill is demanding evidence and
+verifying the parts that matter. This lesson applies the verification habits from the mental
+models pillar (→ verification-and-grounding) to everyday research.
+
+## Citation-first beats answer-first
+
+For factual research, prefer tools built around **sources**: **Perplexity** (designed to cite
+every claim) and the search and research modes in **ChatGPT**, **Gemini** and **Claude**. They
+don't just answer; they show *where the answer came from*, with links. That's the difference
+between "the AI said so" and "here's the page it came from." When facts matter, don't use a mode
+that won't show its sources.
+
+## Pick the right mode for the question
+
+Most assistants now offer three kinds of research, and choosing well saves time:
+
+- **Quick search** — a cited answer in seconds. Good for "what's the current version of X?" or
+  "when does this policy take effect?"
+- **Deep research** — the tool runs many searches for several minutes and writes a long, cited
+  report. Good for a literature scan, a market overview or "what are the main positions on X?"
+- **Your own sources** — tools that answer only from documents you upload: Gemini Notebook
+  (formerly NotebookLM), or a Project with files in ChatGPT, Claude or Gemini. Good when the truth lives in your readings,
+  your company's documents or a set of papers you trust.
+
+A good research question also sets limits: the time window ("since 2024"), the source types
+("official government or university sources only"), and what to exclude ("no vendor marketing").
+Narrow questions get better sources.
+
+## A citation is permission to verify, not proof
+
+The trap: a citation *looks* authoritative, so it's tempting to trust it. But AI can cite a real
+source that **doesn't actually support the claim**, quote a number from a different year, or
+summarize an opinion piece as if it were a finding. Citations make verification possible; they
+don't make it unnecessary. For any **load-bearing** claim — a number you'll put in a proposal, a
+rule you'll follow, a stat you'll repeat — open the source and confirm it says what the AI claims.
+
+This is the same check evaluation teams run on AI systems at scale, usually called
+**faithfulness** or groundedness: is the answer actually supported by the sources it retrieved?
+You're doing it by hand.
+
+## The two-pass workflow
+
+Fast and trustworthy aren't opposites if you split the work:
+
+1. **Broad pass** — run a deep-research or citation-first query to get a wide, cited overview in
+   minutes.
+2. **Verify pass** — list the few claims you'll actually rely on and check *those* sources
+   directly.
+
+You get the speed of automated research and the safety of human verification, without
+fact-checking every sentence. Verify what's load-bearing; skim the rest.
+
+> 💡 **Try it:** ask any assistant a factual question in your field and add "give me the source
+> for each claim." Open the first link and find the exact sentence that supports the first claim.
+> If you can't find it in two minutes, you've just learned how often that matters.
+
+## Worked example: checking a statistic before you use it
+
+Say a student writing an essay on remote work asks a research mode: "What share of workers in
+the UK work from home at least part of the week?" It answers with a percentage and three links.
+Here's how the check typically plays out:
+
+1. **Open the most authoritative link first.** An official statistics office page beats a news
+   article. Suppose the number is there, but for a different year than the summary implied.
+2. **Check the definition.** The source counts "hybrid workers" only, which is narrower than
+   "work from home at least part of the week."
+3. **Check the date.** There's a newer release, and the figure has moved.
+4. **Write it precisely.** The essay cites the newer official figure, with its definition and
+   date, and links the source.
+
+Ten minutes of checking turned a vague, outdated number into a precise, defensible one. That's
+the whole workflow, and it works the same way for a market-size figure at work or a performance
+claim in a technical doc.
+
+## Common failure modes
+
+- **A citation links to a real page that says something else** → the summary over-reached →
+  find the exact supporting sentence or drop the claim.
+- **A number is right but outdated** → the tool found an older source first → ask for the most
+  recent figure and check the publication date.
+- **Every source is a blog quoting another blog** → no primary source in the chain → ask for
+  official, academic or original-data sources only.
+- **A deep-research report reads beautifully and you trust all of it** → polish isn't
+  verification → pick the claims you'll act on and check those.
+
+## Make "show your sources" a reflex
+
+Even in an ordinary chat, add "**give me the source for each claim**" to factual questions. If the
+assistant can't produce one, treat the statement as a **hypothesis to check**, not a fact to use.
+That one habit prevents most AI research mistakes.
+
+Next in this pillar: using all this on real work means setting up privacy, data and accounts
+properly.

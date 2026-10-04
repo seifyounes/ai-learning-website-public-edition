@@ -1,0 +1,296 @@
+---
+title: "Verification & grounding"
+subtitle: "Trust is engineered"
+summary: "Make an assistant answer from a source you supply, give it permission to say it doesn't know, and check its claims before anyone relies on them."
+changeNote: "New: a 7-minute, vendor-neutral video on answering from real sources, a worked check of a contract summary before you send it, and a common-failures list."
+section: foundations
+pillar: mental-models
+order: 6
+level: intermediate
+estMinutes: 14
+taskMinutes: 20
+prerequisites: [what-is-an-llm, prompting-in-2026]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "T-D1OfcDW1M"
+  published: "2023-08-23"
+  year: 2023
+  minutes: 7
+  title: "What is Retrieval-Augmented Generation (RAG)?"
+  channel: "IBM Technology"
+  why: "Seven minutes in which IBM research scientist Marina Danilevsky shows, on a lightboard, the two things that go wrong when a model answers from memory (no source, and out of date) and the fix: retrieve the real material first, answer from it, point to the evidence, and say 'I don't know' when the material doesn't cover the question. That is grounding, citations and the give-it-an-out line in one picture, with no product demo and nothing tied to one vendor's model."
+  notes:
+    - "The title says RAG because she shows the automated version; this lesson starts with the by-hand version (you paste the source) and adds the half the video skips: checking the output afterwards."
+    - "It's from IBM's channel and dates from 2023, but the method hasn't changed."
+readAfter:
+  - label: "Anthropic — Reduce hallucinations (grounding, give-an-out, verify)"
+    url: "https://docs.claude.com/en/docs/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"
+    kind: docs
+  - label: "Chain-of-Verification Reduces Hallucination in LLMs (Dhuliawala et al., 2023)"
+    url: "https://arxiv.org/abs/2309.11495"
+    kind: article
+applyIt: |
+  Grounding and verification aren't only chat habits — they're how you make any AI feature or
+  AI-assisted workflow trustworthy. Picture a hypothetical support bot for an online shop that must
+  answer from the shop's policy pages. The lesson's three ideas become three design decisions:
+
+  - **Grounding, enforced by code:** the prompt feeds the model the *actual* policy text, and a
+    check after generation **rejects any answer that doesn't quote a real policy sentence
+    verbatim** (a plain substring match) — plus a banned-phrase list and length bounds. That's
+    "answer only from the source, cited" turned into a check instead of a hope.
+  - **Give it an out, at the system level:** when the question matches no policy, **skip the model
+    entirely** and return a fixed fallback ("I'll pass this to a person"). The model never gets an
+    empty slot to bluff into.
+  - **Verify before ship:** an answer reaches the customer only if the generation finished normally
+    *and* it cleared every check — a deterministic sensor gating each output.
+
+  Now plan the same for something of your own, in ten minutes and four lines: the grounding rule
+  (what every output must quote or match from the source), the check that gates each output, the
+  fallback when a check fails, and where rejected outputs get logged with the reason, so they
+  become your future fabrication test set (→ evals-and-testing).
+
+  **If you code:** use an AI feature you're building or plan to build. **If you don't code yet:**
+  use a manual workflow such as AI-drafted replies to customers or classmates; the "check" becomes
+  a short checklist you tick before anything is sent.
+
+  Success: four lines, and no generated output in your plan reaches anyone without passing a named check.
+toolkit: |
+  - **Add a grounding rule to your custom instructions.** In ChatGPT, Claude or Gemini custom
+    instructions, and in every Project, Gem or Custom GPT you use for facts, add: "For factual
+    claims, cite the source or the passage I gave you; if you can't, say NOT STATED or UNVERIFIED
+    instead of guessing." Put the same line in any deep-research request.
+  - **Save the two prompts as snippets.** Keep the `<doc>` grounding prompt from this lesson and the
+    claim-check prompt ("list every factual claim; quote the supporting line or mark it
+    UNSUPPORTED") in a notes file or a text-expander shortcut, so checking costs one paste.
+  - **Treat every memory or notes entry as a citation, not proof.** Saved memories and notes files
+    are dated snapshots: they record what was true when written, not what's true now. Check a
+    remembered claim against the real document before you act on it.
+  - **Open every link before you pass it on.** Each URL or quote an assistant hands you is a claim;
+    check that it loads and says what was claimed before it goes into a doc, a slide or an email.
+
+  **If you use a coding agent:**
+
+  - **Ground it in the repo and gate it with a sensor.** Add to AGENTS.md, CLAUDE.md, Cursor rules
+    or Copilot instructions: "quote the file and line or say 'not in the repo'", and have tests or
+    a typecheck run automatically when the agent finishes (a hook, a CI check, a pre-commit check)
+    so "verify before you ship" happens every time (→ harness-engineering).
+recap:
+  - emoji: "🎯"
+    title: "Likely-looking vs checked"
+    text: "The model emits the most likely-looking continuation, not a checked fact — so it will sometimes be confidently wrong. You engineer around that; you don't word it away."
+  - emoji: "🪐"
+    title: "What's wrong with answering from memory"
+    text: "The video's planets-and-moons example: an answer recalled from something read years ago comes with no source and has quietly gone out of date. Fluent, confident, wrong."
+  - emoji: "🔍"
+    title: "Retrieve first, then answer"
+    text: "Put a store of trusted material next to the model and fetch the relevant part before it answers. Retrieval, not recall, is the anti-hallucination move; pasting the source yourself is the by-hand version."
+  - emoji: "🔄"
+    title: "Where new facts go"
+    text: "When the facts change, you update the material, not the model. The answer stays current without retraining anything."
+  - emoji: "🧾"
+    title: "Show me the evidence"
+    text: "A grounded answer can point to the passage it came from, so you can check it. A source only helps because it makes the claim checkable, so actually open it."
+  - emoji: "🙅"
+    title: "The missing permission"
+    text: "When the material doesn't cover the question, the right answer is 'I don't know'. Give the model that option explicitly; without it, gaps come back as fiction."
+  - emoji: "🎣"
+    title: "Only as good as what's fetched"
+    text: "If the retrieval step pulls the wrong passage, even a well-behaved model answers badly or not at all. Grounding moves the risk; it doesn't remove the need to check."
+  - emoji: "🛰️"
+    title: "Who's doing the checking?"
+    text: "Every manual pass/fail you run is a sensor. Harness engineering makes it deterministic and automatic; today you're the hand-run prototype of it."
+task: |
+  Ask one factual question **twice** — cold, then grounded — and verify the grounded answer.
+
+  **If you code:** in Claude Code, Cursor, Codex or Copilot chat, pick a real question about your
+  own repo:
+
+  ```prompt
+  Question: [a factual question about this codebase, e.g. does the signup handler validate the
+  email before it writes to the database?]
+  First, answer from memory only — do NOT read any files.
+  Then read the relevant file(s) and answer AGAIN using only the files: quote the exact lines,
+  or reply NOT IN FILE.
+  ```
+
+  **If you don't code:** use a public document the model may have seen in training (an open-source
+  license, a published university policy, a product's terms of service). Ask ChatGPT, Claude or
+  Gemini a specific question about it without attaching it, then paste the document in and require
+  quoted sentences or NOT STATED.
+
+  Then open the source yourself and confirm the grounded answer's quoted lines actually exist. You
+  just ran grounding + citation-checking by hand — the exact check an automated sensor can one day
+  run for you.
+  Success: you can name where the cold and grounded answers diverged, and you confirmed the grounded quote is real.
+selfCheck:
+  - q: "You ask for '5 papers on X with citations' and get 5 perfectly-formatted references — two have dead DOIs. What went wrong, and what's the rule?"
+    a: "Nothing surprising went wrong: asking for citations doesn't reduce hallucination, it relocates it into a checkable form. A citation is a claim, not proof — the clean formatting is exactly the trap. The rule: resolve every reference (does the source exist, load, and say what's claimed) before trusting any of them."
+  - q: "A grounded prompt ('answer only from this doc') still invents an answer for something the doc doesn't cover. What single line fixes it?"
+    a: "Give it an out: 'if the doc doesn't answer this, reply NOT STATED — do not guess.' Grounding shrinks the space to invent; the out closes the last escape hatch where the model bluffs to fill a gap you left open."
+  - q: "A teammate says 'we added chain-of-verification, so we don't need to check outputs anymore.' Where's the flaw?"
+    a: "Chain-of-verification is still the model checking itself against sources — it reduces error but can't guarantee it, and a committed draft can rationalise its own claims. It's a sensor, not a proof. For anything costly-to-be-wrong you still want a deterministic check (a harness sensor), and a human on the highest-stakes calls."
+  - q: "Every Friday you spend an hour checking AI-drafted invoice summaries by hand: does each total match the spreadsheet, and does each client name appear in your client list? Last month you still missed one. What is this check, and what's the next step?"
+    a: "It's a sensor you're running with your own eyes, and you're the slow, forgetful part. Both checks are mechanical (a number match, a name lookup), so encode them as a deterministic check, such as a script, a spreadsheet formula or a substring match, that fails a bad summary every run without you. Your manual checklist is the spec for that sensor; keep your own eyes for the judgement calls (→ harness-engineering)."
+mcq:
+  - q: "An assistant drafts a market summary, and you ask that same chat to check its own claims. It confirms every one. What should you do?"
+    options:
+      - "Trust it, since the sources are right there in the chat"
+      - "Re-check the claims in a fresh chat or another model"
+      - "Ask it to check a second time, but much more strictly"
+      - "Ask it to rate its confidence in each claim from 1 to 10"
+    answer: 1
+    explain: "The chat that wrote the draft is committed to its own story, so its self-check tends to pass everything; an independent pass in a fresh context catches what it can't. A stricter second pass in the same chat is still the author grading itself, and a confidence score is just more generated text."
+  - q: "You have ten minutes to check a three-page AI-drafted proposal before it goes to a client. Where do you spend them?"
+    options:
+      - "The opening paragraph, since clients read it first"
+      - "A random sample of sentences across all three pages"
+      - "Grammar and tone, since the facts came from your notes"
+      - "The prices, names, dates and commitments it states"
+    answer: 3
+    explain: "Verify the load-bearing claims, the ones someone will act on, and skim the rest. Assuming the facts are right because your notes were the input is the trap: grounding shrinks the room to invent, it doesn't remove the need to check."
+  - q: "Your company changed its refund policy last month. A customer asks about it, and you want an assistant to draft the reply. Which approach makes the answer trustworthy?"
+    options:
+      - "Paste the current policy and ask for the line it used"
+      - "Tell it to answer only if it is highly confident"
+      - "Use the newest model, since it was trained on recent data"
+      - "Ask it to cite where it learned about the policy"
+    answer: 0
+    explain: "Answering from memory gives no source and goes out of date; retrieval (here, pasting the current policy and asking for the supporting line) makes the answer current and checkable. No model's training includes last month's internal change, and a citation to where it 'learned' the policy is just another claim."
+  - q: "Your workflow uses a keyword search to find the policy section to paste in. One answer faithfully follows the pasted text but is wrong for the customer's question. What failed?"
+    options:
+      - "The model ignored the source and answered from memory"
+      - "The prompt was missing the 'say I don't know' line"
+      - "The search fetched the wrong section to ground on"
+      - "The model needed a higher effort setting to reason"
+    answer: 2
+    explain: "Grounding is only as good as what's fetched: the answer was faithful to a passage that didn't fit the question. A give-it-an-out line helps when the material is silent, but here the material looked relevant and was wrong, so the fix is in the retrieval step and in checking the quoted passage."
+backupResources:
+  - label: "Why Large Language Models Hallucinate — IBM Technology (Martin Keen)"
+    url: "https://www.youtube.com/watch?v=cfqtFvWOfg0"
+    type: video
+  - label: "How to Reduce AI Hallucinations with a Claude Skill — The GenAI Nerd Channel (a reusable grounding instruction, demoed in Claude)"
+    url: "https://www.youtube.com/watch?v=gfveGc-yxa8"
+    type: video
+  - label: "Why AI evals are the hottest new skill for product builders — Hamel Husain & Shreya Shankar (Lenny's Podcast)"
+    url: "https://www.youtube.com/watch?v=BsWxPI9UM4c"
+    type: "video · verification-as-discipline"
+  - label: "Anthropic — Citations (grounded, verifiable source spans)"
+    url: "https://docs.claude.com/en/docs/build-with-claude/citations"
+    type: "docs · reference"
+tags:
+  - verification
+  - grounding
+  - citations
+  - chain-of-verification
+  - reliability
+  - sensors
+---
+
+From "what is an LLM": the model emits the most *plausible* continuation, not a
+*verified* one. Confident wrongness isn't a bug you patch — it's the default output of
+a system with no fact-checker inside it. So stop trying to *prompt it away*. The 2024
+move was clever wording; the 2026 move is **engineering trust**: constrain what goes in
+so there's less room to invent, and check what comes out so the inventions get caught.
+Two levers — **grounding** (upstream) and **verification** (downstream) — and you own
+both. Everything you do here by hand is the manual prototype of the automatic
+**sensors** you'll wire in harness engineering.
+
+## Grounding: force retrieval over inference
+
+There are two ways a model can answer "what does clause 4 say?" — **inference**
+(reconstruct it from blurry parametric memory, which is lossy and will confabulate) or
+**retrieval** (read the clause you pasted and answer from it). Inference is where
+hallucination lives. Grounding is the deliberate act of taking inference off the table:
+put the real source in the context and say *"answer using only this; if it isn't here,
+say so."* You've collapsed the space in which the model can make something up.
+
+That's the picture in this lesson's video: fetch the trusted material first, answer from it,
+point to the evidence, and say "I don't know" when the material is silent. The video draws
+the automated version, **RAG** (retrieval-augmented generation), where software finds the
+right passages for you; building that is covered in → rag-fundamentals. Here you do the
+retrieval by hand: paste the source yourself, or save the rule once in your custom
+instructions, a Project or a Gem so every chat starts with it.
+
+> 💡 **Try it:** paste a real doc, then constrain the answer to it:
+> ```prompt
+> Answer ONLY from the text between <doc></doc>. Quote the exact sentence you used.
+> If the text does not answer the question, reply exactly: NOT STATED.
+> Do not use outside knowledge.
+> <doc>...paste source here...</doc>
+> ```
+
+## Give the model an out
+
+Models bluff because their objective rewards a fluent answer over an honest "I don't
+know" — absent permission, uncertainty is literally off the menu. So put it on the
+menu: *"if the sources don't answer this, say NOT STATED — do not guess."* One sentence,
+and you convert confident fabrication into an honest gap you can act on. It's the
+cheapest, highest-leverage line in this lesson, and it only works *paired* with
+grounding: bound the input **and** license "unsure," or the model happily fills the gap
+for you.
+
+## Citations ≠ proof
+
+Ask for citations and models will happily produce them — perfectly formatted, plausible
+authors, dead DOIs. A citation is a **claim**, not evidence. Requesting sources doesn't
+*reduce* hallucination; it **relocates** it into a form you can check — which only helps
+if you actually check. So resolve every reference: does the quote appear *verbatim* in
+the source, does the URL load, does it say what was claimed? The trap is treating a
+citation's *presence* as proof of the claim's *truth* — they're independent. Anthropic's
+**Citations** feature is the strong version: the model cites spans from documents you
+supply, verifiable by construction (linked in the backups); other providers offer similar
+source-grounding features — and even then you spot-check.
+
+## Chain-of-verification
+
+Generating and checking are different jobs, and a model doing both in one pass is
+committed to its own story. Split them (Dhuliawala et al., 2023): **draft → generate
+independent verification questions about the draft's claims → answer each against the
+sources → revise.** The fresh, unanchored pass catches fabrications the first pass was
+blind to. The manual form is one follow-up prompt: *"List every factual claim you just
+made. For each, quote the supporting source span or mark it UNSUPPORTED."* Then delete
+or fix everything marked UNSUPPORTED. This doer-then-checker split is the same shape
+you'll formalise in **loop engineering** — here you run it with your own eyes.
+
+## Verification is a sensor (the bridge)
+
+Notice what you've been doing: reading an output and ruling pass/fail. **That's a
+sensor** — you're just running it manually, and you're the slow, forgetful,
+un-scalable part of the loop. The whole of **harness engineering** (next lessons) is the
+move that makes this deterministic: a test suite, a typecheck, a schema validator, a
+substring check — checks that **fail bad output without you**, every run. Trust is
+engineered: *you* decide what "correct" means, then encode a check that enforces it
+forever. The manual discipline you practised above is the **spec** for that automated
+sensor. (Turning that judgement into a scored, repeatable eval — LLM-as-judge, test
+sets — is its own lesson, → evals-and-testing; here we build the instinct, not the harness.)
+
+## Worked example: checking a summary before you send it
+
+Your manager asks for a one-paragraph summary of a 12-page vendor contract. Run the two
+levers in order:
+
+1. **Ground.** Paste the contract between `<doc>` tags and ask for the summary with every
+   sentence followed by the clause it came from, plus "NOT STATED" for anything the contract
+   doesn't cover (say, the termination notice period).
+2. **Verify.** In a fresh chat, paste the contract and the summary and ask: "List each
+   factual claim in the summary. For each, quote the supporting clause or mark it
+   UNSUPPORTED." Then open the contract yourself and check the two claims that matter most:
+   price and term.
+
+Say the checker flags "auto-renews annually" as UNSUPPORTED, and the contract actually says
+renewal needs written agreement. That's one sentence that would have committed your team to
+something false. Ten minutes of checking bought that.
+
+## Common failure modes
+
+- **Answers cite sources that don't say what's claimed** → citations were treated as proof
+  → open the cited passage for every claim you'll act on.
+- **A grounded prompt still fills gaps with guesses** → no permission to say "unknown" → add
+  the NOT STATED line.
+- **The model's self-check passes everything** → the same chat that wrote the draft is grading
+  it → verify in a fresh chat, or with a different model.
+- **You check everything and run out of time** → no priority → verify only the load-bearing
+  claims (numbers, names, dates, anything someone will act on) and skim the rest.
+
+The apply-it below shows what one of these sensors looks like inside an AI feature.

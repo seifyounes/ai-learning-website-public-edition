@@ -1,0 +1,296 @@
+---
+title: "CLAUDE.md & memory"
+subtitle: "Teach it your project"
+summary: "Write a short CLAUDE.md or AGENTS.md that hands your coding agent the commands, conventions and gotchas of your project every session."
+changeNote: "New: a 5-minute sort of what you keep re-explaining into the right memory layer, a task that encodes your project's key contract, and AGENTS.md equivalents."
+section: foundations
+pillar: claude-code
+order: 5
+level: beginner
+estMinutes: 13
+taskMinutes: 35
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "FRwZg6VOjvQ"
+  published: "2026-02-20"
+  year: 2026
+  minutes: 5
+  title: "Claude Code's Memory System: The Full Guide (Most Developers Miss 90% of This)"
+  channel: "DIY Smart Code"
+  why: "The title is clickbait ('Most Developers Miss 90% of This'), but the content is a plain walkthrough. Five minutes that cover the whole memory system (project, user, nested and imported CLAUDE.md files, plus Claude's own auto memory), where most short videos stop at 'make a CLAUDE.md'. The layers people skip (user memory, per-folder scoping, @-imports) are exactly this lesson's scope. Longer official talks on the topic spend more time on context-budget theory, which the Context engineering lesson (→ context-engineering) covers."
+  notes:
+    - "It's a smaller specialist channel: judge the teaching as you watch, and treat the official memory docs in Read-after as the source of truth."
+    - "File locations and size limits (such as how much of the auto-memory index loads) change between releases; check them in the memory docs, not the video."
+readAfter:
+  - label: "How Claude remembers your project — official Claude Code docs (CLAUDE.md + auto memory)"
+    url: "https://code.claude.com/docs/en/memory"
+    kind: docs
+applyIt: |
+  Sort what you keep re-explaining into the right layer. Write down five things you've told an
+  AI assistant more than once (a test command, a naming rule, "never edit the generated
+  files", how you like commits written, a build quirk) and give each one a home:
+
+  - **User file** (`~/.claude/CLAUDE.md`): true in every project you touch.
+  - **Project file** (`CLAUDE.md`, or `AGENTS.md` when Codex, Cursor or Copilot read the same
+    repo): true for this repo, and a fresh session must never improvise it away.
+  - **Scoped rule** (`.claude/rules/` with `paths:`, or a nested file): true for one folder.
+  - **Auto memory:** an incidental quirk Claude can rediscover and note for itself.
+  - **Not memory at all:** anything that must *always* happen belongs in a hook
+    (→ hooks-automation).
+
+  **If you don't code yet:** run the same sort for a chat assistant: custom instructions
+  (everywhere), a Project's instructions (one job), or nothing (a one-off).
+
+  Success: five repeated explanations, each assigned to exactly one layer with a one-line
+  reason.
+toolkit: |
+  Set up the memory hierarchy deliberately instead of letting it happen:
+
+  - **Create your user-level file.** Put the standards that should follow you into *every*
+    project — language, formatting, "never commit secrets", how you like commits written — in
+    `~/.claude/CLAUDE.md`. (The equivalents: Codex's global `~/.codex/AGENTS.md`, Cursor's User
+    Rules, ChatGPT or Gemini custom instructions.)
+  - **Scope folder-heavy rules.** If one corner of your repo has its own conventions (the
+    database migrations, the UI components, the test fixtures), move those lines into a
+    `.claude/rules/` file with `paths:` frontmatter (or a nested `CLAUDE.md`), so they load only
+    when Claude is in that code.
+  - **Hoist repeats upward.** When the same correction recurs across two or more of your
+    projects, promote it once to the user file so every project inherits it instead of copies
+    drifting apart.
+  - **Keep rules and history in separate files.** Rules go in `CLAUDE.md`; decisions and
+    "why we did it this way" go in a committed `DECISIONS.md` or `MEMORY.md` you `@`-import
+    only if needed. Claude's own auto memory is a third, machine-local layer — run `/memory`
+    now and then so none of the three drift.
+  - **Adopt the "corrected twice" rule.** The second time you re-explain something, stop and
+    ask the assistant to add a one-line rule to the right file. That one habit keeps your
+    instruction files alive.
+recap:
+  - emoji: "📌"
+    title: "When does it get read?"
+    text: "Claude reads CLAUDE.md automatically at the start of every session, so your stack, commands, and rules are in context before your first keystroke."
+  - emoji: "🧬"
+    title: "More than one file"
+    text: "Memory stacks across managed (org), user (~/.claude, follows you everywhere), project (./CLAUDE.md, shared), and nested per-folder files. The layers most people never set up are the user file and per-folder scoping."
+  - emoji: "🔗"
+    title: "One source, many files"
+    text: "Pull shared snippets or other docs into any memory file with @path (up to four hops, @~/ for home), so one source of truth feeds many CLAUDE.mds instead of drifting copies."
+  - emoji: "🤖"
+    title: "A second author"
+    text: "Auto memory: Claude writes learnings from your corrections into its own MEMORY.md and reloads them each session. You're no longer the only author of the project's memory."
+  - emoji: "🎚️"
+    title: "When two layers disagree"
+    text: "The layers concatenate; the most specific file is read last, so it carries the most pull — but memory is context, not law. If two rules truly clash, make them consistent instead of betting on a silent override."
+  - emoji: "⚡"
+    title: "Don't write the first draft"
+    text: "/init drafts a CLAUDE.md from your codebase and won't overwrite an existing one. Treat it as raw material: cut what it can already infer, add the gotchas it can't see."
+  - emoji: "✂️"
+    title: "How long is too long?"
+    text: "It's spent on every session and loaded in full, so a tight, high-signal file beats a sprawling one. Anthropic's target is now a number: under 200 lines — longer measurably hurts adherence."
+  - emoji: "🔁"
+    title: "When to add a line"
+    text: "The trigger for a new rule is catching yourself re-explaining the same thing. Second correction, new line — write the load-bearing contract in by hand so you never repeat it."
+task: |
+  Run `/init` on a repo without a `CLAUDE.md` (your own project, or any small open-source repo
+  you clone), then hand-tune the draft (about 35 minutes). Use Claude to sort what's worth
+  keeping:
+
+  ```prompt
+  You just generated this CLAUDE.md with /init. List which lines you could already infer from
+  the codebase (candidates to cut) versus the non-obvious gotchas and conventions a fresh
+  session would miss. Don't edit — just the two lists.
+  ```
+
+  Delete two inferable lines and add one gotcha it can't see. Then encode the **one contract a
+  fresh session must never improvise away** as one tight block: the calculation two parts of
+  the app must agree on, the table nobody alters without a migration, or the API shape other
+  apps depend on, plus the test that guards it. Move any folder-specific rules into a
+  `.claude/rules/` file with `paths:` frontmatter (or a nested `CLAUDE.md`). If other agents
+  read this repo, keep the shared rules in `AGENTS.md` and import it from `CLAUDE.md` with
+  `@AGENTS.md`, so every tool reads one source.
+
+  Open a fresh session, ask for a change near that contract and confirm Claude respects it
+  unprompted, then run `/memory` to see every layer that loaded, auto memory included.
+
+  Success: a `CLAUDE.md` under 200 lines with at least one line `/init` couldn't have written,
+  and a fresh session that respects your contract without being told.
+selfCheck:
+  - q: "You set a rule in ~/.claude/CLAUDE.md and a flatly contradictory one in the project's ./CLAUDE.md. Which wins?"
+    a: "There's no guaranteed hard override. Every file is concatenated into context, ordered root-to-cwd, so the project file is read last and usually carries more pull — but memory is context, not enforced config, and Claude may pick either side of a real contradiction. The fix isn't to trust the override; it's to not keep contradictory rules — make them consistent, or scope the local one with a path-scoped rule. (The one non-overridable layer is org-managed policy, and hard enforcement is a hook, not memory.)"
+  - q: "You run /init on a repo that already has a 180-line CLAUDE.md. What happens, and what do you do next?"
+    a: "It won't clobber your file — /init suggests improvements to an existing CLAUDE.md rather than overwriting it. Then hand-tune: cut what Claude can already infer (obvious structure, boilerplate) and add the non-obvious gotchas and conventions it can't see, keeping the file lean. /init's output is a draft, not the deliverable."
+  - q: "You keep re-explaining the same rule about the error format every API route must return. Where does it go — and how is that different from a build quirk Claude figured out on its own?"
+    a: "The durable contract goes in CLAUDE.md, written by hand on the second correction, because a fresh session must never improvise it away. The build quirk is exactly what auto memory captures for itself in ~/.claude/projects/<project>/memory/ — Claude-written, machine-local, audited via /memory. Rule of thumb: you author the load-bearing rules; let auto memory accumulate the incidental learnings."
+  - q: "Your root CLAUDE.md is creeping past 200 lines with folder-specific detail. What's the fix?"
+    a: "Scope it out of the always-loaded root. Move folder-local rules into a .claude/rules/ file with paths: frontmatter (loads only when Claude touches matching files) or a nested CLAUDE.md in that subfolder (loads on demand there), and push running history to a memory file. Under-200-lines isn't cosmetic — longer files reduce how reliably Claude follows them."
+mcq:
+  - q: "A teammate proposes four new lines for the project CLAUDE.md. Which one do you turn down?"
+    options:
+      - "Run the tests with: npm test -- --runInBand"
+      - "Never edit files in src/generated; they're rebuilt"
+      - "Store dates in UTC; convert only in the UI layer"
+      - "Fixed the flaky login test last Tuesday afternoon"
+    answer: 3
+    explain: "Transient history isn't a rule: it costs context every session and changes nothing about how Claude should act, so it belongs in a history or decisions file, if anywhere. The other three are what the file is for: commands, gotchas and conventions."
+  - q: "You want Claude to follow a 12-step release checklist whenever you say 'cut a release'. Where does it belong?"
+    options:
+      - "A skill that loads when you ask for a release"
+      - "The project CLAUDE.md, so it's always loaded"
+      - "Your user CLAUDE.md, so every project has it"
+      - "Auto memory: tell Claude to remember the list"
+    answer: 0
+    explain: "A multi-step procedure is a skill, loaded when it's needed, rather than twelve lines every session pays for. The project file feels safer, but it spends context on every unrelated task and pushes the file toward the length where adherence drops."
+  - q: "Your CLAUDE.md says 'never commit .env files', yet one slipped into a commit last month. What's the right fix?"
+    options:
+      - "Move the rule to the top of the file, in capitals"
+      - "Repeat the rule in both the user and project files"
+      - "Add a hook or pre-commit check that blocks it"
+      - "Ask Claude to save the rule to its auto memory"
+    answer: 2
+    explain: "Memory is context, not enforced config, so a rule that must always hold needs a hook or check that runs whether or not the model remembers. Louder or duplicated wording is still a line the model can drift past."
+  - q: "Your team uses Claude Code, Cursor and Codex on one repo, and the three rules files have drifted apart. What's the best fix?"
+    options:
+      - "Copy the newest file over the other two every week"
+      - "Keep shared rules in AGENTS.md; import it in CLAUDE.md"
+      - "Keep only CLAUDE.md, since the other tools read it too"
+      - "Move the rules into the README, which every tool reads"
+    answer: 1
+    explain: "One source of truth can't drift: Codex, Cursor and Copilot read AGENTS.md, and an @AGENTS.md import pulls the same rules into Claude Code. Weekly copying still leaves three files that drift between copies, and you can't count on other tools treating CLAUDE.md as their rules file."
+backupResources:
+  - label: "How to Use CLAUDE.md in Claude Code in 5 Minutes — GritAI Studio"
+    url: "https://www.youtube.com/watch?v=h7QJL2_gEXA"
+    type: "video · quick start"
+  - label: "Claude Code: Best practices for agentic coding — Anthropic Engineering"
+    url: "https://www.anthropic.com/engineering/claude-code-best-practices"
+    type: "article · engineering"
+  - label: "Best practices for Claude Code (incl. CLAUDE.md) — official docs"
+    url: "https://code.claude.com/docs/en/best-practices"
+    type: "docs · official"
+tags:
+  - claude-code
+  - claude-md
+  - memory
+  - auto-memory
+  - init
+---
+
+You've taught Claude how to *work* (the loop) and how to *talk to it* (prompting).
+`CLAUDE.md` is how it **remembers** — the file that turns Claude Code from a sharp
+stranger into a teammate who already knows your project, because it's read
+**automatically at the start of every session.** Nothing else in the tool pays off as
+reliably for so little effort.
+
+## What belongs in it
+
+Think of the brief you'd hand a senior dev on day one. (Same idea elsewhere: Codex, Cursor,
+GitHub Copilot and many other agents read an `AGENTS.md`; Copilot also reads
+`.github/copilot-instructions.md`, Cursor its `.cursor/rules`. What belongs in them is the same.)
+
+- **Stack & commands** — how to run, build, test, and lint (the exact commands).
+- **Architecture** — the folders that matter and where things live.
+- **Conventions** — naming, formatting, the patterns you always follow.
+- **Gotchas & don'ts** — the traps you keep re-explaining.
+
+Anthropic's own trigger for *when* to add a line is sharp: Claude makes the same mistake
+twice, a review catches something it should have known, or you retype a correction you
+already gave last session. What does *not* belong: secrets (never), your whole README, or
+transient history ("fixed the login bug Tuesday"). And two things that feel like they
+belong but don't — a multi-step *procedure* is a skill (→ **skills-and-plugins**), and a
+rule that only matters in one corner of the codebase is a **path-scoped rule** (below),
+not a line every session pays for.
+
+## Bootstrap with /init, then tune
+
+Don't write the first draft by hand. Run **`/init`** in the repo: Claude scans the
+codebase and generates a starter `CLAUDE.md` — detected stack, common commands, a folder
+map — in one pass. It's non-destructive: if a `CLAUDE.md` already exists, `/init`
+*suggests improvements* instead of overwriting, and it folds in an existing `AGENTS.md` or
+`.cursorrules` if you have one. (Set `CLAUDE_CODE_NEW_INIT=1` for the newer interactive
+flow — it explores with a subagent, asks follow-up questions, and shows you a reviewable
+proposal before writing anything.)
+
+Treat that draft as raw material, not the finished file. `/init` can only encode what it
+can *see*, and the highest-value lines are the ones it can't infer: the gotcha that cost
+you an afternoon, the convention that isn't in the code yet, the "always do X before Y."
+Cut the obvious, add the hard-won, move on. This is the one place the course teaches
+`/init`; later lessons assume it's already run.
+
+## The hierarchy: broad to specific
+
+Memory isn't one file; it's a stack, loaded broadest scope first:
+
+- **Managed policy** — an org-wide file IT deploys; it loads first and you can't exclude
+  it. Most solo work never touches this layer.
+- **User** — `~/.claude/CLAUDE.md`, your personal standards across *every* project.
+- **Project** — `./CLAUDE.md` (or `./.claude/CLAUDE.md`), checked into the repo, shared
+  with the team.
+- **Nested** — a `CLAUDE.md` in a subfolder, loaded *on demand* only when Claude reads
+  files in there.
+- **Imports** — pull other docs into any of these with `@path/to/file` (relative to the
+  file, `@~/…` for home, up to four hops deep; the first external import asks once for
+  approval).
+
+Here's the part most guides get wrong: these files are **concatenated, not overriding.**
+Claude reads them in order from the filesystem root down to your working directory, so the
+most specific file is read *last* — closest to the conversation, which gives it the most
+pull. But memory is **context, not enforced config**: if two layers flatly contradict,
+Claude may pick either one. So don't rely on a silent override to win — keep the layers
+consistent, and when a rule truly is local, *scope* it instead of duplicating it. (Only
+managed policy is a hard, non-overridable layer; for guaranteed enforcement you use a
+hook, not memory — → **hooks-automation**.)
+
+Two ways to write without opening a file: tell Claude *"remember X"* and it saves to auto
+memory, or *"add X to CLAUDE.md"* to put it in your file. **`/memory`** lists every loaded
+file — CLAUDE.md, local, rules, auto memory — and opens any of them to edit.
+
+## Keep it lean — under 200 lines
+
+Because it's read on every session, `CLAUDE.md` is *spent* on every session — and loaded
+in **full**, however long it is. Anthropic's guidance is now a number: **target under 200
+lines** per file; longer files consume more context *and* measurably reduce how reliably
+Claude follows them. A tight page beats a sprawl.
+
+When the root starts to bloat, don't just delete — **scope**. A `.claude/rules/` folder
+holds topic files, and any rule with `paths:` frontmatter loads *only* when Claude touches
+matching files:
+
+```markdown
+---
+paths:
+  - "src/api/**/*.ts"
+---
+# API route rules
+- Every handler validates its input before touching the database.
+- Errors return { error: { code, message } }, never a raw stack trace.
+```
+
+That keeps API-only rules out of context while you edit the app's UI code. (Same idea
+elsewhere: Cursor rules take `globs`, and GitHub Copilot's `.instructions.md` files take an
+`applyTo` pattern.) (*Why* a loaded line is a
+real cost — token economics, compaction, what to keep hot versus fetch on demand — is
+context engineering, and that theory lives in its own lesson (→ context-engineering). Here you just
+apply its one rule: every line earns its slot, and you prune the moment one goes stale.)
+Bonus: block-level HTML comments in `CLAUDE.md` are stripped before Claude sees them, so a
+`<!-- maintainer note -->` costs zero tokens.
+
+## Two kinds of memory: what you write vs. what Claude writes
+
+`CLAUDE.md` is memory *you* author — durable **rules** Claude should always follow. Modern
+Claude Code adds a second system: **auto memory**, notes *Claude* writes for itself. As
+you correct it and it debugs your project, it saves learnings to
+`~/.claude/projects/<project>/memory/MEMORY.md` — an index whose first 200 lines (or 25 KB)
+load every session, with deeper topic files it reads on demand. You didn't write a line;
+audit or prune it any time with **`/memory`**.
+
+Two things to hold straight. First, auto memory is **machine-local** and Claude-owned —
+not the same as a hand-written history doc you commit to the repo (many teams keep a
+`MEMORY.md` or `DECISIONS.md` of decisions and gotchas and `@`-import it). Rules shape
+every session; history is what you look back on — keep them in different files so neither
+bloats. Second, the habit that keeps *your* file alive is unchanged: **catch yourself
+correcting Claude on the same thing twice, and encode the rule once.** Auto memory now
+catches some of that for you, but the load-bearing contract — the one a fresh session must
+never improvise away — you still write into `CLAUDE.md` by hand.
+
+Get these files right and everything downstream — custom commands, subagents, hooks — runs
+*your* way. (Turning a prompt you retype into a reusable tool is a → **skills-and-plugins**
+topic, not a memory-file one.)

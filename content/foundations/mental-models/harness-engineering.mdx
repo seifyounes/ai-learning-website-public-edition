@@ -1,0 +1,308 @@
+---
+title: "Harness engineering"
+subtitle: "Guides & sensors"
+summary: "Wrap an AI in standing instructions and automatic checks, so the rules you care about are enforced on every output instead of hoped for."
+changeNote: "New: a plain-language version with a no-code path, a worked harness for a weekly status update, a common-failures list, and when to trust a model as judge."
+section: foundations
+pillar: mental-models
+order: 7
+level: intermediate
+audience: builders
+estMinutes: 16
+taskMinutes: 30
+shortPath: "About 40 min: read the breakdown and do the task: turn one rule into a check, or build the two-part guide-and-sensor harness. Come back for the 56-minute video, which goes deeper on sensors."
+prerequisites: [context-engineering, verification-and-grounding]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "uLWOLmeHOSE"
+  published: "2026-04-24"
+  year: 2026
+  minutes: 56
+  title: "Harness engineering beyond skills: Using sensors to keep your coding agent in check"
+  channel: "Thoughtworks"
+  why: "Made by Thoughtworks, whose Birgitta Böckeler wrote the companion article below, so the video and the reading share one vocabulary (guides and sensors). Most harness content stops at writing better instructions; this one spends its time on the half people skip, sensors that check the output, and treats instructions as the known baseline. Its examples are all coding agents, so this lesson supplies the plain-language version and a no-code path, plus the guides half and the definitions from the article."
+readAfter:
+  - label: "Böckeler — Harness engineering for coding agent users (the guides + definitions half)"
+    url: "https://martinfowler.com/articles/harness-engineering.html"
+    kind: article
+  - label: "Anthropic — Effective harnesses for long-running agents (resets, progress files)"
+    url: "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents"
+    kind: article
+applyIt: |
+  Before you build a sensor, pick the rule that most deserves one. Five minutes: list the three
+  to five rules you most rely on an AI to follow, from your custom or Project instructions or
+  your repo's rules file (AGENTS.md, or CLAUDE.md, Cursor or Copilot rules). Mark each **taste**
+  (a guide is enough) or **must-happen** (it needs a check). For each must-happen rule, write
+  one line: what check would catch a break, and does anything run it today?
+
+  **If you code:** must-happen rules are candidates for a test, a lint rule or a pre-commit
+  check ("no secrets committed", "every API route has a test").
+
+  Success: your rules sorted, and the one unchecked must-happen rule you'll promote named.
+
+  **If you don't code yet:** must-happen rules are candidates for a checklist pass in a
+  separate chat ("every action item names an owner", "no figure without a source").
+
+  Success: your rules sorted, and the one must-happen rule nothing checks today named.
+toolkit: |
+  - **Sort your custom instructions into must-happen and taste.** Read your ChatGPT, Claude or
+    Gemini custom instructions (or a Project's instructions) and mark each rule. Taste rules can
+    stay as guides; every must-happen rule ("every action item has an owner", "no figure without a
+    source") needs a check after the output, or it's decorative.
+  - **Build one checker Project, Gem or Custom GPT.** Its only instruction: "Check the text below
+    against this checklist. Answer PASS or FAIL per item and quote the line that proves it. Do not
+    rewrite." Keep the checklist to three to five items and run every important output through it.
+  - **Review in a fresh chat, ideally another assistant.** Paste the draft into a new chat, or a
+    different provider (a ChatGPT draft checked in Claude or Gemini, or the reverse), and leave out
+    your own self-assessment so the reviewer judges the work, not the story.
+  - **Keep a progress doc a fresh chat can restart from.** For long jobs, keep a short doc of what's
+    done, what's decided and what's next, and start each new chat from it instead of trusting a
+    long conversation to remember.
+
+  **If you use a coding agent:**
+
+  - **Promote must-happen rules from the instruction file to sensors.** A rule in AGENTS.md or
+    a CLAUDE.md rules file like "never commit secrets" or "run the tests before finishing" becomes a
+    secret-scanning pre-commit check, a CI test gate or an agent hook, so it happens whether or not
+    the model remembers; keep a `PROGRESS.md` for resets (mechanics → hooks-automation).
+recap:
+  - emoji: "🎛️"
+    title: "The half you control"
+    text: "The model is a fixed, rented commodity. The harness is everything around it you build — and it's the only half where your engineering leverage lives."
+  - emoji: "🧭"
+    title: "The limit of good instructions"
+    text: "Skills and rules steer the model up front, but you can't anticipate every mistake. 'Beyond skills' means you need feedback, not just better guesses."
+  - emoji: "📡"
+    title: "What a sensor does"
+    text: "A sensor observes what the agent actually produced — a test, typecheck, lint, a judge — and turns a silent error into a signal it can act on."
+  - emoji: "🔁"
+    title: "Detection isn't enough"
+    text: "A sensor only matters if its verdict re-enters the loop so the agent self-corrects. Detection with no feedback is just a dashboard nobody reads."
+  - emoji: "⚙️"
+    title: "Which check to trust"
+    text: "Prefer a check that returns the same verdict every time — a failing test — over a politely-worded rule that only hopes. Machines grade harder than good intentions."
+  - emoji: "🏗️"
+    title: "Rules nothing enforces"
+    text: "Wire sensors into the path the agent travels so output quality depends on them — scaffolding the model can't route around, not a doc it might read."
+task: |
+  Promote one decorative rule to a sensor: the one you named in Apply it. **If you code:** pick a
+  rule your instruction file (or your team's conventions) states but nothing checks — "no
+  `console.log` in committed code", "every API route has a test", "no TODO without an issue
+  link", "every new database function revokes public access" — and have your coding agent
+  turn it into a check that runs inside your existing test or lint command:
+
+  ```prompt
+  My instruction file says: "[the rule]". Nothing enforces it today. Write a small automated check
+  for it that runs inside my existing test or lint command (pure file scanning is fine, no external
+  services). Add a deliberately bad fixture and show me the check failing on it, then passing on
+  the real code. If existing code already breaks the rule, put those offenders in a named allowlist
+  and list them for me — don't change them.
+  ```
+
+  **If you don't code:** build a two-part harness for one recurring writing or analysis job
+  (meeting minutes, a weekly update, a literature summary).
+  1. **Guide:** put the standing instructions into a Custom GPT, a Claude Project or a Gemini Gem
+     (or saved custom instructions), including the rule you care about most, e.g. "every action
+     item names an owner and a due date, or says NOT STATED."
+  2. **Sensor:** write a three-to-five item checklist and keep it in a separate chat whose only
+     job is checking: "Check the text below against this checklist. For each item answer PASS or
+     FAIL and quote the line that proves it. Do not rewrite anything."
+  3. Feed it one deliberately bad draft (delete an owner) and confirm the checker catches it. Then
+     run it on your next three real outputs before you send them.
+  *(Hook mechanics for coders → Hooks & automation.)*
+  Success: the check runs automatically (inside your test or lint command) or as a fixed second pass on every output, goes red on a bad example, and names the offending line — the rule is now enforced, not a line you hope the model reads.
+selfCheck:
+  - q: "Your Custom GPT's instructions say 'always include the client's name and the deadline', and about one draft in five still leaves one out. Guide or sensor problem, and what's the fix?"
+    a: "It's a guide (feedforward, advisory) doing a sensor's job. Anything that *must* happen needs a check after the fact: a fixed checklist pass in a separate chat, or for code a test or lint gate that runs automatically and feeds failures back. The 'one in five' is the tell. The same goes for a coding agent that 'usually' remembers to run the tests."
+  - q: "You ask the same chat that wrote a report to review it, and it praises everything. Why, and how do you get a real signal?"
+    a: "Generation and evaluation aren't separated, so the judge is biased toward output it just produced. Run the check in a fresh context, ideally a different model or provider, and strip the author's self-assessment so the reviewer judges the artifact, not the reasoning that made it."
+  - q: "A task will run 6 hours across many context windows. Do you lean on compaction — and what actually carries the work forward?"
+    a: "Don't rely on compaction alone; it drags noise forward and the model's memory isn't the source of truth. Externalize state into durable, load-bearing artifacts (a progress file + git history + the spec) and reset to a fresh window seeded from them."
+  - q: "A support bot must answer from a shop's policy pages. Point at one guide and one sensor in its harness — and say which one makes it trustworthy."
+    a: "Guide: its system prompt and the policy text it's fed (steer before). Sensor: a check that rejects any answer not quoting a real policy sentence, plus a fixed fallback to a human (verify after). The sensor is what makes it trustworthy: it's load-bearing because no answer can reach the customer without passing it, while the prompt alone only hopes the model complies."
+mcq:
+  - q: "Your separate checker chat flags 'missing source' on most of your weekly reports, week after week. What's the best next step?"
+    options:
+      - "Add more items to the checker so it catches even more"
+      - "Drop that check, since it fails too often to be useful"
+      - "Strengthen the drafting guide with a sourced example"
+      - "Nothing: the checker catching it is the system working"
+    answer: 2
+    explain: "Sensors catch and guides prevent, and a catch that repeats tells you which guide to fix: an example that shows sources stops the mistake upstream. Leaving it as is does work, but you keep paying for the same failure every week."
+  - q: "One rule you rely on: every summary must be under 150 words. Which sensor fits this rule best?"
+    options:
+      - "A word count that fails anything over 150 words"
+      - "A second model asked whether the summary is concise"
+      - "A line in the instructions: 'stay under 150 words'"
+      - "A weekly human spot-check of a few of the summaries"
+    answer: 0
+    explain: "A rule that can be checked mechanically should get a computational sensor: the same verdict every time, cheap, and run on every output. A model judge is inferential and better saved for tone or relevance, and an instruction line is a guide, not a check."
+  - q: "Your checker has grown to 22 items and you've started skipping it on busy days. What's the fix?"
+    options:
+      - "Split it into two 11-item checkers you run back to back"
+      - "Cut it to the few checks that catch repeated mistakes"
+      - "Move all 22 items into the drafting instructions instead"
+      - "Run it only on outputs that already look wrong to you"
+    answer: 1
+    explain: "A sensor nobody runs enforces nothing; three to five checks aimed at real, repeated mistakes stay cheap enough to run every time. Moving the items into the instructions turns checks back into guides that nothing verifies."
+  - q: "Your team's assistant drafts customer replies. Which of these is load-bearing scaffolding rather than decorative?"
+    options:
+      - "A style guide in a shared folder the assistant can read"
+      - "An instruction telling the assistant to double-check facts"
+      - "A reminder in the team wiki to review drafts carefully"
+      - "A check every reply must pass before it can be sent"
+    answer: 3
+    explain: "Load-bearing means the work can't travel past it: a reply that fails the check doesn't go out. The style guide and the instruction steer only if the model reads and follows them, and a wiki reminder depends on someone remembering."
+backupResources:
+  - label: "What is harness engineering? — Thoughtworks Technology Podcast"
+    url: "https://www.youtube.com/watch?v=KQJLPsbnKiQ"
+    type: "video · the coiner's overview"
+  - label: "Anthropic — Harness design for long-running application development"
+    url: "https://www.anthropic.com/engineering/harness-design-long-running-apps"
+    type: "article · the reset-vs-compaction case"
+  - label: "Böckeler — Maintainability sensors for coding agents"
+    url: "https://martinfowler.com/articles/sensors-for-coding-agents.html"
+    type: "article · the sensors deep-dive"
+tags:
+  - harness-engineering
+  - sensors
+  - agents
+  - reliability
+  - claude-code
+---
+
+**Who this is for:** people who build with AI, with a coding agent or with automations that run
+without them watching. If you only chat with an assistant and don't code, you can skip this lesson
+for now. Come back when AI output starts going to other people on a schedule (a weekly report,
+customer replies, a Custom GPT your team relies on) and you need a rule enforced every time, not
+just hoped for. The plain-language section below works without any code when you do.
+
+Stop trying to fix the model. You can't — it's a frozen commodity you rent by the token. What
+you *can* engineer is everything wrapped around it: the instructions, the context you feed in,
+the tools, the checks that run on its output, the memory that survives between sessions.
+Practitioners have settled on a shorthand for this: **Agent = Model + Harness.** The harness is
+the whole apparatus minus the model, and it's the only half you control. Harness engineering is
+the discipline of building that apparatus so a capable-but-fallible model produces trustworthy
+work.
+
+## The idea in plain language
+
+Think of hiring a sharp new assistant who has never seen your work. You'd do two things.
+Before they start, you'd hand them a brief, a style guide and a couple of good examples. After
+they finish, you'd check their work against a short checklist before it goes out. The first is a
+**guide**; the second is a **sensor**. Together they're a harness.
+
+You don't need code for this. A Custom GPT, a Claude Project or a Gemini Gem with standing
+instructions and reference files is a guide. A second chat that checks every draft against a
+checklist is a sensor. A coding agent's harness is the same idea with sharper tools: instruction
+files as guides, tests and linters as sensors.
+
+## Two axes: guides and sensors
+
+Every part of a harness does one of two jobs. Böckeler's article (linked below) calls them
+feedforward and feedback controls.
+
+**Guides are feedforward** — they steer *before* the model acts. Custom instructions, an
+instruction file such as `CLAUDE.md` or `AGENTS.md`, skills, specs, examples, tool descriptions:
+all guides. They encode "here's how we do it" so the model starts on the right path.
+
+**Sensors are feedback** — they observe *after* the model acts and report what's wrong. A
+checklist pass, tests, a typecheck, a linter, a build, an LLM acting as judge: all sensors. They
+turn a silent mistake into a signal.
+
+The video's whole thesis is in its title — *beyond skills*. Guides alone don't scale, because you
+cannot anticipate every way a model will go wrong. A guide is a hope; a sensor is a fact. The
+article draws one more useful line: some sensors are **computational** (a test or a word-count
+check gives the same verdict every time, cheaply) and some are **inferential** (another model
+judging tone or relevance, richer but not deterministic). Lean on computational checks wherever a
+rule can be checked mechanically, and save the model-as-judge for what can't. *(Making a check
+mandatory instead of advisory is a mechanics question — that's the Hooks & automation lesson;
+here we care about the concept.)*
+
+## Load-bearing vs decorative scaffolding
+
+A useful test for any harness: is each piece **load-bearing** or **decorative**? A test suite the
+agent runs every iteration is load-bearing — output quality actively depends on it. A rule in an
+instruction file that nothing enforces is decorative: it looks like control, but the model can
+drift past it and nothing stops it.
+
+The move is to make your scaffolding load-bearing — wire it into the path the work actually
+travels. A check that runs on every output and feeds its result back is load-bearing; a document
+the model *might* read is not. Opinionated beats permissive: a harness with strong defaults
+narrows the model to the good choices instead of trusting it to find them.
+
+> 💡 **Try it:** map your own harness in five minutes. **If you don't code:** open the custom
+> instructions or Project you use most and list each instruction as a guide. Then ask: which of
+> these does anything actually *check*? Usually the answer is none. **If you code:** point your
+> coding agent at a repo with the prompt below. Either way, the gap between what you *think*
+> enforces quality and what actually does is usually wider than you'd guess.
+
+```prompt
+Audit this repo as a harness. List every guide (instruction files, skills, specs)
+and every sensor (tests, typecheck, lint, CI, guardrails). For each sensor, say
+whether it runs automatically or only when I remember. Then flag the rules I rely
+on that nothing enforces — the decorative scaffolding.
+```
+
+## Separate the generator from the judge
+
+A sensor is only trustworthy if it's independent of what it's grading. A model reviewing the same
+context that just produced the work is a weak sensor — it's biased toward its own reasoning and
+will wave it through. So **separate generation from evaluation**: run the check in a clean
+context — a new chat, a different subagent, sometimes a different model or provider entirely.
+The evaluator should judge the artifact, not the thought process that made it.
+
+The same logic says: strip the author's self-assessment ("I've made sure every claim is
+sourced") before you hand work to a reviewer, so it checks rather than agrees. A doer/checker
+split beats one assistant marking its own homework. *(How you wire that check into a repeating
+cycle — who runs when, when to stop — is the next lesson, → loop-engineering; here the point is
+only that the two roles must be different passes.)*
+
+## Context resets vs compaction
+
+Long tasks outrun a single context window, and every new window starts blank. You bridge the gap
+two ways: **compaction** (carry a summary forward; its mechanics and tradeoffs →
+context-engineering) or a **context reset** — throw the window away and re-seed a fresh session
+from durable artifacts: a progress file, git history, the spec. In a chat app, the reset is a new
+chat started from a written brief.
+
+Anthropic's long-running-agent work (linked below and in the backups) found that one model,
+Claude Sonnet 4.5, showed "context anxiety" (wrapping up early as it neared its limit), so
+periodic resets became essential to that harness; a later model largely dropped the behaviour.
+The durable lesson for you: **don't trust the model's memory — externalize state into
+load-bearing artifacts that survive a reset.** The harness holds the truth, not the context
+window, and the right harness call can change when the model does.
+
+## Worked example: a harness for weekly status updates
+
+Say you send a status update every Friday, drafted with an assistant.
+
+- **Guides:** a Project (or Custom GPT, or Gem) holding the update template, two past updates you
+  were happy with, and the rule "every risk names an owner."
+- **Sensor:** a separate checker chat with four checks: under 200 words; every risk has an
+  owner; no dates in the past described as upcoming; no claim that isn't in this week's notes.
+- **Loop-back:** paste the checker's FAIL lines into the drafting chat and ask for a fix of
+  those lines only.
+
+Two weeks in, you notice the checker keeps flagging the same thing, missing owners. That's your
+signal to strengthen the guide (add a third example that shows owners) rather than keep catching
+it after the fact. That's the harness habit: guides prevent, sensors catch, and repeated catches
+tell you which guide to fix.
+
+## Common failure modes
+
+- **A rule you wrote down keeps getting broken** → it's a guide with no sensor → add a check
+  that runs every time and names the failing line.
+- **The reviewer approves everything** → it shares context with the author → review in a fresh
+  chat or with a different model, without the author's self-assessment.
+- **The checklist grows to twenty items and nobody runs it** → the sensor is too expensive →
+  keep three to five checks that catch real, repeated mistakes.
+- **A long task drifts after a summary** → you trusted compaction to carry the facts → keep a
+  progress or decisions file and restart from it.
+
+## The habit
+
+Name every part of your setup as a guide or a sensor, decide which are load-bearing, then go
+strengthen the weakest sensor. That single habit is the difference between *hoping* the model
+behaves and *engineering* it to.

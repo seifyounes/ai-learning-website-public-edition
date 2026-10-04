@@ -1,0 +1,194 @@
+---
+title: "Build your first automation (no-code)"
+summary: "Build, test and switch on a real form-to-spreadsheet automation with a notification, without writing any code."
+changeNote: "New: a click-by-click worked example, a failure-modes list, and a short planning exercise so you build your first flow once, properly."
+section: foundations
+pillar: workflows-agents
+order: 3
+level: beginner
+estMinutes: 16
+taskMinutes: 40
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "SVkiqiSVo3k"
+  published: "2026-01-21"
+  year: 2026
+  minutes: 18
+  title: "Make.com Tutorial for Beginners (2026) – Full Guide"
+  channel: "Metics Media"
+  why: "A current, beginner-paced Make walkthrough that builds and runs a real scenario instead of touring menus, and at 18 minutes it covers exactly what a first build needs. Make's visual canvas is the friendliest place to see an automation work end to end. If you chose n8n, the n8n beginner guide in the backups covers the same four steps."
+applyIt: |
+  Take the four steps to a second intake in your own life, on paper, in ten minutes. The point is
+  to see that the build you just learned is a pattern you can reuse, not a one-off.
+
+  1. **Pick the intake.** Something that arrives in your inbox or chat and gets copied somewhere
+     by hand: a request, a sign-up, a report, a receipt.
+  2. **Write the four lines.** Trigger (what starts it), action (where it lands), mapping (which
+     three fields go where), test record (one realistic fake entry you'd run first).
+  3. **Decide the start point and the alert.** "From now on" or include past entries? Who gets
+     notified, and is that alert worth the noise?
+
+  **At work:** client inquiries, internal requests or bug reports are the usual first picks.
+  **If you're a student or between projects:** a study group, a club sign-up, or feedback on
+  something you've built.
+  Success: a four-line spec for your next flow, with a test record you could paste in today.
+toolkit: |
+  - **Make "test before enable" a written rule.** Add one line to your notes and to your ChatGPT,
+    Gemini or Claude custom instructions: no flow goes live before it runs clean on a real record.
+    Then any build coaching you ask for starts from that rule.
+  - **Set up a build-coach Project.** A custom GPT, Gemini Gem or Claude Project whose standing
+    instructions say which tool you use (Make or n8n) and how you like steps explained. Paste the
+    build spec and ask for step-by-step clicks, then paste back any error message the tool shows.
+  - **Save the build-spec prompt as a template.** Keep the task's walk-me-through prompt as a saved
+    prompt or snippet with slots for trigger, fields, actions and test record, so every new flow
+    starts from the four-line spec you wrote in Apply it.
+  - **Have the assistant check your mapping.** Before you enable a flow, paste a screenshot of the
+    mapping screen and the sample data into ChatGPT, Gemini or Claude and ask it to read each
+    mapping back and flag any field that lands in the wrong place.
+recap:
+  - emoji: "🚪"
+    title: "Why the first one matters"
+    text: "Your first automation is the moment the mystery dies. Build one end-to-end and the rest is just more of the same."
+  - emoji: "1️⃣"
+    title: "Step one"
+    text: "Choose the event that starts the flow — a new form entry, an email, a schedule. Everything downstream hangs off this."
+  - emoji: "2️⃣"
+    title: "Step two"
+    text: "Say what happens next: add a row, send a message, call an app. The right-hand side of the sentence."
+  - emoji: "🔗"
+    title: "Where beginners fumble"
+    text: "Wire the trigger's outputs into the action's inputs — the email field into the send-to field. This is where beginners fumble; go slow."
+  - emoji: "✅"
+    title: "Before you flip the switch"
+    text: "Run it on real data and confirm before you turn it on. An automation repeats, so one bad mapping becomes a hundred wrong emails."
+  - emoji: "🔓"
+    title: "What you just unlocked"
+    text: "That four-step loop builds most no-code automation; complex ones are just more blocks and branches. The pattern beats the tool."
+task: |
+  Build and turn on one real automation today: **new form submission → add a row to a Google
+  Sheet → notify you.** If you don't have an intake yet, create a free Google Form or Tally form
+  with five fields (name, email, topic, message, date) first. Build it on a real signal, not a
+  demo, if you can: a form people actually fill in gives you real data to map and a flow that earns
+  its keep the day you turn it on. Use Make's free plan, or your top
+  pick from the mindset lesson's ROI list. Hand the build spec to an assistant (ChatGPT, Gemini,
+  Claude) and have it walk you through each click:
+
+  ```prompt
+  Walk me through this build in [Make or n8n], one click at a time.
+  Trigger: a new submission to my [Google Forms or Tally] form.
+  Map these fields off each submission: name, email, topic, message, date.
+  Action 1: append one row to a Google Sheet called "Inbox log", one column per field.
+  Action 2: notify me (Slack, Discord or email) with name + topic + the first line of the message.
+  Before enabling, run it once on this test submission:
+  {"name":"Sam","email":"sam@example.com","topic":"question","message":"Do you offer weekend sessions?","date":"2026-07-11"}
+  Stop me if the test gives anything other than one correctly-mapped row and one alert.
+  ```
+
+  Submit one real entry yourself, check the sheet row and the alert field by field, and only then
+  switch the flow on. Then start an automation log: a spreadsheet with one row per flow you turn on
+  (the trigger, the actions, which account and credentials it uses, and how to switch it off), and
+  make this flow row one. Future you will rebuild nothing from memory.
+  Success: one live flow, logged, and a test submission that produced exactly one correct row and one alert.
+selfCheck:
+  - q: "A classmate builds their first flow: new email in a shared inbox → create a task card. They connect both apps, switch it on and go home. What did they skip, and what should they do before switching it back on?"
+    a: "They did the trigger and the action but skipped the last two of the four steps: mapping each field from captured sample data (subject → card title, and so on) and testing on one real email. Turn it off, map from a sample, run once, check the card field by field, then enable."
+  - q: "You run a small tutoring business and automate your booking form into a sheet. The test run worked, but the row has the parent's email address in the Name column. What happened, and how do you fix it?"
+    a: "A mapping mistake: the wrong trigger field was dropped into that column, often because the sheet had no header row and the columns showed only as A, B, C. Add headers, re-map each column from the sample data, and run the test again."
+  - q: "You switch on your club's sign-up flow on Friday. On Monday the sheet has 200 rows, including sign-ups from months ago. What went wrong?"
+    a: "The trigger processed old submissions because its starting point included past entries. Clean out the duplicates, set the trigger to start 'from now on', and check the start setting before enabling any future flow."
+  - q: "The flow works every time you click 'Run once', but real submissions never show up. Name two likely causes."
+    a: "The flow was never switched on (scheduling is off), or it's a polling trigger with a long interval, so entries wait until the next check. Turn it on, check the interval, and submit one live entry to confirm."
+backupResources:
+  - label: "n8n Automation Tutorial 2026: Complete Beginner's Guide — Thetips4you"
+    url: "https://www.youtube.com/watch?v=jCWPqTDgplk"
+    type: "video · n8n path"
+  - label: "Make — official help center"
+    url: "https://www.make.com/en/help"
+    type: "docs · official"
+tags:
+  - automation
+  - make
+  - no-code
+  - hands-on
+---
+
+Enough theory — time to build. Your first automation is a rite of passage, and the
+good news is that **every** automation you'll ever build is the same four steps
+repeated. Do it once and the mystery is gone.
+
+## The four steps (memorise these)
+
+1. **Pick a trigger** — what starts the flow (a new form entry, email, schedule).
+2. **Add an action** — what happens (add a row, send a message, call an app).
+3. **Map the data** — wire the trigger's outputs into the action's inputs (the
+   email field → the "send to" field). This is the part beginners fumble; go slow.
+4. **Test, then enable** — run it with real data, confirm it's correct, *then* turn
+   it on.
+
+## A great first project
+
+Build: **new lead (form submission) → add a row to a Google Sheet → send a Slack /
+email notification.** It's simple, genuinely useful, and touches all four steps. It
+maps directly onto client intake, event sign-ups, or bug reports for a side project.
+
+One note on tools: this first build uses **Make** because its canvas is the gentlest
+on-ramp — but the pillar later leans **n8n** for AI steps and self-hosting. That's fine
+on purpose: the four steps are identical in both, so nothing you learn today is wasted;
+you're learning the pattern, not the canvas.
+
+## Worked example: the build, click by click
+
+Here's the whole build in Make, written so you can follow it with the editor open. Menu names
+shift a little between versions; the order of moves doesn't.
+
+1. **Prepare the destination first.** Create a Google Sheet called "Inbox log" and type a header
+   row: Name, Email, Topic, Message, Date. Headers matter: without them, most tools show your
+   columns as A, B, C and mapping becomes guesswork.
+2. **Create a scenario and add the trigger.** Search for your form tool (Google Forms or Tally),
+   pick its "watch new responses" trigger, connect your account and choose the form. If it asks
+   where to start, choose **from now on** so it doesn't process every old entry.
+3. **Capture sample data.** Click **Run once**, then submit a test entry in the form. The trigger
+   bubble now holds a real submission, and every field (name, email and the rest) becomes
+   something you can click on when mapping.
+4. **Add the sheet action.** Add Google Sheets → "Add a row", pick the spreadsheet and the tab.
+   You'll see one input per column header.
+5. **Map, one field at a time.** Click into the Name input and pick the *name* field from the
+   trigger's output. Repeat for each column. Read every mapping back out loud: "Email column gets
+   the email answer." This is the step that goes wrong.
+6. **Add the notification.** Add your chat or email module and build the message from mapped
+   fields, for example `New enquiry from [name] about [topic]`, with each bracket replaced by
+   the mapped field.
+7. **Test the whole chain.** Run once again, submit a second test entry, then check the sheet
+   cell by cell and read the alert.
+8. **Turn it on.** Only now switch scheduling on. Note the check interval: some triggers are
+   **instant** (the form tool pushes the entry to Make the moment it arrives), others **poll**
+   on a timer. You'll learn why in the webhooks lesson (→ webhooks-and-apis).
+
+> 💡 **Try it:** Before you open any tool, draw a three-column table on paper: form field → sheet
+> column → where it appears in the alert. Five minutes, and step 5 becomes copying, not thinking.
+
+## Why testing isn't optional
+
+An automation runs unattended, again and again. A tiny mapping mistake doesn't
+happen once — it happens to every record. So you always test with real data first.
+This is the automation version of the coding-agent habit "give it a way to verify."
+
+## Common failure modes
+
+- **"Run once" sits there doing nothing** → the trigger is waiting for a *new* entry → no fresh
+  data arrived → submit a test entry *after* you start the run.
+- **Data lands in the wrong columns** → wrong field mapped, or no header row → you mapped from
+  memory, not from sample data → add headers and re-map from the captured sample.
+- **A flood of old rows** → the trigger processed past submissions → the start point included
+  history → choose "from now on" and remove the duplicates.
+- **Perfect in testing, silent in real life** → the flow was never switched on, or it polls
+  rarely → enabling is a separate step → turn it on, check the interval, send one live entry.
+- **Dates look wrong** → a different format or time zone than the sheet expects → tools pass
+  dates as text → format the date explicitly in the mapping.
+
+## You just unlocked the pattern
+
+Pick trigger, add action, map data, test. That loop builds most no-code automations; complex
+ones are just more steps and some branching. Next we make these flows *smart* by dropping an AI
+step into the middle (→ ai-in-automations).

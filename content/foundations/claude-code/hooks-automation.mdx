@@ -1,0 +1,241 @@
+---
+title: "Hooks"
+subtitle: "Deterministic guardrails & automation"
+summary: "Turn rules your agent sometimes forgets into hooks that always run, such as tests before it finishes and blocks on secret files."
+changeNote: "New: a 10-minute sort of your rules into 'ask' and 'enforce', a task that builds a lint hook, a secrets guard and a test gate, and a .env.example scenario."
+section: foundations
+pillar: claude-code
+order: 8
+level: intermediate
+estMinutes: 15
+taskMinutes: 45
+prerequisites: [install-first-session, core-loop]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "J5B9UGTuNoM"
+  published: "2025-07-07"
+  year: 2025
+  minutes: 31
+  title: "I'm HOOKED on Claude Code Hooks: Advanced Agentic Coding"
+  channel: "IndyDevDan"
+  why: "Most hooks videos show one notification hook; IndyDevDan wires the core lifecycle events into a working build, ships a companion repo you can run (in the backups), and frames hooks as programming the harness rather than toggling a setting, which is this lesson's angle."
+  notes:
+    - "Filmed in July 2025: the config UI has changed and newer events have been added since."
+    - "The core events he wires (PreToolUse, PostToolUse, Stop, SubagentStop, session start and end) still work the same way."
+    - "Check exact fields against the official hooks reference in Read-after."
+readAfter:
+  - label: "Hooks reference — official Claude Code docs (source of truth)"
+    url: "https://code.claude.com/docs/en/hooks"
+    kind: "docs"
+applyIt: |
+  Spend ten minutes sorting the rules you already give your agent into **ask** and **enforce**.
+  Open your project's CLAUDE.md (or AGENTS.md, the cross-tool equivalent) plus the last few
+  corrections you typed into a session, and give every rule one label:
+
+  - **Taste** (naming, tone, "prefer small functions"): it stays a line in the file.
+  - **Must happen** (tests pass, formatting is clean, a secret stays unread, nothing
+    force-pushes): it becomes a hook. Note the event it attaches to (PreToolUse to block,
+    PostToolUse to react to an edit, Stop to gate the finish) and whether it blocks (`exit 2`)
+    or only reports.
+
+  Then take the one must-happen rule that would hurt most if it failed silently and write two
+  lines: what the hook reads (the file path, the command, the test result) and what it tells
+  the agent when it blocks.
+
+  **No coding project yet?** Run the same sort on a checklist you follow at work or in class:
+  which steps need judgment, and which should a script or a form check for you every time?
+
+  Success: every current rule labeled taste or must-happen, and one must-happen rule written up
+  as event + check + message, ready to become your next hook.
+toolkit: |
+  Make your setup *enforce* your standards instead of documenting them:
+
+  - **Put the secrets guard in user settings.** A PreToolUse block-hook in
+    `~/.claude/settings.json` guards every repo you open at once, and a script that reads the
+    real path or command beats a coarse deny rule you'd repeat per project.
+  - **Give every repo a lint-on-edit hook.** A PostToolUse hook running your linter on the
+    edited file turns the project's Definition of Done into something the harness *runs*, not
+    something you hope the agent ran before it said "done."
+  - **Make each project's Definition of Done a Stop hook.** Gate the turn on your test (and
+    build or typecheck) command, `exit 2` on red, with a `stop_hook_active` guard so a truly
+    unfixable test can't trap the session. "Green before done" becomes guaranteed, not
+    remembered.
+  - **Cover the tools without these hooks.** Cursor has its own hooks; for Copilot, Codex or a
+    plain editor, a git pre-commit hook (or a CI check) is the universal fallback that enforces
+    the same rules on every commit.
+  - **Log every hook decision.** Add a one-line append to a log file in each hook, so you can
+    audit what the harness blocked and ran across your repos: cheap observability, zero
+    babysitting.
+recap:
+  - emoji: "🔒"
+    title: "Asking vs. guaranteeing"
+    text: "CLAUDE.md and prompts ask; a hook is a script the harness runs no matter what the model decides. That's the whole pitch — deterministic control over the agent loop instead of hope."
+  - emoji: "🎚️"
+    title: "Where hooks attach"
+    text: "Hooks attach to points in the loop: a prompt coming in, before a tool, after a tool, when the turn tries to stop, when a subagent ends, and session start/end. Pick the moment, run your code."
+  - emoji: "🛑"
+    title: "Before the action"
+    text: "It fires before an action and can block it — inspect the exact command or file path and refuse the edit to .env, the rm -rf, the force-push. The one place you stop a mistake instead of cleaning it up."
+  - emoji: "🧹"
+    title: "After the edit lands"
+    text: "After an edit lands, fire your formatter, linter, or tests automatically. Quality stops depending on the model remembering — it happens because the harness always does it."
+  - emoji: "🏁"
+    title: "When it tries to finish"
+    text: "When Claude tries to end the turn, run the suite. Block the stop on failure and hand the errors back, and it keeps working until the work is actually green — not just 'looks done.'"
+  - emoji: "📣"
+    title: "More than a log line"
+    text: "A blocking exit code (or a decision JSON) doesn't just log — it stops the action and feeds your message straight into Claude's context. That feedback wire is the difference between a dashboard and a control."
+  - emoji: "🛠️"
+    title: "What you're really doing"
+    text: "Hooks are just shell scripts on lifecycle events — guardrails, tests, notifications, logs. Wiring them in is agentic engineering: you stop using the tool and start operating the system."
+task: |
+  Ship three hooks in a repo with a test command (your own, or a small starter app you clone;
+  about 45 minutes). Start with the two rules that must hold on every edit, as one order:
+
+  ```prompt
+  Add two hooks to this project's .claude/settings.json (scripts in .claude/hooks/; keep any
+  existing hooks untouched).
+  1) A PostToolUse Edit|Write hook that runs our formatter and linter on the edited file only
+  [e.g. "prettier + eslint" for JS/TS, "ruff" for Python, "gofmt + go vet" for Go], and exits 2
+  with the lint output on failure so you fix it immediately.
+  2) A PreToolUse guard that refuses any read or edit of .env* files (except .env.example),
+  secrets/**, and any key or credential file, exiting 2 with the reason: a hard gate the model
+  can't talk past, not a CLAUDE.md line it drops under load.
+  Show me both scripts and the settings diff.
+  ```
+
+  Make one small edit and confirm the lint hook fires unprompted, then ask Claude to read `.env`
+  and watch the guard refuse with its reason. Now add a **Stop hook** that runs the test suite
+  and exits 2 on failure (with a `stop_hook_active` check so it can't loop forever).
+  Deliberately break one test, ask Claude to finish, and watch the harness refuse to let the
+  turn end; revert the test.
+
+  **No linter or tests yet?** A two-file starter works: one function and one test file, with
+  `npm test` or `pytest` as the command; let the PostToolUse hook run that test command instead
+  of a linter. **On Windows:** ask for PowerShell scripts instead of `.sh`, or run Claude Code
+  in WSL2.
+
+  Success: the lint hook fired on its own, the guard refused a secrets read with a reason, and
+  the Stop hook refused to end the turn on a red test. Those refusals are your standards,
+  enforced.
+selfCheck:
+  - q: "You've written 'always run the linter before committing' in your project's CLAUDE.md three times and Claude still skips it under a long task. What actually fixes it, and how is a hook different from that line?"
+    a: "Move it out of the doc and into a PostToolUse (or Stop) hook. CLAUDE.md is advisory — the model usually complies but drops rules as context fills. A hook is guaranteed: the harness runs the script every time, identically, no matter what the model decided. Anything that MUST happen belongs in a hook, not a hope."
+  - q: "Your `Read(./.env*)` deny rule works, but it also blocks `.env.example`, which Claude needs to see which variables exist. What do you change, and why?"
+    a: "Replace the coarse deny with a PreToolUse hook that reads the real path: allow `.env.example`, block every other `.env*` file, and send the reason back with exit 2 (or a `permissionDecision` of `deny`). Deny rules are static pattern matches; a hook is a program, so it wins whenever the answer is 'it depends'."
+  - q: "Your Stop hook runs tests and exit-2s on failure so Claude keeps fixing — but now it loops forever on a genuinely unfixable test. What's the guard?"
+    a: "The Stop event's JSON carries stop_hook_active (true when Claude is already continuing because of your stop hook). Check it and let the stop through after a cycle, or cap the retries — so the gate buys one more fix attempt without trapping the session. Deterministic shouldn't mean unbounded."
+  - q: "You want your test suite to be a 'load-bearing' sensor (a term from the Harness engineering lesson, → harness-engineering), not a doc Claude might read. Concretely, which hook makes it load-bearing — and what earns that word?"
+    a: "A Stop (or PostToolUse) hook that runs the suite and exit-2s on failure. It's load-bearing because it sits on the path the agent MUST travel to finish: the harness runs it deterministically and the turn can't end until it passes, so output quality depends on it. An unenforced 'run the tests' in CLAUDE.md is decorative — the hook is the wire."
+backupResources:
+  - label: "claude-code-hooks-mastery — IndyDevDan's companion repo (all lifecycle events, runnable)"
+    url: "https://github.com/disler/claude-code-hooks-mastery"
+    type: "repo · companion to the video"
+  - label: "How Claude Code Hooks Save Me HOURS Daily — Better Stack"
+    url: "https://www.youtube.com/watch?v=Q4gsvJvRjCU"
+    type: "video · real-world"
+tags:
+  - claude-code
+  - hooks
+  - automation
+  - safety
+  - reliability
+---
+
+`CLAUDE.md` *asks* Claude to follow your rules; a prompt *requests*. **Hooks make them law.** A
+hook is a shell script the harness runs automatically at a fixed point in the agent loop — before
+a tool call, after an edit, when the turn tries to end — so the behavior happens because the
+*harness* fired it, not because the model chose to. That's the shift: from hoping to **wiring**.
+
+## Advisory vs. guaranteed — the whole point
+
+Everything you've built so far steers the model *probabilistically*. CLAUDE.md, skills, a
+well-worded prompt: the model usually complies, sometimes doesn't — and "sometimes doesn't" grows
+with context pressure and task length. A hook is *deterministic*: the harness executes it every
+time, identically, whatever the model decided or forgot. So the rule is blunt. When something
+**must** happen — tests run, secrets stay untouched, formatting is clean — you don't write it in a
+doc and cross your fingers, you make it a hook. Advisory is for taste; guaranteed is for anything
+load-bearing. (Same idea elsewhere: Cursor has its own agent hooks, and for any tool without
+them, a git pre-commit hook or a CI check enforces the same rule on every commit.)
+
+## The lifecycle events you'll wire
+
+Hooks attach to points in the agent loop. The load-bearing set:
+
+- **PreToolUse** — fires *before* a tool runs, and can **block it**. This is your gate: inspect
+  the exact command or file path and refuse edits to `.env`, an `rm -rf`, a force-push.
+- **PostToolUse** — fires *after* a tool succeeds. The workhorse: run your formatter, linter, or
+  tests after every edit so quality is automatic instead of remembered.
+- **Stop** — fires when Claude tries to *end the turn*. Run the suite here and you can refuse to
+  let it stop on red.
+- **SubagentStop** — the same finish-line gate for a subagent's turn, so delegated work is
+  verified before its result returns (→ subagents-and-agent-teams).
+- **Session** (`SessionStart` / `SessionEnd`) — bookend the whole session: load fresh context in,
+  log or clean up on the way out.
+
+Two more you'll meet: **UserPromptSubmit** (screen or enrich a prompt before Claude sees it) and
+**PreCompact** (snapshot state before the window is summarized). The event surface keeps *growing*
+(newer versions add events, including some for Agent Teams), but these core events are unchanged
+in name and behavior; the newer ones are additions, not replacements.
+
+Everything is configured in **`settings.json`** with a matcher that picks which tools trigger it:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{ "type": "command", "command": ".claude/hooks/guard.sh" }]
+      }
+    ]
+  }
+}
+```
+
+## How a hook blocks and talks back
+
+A hook reads a JSON event on stdin (the tool name, its inputs, the session) and answers two ways.
+The fast way is the **exit code**: `0` = allow and continue; **`2` = block, and send stderr
+straight back to Claude** as feedback; anything else = a non-blocking error. The precise way is
+**JSON on stdout** — a `decision` with a `reason`, or for PreToolUse a
+`hookSpecificOutput.permissionDecision` of `deny` with a reason. Either way, the key move is that a
+hook doesn't just *log* — it **feeds a verdict back into the loop**, and Claude reacts to it. That
+is the difference between a dashboard and a control.
+
+This is also what separates a hook from a **permission deny rule** (those live in
+→ install-first-session). A deny rule is coarse, static string-matching; a PreToolUse hook is a
+*program* — it reads the real arguments and decides with logic, allowing some cases and blocking
+others with an explanation the model can act on.
+
+## Hooks are how you wire a sensor into the loop
+
+Harness engineering gave you the concept: an agent is a model plus the guides and **sensors** you
+build around it, and a sensor only matters when it's **load-bearing** — on the path the agent must
+travel, not a doc it might read (the theory lives in → harness-engineering). **Hooks are the
+wiring.** A test suite on its own is just a sensor; a *Stop hook that runs it and `exit 2`s on
+failure* is that sensor made load-bearing — the turn cannot end until it passes, and the agent
+can't route around it. A PreToolUse guard is a guide made deterministic — the guardrail fires
+*before* the act instead of trusting the model to recall the rule. When the Harness engineering
+lesson said "make your scaffolding load-bearing," a hook is the mechanism it meant.
+
+## Two patterns you'll ship tonight
+
+**The safety gate (PreToolUse).** One script that blocks edits and reads of secrets plus the
+handful of irreversible commands, with a reason fed back so Claude self-corrects. Write it once
+in *user* settings and it guards every repo you touch.
+
+**Test-on-stop (Stop).** Run the suite when Claude tries to finish; `exit 2` with the failure on
+red so it keeps working until green — the deterministic version of the runnable-check habit
+(the idea is covered in → core-loop; this is how you make it non-optional). One gotcha: the Stop
+event passes `stop_hook_active` so you can detect "I'm already looping because of my own hook" and
+cap the retries — deterministic shouldn't mean infinite.
+
+> 💡 **Try it:** add a Stop hook that runs your tests and blocks on failure, then deliberately
+> break a test and try to end the turn. Watch the harness refuse to let the session close — that
+> refusal is your standard, enforced.
+
+Hooks are the smallest lever with the biggest reliability payoff: a few shell scripts on lifecycle
+events turn "the agent usually behaves" into "the harness makes it" — the jump from *using* Claude
+Code to *operating* it.

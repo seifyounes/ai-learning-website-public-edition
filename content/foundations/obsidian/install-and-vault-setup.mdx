@@ -1,0 +1,309 @@
+---
+title: "Install Obsidian & lay out an agent-ready vault"
+summary: "Install Obsidian and lay out one vault whose folders say which notes are yours and which an AI assistant may write, with sync decided."
+changeNote: "New: a sorting drill for your own files, a no-code path through a chat Project, one rules note any AI can follow, and a 9-minute watch range."
+section: foundations
+pillar: obsidian
+order: 2
+level: beginner
+estMinutes: 16
+taskMinutes: 25
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "VamxACAdKgQ"
+  published: "2026-04-28"
+  year: 2026
+  minutes: 70
+  start: 71
+  watchMinutes: 9
+  title: "Obsidian Tutorial For Beginners 2026 (Master Obsidian In 60 Minutes)"
+  channel: "Emma's Productivity Lab"
+  why: "A current (2026) beginner tutorial that shows install, creating a vault, folders and notes, the file sidebar, panes and graph view clearly. Older tutorials can show a different interface; this one matches what you'll see. Hold one thing at arm's length: her five numbered folders (`01 Inbox` … `05 Projects`) don't say which folders an AI may write to, so this lesson replaces them with a layout that does."
+  notes:
+    - "It runs 70 minutes, but you need only 1:11 to 9:39, about eight and a half. It has no chapter markers, so the player starts at 1:11 for you; stop at 9:39."
+    - "After 9:39 it moves to Canvas (this pillar doesn't use it), then to daily notes, templates and properties, which later lessons cover."
+    - "Recorded on Windows. On a Mac the steps are identical; read Ctrl as Cmd."
+    - "Obsidian Sync appears only once, at 1:55, with no comparison to a free synced folder, so take the sync decision from the lesson body."
+applyIt: |
+  Before you build anything, practise the one judgment this layout encodes: which layer a file
+  belongs in. The folder a file lands in is what tells an AI whether it may touch it.
+
+  - **`sources/`** — material you didn't write and can't afford to lose. **If you study:**
+    lecture slides, the syllabus, a paper you keep citing. **If you code:** a docs page you keep
+    re-opening, an API reference. **At work:** the policy doc, the style guide, a long spec. An
+    AI reads it forever and edits it never.
+  - **`inbox/`** — your own raw, unsorted notes.
+  - **`wiki/`** — what an AI writes *about* that material: a page per concept, decision or fix.
+
+  Write ten files you already own as a list, and next to each write its layer and a one-line
+  reason. Mark any you can't place AMBIGUOUS. The deciding question is always "did I write
+  this, and may an AI ever edit it?"
+
+  **With a chat assistant (no code):** paste the list into ChatGPT, Claude or Gemini and ask
+  "Which of these placements would you change, and why? Leave the rest alone." Keep only the
+  changes you can defend.
+
+  Success: ten files placed, and you can defend where each ambiguous one went.
+
+  **With a coding agent:** open your agent in a folder you already work in and ask it to list
+  the files two levels deep and name the three hardest to place in `sources/`, `inbox/` or
+  `wiki/`, moving and editing nothing. Place those three yourself.
+
+  Success: the three hardest files placed by you, with a reason each, and no file touched.
+toolkit: |
+  - **Point Daily notes at `daily/` today.** In Settings → Core plugins, turn on Daily notes, set
+    its folder to `daily/` and its date format to `YYYY-MM-DD`. Then bind "Open today's daily
+    note" in Settings → Hotkeys, so the name your later prompts expect is the one you get.
+  - **Turn the vault's rules into a Project.** Paste `vault-rules.md` into the instructions of a
+    ChatGPT or Claude Project (or a Gemini Gem) for your notes. Every chat about your vault then
+    follows the same conventions without you re-explaining them.
+  - **Give your notes a spine, and log every save.** Keep `index.md` with one line per important
+    note and `log.md` with one dated line per change, whoever makes it. "When did this get in
+    here?" is the question you'll ask most, and the log answers it.
+  - **Keep the vault its own folder, not a subfolder of a work or course folder.** Each project
+    has its own history; a vault swallowed by one of them stops being readable from the others,
+    and you don't want personal notes shared or pushed along with a project's files.
+
+  **If you use a coding agent:**
+
+  - **Point the agent's own file at the vault rules.** Keep a one-line `AGENTS.md` (or CLAUDE.md /
+    GEMINI.md for those agents) at the vault root: "Read vault-rules.md first, and append a
+    log.md line on every save." The rules stay in one note, whichever agent you run.
+recap:
+  - emoji: "📦"
+    title: "How many vaults?"
+    text: "Obsidian is free, and a vault is just a folder of `.md` files on your disk. Make one for everything — a vault per project breaks the connections that make it worth having."
+  - emoji: "🧱"
+    title: "Why decide the layout now"
+    text: "Seven entries, decided on day one. This vault has two readers — you in Obsidian, and an AI working from the files — and the second one needs the layout to mean something."
+  - emoji: "📚"
+    title: "The sources/ rule"
+    text: "`sources/` holds raw material you curate: articles, docs, transcripts. The AI reads it forever and edits it never, so there's always something stable to check a claim against."
+  - emoji: "🤖"
+    title: "Who writes wiki/?"
+    text: "Every summary, concept page and entity page lives in `wiki/`, drafted by an AI: a coding agent writes the files, or a chat assistant drafts and you save. You read and correct; it does the bookkeeping."
+  - emoji: "📜"
+    title: "The file at the root"
+    text: "`vault-rules.md`, a plain note at the vault root stating your conventions — naming, note shape, who may write where. A chat assistant gets it as Project instructions; a coding agent reads it through a one-line pointer file."
+  - emoji: "🗂️"
+    title: "The two spine files"
+    text: "`index.md` is the catalog of what's in the vault; `log.md` is an append-only record of what was done to it. Both AI-maintained, both the reason the vault doesn't drift."
+  - emoji: "🌳"
+    title: "What happens inside wiki/"
+    text: "The top level is fixed, but inside `wiki/` structure comes from links, not subfolders. Premature hierarchies are still the number one beginner trap."
+  - emoji: "🔄"
+    title: "The decision not to postpone"
+    text: "Pick paid Obsidian Sync or a free synced folder now. Two lessons from here you'll want to capture from your phone, and no answer means the habit quietly dies."
+task: |
+  Install Obsidian (free), create **one empty folder** for the vault (e.g. `Documents/Brain`),
+  and open it in Obsidian with **Open folder as vault**. Then build the seven entries.
+
+  **With a chat assistant (no code):**
+
+  - In Obsidian's file pane, right-click → **New folder** four times: `inbox`, `sources`,
+    `wiki`, `daily`. Then create three notes at the root: `index`, `log` and `vault-rules`.
+  - Ask ChatGPT, Claude or Gemini to write the rules:
+
+  ```prompt
+  Write a rules note for my Obsidian vault, as one markdown block I can paste. State what
+  each part is for: inbox/ (my raw capture), sources/ (material I curate; an AI may read it
+  and never edit it), wiki/ (pages an AI drafts and I review and save), daily/ (one note per
+  day, named YYYY-MM-DD.md), index.md (a catalog with "Sources", "Wiki pages", "Daily notes"
+  and "Reports" headings) and log.md (one dated line per change, append-only). Add two rules:
+  every note's H1 matches its filename, and links use [[wikilinks]].
+
+  Success: every folder and file above is named, with one line on what it's for.
+  ```
+
+  - Paste the answer into `vault-rules.md`. Give `index.md` its four headings, and give
+    `log.md` one line such as `YYYY-MM-DD | scaffold | vault created`, with today's date.
+  - Create a Project in ChatGPT or Claude (or a Gem in Gemini) called "Vault" and paste
+    `vault-rules.md` into its instructions. Every later chat path in this pillar runs there,
+    so the assistant always knows your rules.
+
+  Success: seven entries in the file pane, `vault-rules.md` names every one of them, and the
+  same rules sit in your Vault Project's instructions.
+
+  **With a coding agent:**
+
+  - Open a terminal **in that folder**, start your agent (Codex, Claude Code, Gemini CLI or
+    another), and run your first prompt against a vault:
+
+  ```prompt
+  This empty folder will become my Obsidian vault. Create exactly this and nothing else:
+  folders inbox/, sources/, wiki/, daily/; an index.md catalog with "Sources", "Wiki pages",
+  "Daily notes" and "Reports" headings; a log.md with one dated line recording this scaffold;
+  and a vault-rules.md. Write vault-rules.md as the vault's schema — what each folder is
+  for, that sources/ is mine and read-only to you, that you own wiki/ and index.md and
+  log.md, that every note's H1 matches its filename, that links use [[wikilinks]], and that
+  daily notes are named YYYY-MM-DD.md. Then create the rules file you load automatically
+  (AGENTS.md, or CLAUDE.md / GEMINI.md if that's yours) with one line: "Read vault-rules.md
+  first." Show me the file list before you write, and create nothing outside this folder. Success:
+  the folders and files exist, and vault-rules.md names every one of them.
+  ```
+
+  Success: the seven entries plus the one-line pointer appear in Obsidian's file pane, and
+  `vault-rules.md` names every one of them.
+
+  **Either way, finish the same:** write two real notes into `inbox/`, one on a **decision**
+  you made recently and why (a framework you chose, how you split a group project, a tool your
+  team adopted), and one on a **problem you hit and how you fixed it** (a build error, a
+  formula that kept going wrong, a process that broke). Lesson 3 links them together.
+
+  Success: the vault opens in Obsidian with the seven entries, `vault-rules.md` names every
+  one of them, and two real notes sit in `inbox/`.
+selfCheck:
+  - q: "A classmate wants a separate vault for each course 'to keep things tidy.' Six months later they want to see everything they've learned about statistics across three courses. What went wrong, and what would you have suggested?"
+    a: "A vault per course severed the links between courses: Obsidian links and searches within one vault, so notes on the same idea in three vaults can't find each other. One vault, with courses as folders or (better) as links and tags, keeps every connection possible. A vault is just a folder of markdown files, so merging later is possible, but the links have to be rebuilt."
+  - q: "You ask an AI to 'clean up the vault', and it edits an article in `sources/` so it agrees with the summary it wrote in `wiki/`. Why is that worse than a mistake in `wiki/` alone, and what prevents it?"
+    a: "`sources/` is the evidence everything else is checked against. A wrong summary in `wiki/` can be caught by comparing it with its source; once the AI rewrites the source to match, the wrong claim has erased its own evidence. The fix is the boundary in `vault-rules.md`: `sources/` is yours and read-only to any AI. It's a permission boundary, not a filing category."
+  - q: "The lesson says 'don't build a folder tree' and then hands you a seven-entry tree. Which is it?"
+    a: "Both, at different levels. The top level is a contract between you and the agent — three layers plus two spine files — so it's fixed on day one. Inside `wiki/`, structure still emerges from links, not subfolders. Folders declare ownership; links carry meaning."
+  - q: "You wrote your note conventions in a `README.md` at the vault root, but your coding agent keeps naming files its own way and writing into `sources/`. What's the fix?"
+    a: "Point the file the agent reads automatically at the start of every session at your rules: `AGENTS.md` for Codex, OpenCode and most others, or CLAUDE.md / GEMINI.md for Claude Code and Gemini CLI, holding one line that says to read `vault-rules.md` first. A README is documentation the agent may never open; that file is loaded every time, which is why Karpathy's wiki names it as the schema layer. In a chat assistant, the same job falls to a Project's or Gem's standing instructions."
+backupResources:
+  - label: "Obsidian Help — official documentation"
+    url: "https://help.obsidian.md"
+    type: "docs · official"
+  - label: "Obsidian — official download"
+    url: "https://obsidian.md/download"
+    type: "download"
+  - label: "Karpathy's LLM wiki — the idea file this layout comes from"
+    url: "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f"
+    type: "reference"
+tags:
+  - obsidian
+  - setup
+  - vault
+---
+
+Setup takes ten minutes. The **layout** you pick in those ten minutes is the lesson —
+because this vault has two readers.
+
+You read it in Obsidian: that's where you browse, link, and notice what's wrong. **An AI
+reads it too**: a coding agent (Codex, Claude Code, Gemini CLI and the like) straight from
+the folder, or a chat assistant from the notes you upload to it. From lesson 4 onward that AI drafts the filing,
+the summarising and the cross-referencing. A vault is a folder of markdown files on your
+disk, and that's exactly what makes the second reader possible — an agent can open a
+folder and any chat app can take a `.md` upload; neither can open a proprietary notes API.
+
+So we don't "let structure emerge" at the top level. We decide it now, once, and write the
+decision down where the agent will read it.
+
+## Get it running
+
+1. Download Obsidian from `obsidian.md` — free on desktop and mobile, and free for work
+   too: the commercial licence became **optional in February 2025**.
+2. **Create one vault**, not one per project. A second brain only works when ideas can
+   connect, and a vault per project severs them.
+3. Skip the settings tour. Themes and hotkeys are procrastination dressed as setup.
+
+## Three layers — the reason the folders look like this
+
+The layout below isn't taste. It comes from Karpathy's *LLM wiki* — an idea file published
+in April 2026 describing a knowledge base built for a human and an agent to share. It's
+agent-agnostic (its example schema files are `AGENTS.md` for Codex or CLAUDE.md for Claude
+Code, and he reviews the results in Obsidian), and it splits the vault into three layers:
+
+- **Raw sources — you curate, the agent never edits.** Articles, papers, docs pages,
+  transcripts, exports. This is the source of truth. It stays immutable so that every claim
+  in the layer above it can be re-checked against something that didn't change.
+- **The wiki — the agent owns it entirely.** Summaries, concept pages, entity pages, and
+  the cross-references between them. This is generated *from* sources and maintained by the
+  agent. You read it and correct it; you rarely author it.
+- **The schema — a config document that tells the agent the conventions.** Naming, note
+  shape, which folders are writable, what a good page looks like. In this vault it's
+  `vault-rules.md` at the root, and it co-evolves: every time you correct the AI twice, the
+  fix belongs in there.
+
+Two spine files hold it together. **`index.md`** is the catalog of what the vault contains,
+updated on every ingest. **`log.md`** is append-only — a dated line for every ingest, query
+and clean-up pass, so you can always answer "when did this get in here, and from what?"
+
+Say the division plainly to yourself, because the rest of the pillar depends on it:
+**Obsidian is the human interface. An AI is what drafts and maintains `wiki/`, `index.md` and
+`log.md`.** Obsidian itself is doing no AI work at any point.
+
+**Don't code?** That's the default route in this pillar. Paste `vault-rules.md` into a ChatGPT
+or Claude Project's instructions (or a Gemini Gem), upload the notes a question needs, and save
+what it drafts into `wiki/` yourself. You do the file moves; it does the reading and writing.
+
+**Use a coding agent?** It writes the files itself. Each agent looks for its own rules file at
+the folder root: `AGENTS.md` (Codex, OpenCode, Cursor, Copilot), or CLAUDE.md / GEMINI.md for
+Claude Code and Gemini CLI. Keep that file to one line, "Read vault-rules.md first", so the
+rules live in one note whichever agent you run.
+
+## The layout
+
+```diagram
+vault/
+├── vault-rules.md
+├── index.md
+├── log.md
+├── inbox/
+├── sources/
+├── wiki/
+└── daily/
+```
+
+- **`vault-rules.md`**: the schema, meaning the conventions, structure and workflows.
+- **`index.md`**: the content catalog, maintained by the AI.
+- **`log.md`**: append-only, one line per ingest, query and lint pass.
+- **`inbox/`**: raw, unprocessed capture. This is where *you* dump things fast, in whatever
+  shape; lesson 4 teaches an AI to drain it.
+- **`sources/`**: immutable raw material; the agent reads it and never edits it.
+- **`wiki/`**: concept and entity pages, owned by the agent. `sources/` and `wiki/` are the
+  two layers above, made physical.
+- **`daily/`**: daily notes, one per day, named `YYYY-MM-DD.md` (also lesson 4).
+
+Seven entries — the spine every later lesson refers back to. (With a coding agent, add its
+one-line pointer file beside them.) It grows once: lesson 5 adds four PARA folders that are
+unambiguously yours. What never changes is who owns what.
+
+The folder a file sits in is how the agent knows what it may do with it. That is the entire
+job of this tree, and it's why "start flat and see what happens" is the wrong advice here:
+a flat vault gives an agent no way to tell your raw material from its own output.
+
+> 💡 **Try it:** before you create anything, list three things you already own (a lecture
+> PDF, a page of your own notes, a policy doc, a bug write-up) and write next to each which
+> folder it belongs in: `sources/`, `inbox/` or `wiki/`. If one is hard to place, ask
+> yourself: did *I* write this, and may an agent ever edit it?
+
+## Where "don't build a folder tree" still applies
+
+The instinct is still right — just aimed one level down. **Inside `wiki/`, do not build
+subfolders.** No `wiki/tools/`, no `wiki/projects/flutter/`. A concept page belongs to many
+contexts at once, and the moment you file it under one you've thrown the others away.
+Structure in there comes from links (next lesson), not from hierarchy.
+
+The rule to hold: **folders declare ownership; links carry meaning.** The top level is fixed
+because ownership must be unambiguous. Everything below it stays flat because meaning isn't.
+
+## Decide sync now (capture depends on it)
+
+Two lessons from here you'll want to capture ideas from your **phone**, and that only works
+if the vault syncs. The video doesn't help you here — Sync appears once, at [01:55], purely
+as a way to open an existing vault, and is never compared to anything. So decide it from
+this list:
+
+- **Obsidian Sync** (paid) — official, end-to-end encrypted, no fiddling, works on mobile
+  out of the box. The buy-your-time option.
+- **A synced folder** (free) — put the vault in OneDrive, Google Drive or Dropbox and point
+  the mobile app at it. Fine for one person; occasional sync conflicts are the tax. On
+  Windows, right-click the vault folder and choose **Always keep on this device** —
+  on-demand placeholder files and an app that indexes every note are a bad pairing, and the
+  agent needs the real bytes on disk too.
+- **Git** works and versions everything, but it isn't phone-friendly. Use it *alongside* one
+  of the above, not instead.
+
+Either of the first two is fine. Having no answer is what kills the capture habit later.
+
+## You own your data
+
+Open the vault in File Explorer and you'll see seven plain entries — no database, no
+account, no export step. That's what lets you point a coding agent at it, or drag any note
+into a chat, from the very next lesson, and it's why this whole pillar is possible at all.
+
+Next: the links that turn those files into a graph — the thing *you* navigate and the thing
+the agent reads.

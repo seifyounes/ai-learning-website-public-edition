@@ -1,0 +1,243 @@
+---
+title: "Privacy, data & account setup for pro use"
+summary: "Set up ChatGPT, Claude and Gemini so your chats stay out of training, your account is locked down, and you know what never to paste in."
+changeNote: "New: a short video from a privacy charity, how training, retention and memory differ, a worked example of scrubbing a document, and checks for connectors and shared links."
+section: foundations
+pillar: chat-assistants
+order: 3
+level: beginner
+estMinutes: 12
+taskMinutes: 20
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "M1Cw1hXlZ5k"
+  published: "2026-05-29"
+  year: 2026
+  minutes: 5
+  title: "Is ChatGPT Sharing Your Data? 6 Settings To Protect Your Privacy"
+  channel: "Privacy International"
+  why: "Five minutes from Privacy International, a long-running privacy charity with nothing to sell, walking through six settings in order: the training opt-out, the third-party apps the assistant can reach, shared chat links, deleting old chats, two-factor sign-in and ad personalisation. Most privacy videos on YouTube are quick menu tours from tutorial channels; this one also says why each setting matters (for example, that shared links can end up in search results)."
+  notes:
+    - "It shows ChatGPT only; the lesson body gives the Claude and Gemini equivalents."
+    - "It doesn't cover memory or what you should never paste, so the lesson body adds both."
+    - "Menus move between releases; the reasons don't. If a toggle isn't where the video shows it, search the app's settings or help center."
+applyIt: |
+  The settings are the same for everyone; the never-paste line is yours. Draw it for your own
+  situation in five to ten minutes. List three kinds of material you'll handle this month (a
+  client's draft, a class's grades, an internal report, a customer spreadsheet, your own CV) and
+  mark each **paste** (fine in a consumer chat with training off), **scrub first** (useful, but
+  names, numbers and identifiers come out) or **never** (an approved enterprise tool or a local
+  model only).
+
+  **At work or school:** check first whether your organization already has an approved AI tool or
+  policy; it decides some rows for you. **If you code:** add a row for code and data: when an
+  assistant needs data to help with a bug, it gets a fake or scrubbed sample, never a real user's
+  row, an API key or a `.env` file.
+
+  Success: three kinds of material sorted, and your never-paste line written as one sentence.
+toolkit: |
+  - **Put the never-paste rule where you'll see it.** Write your one-line rule into your ChatGPT,
+    Claude or Gemini custom instructions ("remind me if I paste personal data, passwords or
+    confidential documents") and pin it at the top of your prompts notes file.
+  - **Keep a scrubbed sample next to the real thing.** Save a copy of the spreadsheet, report or
+    email template you most often need help with, with names replaced by roles and figures relabeled,
+    so when a problem needs an assistant you paste the sample, not a real person's details.
+  - **Put a privacy check on your calendar.** Once a quarter, run the checklist in each app you use:
+    training setting, saved memories, connected apps, shared links, old chats. A repeating phone or
+    calendar reminder turns a one-off setup into a habit.
+  - **Keep work and personal identities separate,** including Custom GPTs, Claude Projects and
+    Gemini Gems, so context from one job or client doesn't cross-contaminate another, and lock every
+    account that holds that context (and the Google or Microsoft account it signs in through) with
+    a unique password and 2FA.
+
+  **If you use a coding agent:**
+
+  - **State the rule in the agent's instruction file too.** In AGENTS.md, CLAUDE.md, Cursor rules
+    or Copilot instructions: no API keys, no `.env` contents and no real user data in prompts; use
+    fake fixtures for debugging, and put 2FA on the GitHub account the agent works through.
+recap:
+  - emoji: "🚫"
+    title: "The toggle that matters most"
+    text: "Data Controls, 'Improve the model for everyone': off. The video's reason: text used for
+      training can resurface later, so keep your chats out of it."
+  - emoji: "🔌"
+    title: "What the assistant can reach"
+    text: "Connected apps (cloud files, calendar) let the assistant read your data. Review the list,
+      remove what you don't use, and revoke access from the other app's side too."
+  - emoji: "🔗"
+    title: "Who can open a shared chat"
+    text: "A shared link works for anyone who has it, and links can end up indexed by search
+      engines. Manage your shared links and delete the ones you no longer need."
+  - emoji: "🗑️"
+    title: "Chats you won't reopen"
+    text: "Old chats are like an email archive: sensitive if someone gets into your device or
+      account. Delete the ones you won't come back to."
+  - emoji: "🔐"
+    title: "The account itself"
+    text: "Two-factor sign-in with an authenticator app, so a stolen password alone can't open your
+      chat history, files and memory."
+  - emoji: "📣"
+    title: "Ads built from your chats"
+    text: "Where the app offers ad personalisation, switch it off so your conversations don't shape
+      the ads you see."
+  - emoji: "✋"
+    title: "What settings can't fix"
+    text: "The video shows ChatGPT; set the same things in Claude and Gemini. And no toggle makes
+      personal data, contracts or credentials safe to paste into a consumer tier."
+task: |
+  In your main assistant's settings: turn off training/data sharing, review and clean memory, enable
+  2FA, and read the retention terms. Then do the same for the second assistant you use most (names
+  drift — search the settings or the help center if a toggle has moved).
+
+  Next, practice scrubbing. Take one real document you'd like help with (an email thread, a
+  report, a spreadsheet extract) and make a safe copy: replace names with roles ("Client A",
+  "Manager"), remove account numbers and contact details, and round or relabel sensitive figures.
+  Ask the assistant for help using only the scrubbed copy, and check whether the answer is still
+  useful. It usually is.
+
+  Finally, save the one-line never-paste rule from Apply it where you'll see it, and make sure
+  your own API keys and passwords, and anyone else's personal data, are on it. **If you code:** also check that your
+  repo's `.gitignore` covers `.env` and any key or credentials files.
+  Success: two assistants configured, one scrubbed document that still got a useful answer, and a one-line never-paste rule saved where you'll see it (custom instructions or notes).
+selfCheck:
+  - q: "A colleague pastes a client's full contract into a personal ChatGPT account to get a
+      summary, saying 'it's fine, I turned training off.' What's wrong with that reasoning?"
+    a: "Training opt-out covers one risk: the text being used to improve future models. The
+      contract still leaves the company, sits in a personal account's history (and in provider
+      logs for a retention period), and may break the client agreement or company policy. Use the
+      organization's approved tool or an enterprise tier, or summarize a scrubbed version."
+  - q: "You've used one assistant's memory for months across personal and freelance work. A new
+      client asks you to keep their project confidential. What do you change before starting?"
+    a: "Review and clear what memory has stored about other clients, then keep this client's work
+      out of memory: use a separate account or a separate Project with memory off, or temporary
+      chats. That stops their details persisting and stops other clients' details showing up in
+      their work."
+  - q: "You need help debugging a spreadsheet that contains customers' names, emails and order
+      totals. How do you get help without exposing the data?"
+    a: "Make a scrubbed sample with the same structure: a few rows with fake names and emails and
+      realistic but invented totals, same columns and formulas. The assistant can diagnose the
+      problem from the structure; it doesn't need the real people."
+backupResources:
+  - label: "ChatGPT Settings for Privacy, Memory, & Personalization (Full Tutorial) — PromoAmbitions (covers memory)"
+    url: "https://www.youtube.com/watch?v=G_0NTpn7QPM"
+    type: video
+  - label: "What NOT to Share with AI: 5 Things to Keep Private When Using LLMs — Security Journey"
+    url: "https://www.youtube.com/watch?v=Z71DBzHrd-Q"
+    type: video
+  - label: "PROTECT YOUR PRIVACY! Best ChatGPT Privacy Settings for 2025"
+    url: "https://www.youtube.com/watch?v=gtgLhggKgJM"
+    type: "video · privacy"
+  - label: "How to Opt Out of ChatGPT Using Your Data for Training"
+    url: "https://www.youtube.com/watch?v=gHOAbFOaa5c"
+    type: "video · opt-out"
+tags:
+  - chat-assistants
+  - privacy
+  - security
+  - settings
+---
+
+Using AI assistants for *real* work — coursework, client files, business decisions — means
+setting them up properly first. Fifteen minutes in the settings protects you, the people whose
+data you handle, and your organization. This lesson is the quick, unglamorous setup that makes
+everything before and after it in this pillar safe to use on real work.
+
+## What actually happens to what you type
+
+Three separate things can happen to a conversation, and the settings control them separately:
+
+- **Training** — your chats may be used to improve future models, depending on the product and
+  your settings.
+- **Retention** — the provider stores your chats for some period, even with training off, for
+  history, abuse monitoring or legal reasons. Read the retention terms; they differ by product and
+  tier.
+- **Memory** — the assistant saves facts about you and feeds them into future chats.
+
+Business, enterprise and education tiers usually come with contractual terms (no training on your
+data by default, set retention, admin controls), which is why your employer or university may
+require them. Check your organization's terms rather than assuming.
+
+## Turn off model training
+
+The most important toggle: **data controls / "improve the model for everyone."** Turn it **off**
+before you put any work or client data in. Where it lives (names drift; search the settings or
+help center if they've moved):
+
+- **ChatGPT:** Settings → **Data Controls** → "Improve the model for everyone" → off.
+- **Claude:** Settings → **Privacy** → review the "Help improve Claude" option and set it
+  deliberately.
+- **Gemini:** the activity setting at myactivity.google.com (labelled **Gemini Apps Activity**,
+  renamed **Keep Activity** in newer versions) — turning it off limits what's kept and used.
+
+All three also offer a **temporary or incognito chat** that isn't saved to your history or used
+for memory, though providers may keep it briefly for safety review. Use it for one-off sensitive
+questions. Set all three apps, not just the one you use most.
+
+## Know the never-paste line
+
+Opting out of training reduces one risk, but it doesn't make everything safe. **Personal data
+about other people, contracts, unreleased financials, credentials and secrets don't belong in a
+consumer-tier chatbot** — opt-out or not. For genuinely sensitive material, use an **approved
+enterprise tier** (with a contractual data guarantee) or a local model. Match the tool to the
+sensitivity of the data. The organizational version of this rule is covered in the AI-in-companies
+track (→ governance-security).
+
+> 💡 **Try it:** open your main assistant's memory or personalization page right now and read what
+> it has saved about you. Delete one thing you wouldn't want a colleague to see. Two minutes.
+
+## Scrub instead of skipping
+
+The never-paste line doesn't mean "don't get help." It means **send the structure, not the
+secrets**. Replace names with roles, swap real numbers for realistic fake ones, cut account
+numbers and contact details. For most tasks — fixing a formula, tightening an email, finding a
+bug, restructuring a report — the assistant needs the shape of the problem, not the real people.
+
+**Worked example.** You want help replying to an angry customer email. Instead of pasting the
+thread, paste: "Customer A ordered product X on [date], received it damaged, and our first reply
+offered a 10% discount, which they called insulting. Our policy allows a full refund or
+replacement. Draft a calm reply offering both." You get the same quality of draft, and the
+customer's name, address and order number never left your inbox.
+
+## Manage memory, connectors and shared links
+
+Memory is convenient, but it's *storing information about you*. Periodically **review what it's
+saved**, clear anything sensitive, and **turn it off for confidential projects** so details don't
+leak into unrelated chats.
+
+Two newer surfaces deserve the same care:
+
+- **Connectors** (Drive, email, calendar) let an assistant read your files. Connect only what a
+  task needs, and disconnect what you no longer use.
+- **Shared chat links** can be opened by anyone who has the link. Check what's in a chat before you
+  share it, and delete old shared links you no longer need.
+
+## Secure the account
+
+Your AI account now holds a surprising amount: chat history, uploaded files, memory, custom
+assistants — a detailed picture of your work. Treat it like the sensitive login it is: **strong,
+unique password + 2FA**, on the AI account and on any Google, Microsoft or GitHub account it signs
+in through. Delete old chats you won't reopen: a chat history is as sensitive as an email
+archive if someone gets into your device or account. And consider **separate accounts** for personal vs work or client use so data, memory
+and custom assistants don't bleed across contexts.
+
+## Common failure modes
+
+- **You assume opt-out means private** → retention and policy still apply → use approved tools
+  for sensitive data and scrub everything else.
+- **An old client's details show up in a new client's draft** → memory carried them across →
+  separate accounts or Projects, and memory off for confidential work.
+- **A shared chat link exposes more than you meant** → the whole conversation is visible → review
+  before sharing, and delete old links.
+- **You configured one app and use three** → defaults differ per tool → run the checklist on every
+  assistant you actually open.
+
+## The professional baseline
+
+Run the checklist once per tool: training off, memory reviewed, connectors scoped, 2FA on,
+retention terms read, and a clear personal "never paste this" rule. Do it and you can use these
+assistants on real work with confidence instead of crossing your fingers.
+
+That completes the pillar's foundation: routing jobs across the big three, trustworthy research,
+and safe setup. With the safety baseline in place, the rest of the pillar puts the assistants to
+work on everyday jobs, starting with drafting and editing (→ writing-with-ai).

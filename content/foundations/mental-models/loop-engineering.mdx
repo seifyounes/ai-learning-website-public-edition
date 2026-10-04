@@ -1,0 +1,318 @@
+---
+title: "Loop engineering"
+subtitle: "The system prompts the agent"
+summary: "Design an AI loop that runs, checks its own output with a separate checker and stops on its own, and judge when a job is safe to leave running."
+changeNote: "New: a two-chat-window loop you can run without code, a quick sort of your own jobs into loop-ready or not, a common-failures list, and a 20-minute watch range."
+section: foundations
+pillar: mental-models
+order: 8
+level: advanced
+audience: builders
+estMinutes: 17
+taskMinutes: 30
+prerequisites: [harness-engineering, verification-and-grounding]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "uLaDjhTkJKM"
+  published: "2026-06-19"
+  year: 2026
+  minutes: 106
+  start: 181
+  watchMinutes: 20
+  title: "Loop Engineering, Claude Code /goal, and Agent Routines"
+  channel: "Sabrina Ramonov"
+  why: "Sabrina Ramonov's livestream lays out the ideas this lesson uses (what fires a loop, how the maker and checker are wired, why the checker must be independent, and why defining the check is the hard part) and the 'most people are stuck in the loop' framing, then shows it running. Written explainers, like Addy Osmani's essay below, give you the idea; this shows a working loop, which makes the idea stick. Its demos run on Claude Code; the concepts don't depend on it."
+  notes:
+    - "The player starts at 3:01: watch Section 1, \"Loop Engineering Concepts\" (3:01–22:48, about 20 minutes)."
+    - "If you want one more chapter, \"Goal Conditions, Constraints, and Guardrails\" (from 31:38) covers stop-rules."
+    - "The rest is Claude Code demos and live Q&A and is optional: the hands-on commands belong to the Claude Code pillar (→ autonomy-at-scale); this lesson keeps the concept and gives a no-code version."
+readAfter:
+  - label: "Addy Osmani — Loop Engineering (June 2026 essay: split the verifier from the maker, keep state on disk)"
+    url: "https://addyosmani.com/blog/loop-engineering"
+    kind: article
+  - label: "Anthropic — Building effective agents (evaluator-optimizer = doer/checker in a loop)"
+    url: "https://www.anthropic.com/engineering/building-effective-agents"
+    kind: article
+applyIt: |
+  Not every job should become a loop. Sort three of your own repetitive jobs before you build
+  one. Five to ten minutes: for each, write the verifier you'd trust more than your own glance
+  (or "none"), and the blast radius of one bad pass (reversible and internal, or public and
+  permanent). Then mark it **loop-ready**, **loop with a human gate** or **stays a session**.
+  Strong verifier + reversible = safe to loop.
+
+  **If you code:** good candidates are "get lint + typecheck + tests green on this branch", a
+  behaviour-preserving refactor of code with tests you trust, or triaging new issues into fixed
+  buckets. Code without tests, or anything you treat as frozen (billing or scoring logic), is
+  off-limits to loops.
+
+  Success: three jobs sorted, each with its verifier and blast radius written down.
+
+  **If you don't code:** good candidates are a weekly report checked against a fixed checklist,
+  tagging feedback into set categories, or drafting routine replies (with a human gate on send).
+
+  Success: three jobs sorted, and the one you'll run as a loop in the task chosen.
+toolkit: |
+  - **Name the four parts of a loop you already run.** Pick something you repeat ("draft, review,
+    revise the weekly report") and write its trigger, roles, check and stop-rule in one line each in
+    your notes file. The part you *can't* state crisply is your bottleneck.
+  - **Make the checker a separate Project, Gem or Custom GPT.** Give it the checklist as its standing
+    instructions and nothing else, ideally on a different assistant from the one that drafts (Claude
+    checking a ChatGPT draft, or the reverse). A judge that saw the drafting rubber-stamps it.
+  - **Write the stop-rule into the checker's instructions.** "After three rounds, or the same FAIL
+    twice, reply HAND BACK TO ME." Saved once, it stops you burning time on a problem another pass
+    can't fix.
+  - **Put a human gate in any automation template.** If you build the loop in Zapier, Make or n8n,
+    have the AI step write drafts to a folder or a review queue and approve the send yourself;
+    sending, posting and deleting are the irreversible steps a bad pass can't undo.
+
+  **If you use a coding agent:**
+
+  - **Separate the verifier and keep state on disk.** Run the checker as a separate subagent or a
+    different model family (a Claude-written diff reviewed by Codex or Copilot, or the reverse) with
+    the author's self-assessment stripped, and keep a plan or progress file plus git history so a
+    fresh session resumes where the last one stopped.
+recap:
+  - emoji: "🔁"
+    title: "Who's been running it all along?"
+    text: "In a plain session you're the one reading the output, deciding it's not done, and typing the next prompt. That human-in-a-chair cycle IS the loop — you just never named it."
+  - emoji: "🧬"
+    title: "Four parts of every loop"
+    text: "Every loop factors into four parts: what fires it, how the roles are wired, what checks each pass, and when it ends. Name all four or you have a runaway, not a loop."
+  - emoji: "🖐️"
+    title: "What you actually automate"
+    text: "You don't automate the work — the model already does that. You automate your judgment about when to run it again and when to stop, so the loop turns while you sleep."
+  - emoji: "✂️"
+    title: "Who grades the work?"
+    text: "The pass that writes and the pass that judges must be independent — ideally a different model. One agent grading its own homework waves everything through."
+  - emoji: "⏱️"
+    title: "The smallest complete recipe"
+    text: "A goal the agent chips away at, plus something that keeps firing, turns a single one-shot run into a self-continuing loop. That's the smallest complete recipe."
+  - emoji: "⚖️"
+    title: "When looping backfires"
+    text: "Automate a weak check and you just mass-produce plausible-wrong output faster than you could by hand. The verifier's trustworthiness decides whether to loop at all."
+  - emoji: "🧨"
+    title: "What a bad pass can touch"
+    text: "An autonomous loop acts while you're away. Match the leash to the damage a bad iteration can do — autonomy scales with verifier-trust times reversibility, not trust alone."
+task: |
+  **If you code:** take one repetitive, well-specified job you currently *babysit* — "get lint +
+  typecheck + tests green on this branch", or a behaviour-preserving refactor of one function
+  covered by tests you trust — and write its four parts, one line each: **TRIGGER** (what re-runs
+  it), **TOPOLOGY** (doer fixes / checker = the test command — two passes), **VERIFIER** (the
+  exact command whose exit code is pass/fail), **STOP-RULE** (green, OR 5 iterations, OR
+  no-progress → hand back). Work on a branch or a git worktree so every doer pass is reversible,
+  and never let the doer edit the tests to make a pass. Then run one turn by hand:
+
+  ```prompt
+  DOER: fix the current failures on this branch. Do NOT declare success.
+  Then STOP — I will run the verifier myself.
+  ```
+
+  Run the verifier yourself (`npm run lint && npm run typecheck && npm test`, or your stack's
+  equivalent such as `pytest` or `flutter analyze && flutter test`), then feed the failures back
+  for one more doer pass.
+
+  **If you don't code:** run the same loop with two chat windows on a repeatable document job (a
+  cover letter, a product description, a weekly report). Write the four parts first: TRIGGER (you
+  paste the checker's verdict back), TOPOLOGY (window A drafts, window B checks), VERIFIER (a
+  checklist of four to six yes/no items, such as "under 250 words", "names the reader's main
+  objection", "no claim without a source"), STOP-RULE (all PASS, or three rounds, or the same
+  FAIL twice → you take over). Then run it:
+
+  ```prompt
+  [Window B — the checker. Paste once, then paste each draft below it.]
+  You are a strict checker. You did not write this draft. Check it against this list and answer
+  each item PASS or FAIL, quoting the line that proves it: [your checklist]. Final line: PASS or
+  FAIL only. Do not rewrite the draft.
+  ```
+
+  Paste window B's FAIL lines into window A with "Fix only these, change nothing else," and repeat
+  until the stop-rule fires.
+  Success: four crisp parts written and at least one full doer → checker → feedback turn executed by hand. If you can't write a one-line verifier, that job isn't loop-ready — that's the finding.
+selfCheck:
+  - q: "You point a loop at 'refactor this module for elegance' with an LLM-judge as the verifier and let it run 30 iterations unattended. It burns your budget and the code ends up worse. Name the two design errors."
+    a: "(1) The goal isn't crisply verifiable — 'elegance' has no cheap, trustworthy check, so the verifier is weak and the loop just mass-produces plausible-wrong refactors. (2) The stop-rule is unbounded (30 iterations, no no-progress or budget cap), so a weak verifier runs the budget to zero. Fix: keep it a session (taste call, no trustworthy verifier), or give it a real verifier — tests/benchmarks — plus a stop-rule that halts on no-progress."
+  - q: "Your loop's doer and checker are the same agent in the same context, and it passes everything on the first try, every time. Why, and what's the one structural fix?"
+    a: "The maker is grading its own homework — committed to its own output, it rubber-stamps. Fix: make the checker an independent pass — fresh context, ideally a different model or provider — so it judges the artifact, not the reasoning that made it. Independence, not a stricter rubric, is what makes the verdict real."
+  - q: "Two jobs: (a) 'triage today's new error-tracker issues into fixed buckets,' (b) 'design the new onboarding flow.' Which is loop-ready, which stays a session, and what's the deciding property?"
+    a: "(a) is loop-ready: specifiable, repetitive, outlasts your attention, and has a cheap verifier (the buckets are a fixed schema you can validate). (b) stays a session: an open, taste-driven design call with no trustworthy verifier and a high cost of a wrong autonomous step. Deciding property: is there a verifier you'd trust more than your own glance?"
+  - q: "You want to automate 'reply to routine support emails.' The verifier is decent but imperfect. How does blast radius change your design versus automating 'label incoming emails'?"
+    a: "Sending is irreversible and public (high blast radius), so even with a decent verifier you keep a human gate on send — the loop drafts, you approve — or restrict it to a safe subset. Labeling is reversible and internal (low blast radius), so a decent verifier is enough to run unattended. Autonomy scales with verifier-trust × reversibility, not with verifier trust alone."
+mcq:
+  - q: "Your two-window loop for product descriptions checks 'is it engaging?'. Each round the text gets longer and blander. What's the fix?"
+    options:
+      - "Swap 'engaging' for yes/no checks you could verify"
+      - "Raise the round cap so it has more time to converge"
+      - "Ask the checker to be much stricter about engagement"
+      - "Have the drafting window grade itself before handing over"
+    answer: 0
+    explain: "A vague verifier rewards whatever sounds like the quality, so the loop drifts; concrete yes/no checks (a word limit, one named benefit, no invented figures) give it something real to converge on. More rounds on a weak verifier just produce plausible-wrong output for longer."
+  - q: "A loop tidying a spreadsheet's formatting has failed the same check four rounds in a row. What should a good stop-rule have done?"
+    options:
+      - "Kept going to the round cap, since each pass is cheap"
+      - "Switched the checker to a looser list so it can pass"
+      - "Halted at the repeat failure and handed it to you"
+      - "Restarted the loop from scratch with the same setup"
+    answer: 2
+    explain: "A no-progress rule (the same FAIL twice, or passes that don't move the verifier) stops a loop that another pass can't fix and hands it to a person. Loosening the checker makes the loop pass by lowering the bar, which defeats the point of having a verifier."
+  - q: "You want to set up your first loop that runs without you watching. Which job is the best candidate?"
+    options:
+      - "Posting replies to complaints on your public social pages"
+      - "A weekly expense summary checked against a fixed list"
+      - "Rewriting the mission statement until it feels inspiring"
+      - "Deleting old files from the shared drive every night"
+    answer: 1
+    explain: "Autonomy scales with verifier trust times reversibility, and a draft checked against a fixed list is both verifiable and easy to undo. Public posting and deleting are irreversible, and 'inspiring' has no check you'd trust unwatched."
+  - q: "A nightly loop drafts reports into a folder and has a strong checklist verifier, but no round cap, budget or no-progress rule. What's the risk?"
+    options:
+      - "None: a strong verifier makes a cap unnecessary"
+      - "The checker will gradually start approving weak drafts"
+      - "The drafts become irreversible after many passes"
+      - "One stuck draft can burn tokens all night long"
+    answer: 3
+    explain: "Every iteration costs tokens, so a draft that can never pass keeps looping until something stops it; a cap, a budget and a no-progress rule are the stop-rule it needs before the first run. A strong verifier decides whether the work is good, not when to give up."
+backupResources:
+  - label: "Owain Lewis — a real two-loop (manager + worker) build, end to end"
+    url: "https://www.youtube.com/watch?v=RVEaDvh6f5A"
+    type: "video · applied · the systems-design counterpart to Sabrina's concept"
+  - label: "Sabrina Ramonov — Loop Engineering companion write-up (/goal + routines)"
+    url: "https://sabrina.dev/p/loop-engineering-claude-code-goal-routines"
+    type: "article · the video's companion post"
+tags:
+  - loop-engineering
+  - agents
+  - doer-checker
+  - autonomy
+  - reliability
+  - claude-code
+---
+
+**Who this is for:** people who build with AI, with a coding agent or with automations that run
+on a schedule. If you don't code and haven't automated anything yet, you can skip this lesson for
+now. Come back when a repetitive AI job (drafting replies, tagging feedback, cleaning a
+spreadsheet every week) is eating your time and you want it to run, check itself and stop without
+you in the chair. The two-chat-window version in this lesson needs no code when you do.
+
+Every lesson so far left one job in your hands. Prompt engineering phrased the request; context
+engineering curated the window; harness engineering wrapped the model in guides and sensors — but
+*you* were still the one who read the output, decided it wasn't done, and typed the next prompt.
+**Loop engineering is the discipline of removing yourself from that seat.** The unit of work stops
+being the prompt and becomes the *loop*: a self-continuing cycle where the **system** decides to run
+the AI again, not you. Addy Osmani set out the idea in a June 2026 essay,
+[Loop Engineering](https://addyosmani.com/blog/loop-engineering/), and practitioners such as Peter
+Steinberger and Boris Cherny, both quoted there, describe the same shift. The video compresses it to
+one line: **the system prompts the agent.**
+
+## You are the loop — until you're not
+
+Start without any code. You ask a chat assistant for a cover letter. You read it, notice it never
+mentions the job's main requirement, and type "add a paragraph on X." You read it again, spot that
+it's too long, and type "cut it to 250 words." You stop when it looks right. That cycle — run,
+judge, re-prompt, stop — *is* a loop, and **you are the running part of it.** Your eyes are the
+verifier. Your finger on Enter is the trigger. Your gut sense of "okay, that's done" is the
+stop-rule.
+
+A coding session is the same cycle with different nouns: the agent produces a change, you catch the
+test it forgot, you type "now make the tests pass," repeat. Loop engineering is the deliberate act
+of **replacing yourself as the prompter**: encoding those three human functions so the loop keeps
+turning without you. You're not automating the *work* — the model already does that. You're
+automating **your judgment about when to run it again and when to stop.**
+
+## The anatomy: trigger → topology → verifier → stop-rule
+
+Every loop, from two chat windows to a fleet of agents, factors into four parts. Name all four or
+you don't have a loop — you have a runaway or a one-shot.
+
+- **Trigger** — what starts each iteration: a schedule, a new file or email arriving, a webhook,
+  or simply the previous pass finishing. The video's shorthand — **timer + goal = loop** — is the
+  smallest complete recipe: a goal the AI chips at, plus something that keeps firing.
+- **Topology** — how the roles are wired for one iteration. The simplest is one assistant
+  re-running itself; the load-bearing one is **doer/checker** (next section); scale to
+  manager/worker or fan-out when the work splits. Topology is the *shape*, independent of what
+  triggers it.
+- **Verifier** — the check each iteration must pass: a checklist, a word count, a schema
+  validation, a test suite, an LLM-judge. This is exactly the **sensor** from harness engineering,
+  now dropped into a loop so its verdict becomes feedback. *(How to design a sensor you can trust →
+  harness-engineering; here it's just the slot that rules pass/fail.)*
+- **Stop-rule** — when the loop ends: success (the verifier passes), a max-iteration cap, a
+  token/time budget, a no-progress detector, or a human gate. **A loop with no stop-rule isn't
+  autonomous — it's a fire.**
+
+The four compose into one cycle: trigger fires → topology does a pass → verifier judges →
+stop-rule says *continue or halt* → continue loops back. That cycle is the machine you engineer —
+prompt, context, and harness engineering all live *inside* it now.
+
+## Keep the maker away from the checker
+
+One topology choice decides whether a loop is trustworthy: **the doer and the checker must be two
+different passes.** An assistant that writes something and then grades its own work is committed to
+its own story — it rubber-stamps. You met this by hand in verification (chain-of-verification) and
+as a principle in harness engineering (separate the generator from the judge); in a loop it becomes
+structural. The checker runs in an **independent context — ideally a different model or
+provider** — and its verdict is the feedback that triggers the next doer pass. Osmani's essay makes
+the same point: you split the verifier from the maker so that "done" means something, and even then
+"done" is a claim to check. Anthropic describes the same shape as the **evaluator-optimizer**
+workflow — one call generates, another evaluates, in a loop. *(Configuring separate agents for
+these roles → subagents-and-agent-teams; here the only point is that they must be separate
+passes.)*
+
+> 💡 **Try it:** feel the split in five minutes. **Without code:** open two chat windows. In window
+> A ask for a 100-word product description of something on your desk. In window B paste: "You did
+> not write this. Check it: under 100 words? names one concrete benefit? no made-up numbers? Answer
+> PASS or FAIL per item, quoting the line." Paste B's verdict into A, ask for a fix, and stop at PASS
+> or three rounds. **In a coding agent**, run the same split as two rounds:
+>
+> ```prompt
+> Round 1 — DOER: implement the change. Do not evaluate it.
+> Round 2 — CHECKER (act as if you've never seen round 1): run the tests and the
+> type-checker. List every failure as file:line. Verdict must be PASS or FAIL only.
+> If FAIL, hand the list back to the doer and repeat. Stop at PASS or 5 rounds.
+> ```
+>
+> A single session playing both roles is weaker than two separate contexts; it's here so you feel
+> the shape.
+
+## When a loop beats a session
+
+Not everything should be a loop. A **session** — you in the chair — wins when the work is
+exploratory, ambiguous, taste-driven, or when a wrong autonomous step is expensive to undo. A
+**loop** wins when three things line up: the goal is **specifiable**, an iteration's cost is
+**bounded and reversible**, and — the deciding factor — **there's a verifier you'd trust more than
+your own glance.** That last one is everything. **A loop is only as good as its verifier.** Point
+one at "make the tests green" or "every field in this form is filled and valid" and it's gold.
+Point it at "make this essay more elegant" with an LLM-judge that can't really tell, and you've
+built a machine that mass-produces plausible-wrong output *faster than you ever could by hand.* So
+before you loop, ask one question: what is the check, and do I trust it unwatched? No good answer
+means keep it a session.
+
+## Cost and safety: mind the blast radius
+
+Autonomy has two bills. **Cost:** every iteration burns tokens and compute, so a permissive
+stop-rule on a weak verifier is a budget fire — cap iterations, set a token budget, add no-progress
+detection (three passes that don't move the verifier → stop). **Safety:** a loop acts while you're
+not looking, so what matters is **blast radius** — what a bad iteration can touch. Drafting text or
+editing files on a separate branch is reversible; sending emails, posting publicly, deploying,
+spending money or deleting records is not. Match the leash to the damage: shrink what the loop can
+reach (drafts folder, sandbox, scoped permissions, a separate git branch or worktree), and **gate
+anything irreversible or high-stakes behind a human.** The whole judgment reduces to one line:
+**autonomy scales with verifier-trust × reversibility.** Strong verifier and reversible actions →
+let it run all night. Weak verifier *or* irreversible actions → tighten the stop-rule, shrink what
+it can reach, or keep your hand on it.
+
+## Common failure modes
+
+- **The loop never stops, or stops at a random point** → no explicit stop-rule → add success, a
+  round cap and a no-progress rule before the first run.
+- **Every pass is approved on the first try** → the checker shares the doer's context → move the
+  checker to a fresh window or a different model.
+- **The output gets longer and blander each round** → the verifier rewards vague qualities ("more
+  engaging") → replace them with yes/no checks you could verify yourself.
+- **One bad pass did real damage** → the loop could take an irreversible action → restrict it to
+  drafts or a branch, and gate sending, publishing or deleting behind a human.
+
+## The habit
+
+Most loops you already run lack two things: a separate checker and a hard cap. Name the four
+parts, harden the weakest, and you've engineered a loop instead of babysitting one. *(The
+commands that run loops unattended inside coding agents → autonomy-at-scale; loop engineering is
+the thinking those commands execute.)*

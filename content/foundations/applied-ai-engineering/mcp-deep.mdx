@@ -1,0 +1,243 @@
+---
+title: "MCP"
+subtitle: "The open standard for tools (deep)"
+summary: "Explain how MCP hosts, clients and servers fit together, build a small server, and vet third-party servers as untrusted input."
+changeNote: "New: a worked example, MCP compared with plain function calling, its security risks, a failure-modes list, and a quick check for vetting a third-party server."
+section: foundations
+pillar: applied-ai-engineering
+module: "Core engineering"
+order: 7
+level: advanced
+estMinutes: 16
+taskMinutes: 45
+shortPath: "About 45 min: watch the video and read the breakdown through The architecture. Come back for the rest of the breakdown and the task: the minimal server, tested in the MCP Inspector, then registered in your host."
+prerequisites: [structured-outputs-tools, build-agent-in-code, mcp-servers]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "RhTiAOGwbYE"
+  published: "2025-07-21"
+  year: 2025
+  minutes: 40
+  title: "MCP Tutorial: Build Your First MCP Server and Client from Scratch (Free Labs)"
+  channel: "KodeKloud"
+  why: "Most MCP videos show how to *connect* a server; this one builds both a server and a client from scratch, so you see the protocol from both ends. It's hands-on and paced for following along. It comes from KodeKloud, a training company, and points to its own free labs. The 20-minute Shaw Talebi backup is the faster concepts-only option."
+  notes:
+    - "It was recorded before the protocol added the Streamable HTTP transport. The server and client concepts are unchanged; the official spec in the backups has today's transport details."
+applyIt: |
+  You've used MCP servers someone else wrote. Take ten minutes to vet one the way you'd vet any
+  dependency: a server you already have connected, or one you're thinking of adding to your AI
+  app or coding agent. Write one line for each:
+
+  - **Publisher:** who maintains it, and is it the official one or a lookalike?
+  - **Reach:** which tools it exposes, and which of them can write, delete or send.
+  - **Credentials:** where its keys or tokens live, and what they can access beyond this server.
+  - **Transport:** local stdio (runs with your machine's trust) or remote over HTTP (needs real
+    auth)?
+
+  Then name two read-only capabilities of something you own (your app's API, a notes folder, a
+  CSV you update weekly) that would be worth wrapping as a server of your own, and why.
+
+  Success: a four-line vetting note for one real server, with a keep, restrict or remove verdict.
+toolkit: |
+  - **Wrap one repeated chore as an MCP server.** A deploy check, a "what changed this week"
+    report or a lookup into your own data, exposed once, can be called from every MCP host you
+    use: the N×M → N+M win applied to your own tasks.
+  - **Know which trust model you're wiring.** A local stdio server runs as a child process with
+    your machine's trust; a remote server over streamable HTTP needs real OAuth-style auth.
+    Decide which one you're building before you expose anything.
+  - **Vet every third-party server like a dependency.** Check who publishes it, what it can write
+    and how it authenticates; its tool descriptions and results are untrusted input that can
+    steer your assistant. Audit it before it goes into `.mcp.json`, `.cursor/mcp.json` or
+    `.vscode/mcp.json` (→ llm-security-prompt-injection).
+  - **Keep your server list short.** Every connected server's tool definitions ride along in the
+    model's context and widen what a confused agent can reach. Disconnect the ones you haven't
+    used this month.
+recap:
+  - emoji: "🔌"
+    title: "One port, many tools"
+    text: "MCP is one open protocol, so a capability plugs into any MCP host the same way: a universal port instead of a custom cable per tool."
+  - emoji: "♾️"
+    title: "N apps × M tools"
+    text: "Without a standard, every app needs a connector for every tool. Build it once as an MCP server and every MCP host can use it: N+M."
+  - emoji: "🏛️"
+    title: "Three roles"
+    text: "The host is the AI app, a client inside it holds one connection, and the server is what you build."
+  - emoji: "🧰"
+    title: "What a server offers"
+    text: "Tools the model can call, resources the host can read as context, and prompt templates a user can pick."
+  - emoji: "🔗"
+    title: "Two ways to connect"
+    text: "Local servers run as a child process over stdio with your machine's trust; remote servers speak Streamable HTTP and need real auth."
+  - emoji: "☠️"
+    title: "Text the model trusts too much"
+    text: "Tool descriptions and results go straight into context, so a malicious server can inject instructions. Vet servers like dependencies."
+  - emoji: "🌐"
+    title: "When to skip MCP"
+    text: "If only your own app uses a tool, plain function calling is simpler. MCP pays off when a capability must work across several hosts."
+task: |
+  Grasp the whole protocol by shipping the smallest possible server end to end, in under 40
+  lines with the official Python or TypeScript SDK:
+
+  ```prompt
+  Build a minimal MCP server exposing ONE read-only tool, get_order_status(order_id) -> string,
+  backed by a hardcoded map of 3 fake orders. Use stdio transport. Any config value it needs
+  comes from the environment, never from a tool description or result. Show me how to test it
+  with the MCP Inspector first, then the config entry to register it in my MCP host (Claude
+  Code's .mcp.json, Cursor's .cursor/mcp.json or VS Code's .vscode/mcp.json). Keep it under ~40
+  lines. Finally, list everything a caller of this server can reach.
+  ```
+
+  Restart the host, confirm the tool appears, and ask a question that makes the model call it.
+  Once it works, swap the fake map for one real read capability you own (a notes folder, a CSV,
+  your app's read endpoint) if you have one. **No-code path:** let your assistant write the
+  file, then run the MCP Inspector (`npx @modelcontextprotocol/inspector`): it opens in your
+  browser and lets you list and call the tool by hand, no AI app required.
+
+  Success: your MCP host (or the Inspector) lists get_order_status and returns the mock status when you ask about an order, and nothing exposes a write path or a secret.
+selfCheck:
+  - q: "Your stdio MCP server works when you call it from the Inspector, but in your coding agent its tools fail with parse errors. You recently added `print` statements for debugging. What's wrong?"
+    a: "In a stdio server, stdout *is* the protocol channel, so your prints corrupt the JSON-RPC messages. Send logs to stderr (or a file) instead."
+  - q: "After installing a popular third-party MCP server, your assistant starts proposing to email files to an unfamiliar address. What's the likely mechanism, and what do you do?"
+    a: "Tool poisoning: instructions hidden in the server's tool descriptions or results are steering the model. Disconnect it, review its descriptions and source, and only reconnect servers you've vetted like dependencies (publisher, write access, auth)."
+  - q: "Your team's web app needs one internal lookup tool that only that app will ever call. A teammate wants to build it as an MCP server. What would you suggest?"
+    a: "Plain function calling inside the app is simpler: no extra process or protocol. Build an MCP server when the capability should work across several hosts or be reachable from other people's AI apps."
+  - q: "What problem does MCP solve, and what are its three roles?"
+    a: "It turns N×M custom integrations into N+M: build a capability once as a server and any MCP host can use it. The roles are host (the AI app), client (one connection inside the host) and server (exposes tools, resources and prompts)."
+mcq:
+  - q: "You're turning your local stdio notes server into a remote one so teammates can use it from their own machines. What must you add that the local version didn't need?"
+    options:
+      - "Real auth scoping who may call which tools"
+      - "A JSON-RPC layer, which stdio servers skip"
+      - "Resources, since remote servers can't use tools"
+      - "A separate client process on the server side"
+    answer: 0
+    explain: "A local stdio server inherits your machine's trust; a remote one over Streamable HTTP has to earn it with OAuth-style tokens. Both transports carry the same JSON-RPC messages, and remote servers expose tools just like local ones."
+  - q: "You registered your new server in your host's MCP config with a relative path to the script and restarted the host, but its tool doesn't appear. What's your first move?"
+    options:
+      - "Rewrite the tool description to be more specific"
+      - "Switch the server from stdio to Streamable HTTP"
+      - "Use an absolute path and test it in the Inspector"
+      - "Disconnect other servers to make room for it"
+    answer: 2
+    explain: "A relative path or a crash on start keeps the server from ever launching, so use an absolute path and run it alone in the Inspector to see whether it starts and lists its tool. A description affects which tool the model picks, not whether the host can see the tool at all."
+  - q: "You have 12 MCP servers connected, and the model keeps calling a similar tool from another server instead of your search_notes. What helps most?"
+    options:
+      - "Rename the tool so it sorts first in the list"
+      - "Cut the server list and sharpen the descriptions"
+      - "Move search_notes into a resource instead"
+      - "Run the server remotely so it ranks higher"
+    answer: 1
+    explain: "Every connected server's tool definitions compete in the model's context, so a short list and descriptions that say when to use each tool steer the choice. List order and transport don't decide which tool the model picks, and a resource is data the host attaches, not something the model calls."
+  - q: "Your server needs an API key for a backend service. A teammate suggests putting the key in the tool description so the model can pass it along. What's wrong with that?"
+    options:
+      - "Nothing, if the server only runs locally over stdio"
+      - "Descriptions are cached, so key rotation breaks"
+      - "The key belongs in the result, not the description"
+      - "It enters the model's context; keep it in env vars"
+    answer: 3
+    explain: "Tool descriptions and results go straight into the model's context, where a secret can be repeated or leaked; credentials belong in the server's environment, and results should carry only the data needed. Running locally doesn't help, because the description still reaches the model."
+backupResources:
+  - label: "Model Context Protocol (MCP) Explained in 20 Minutes — Shaw Talebi"
+    url: "https://www.youtube.com/watch?v=N3vHJcHBS-w"
+    type: "video · concepts"
+  - label: "Model Context Protocol — official specification & docs"
+    url: "https://modelcontextprotocol.io"
+    type: "docs · official standard"
+tags:
+  - mcp
+  - tools
+  - applied-ai
+  - integrations
+---
+
+You may have used MCP as a *consumer* already (→ mcp-servers). Now you build it. MCP (Model
+Context Protocol) is the open standard that lets an AI app plug into tools and data the same
+way every time, and understanding it from the inside is one of the most reusable skills in
+this course.
+
+## The problem it kills: N×M integrations
+
+Without a standard, every AI app needs a custom integration for every tool: one GitHub
+connector for your chat app, another for your IDE, another for the next app. N apps times M
+tools. **MCP makes it N+M:** build a capability **once** as an MCP server, and **any**
+MCP-compatible app can use it. Anthropic, which introduced the protocol, compares it to a
+USB-C port for AI. Today many hosts speak it, including Claude's apps, ChatGPT, Gemini CLI,
+Cursor and VS Code with Copilot, so the comparison holds well beyond one vendor.
+
+## The architecture
+
+- **Host**: the AI app (a coding agent, an IDE, a chat app, your own app).
+- **Client**: lives in the host and holds one connection to one server.
+- **Server**: what *you* build. It exposes three kinds of capability:
+  - **Tools**: actions the model can call (query a database, create a ticket).
+  - **Resources**: data the host can read and attach as context (files, records).
+  - **Prompts**: reusable prompt templates a user can pick.
+
+Under the hood the messages are JSON-RPC. A session starts with a handshake in which client and
+server declare what they support; the client then asks the server for its tool list, and the
+host shows those **names, descriptions and argument schemas** to the model. From there it's the
+tool-calling loop you already know (→ build-agent-in-code), with MCP as the wire between the
+host and your code. The spec also defines features flowing the other way, such as a server
+asking the host for user input, but tools are where most servers start.
+
+**How they actually talk.** A **local** server runs as a child process the host launches and
+speaks over **stdio**: simple, private, no network. Most servers you add to a coding agent run
+this way. A **remote** server speaks **Streamable HTTP**, which means it needs real **auth**
+(OAuth-style tokens scoping who may call which tools). Local inherits your machine's trust;
+remote must earn it.
+
+## Worked example: a notes-search server, from launch to answer
+
+You wrap a folder of meeting notes as a server with one tool, `search_notes(query)`.
+
+1. **Register.** You add one entry to your host's MCP config: the command that starts your
+   server (for example `python notes_server.py`), with an absolute path.
+2. **Launch and handshake.** On startup the host spawns the process, and they exchange
+   capabilities over stdio.
+3. **Discovery.** The host asks for the tool list and receives `search_notes`, its
+   description ("Search the team's meeting notes by keyword; returns titles and dates") and
+   its schema.
+4. **Use.** You ask "when did we decide to drop the beta?" The model emits a tool call; the
+   client forwards it; your server searches the folder and returns three matching snippets.
+5. **Answer.** The host appends the result to the conversation and the model answers with the
+   date, citing the note.
+
+Notice what *you* wrote: one function, a description and a schema. The protocol did the rest,
+and the same server now works in every MCP host you use.
+
+> 💡 **Try it:** If you have Node installed, run
+> `npx @modelcontextprotocol/inspector npx -y @modelcontextprotocol/server-everything`. The
+> Inspector opens in your browser against the official reference server. List its tools,
+> read one description and call it by hand. **No Node?** Open the connected tools list in
+> any MCP host you use and read what each tool's description says it can do.
+
+## MCP or plain function calling?
+
+If a tool is used only inside your own app, plain function calling (→ structured-outputs-tools)
+is simpler: no extra process, no protocol. Reach for MCP when the **same capability should
+work in several hosts**, when you want other people's AI apps to reach your service, or when
+you want to use the many servers others have already written.
+
+## Security: descriptions are untrusted input
+
+A third-party server's **tool descriptions and results go straight into the model's context**.
+A malicious or compromised server can hide instructions in a description ("tool poisoning") or
+in results, steering the model: prompt injection through the side door
+(→ llm-security-prompt-injection). Vet servers like dependencies: who publishes it, what it can
+write, how it authenticates.
+
+## Common failure modes
+
+- **The server never shows up in the host** → wrong config file, relative path, or the server
+  crashes on start → use absolute paths and test it alone in the Inspector first.
+- **A stdio server works in testing, then garbles in the host** → the server prints logs to
+  stdout, which is the protocol channel → log to stderr only.
+- **The model picks the wrong tool or ignores yours** → too many connected tools, or vague
+  descriptions → keep the server list short and write descriptions that say when to use each
+  tool.
+- **A secret leaks into a conversation** → a token placed in a tool description or returned in
+  a result → keep credentials in the server's environment and return only the data needed.
+
+The server you write isn't tied to one vendor; it's an asset across every AI tool you touch.
+Next: proving all of this actually works, with **evals** (→ evals-and-testing).

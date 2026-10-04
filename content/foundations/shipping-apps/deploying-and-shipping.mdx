@@ -1,0 +1,247 @@
+---
+title: "Deploying & shipping (Vercel & app stores)"
+summary: "Deploy a web app with the right environment variables and a secret-free build, and plan around the gates for shipping to the app stores."
+changeNote: "New video: Vercel's walkthrough of environments, plus an environment-variable worked example, a failure-modes list, a secret scan in the task and a quick deploy audit."
+section: foundations
+pillar: shipping-apps
+order: 8
+level: intermediate
+estMinutes: 20
+taskMinutes: 55
+prerequisites: [backend-database-with-ai, testing-qa-with-ai]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "nZrAgov_-D8"
+  published: "2024-01-24"
+  year: 2024
+  minutes: 12
+  title: "Environments on Vercel"
+  channel: "Vercel"
+  why: "An official Vercel walkthrough, so it shows Vercel's own dashboard, but it's a docs-style explainer rather than a sales pitch, and the model it teaches (Git-connected deploys, preview and production, variables per environment) carries over to Netlify and Cloudflare Pages. In about 12 minutes it covers the parts of a web deploy that trip people up, including promoting a tested deployment to production. Custom domains and the secret-in-the-bundle trap are in the breakdown."
+  notes:
+    - "It covers the web half only. For the app-store half, a short Flutter publishing walkthrough is in the backups, and Flutter's official release guides below are the always-current reference."
+readAfter:
+  - label: "Environment variables — Vercel docs"
+    url: "https://vercel.com/docs/environment-variables"
+    kind: docs
+  - label: "Build and release an Android app — Flutter official deployment guide"
+    url: "https://docs.flutter.dev/deployment/android"
+    kind: docs
+  - label: "Build and release an iOS app — Flutter official deployment guide"
+    url: "https://docs.flutter.dev/deployment/ios"
+    kind: docs
+applyIt: |
+  The one shipping mistake you can't undo is a secret inside a public bundle: anyone can unpack a
+  web bundle or an app binary and read it. Spend ten minutes sorting the keys in your own project.
+
+  1. **List every environment variable and key** the project uses: database URL, model API key,
+     payment keys, analytics IDs.
+  2. **Mark each one public or secret.** Publishable and anon keys and public analytics IDs are
+     public; service-role, admin and third-party API keys are secret.
+  3. **Check where each secret lives now.** Anything secret that sits in a public-prefixed variable
+     (such as `NEXT_PUBLIC_*`), the repo or client code gets moved server-side and rotated.
+
+  **If you code:** ask your coding agent (Claude Code, Cursor, Codex or Copilot) for the list from
+  your real project, then check it yourself. **If you don't code yet:** ask an assistant to explain
+  which variables in your builder project (Lovable, Bolt, Replit) are public and which are secret,
+  and check each one in the platform's settings.
+  Success: every key marked public or secret, and no secret anywhere the client can read it.
+toolkit: |
+  - **Keep the secret scan as a standing gate.** Run it in pre-commit and in CI on every push,
+    not only before big releases, so a leaked key is caught at the commit that added it.
+  - **Test on the production URL, not a preview.** Each preview deploy is a different origin,
+    so anything stored in the browser (localStorage, cookies) starts empty there. Note in your
+    instruction file which URL counts as "the real one", so a "data reset to zero" scare
+    doesn't send you hunting for a bug that isn't there.
+  - **Log the store gates in your project notes.** Developer account costs, review times and
+    Google's closed-test requirement for new personal accounts belong in the project's notes
+    or memory file, so a release date never collides with a gate you forgot.
+  - **Write your release runbook once.** Version bump → build → secret scan → smoke test on a
+    real device or the production URL → release. Save it as a checklist file, a skill or a
+    saved prompt, and have the agent walk it every time.
+recap:
+  - emoji: "🚢"
+    title: "Who a laptop app helps"
+    text: "No one. Putting it where real people can use it is the whole job, and it has never been easier."
+  - emoji: "▲"
+    title: "How hard is web, really?"
+    text: "Barely. Push to GitHub, import the repo into Vercel (or Netlify, Cloudflare Pages), and every later push deploys, with a preview URL per branch."
+  - emoji: "🔐"
+    title: "Where production keys go"
+    text: "Into the host's environment settings, server-side, never the repo or the client bundle. Same rule as ever, now in production."
+  - emoji: "📱"
+    title: "Why mobile is slower"
+    text: "The stores gatekeep: you build signed native binaries and pass review on every release. No instant deploys like the web."
+  - emoji: "✍️"
+    title: "Same pipeline, two toolsets"
+    text: "Flutter builds an app bundle plus an iOS archive; Expo uses EAS Build and Submit. iOS builds need macOS, or a cloud CI service."
+  - emoji: "💳"
+    title: "Tolls and gates"
+    text: "Apple Developer is $99/yr, Google Play $25 once. New personal Play accounts must also run a 12-tester, 14-day closed test before production unlocks."
+  - emoji: "🧪"
+    title: "Before the public sees it"
+    text: "Ship to TestFlight and Play internal testing first, then promote. Store review runs on every update, not just the first release."
+  - emoji: "🏁"
+    title: "The hardest part of shipping"
+    text: "Letting go. A live v1 real people touch teaches more in a day than another week of polishing in private."
+task: |
+  Put one real build in front of real people, with a gate that keeps secrets out of it. Pick the
+  path that fits:
+
+  - **Web (free):** push your project to GitHub, import it into Vercel (Netlify and
+    Cloudflare Pages work the same way), set your environment variables in the dashboard,
+    then open the production URL and complete one real action end to end.
+  - **Mobile:** bump the version, make a release build, and install it on your own phone (an
+    Android APK, or Expo's internal distribution), then complete one real action on it.
+
+  ```prompt
+  Walk me through shipping [my app] to [Vercel / my phone] one step at a time, waiting for
+  my result before each next step: version bump, environment variables (which are public,
+  which are secret), build, deploy or install, then a smoke test of one real user action.
+  Before the deploy, add a secret-scan gate: scan tracked files and the production build output
+  (web bundle, or the APK, app bundle or IPA) for key-shaped values, using an existing scanner
+  such as gitleaks, wired into the pre-commit hook or build script so it fails loudly. At the
+  end, draft three questions to ask the first people who try it.
+  ```
+
+  Prove the gate works by planting a fake secret in a tracked file and watching it fail, then
+  remove it. No app yet? Deploy the landing page from the scaffold lesson (→ scaffold-with-ai).
+  Success: a planted fake secret trips the gate, and a versioned, secret-free build is live (or
+  installed) with one real action completed on it.
+selfCheck:
+  - q: "Your Next.js app works locally, but in production every page that reads the database shows a server error. The build log is clean. What's your first suspect?"
+    a: "Missing environment variables on the host. Your local `.env` file isn't deployed, so the database URL or key is undefined in production; add the variables in the host's settings for the Production environment and redeploy."
+  - q: "A teammate stored the payment provider's secret key in `NEXT_PUBLIC_PAYMENTS_KEY` \"so the checkout page can read it\". What's wrong, and what do you do now?"
+    a: "The `NEXT_PUBLIC_` prefix inlines the value into the browser bundle, so anyone can read it. Rotate the key now, move the call that needs it into a server route or function, and keep only the publishable key on the client."
+  - q: "What's different about shipping a mobile app compared with the web?"
+    a: "You build signed native binaries and pass store review on every release, instead of deploying instantly. Flutter uses `flutter build appbundle` plus an iOS archive (which needs macOS or a cloud CI service), Expo uses EAS Build and Submit, and both need developer accounts (Apple $99/yr, Google $25 once)."
+mcq:
+  - q: "Your app keeps each user's progress in the browser's localStorage. A friend testing your branch's preview link reports that all their progress reset to zero. What's the most likely explanation?"
+    options:
+      - "The deploy cleared localStorage, so you need a data migration"
+      - "Each preview is its own origin, so its browser storage starts empty"
+      - "The preview environment is missing the app's environment variables"
+      - "The new build is broken, so you should roll back to the last deploy"
+    answer: 1
+    explain: "Browser storage belongs to an origin, and every preview URL is a different origin from production, so it starts empty. Nothing was deleted: test on the production URL. Missing variables cause errors, not a clean empty state, and rolling back fixes nothing that's broken."
+  - q: "You've just opened a new personal Google Play Console account and want your Android app publicly available in about ten days, after a final week of polish. What should you do today?"
+    options:
+      - "Submit to production now, since store review only takes a few days"
+      - "Finish the polish first, then start testing on the finished build"
+      - "Publish to internal testing, which unlocks production straight away"
+      - "Start a closed test with at least 12 testers, in parallel with polish"
+    answer: 3
+    explain: "New personal accounts must run a closed test with at least 12 testers for 14 continuous days before production unlocks, so ten days is already too short. Start the clock now and polish while it runs. Waiting until the polish is done adds the full 14 days on top."
+  - q: "You fix a crash in your Flutter app, rebuild the app bundle and upload it to Play Console. The upload is rejected straight away. What's the most likely cause?"
+    options:
+      - "The build number wasn't raised above the previous upload's"
+      - "The upload key has expired, so you need to create a new keystore"
+      - "The store's review flagged the crash you have just fixed"
+      - "The console is busy, so retrying the same file later works"
+    answer: 0
+    explain: "Every upload needs a higher build number than the last, so bump it and rebuild. Creating a new keystore is the dangerous wrong turn: the store expects the key you registered, which is why backing it up matters. Review happens after a successful upload, not at the moment of upload."
+  - q: "Your secret scanner runs on every commit and finds nothing in the repo. A teammate added a model API key in the host's dashboard as `NEXT_PUBLIC_AI_KEY`. Is the deployed site secret-free?"
+    options:
+      - "Yes, the dashboard stores variables server-side and encrypted"
+      - "Yes, because the repo scan passing means the build is clean"
+      - "No: the prefix inlines it into the bundle, so scan the build too"
+      - "No, but only signed-in users could ever read the key's value"
+    answer: 2
+    explain: "A public-prefixed variable is copied into the browser bundle at build time, and it never appears in the repo, so a repo-only scan misses it. Scan the build output as well, then rotate the key and move the call to a server route. Anyone who loads the page can read the bundle, signed in or not."
+backupResources:
+  - label: "How to Publish Flutter Apps: Step-by-Step App Store + Google Play Tutorial — DevVibe"
+    url: "https://www.youtube.com/watch?v=pYb0-U653hs"
+    type: "video · the app-store half"
+  - label: "How to deploy Next js app on Vercel Full Guide 2026 — How To Solve Pro"
+    url: "https://www.youtube.com/watch?v=CtvPiU3bSs4"
+    type: "video · the web half"
+  - label: "Expo EAS — build & submit to the app stores (docs)"
+    url: "https://docs.expo.dev/eas/"
+    type: "docs · the RN/Expo path"
+tags:
+  - shipping-apps
+  - deployment
+  - vercel
+  - app-stores
+---
+
+A finished app on your laptop helps no one. **Shipping**, putting it where real people can use
+it, is the whole point, and it's never been easier. The web half takes minutes. The mobile
+half takes days of calendar time, mostly waiting on gates you can plan around.
+
+## Web: deploy on Vercel (or a similar host)
+
+For a Next.js app, deployment is almost trivial. Netlify and Cloudflare Pages work the same
+way:
+
+1. Push your code to **GitHub**.
+2. Import the repo into **Vercel**. It detects the framework, builds and deploys.
+3. Set **environment variables** (your secrets) in the dashboard, server-side.
+4. Add a **custom domain** when you're ready.
+
+From then on, **every push deploys automatically**, and each branch gets a **preview URL**,
+handy for showing work in progress before it goes live. If a release misbehaves, hosts like
+these let you put a previous deployment back in a click or two, so a bad deploy is an
+inconvenience, not a crisis.
+
+## Worked example: classifying your environment variables
+
+The most common first-deploy problem is environment variables. Before your first deploy, list
+every variable your app reads (ask your agent: "list every environment variable this code
+reads, and where") and sort them:
+
+| Variable | Public or secret? | Where it goes |
+| --- | --- | --- |
+| Backend URL | Public | Client is fine (`NEXT_PUBLIC_` on Next.js) |
+| Publishable / anon key | Public, by design | Client is fine; access rules protect the data |
+| Service-role / admin key | **Secret** | Server only, never prefixed |
+| AI model API key | **Secret** | Server only, used inside a server route |
+| Payment secret key | **Secret** | Server only |
+
+The prefix is the trap. On Next.js, `NEXT_PUBLIC_` means "copy this value into the browser
+bundle"; Expo's `EXPO_PUBLIC_` does the same for the app bundle. Anything with that prefix is
+readable by anyone who opens your app. Then add each variable in the host's settings, for the
+Production environment as well as Preview, and redeploy.
+
+> 💡 **Try it:** Open your deployed site, open DevTools, and search the loaded JavaScript
+> (the Sources panel's search) for the first few characters of one of your secret keys. You
+> want zero hits. If you find one, rotate that key today.
+
+## Mobile: the app stores
+
+Mobile is more involved because the stores gatekeep. Two paths, same shape:
+
+- **Flutter:** `flutter build appbundle` for Android (signed with your upload keystore) and
+  an iOS archive for the App Store. iOS builds need macOS; on Windows or Linux, a cloud CI
+  service such as **Codemagic** can build, sign and push to TestFlight for you. Ship to
+  **TestFlight** and **Play internal testing** first, then promote to production.
+- **React Native / Expo:** **EAS Build** produces the binaries and **EAS Submit** uploads
+  them: the same build → sign → submit pipeline with different tooling.
+- Either way you need an **Apple Developer** account ($99/yr), a **Google Play** account
+  ($25 one-time), and to pass each store's **review**. Plan for review time; it's not
+  instant like the web. One more Google gate: a brand-new **personal** Play Console account
+  must run a **closed test with at least 12 testers for 14 continuous days** before it unlocks
+  production access (organization accounts are exempt).
+
+Two housekeeping rules save real pain. Every upload needs a **higher build number** than the
+last one, so bump it before each build. And **back up your signing key and its passwords**
+somewhere safe outside the repo. Losing them turns a routine update into a recovery process.
+
+## Common failure modes
+
+- **Works locally, errors in production** → environment variables were never added on the
+  host, or only for Preview → add them for Production and redeploy.
+- **A secret is readable in the browser** → it was given a public prefix → rotate it and move
+  the code that uses it to a server route or function.
+- **"All my data disappeared"** on a preview URL → each preview is a different origin with
+  empty browser storage → test on the production URL.
+- **The store rejects your upload** → the build number wasn't bumped → increase it and rebuild.
+- **Play won't let you publish to production** → the closed-test requirement for new personal
+  accounts → start the 14-day test early, in parallel with your final polish.
+
+## "Done" beats "perfect"
+
+The hardest part of shipping is letting go. A live v1 that real people touch teaches you more
+in a day than another week of polishing in private. Ship it, then use the next lesson to make
+it better with real feedback.

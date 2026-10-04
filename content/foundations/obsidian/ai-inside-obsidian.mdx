@@ -1,0 +1,292 @@
+---
+title: "AI inside Obsidian"
+subtitle: "RAG, and where it stops"
+summary: "Run retrieval over your vault with a local AI plugin, keep private notes on your machine, and see where search stops and synthesis begins."
+changeNote: "New: a privacy-line decision for your own notes, a chat-assistant version of the retrieval-versus-wiki race, and a scoped 9-minute watch list."
+section: foundations
+pillar: obsidian
+order: 8
+level: intermediate
+estMinutes: 14
+taskMinutes: 45
+prerequisites: [zettelkasten-evergreen]
+reviewedOn: "2026-10-03"
+video:
+  videoId: "_i3577ti8jg"
+  published: "2026-05-31"
+  year: 2026
+  minutes: 26
+  start: 0
+  watchMinutes: 9
+  title: "Obsidian Smart Plugin Workflow 📝 New Smart Connections + Context AI"
+  channel: "Wanderloots"
+  why: "Callum builds retrieval over a whole vault with Smart Connections, the plugin this lesson's task uses, which is free, private and offline by default with its own local embedding model. Many 'AI in Obsidian' videos only run a chat on text you selected by hand; this one shows whole-vault retrieval, with the vector database and similarity scores on screen. **The video is sponsored by Smart Connections**, so you're watching an advocate, and only discovery and bundling are free; the in-Obsidian chat needs a model login."
+  notes:
+    - "It runs about 26 minutes; watch about nine, scoped: 0:00–1:20 (the discover, bundle, use loop), 3:44–6:28 (the load-bearing range: watch it twice) and 9:14–11:00 (bundling hits into context)."
+    - "Then 13:18–14:00 (link depth inflates the bundle), the two ceiling moments at 17:39–18:08 (a 35,000-token bundle) and 20:51–21:30 (the model sees only the bundle), and the close, 24:39–25:17."
+    - "The sponsorship is disclosed at 1:21. What's shown is the free core; there's also a paid Pro tier the video doesn't demo."
+readAfter:
+  - label: "Smart Connections — the plugin's own docs (local embedding model, Smart Environment)"
+    url: "https://smartconnections.app/smart-connections/"
+    kind: docs
+applyIt: |
+  Local embeddings never leave your machine; a bundle sent to a cloud model does. Decide your
+  privacy line once, for your own material, before you send a single bundle anywhere.
+
+  List the kinds of notes your vault holds or will hold (course notes, client files, health or
+  money notes, a journal, work documents) and mark each **cloud OK**, **local only** (Smart
+  Connections plus a local model in Ollama or LM Studio) or **not in the vault at all**. Check
+  your employer's or university's rules on AI tools before you mark their material cloud OK.
+
+  **With a chat assistant (no code):** check the files already uploaded to your Projects or
+  Gems against the line, and remove any that fall on the local-only side.
+
+  Success: every kind of note marked, and no local-only file left in a cloud Project.
+
+  **With a coding agent:** remember that an agent on a cloud model sends whatever it reads to
+  that cloud. Add the local-only folders to `vault-rules.md` as off-limits.
+
+  Success: every kind of note marked, and the local-only folders named as off-limits.
+toolkit: |
+  - **Notice the retrieval you already run.** Files you add to a ChatGPT or Claude Project, a
+    Gemini Gem or a Gemini Notebook (formerly NotebookLM) get pulled into answers the same
+    embed-retrieve-generate way. Knowing that tells you why a sharp, well-titled file beats a
+    long dump.
+  - **Pin a one-paragraph summary to each Project.** Every chat that re-reads the same long files
+    to rebuild the same answer pays retrieval's tax in tokens and waiting. A short summary note
+    uploaded alongside them gives the assistant the conclusion first.
+  - **Distinguish logs from answers.** A running notes file is raw material. If you keep asking
+    your assistant to re-read it to reach the same conclusion, write that conclusion down as its
+    own short note it can answer *from* (lesson 9 makes this the system).
+  - **Decide your privacy line once.** Local embeddings (Smart Connections) never leave your
+    machine; a chat bundle sent to a cloud model does. Write down which folders may go to a cloud
+    model and which stay local (Ollama, LM Studio), and hold that line in every tool.
+recap:
+  - emoji: "🔍"
+    title: "Three steps under the hood"
+    text: "Embed each note into a vector, retrieve the closest chunks to your question, hand them to the model. Retrieval-augmented generation — the same architecture behind enterprise AI assistants."
+  - emoji: "👀"
+    title: "The empty-note moment"
+    text: "The video shows the vector database, similarity scores per note, and a brand-new empty note with zero related notes until enough words exist to embed. Retrieval is derived from text, not from your judgment."
+  - emoji: "🆓"
+    title: "What it costs, where it runs"
+    text: "Smart Connections ships its own embedding model and is private and offline by default, so the discovery layer costs nothing and sends nothing. Only the chat layer needs a model login."
+  - emoji: "🧺"
+    title: "From hits to a bundle"
+    text: "Smart Context turns retrieved notes into a reusable bundle you can hand to any chat. Widen the link depth and the bundle balloons — curation is manual, and it's on you."
+  - emoji: "🎯"
+    title: "The job retrieval wins"
+    text: "Recall over material you never curated. Dumped a 90-page PDF in last month and forgot it existed? Retrieval finds the paragraph. A wiki only knows what someone bothered to compile."
+  - emoji: "🧱"
+    title: "Ask the same question twice"
+    text: "Every query re-derives the answer from raw chunks. Ask the same hard question twice and the model does the same work twice — nothing was built."
+  - emoji: "💸"
+    title: "The 35,000-token moment"
+    text: "One project bundle in the video weighs 35,000 tokens, and the model still only sees what you hand it. Synthesis you paid for dies in the chat thread."
+  - emoji: "➡️"
+    title: "The alternative coming next"
+    text: "Lesson 9's move is to compile sources into distilled pages once, so the knowledge is already there next time. Retrieval stays in the toolkit; it stops being the plan."
+task: |
+  Install **Smart Connections** from Community plugins (free, local, no key), let it
+  finish embedding your vault, then open the Connections view on `sources/first-source.md`
+  — the file lesson 6 had you copy in. That's the retrieval step, and it's the same on both
+  routes. Then answer one question twice: from what retrieval found, and from your compiled
+  `wiki/`. Pick a question you re-ask whose answer you already know is in the source, with at
+  least two parts. On the retrieval side, keep two numbers: **how much of what retrieval found
+  was irrelevant**, and **how much you had to curate by hand**. Those numbers and the race are
+  the argument for lesson 9.
+
+  **With a chat assistant (no code):**
+
+  - Send the top hits to **Smart Context**, copy the bundle, and paste it into any chat
+    assistant (ChatGPT, Claude, Gemini, or a local model in Ollama), with your question:
+
+  ```prompt
+  Answer only from the notes in this bundle. [Your question.] Name the note behind each
+  detail, and write "not in my notes" rather than guess.
+  Success: every part of the answer traced to a real note in the bundle, nothing invented.
+  ```
+
+  - Check the answer against what you know. Count how much of the bundle was irrelevant and
+    how many hits you added or pruned by hand, and write both numbers in today's daily note.
+  - Now the compiled side: open a fresh chat, upload `index.md` and only the `wiki/` pages it
+    lists, and ask the same question with the same rules. Save a short note,
+    `wiki/compare-retrieval-vs-wiki.md`: both answers, which cited better, and what the wiki
+    already knew that retrieval had to re-derive. Add a line for it to `index.md`.
+
+  Success: two cited answers you checked, your two numbers in today's daily note, and a
+  comparison note in `wiki/` listed in the index.
+
+  **With a coding agent:**
+
+  - Note the file paths of the top hits in the Connections view, then hand only those files
+    to your agent at the vault root, so it answers from exactly what retrieval found:
+
+  ```prompt
+  Answer only from these files: [the paths Smart Connections listed]. [Your question.] Name
+  the file behind each detail, and write "not in my notes" rather than guess. List which of
+  the files contributed nothing to the answer. Then answer the same question again from the
+  compiled side only: read index.md, then only the wiki/ pages it lists, citing pages.
+  Finally write ONE new file, wiki/compare-retrieval-vs-wiki.md: both answers, which cited
+  better, and what the wiki already knew that the first answer had to re-derive. Add one line
+  for it to index.md. Touch nothing else.
+  Success: two cited answers, the irrelevant files named, and one comparison note in the index.
+  ```
+
+  - Check both answers against what you know. The list of files that contributed nothing is
+    your first number; the hits you added or dropped by hand before running it are the second.
+
+  Success: two cited answers you checked, your two numbers in today's daily note, and a
+  comparison note in `wiki/` listed in the index.
+selfCheck:
+  - q: "You ask your vault 'what did I decide about the project budget?' and the top retrieved note is an idea you rejected months ago, because it uses the same words. Walk the three RAG steps and say which one let you down."
+    a: "Embed (every note chunk becomes a vector, done once and refreshed as you write), retrieve (your question is embedded too, and the nearest chunks come back ranked by similarity), generate (those chunks go to the model as context). Retrieval let you down, and your judgment never touches it — it ranks by textual similarity, which is why a brand-new note in the video has zero connections until words exist to embed. Relevance to you and similarity to your words are not the same thing."
+  - q: "Last month you dumped 40 PDFs into `sources/` without reading them. Tonight you need one paragraph from them. Retrieval or a compiled wiki, and why does that keep retrieval in your toolkit permanently?"
+    a: "Recall over material you have NOT curated. Drop 40 PDFs into `sources/` and retrieval can find the right paragraph tonight, with zero upfront work; a wiki only knows what an agent has already been asked to compile. So retrieval stays as the front door for raw, unprocessed, or one-off material — the search layer. What it can't do is accumulate, which is the other half of the job."
+  - q: "You asked your vault a hard question and got a good synthesis. Where does that synthesis live tomorrow, and what does that cost you?"
+    a: "In the chat thread, and nowhere else. RAG re-derives from raw sources on every query, so tomorrow's identical question does identical work — same tokens, same latency, same chance of a slightly different answer. Nothing compounded. Lesson 9's fix is to file good answers back into the vault as pages, so the second ask is a read instead of a re-derivation."
+backupResources:
+  - label: "How To Add AI To Obsidian (Free Private Local) — Smart Connections — Wanderloots"
+    url: "https://www.youtube.com/watch?v=ce2PVHyuRtA"
+    type: "video · the deeper RAG explainer the main video points to (from ~6:00)"
+  - label: "Copilot for Obsidian — the other major AI plugin, repo + docs"
+    url: "https://github.com/logancyang/obsidian-copilot"
+    type: "repo · alternative plugin"
+  - label: "Ollama — run a local model for the chat layer"
+    url: "https://ollama.com"
+    type: "tool · local models"
+  - label: "Obsidian Help — community plugins"
+    url: "https://help.obsidian.md"
+    type: "docs · official"
+tags:
+  - obsidian
+  - ai
+  - rag
+  - smart-connections
+  - retrieval
+---
+
+This is the lesson where AI arrives in your vault — and the lesson where you learn
+what it can't do. Both halves matter. The plugins here are genuinely useful and the
+vocabulary is genuinely worth having. But this pillar ends somewhere else, and you
+should know why before you get attached.
+
+## The mechanism has a name: RAG
+
+Ask a vault question through Smart Connections and three steps run underneath:
+
+1. **Embed.** Each chunk of each note is converted into a vector, a list of numbers
+   that positions it by meaning. Your whole vault becomes a map.
+2. **Retrieve.** Your question gets embedded too. The chunks nearest to it come back,
+   ranked by similarity.
+3. **Generate.** Those chunks go to the model alongside your question, and it answers
+   from them.
+
+That is **retrieval-augmented generation — RAG** — the same architecture behind every
+"chat with your docs" product and enterprise assistant, and the one you'll build from
+scratch in the *Applied AI engineering* pillar (→ rag-fundamentals, then
+→ embeddings-vector-databases for what's under the hood). Knowing that your notes app
+runs the same architecture as a company's internal assistant is a useful mental model:
+whatever you learn about retrieval here transfers.
+
+### Careful: "plugin" no longer means "RAG"
+
+That used to be the whole plugin category. It isn't any more. Copilot for Obsidian (version 4)
+can run opencode, Claude Code or Codex as an agent *inside* the vault, on desktop, doing
+multi-step tool use rather than embed-retrieve-generate; paid tiers add hosted models and
+extras. So a plugin can now host the same kind of agent you'd run in a terminal.
+
+Which means the line this lesson draws is **not** plugin-versus-terminal — that one is
+already blurring. The real line is what the next lesson is about: *retrieving* your raw
+notes on every question, versus *compiling* them once into pages that keep getting better.
+Judge a tool by which of those it does, not by where it runs.
+
+## Watch it scoped
+
+The video is about 26 minutes against a 14-minute lesson. Don't binge it: these ranges, about
+nine minutes in all, carry the teaching.
+
+- **[00:00–01:20]** — the loop: discover with Smart Connections, bundle with Smart
+  Context, use it with a chat.
+- **[03:44–06:28]** — **watch this twice.** The vector database on screen, similarity
+  percentages per note, and the moment that makes the whole mechanism concrete: a new
+  empty note has *no* related notes, and neighbours appear only once enough words exist
+  to embed. Retrieval is derived from your text, not from your judgment.
+- **[09:14–11:00]** — bundling the hits into reusable context.
+- **[13:18–14:00]** — link depth: go one hop deeper and the bundle balloons.
+- **[17:39–18:08]** and **[20:51–21:30]** — the two ceiling moments. Keep them.
+- **[24:39–25:17]** — the close.
+
+Two things to know going in. The video is **sponsored by Smart Connections** — it says
+so at [01:21], and the workflow shown is genuinely the free core, but you're watching an
+advocate. And only **discovery and bundling** are free: the in-Obsidian chat layer needs
+a model login, and there's a paid Pro tier the video declines to demo.
+
+## Local vs. cloud — a real decision
+
+Smart Connections ships its **own embedding model and runs offline by default**, so the
+map of your vault is built on your machine and stays there. That's the free, private
+route, and it's why this lesson uses it.
+
+The moment you send a bundle to a chat, the fork appears:
+
+- **Cloud** models (Claude, GPT, Gemini) are the most capable, but the note text leaves
+  your machine.
+- **Local** models via **Ollama** or **LM Studio** keep everything home — slower, a bit
+  less sharp, and free.
+
+Make the call per note, not per tool. It's the same call a well-built app makes when it
+keeps its AI provider's API key on its own server instead of shipping it inside the app:
+decide once where sensitive material is allowed to go, then hold the line.
+
+## What retrieval is genuinely best at
+
+This lesson ends by naming a ceiling, so be fair about the floor first. Retrieval wins
+outright at **recall over material you have not curated.**
+
+Dump forty PDFs, a year of meeting transcripts, and a folder of half-read articles into
+`sources/` tonight. Retrieval can find the right paragraph in the morning, with zero
+upfront work from you. It scales with disk, not with attention. When the job is *"find me
+that thing I know is in there somewhere"*, nothing beats it — and no compiled wiki will,
+because a wiki only knows what someone has already bothered to compile.
+
+Keep it. Use it. It's the search layer of your second brain, permanently.
+
+> 💡 **Try it:** once Smart Connections has embedded your vault, open a note and look at its
+> top three "related" notes. For each, ask: is this related in *meaning* to me, or does it
+> just share words? One mismatch is the best two-minute lesson in why similarity is not
+> relevance.
+
+## Where it stops
+
+Now the honest part. Watch what happens over a month of real use:
+
+- **Every query starts from zero.** RAG re-derives the answer from raw chunks each time.
+  Ask the same hard question in March and in June and the model does the same work twice,
+  at the same cost, with no guarantee of the same answer. Nothing accumulated.
+- **Synthesis dies in the thread.** You ask something subtle, get a genuinely good
+  answer that pulled five notes together — and it lives in a chat log you'll never open
+  again. The next question rebuilds it from scratch.
+- **You are the curator, forever.** The video is explicit about this. You choose which
+  hits go in the bundle, prune the irrelevant ones, and watch the link depth. One project
+  bundle hits **35,000 tokens** at [17:39], and at [20:51] he says the quiet part clearly:
+  the AI is not searching your vault — it only sees the bundle you handed it.
+- **Similarity is not relevance.** Two notes that share vocabulary rank as neighbours even
+  when one is a decision you made and the other is an idea you rejected. Retrieval has no
+  idea which is which. You do.
+
+None of that is a bug. It's what retrieval *is*: a fast, cheap, un-opinionated way to get
+raw material in front of a model. The problem is only that most people stop here and
+assume this is what "AI on my notes" means.
+
+## What comes next
+
+Lesson 9 is the alternative, and it's the reason this pillar exists in the shape it does.
+Instead of retrieving from raw sources on every query, you have an agent **compile** them
+once — into distilled, cross-linked pages it then keeps current. (A chat assistant can do the
+compiling too, with you saving the pages; lesson 9 shows both routes.) Ask a question and it
+reads pages that already contain the synthesis, instead of rebuilding it from chunks.
+Good answers get filed back as new pages, so your explorations compound too.
+
+Retrieval re-derives. A compiled wiki accumulates. Run the race in the task before
+you read on — the difference is much more convincing when it's your own vault answering.

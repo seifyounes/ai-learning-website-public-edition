@@ -1,0 +1,289 @@
+---
+title: "Analytics & reporting with AI"
+summary: "Analyze an export or database with an AI assistant in a fixed order, and turn the numbers into one decision you can defend and re-check."
+changeNote: "New video: a data warm-up tutorial, plus a worked online-course-shop example, a signal-or-noise check, and a task that runs the full four-question routine."
+section: applications
+pillar: marketing-content
+order: 9
+level: intermediate
+estMinutes: 15
+taskMinutes: 45
+prerequisites: [email-and-funnels]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "FKLr3ft8ea0"
+  published: "2025-07-15"
+  year: 2025
+  minutes: 12
+  title: "Master Data Analysis with ChatGPT (in just 12 minutes)"
+  channel: "Jeff Su"
+  why: "Jeff Su's widely watched productivity tutorials target office workers; this one suits spreadsheet users with no analysis training. Its warm-up comes before any number you'd act on: have the assistant describe the data and check its quality, ask what the data can and can't answer, then state your goal. That makes the lesson's four questions trustworthy. It uses ChatGPT, but the steps work with a file in Claude or Gemini, and it isn't selling a tool (the description carries a course affiliate link)."
+  notes:
+    - "Watch all 12 minutes; the warm-up (describe the data, check its quality, state your goal) is the part the lesson builds on."
+    - "Have a database rather than a file? The reading below and the MCP demo in the backups run the same conversation on live data."
+readAfter:
+  - label: "Supabase MCP Server — connect your AI tools to your database (official docs)"
+    url: "https://supabase.com/docs/guides/getting-started/mcp"
+    kind: docs
+applyIt: |
+  Take the four questions to a decision you actually face. Name one marketing call you'll make
+  in the next month (where to spend, which email to fix, which channel to drop), then write
+  three lines: which of the four questions answers it, which column or event in your data
+  measures it, and how big the base must be before you'd act on a change.
+
+  **If you have a database:** run question 1 alone through a read-only connection (Claude Code,
+  Cursor or another MCP client) and note the base it returns next to your three lines.
+
+  Success: three written lines plus a real base from your own data.
+
+  **If you don't code:** open the export you'd use (analytics, email platform, store or social
+  dashboard) and check it has both a first-step column and a goal column. If one is missing,
+  write down which export would have it.
+
+  Success: three written lines and an export you've confirmed can answer the question.
+toolkit: |
+  - **Give the data a home.** Create a ChatGPT or Claude Project or a Gemini Gem that holds a
+    short note on your columns, goals and audience. Each week, upload the same CSV export from
+    your analytics, email platform or store to it, so the analysis starts with context.
+  - **Save the routine as one prompt** (describe the data → what it can answer → your goal →
+    funnel → cohort → drop-off → decision) as a saved prompt or Custom GPT that drafts the weekly
+    report. For a freelancer, that's a repeatable, sellable deliverable.
+  - **Bake the small-sample guardrail into it.** "Always state the base; don't react to a
+    5-point swing on a small group until it persists." Then reports drive decisions instead of
+    chasing noise.
+  - **Log every decision with a date.** A spreadsheet row per change (what, when, which metric,
+    re-measure date) closes the measure → learn → improve loop the whole track builds toward.
+
+  **If you use a coding agent:**
+
+  - **Query the database directly.** Connect your agent (Claude Code, Cursor, Codex or another
+    MCP client) through a read-only MCP server and note the setup in its instruction file, so any
+    session can run the same routine on live data (→ mcp-servers).
+recap:
+  - emoji: "🔍"
+    title: "Before any number"
+    text: "Describe the data: have the assistant list every column with sample values and flag missing or odd entries, so you know it read the file right."
+  - emoji: "❓"
+    title: "What can this data answer?"
+    text: "Ask for the questions the data supports, which columns back each one, and what it can't tell you, before stakeholders ask."
+  - emoji: "🎯"
+    title: "Point it at a goal"
+    text: "State the decision you need and who reads the result. A goal turns open-ended exploration into a focused answer."
+  - emoji: "🧮"
+    title: "Who does the math"
+    text: "The AI, with code: a calculation or a query you can see. Your job is asking the right questions in the right order and checking the working."
+  - emoji: "🔢"
+    title: "Which question first"
+    text: "Funnel gives magnitude, cohort gives the driver, drop-off gives the location. Start at drop-off and you optimize the wrong step."
+  - emoji: "🎲"
+    title: "Small numbers lie"
+    text: "A small cohort's 5-point swing is likely sampling noise. Don't react until it persists or a driver shows up."
+  - emoji: "📝"
+    title: "A report worth reading"
+    text: "The few numbers that matter, week-over-week deltas, one recommended change, every claim re-runnable. Otherwise it's a chart dump."
+  - emoji: "🔁"
+    title: "The loop"
+    text: "Measure, learn, improve, repeat: the marketing twin of evals. Move one number at a time."
+task: |
+  Run the whole routine on one real dataset, end to end: warm-up, four questions, report. Use
+  your own data, a client's export, or, if you have none yet, Google's free Google Analytics
+  demo account or a public marketing dataset from Kaggle. **If you have a database,** connect it
+  read-only through an MCP server (the Supabase MCP, a Postgres MCP server). **If you don't
+  code,** upload a CSV export to ChatGPT, Claude or Gemini.
+
+  ```prompt
+  Analyse this data [the connected database, or the attached CSV] for [what you promote].
+  Warm-up: list every column with sample values, flag missing or odd entries, and say which
+  questions this data can and can't answer. My goal: [the decision I need to make].
+  Then, in this exact order, showing the SQL or calculation for each step:
+  (1) FUNNEL: of people who [first step], what % reached [the goal] in the last 30 days, out of
+  how many? (2) COHORT: compare that rate across one split that could be the driver (source,
+  campaign, signup week or device). (3) DROP-OFF: the last step before people leave, ranked.
+  (4) DECISION: the ONE change to test first, and why.
+  State the base for every number and flag any group too small to trust. End with a
+  one-paragraph report a stakeholder (a client, my manager or future me) could read.
+  ```
+
+  The order is the skill: funnel gives magnitude, cohort the driver, drop-off the location.
+  Spot-check one number by hand, then make the change or book it with a date. A report without
+  a decision attached is a chart dump.
+
+  Success: three numbers each with its base, one dated change, and a report paragraph you could
+  hand to a stakeholder, all re-runnable from the shown working.
+selfCheck:
+  - q: "Your product's conversion rate dropped 5 points this week, measured on a small group of new users. Which of the four questions do you run first — and what would make you NOT react?"
+    a: "The funnel query first: confirm the number and its base. On a group that small, a 5-point swing is likely sampling noise (→ probability-statistics-for-ai), so you don't react until the drop persists or the cohort comparison shows a real driver, like a release or campaign that landed that week."
+  - q: "Why does the funnel → cohort → drop-off → decision order matter? What goes wrong if you start with drop-off?"
+    a: "Funnel gives the magnitude, cohort gives the driver, drop-off gives the location, and decisions need all three. Start at drop-off and you'll optimize the most visible step, not the most costly one: users bailing at a screen only 5% ever reach doesn't move trial-to-paid."
+  - q: "A client pays you for a weekly AI-generated analytics report. What must be in it for it to drive decisions instead of vibes?"
+    a: "The few numbers that matter (funnel, retention, drop-off) with week-over-week deltas, ONE recommended change with the reasoning, and every claim traceable to a query or calculation the client could re-run. A report without a decision attached is a chart dump."
+mcq:
+  - q: "You upload a store export and immediately ask for revenue by channel. The assistant returns a neat table, but the export has order counts and no prices. What went wrong?"
+    options:
+      - "It needed a larger export to estimate the prices"
+      - "You should have asked for a chart instead of a table"
+      - "You skipped asking what the data can and can't answer"
+      - "It worked without code; asking for code would fix it"
+    answer: 2
+    explain: "The warm-up asks which questions the data supports before any number; with no price column, revenue isn't one of them, so the table was invented. Asking for code makes the working checkable, but no code can compute revenue from a column that doesn't exist."
+  - q: "Trial users from search convert at 18% (36 of 200); trial users from ads convert at 6% (24 of 400). Most people who don't convert leave at the onboarding checklist. What do you test first?"
+    options:
+      - "An onboarding fix aimed at the ad-sourced trial users"
+      - "An onboarding redesign for everyone, since that's the exit"
+      - "A cut to the ad budget, since ad users convert at a third"
+      - "Nothing yet; 600 trials is too few to act on at all"
+    answer: 0
+    explain: "The decision uses all three readings: the funnel gives the size, the cohort split points at ad users as the driver, and drop-off says where. A redesign for everyone acts on the location alone, and cutting ads acts on the cohort without testing anything. Bases of 200 and 400 are large enough to take a threefold gap seriously."
+  - q: "The assistant reports a 23% conversion rate from your email export, with no working shown. It's going into a client report tomorrow. What do you do?"
+    options:
+      - "Ask it to double-check, and use it if the answer agrees"
+      - "Ask for the calculation as code and redo one by hand"
+      - "Compare it with an industry average to see if it's plausible"
+      - "Round it to 20% and label it an estimate in the report"
+    answer: 1
+    explain: "Confident wrong numbers usually come from mental arithmetic or a misread column; shown code plus one hand spot-check catches both, and the client can re-run it. Asking the model to re-check without working gives you a second unverified answer, and an outside average says nothing about your data."
+  - q: "Three weeks ago you changed both the email subject lines and the landing page, and conversion rose. The client asks which change worked. What should you have done?"
+    options:
+      - "Tracked more metrics so a dashboard shows each effect"
+      - "Run the funnel query daily instead of once a week"
+      - "Asked the assistant to estimate each change's share"
+      - "Made one change at a time, logged with a re-measure date"
+    answer: 3
+    explain: "Two changes at once can't be pulled apart afterwards, so the loop moves one number at a time and logs each change with a date to re-measure. More metrics or more frequent queries still mix both effects, and an assistant's split of the credit would be a guess with no data behind it."
+backupResources:
+  - label: "MCP with Postgres — Natural Language Interface to your Data — kulbinder dio"
+    url: "https://www.youtube.com/watch?v=yUv9H6imuvE"
+    type: "video · the database route"
+  - label: "Claude Supabase MCP: 2 Minutes to Full Database Access in Claude Code — Giuseppe Builds"
+    url: "https://www.youtube.com/watch?v=EKHiqpLUMpU"
+    type: "video · the Supabase-specific hookup"
+  - label: "Analyze Marketing Data with AI — TextCortex"
+    url: "https://www.youtube.com/watch?v=UGpsWtlbzeE"
+    type: "video · marketing-data angle"
+  - label: "How to Create Social Media Reports in Minutes with AI — Metricool"
+    url: "https://www.youtube.com/watch?v=HnrgqrYzqYE"
+    type: "video · reporting"
+  - label: "Google Looker Studio — free marketing dashboards"
+    url: "https://lookerstudio.google.com"
+    type: "tool · reference"
+tags:
+  - marketing
+  - analytics
+  - reporting
+  - data
+---
+
+Marketing without measurement is guessing with a budget. **Analytics** tells you what
+actually works, and AI turns the overwhelming pile of data into clear decisions in minutes.
+This is the loop that makes everything else in the track pay off.
+
+## The point: data → decisions
+
+Most marketers have *too much* data and too little insight: numbers across web analytics, ad
+platforms, email and social, none of it adding up to "so what do I do?" The job isn't
+collecting data; it's **deciding** from it. That's where AI shines, as long as you ask the
+right questions and check its working.
+
+## Two ways to connect your data
+
+- **No code:** export a CSV from your analytics, email platform, store or social dashboard and
+  upload it to ChatGPT, Claude or Gemini. Ask it to calculate with code rather than "in its
+  head"; all three can run analysis code on uploaded files, and the shown working is what makes
+  the numbers checkable.
+- **With a database:** connect a coding agent (**Claude Code, Cursor** or any MCP client) to
+  your data through an **MCP server** and *converse* with it: it writes the query, runs it and
+  explains the result. Use read-only credentials so a misunderstood request can't change
+  anything (→ mcp-servers).
+
+Either way, mind privacy: strip names and emails from exports you don't need, and check the
+tool's data terms before uploading customer data.
+
+## Warm up before you analyze
+
+Before you trust any number, run the three checks from the video:
+
+- **Describe:** ask the assistant to list every column with a few sample values and flag
+  missing, duplicated or odd entries. If it misreads a column here, every later number is
+  wrong.
+- **Ask what the data can answer:** which questions it supports, which columns back each one,
+  and which questions it *can't* answer (for example, revenue when the export has no prices).
+- **State the goal:** the decision you need to make and who will read the result.
+
+## The four questions, in order
+
+1. **Funnel:** of the people who took the first step, what percentage reached the goal, out of
+   how many? This tells you the *size* of the problem.
+2. **Cohort:** does that rate differ by traffic source, campaign, week or device? This points
+   to a *driver*.
+3. **Drop-off:** what's the last step people take before they leave? This tells you *where* to
+   act.
+4. **Decision:** given all three, what ONE change do you test first?
+
+## Worked example: an online course shop
+
+Here's a hypothetical small shop selling an online course, with made-up numbers for
+illustration.
+
+1. **Funnel:** last 30 days, 300 people signed up for the free lesson and 24 bought the
+   course: 8% of signups.
+2. **Cohort:** split by source. Newsletter signups: 12 of 80 bought (15%). Social signups: 12
+   of 220 bought (about 5.5%). The underlying query is simple:
+
+   ```sql
+   SELECT source,
+          COUNT(*) AS signups,
+          COUNT(*) FILTER (WHERE purchased) AS buyers
+   FROM signups
+   WHERE created_at > now() - interval '30 days'
+   GROUP BY source;
+   ```
+
+3. **Drop-off:** ranking the last event before leaving, the most common among non-buyers is
+   "viewed pricing page".
+4. **Decision:** social signups convert at about a third of the newsletter rate and stall at
+   pricing. Test one change: send social signups a short email sequence that answers the
+   pricing objection before they see the price. Re-measure in a month.
+
+Notice the decision uses all three numbers. Starting from "people leave on the pricing page"
+alone would have led to a pricing-page redesign that might not touch the real gap.
+
+## Signal or noise?
+
+Small groups produce big swings by chance. If 100 people convert at 20%, the plausible range
+for the "true" rate is roughly 12% to 28% at 95% confidence, so a 5-point change from one
+week to the next can easily be noise. Before reacting, check the base, wait to see whether the
+change persists, and look for a driver (a release, a campaign, a price change) in the cohort
+split (→ probability-statistics-for-ai).
+
+## What a useful report contains
+
+The few numbers that matter, each with its base and its change from last period; one or two
+sentences on why it moved; **one** recommended change; and every claim traceable to a query
+or calculation someone could re-run. For a freelancer, that report is a sellable weekly
+deliverable.
+
+> 💡 **Try it:** Export any small CSV you have (email campaign results, store orders, social
+> post stats), upload it to your assistant and ask: "What's the conversion rate from the first
+> step to the goal, out of how many people? Show your calculation." Check one number by hand.
+> Five minutes.
+
+## Common failure modes
+
+- **Symptom:** confident numbers that turn out wrong. **Cause:** the model calculated without
+  code, or misread a column. **Fix:** demand the query or code and spot-check one number.
+- **Symptom:** a big reaction to a small swing. **Cause:** no base size. **Fix:** always report
+  "out of how many" and wait for persistence.
+- **Symptom:** effort spent on a step that doesn't matter. **Cause:** starting at drop-off.
+  **Fix:** run funnel and cohort first.
+- **Symptom:** reports nobody acts on. **Cause:** charts with no recommendation. **Fix:** every
+  report ends with one dated decision.
+
+## Close the loop
+
+This is the marketing twin of **evals** and **iterating from feedback**: measure → learn →
+improve → repeat. Make one data-driven change at a time and watch the number move.
+
+You've finished the track: stack → content → copy → SEO → social → video → images → email →
+analytics. You can now run a complete, AI-powered marketing engine, and package each piece
+as a service.

@@ -1,0 +1,207 @@
+---
+title: "From idea to MVP spec"
+summary: "Turn an idea into a half-page MVP spec: the riskiest assumption, the one feature that tests it, and a list of what you won't build yet."
+changeNote: "New: MVP shapes that aren't software, a worked invoice-chasing example, a common-failures list, a task that writes your spec, and an exercise to pick the cheapest MVP."
+section: applications
+pillar: building-products
+order: 2
+level: intermediate
+estMinutes: 12
+taskMinutes: 35
+prerequisites: [validate-an-idea]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "_9ZhyJCKZcg"
+  published: "2024-06-09"
+  year: 2024
+  minutes: 11
+  title: "How To Plan Your MVP (Minimum Viable Product) in 5 Simple Steps"
+  channel: "Rob Walling"
+  why: "Rob Walling founded MicroConf, a community for self-funded software founders, and has built and sold a SaaS company himself, so his advice is aimed at people spending their own time and money. It's short and structured in five steps, which suits a scoping lesson better than a long build-along. 'MVPs that don't suck' is in the backups for a builder's angle."
+applyIt: |
+  Pick the cheapest MVP shape for one idea of yours: the one you validated in the last lesson,
+  or any product you keep meaning to build. Write the riskiest assumption in one sentence (the
+  belief that kills the idea if it's wrong), then go through the four shapes (fake door,
+  concierge, Wizard of Oz, single-feature product) and choose the cheapest one that tests it.
+  Add the number you'd count with your first ten users.
+
+  **If you code:** ask whether the assumption needs software at all before you reach for the
+  single-feature shape. Code is the expensive option here, even when it's the fun one.
+
+  Success: one assumption, one chosen shape, and a line on why the cheaper shapes can't test it.
+
+  **If you don't code yet:** the fake door, concierge and Wizard of Oz shapes are fully open to
+  you. Pick the one you could start this week with a doc, a form and your own time.
+
+  Success: one assumption, one shape you can start this week, and a first-ten-users number.
+toolkit: |
+  - **Turn "riskiest assumption + one core feature + cut list" into a reusable prompt.** Save it
+    as a saved prompt, a ChatGPT or Claude Project or a Gemini Gem, so every idea gets the same
+    half-page spec.
+  - **Keep the spec in one shared doc.** A single MVP-spec doc (Google Docs, Notion or a Project
+    file) is the version you, collaborators and your assistant all read, instead of you
+    re-explaining scope in every chat.
+  - **Add a "non-goals" rule to your custom instructions.** One line such as "every scoped task
+    lists what we will NOT build yet" makes the assistant attach a cut list by default instead of
+    padding scope.
+  - **Log cut features as decisions.** Record the "Not yet" list in your project notes so a
+    later chat doesn't quietly rebuild the whole vision you deliberately deferred.
+
+  **If you use a coding agent:**
+
+  - **Put the spec beside the instruction file.** Keep `docs/mvp-spec.md` in the repo next to
+    AGENTS.md (or CLAUDE.md / GEMINI.md for those agents, or `.cursor/rules`), so scope is
+    version-controlled and ready to hand to plan mode (→ plan-mode-spec-driven).
+recap:
+  - emoji: "🎯"
+    title: "The MVP's real job"
+    text: "An MVP is the leanest version that delivers the core value and tests your riskiest assumption. Its job is to learn fast, not to impress."
+  - emoji: "🚫"
+    title: "Shrinking the vision?"
+    text: "An MVP is one core feature done well, not a tiny version of everything. A miniature of the whole plan is just the slow path in disguise."
+  - emoji: "🔪"
+    title: "How scope gets decided"
+    text: "Name the assumption that would kill the idea if wrong, then keep only the single feature that tests it. Sometimes that feature is you doing the work by hand."
+  - emoji: "🗂️"
+    title: "The other half of the spec"
+    text: "Everything else becomes an explicit 'not yet'. The list of what you refuse to build now matters as much as the build list."
+  - emoji: "😬"
+    title: "How small is small enough"
+    text: "If the scope doesn't feel almost embarrassingly lean, cut more. Founders regret months spent on unused features far more often than shipping too small."
+  - emoji: "📝"
+    title: "Who guards the scope"
+    text: "AI will happily pad the scope with sensible-sounding extras. You hold the line on half a page: problem, one feature, core flow, success criteria."
+task: |
+  Write the half-page MVP spec for your idea, and package the scoping discipline so every future
+  idea gets the same spec with its non-goals attached. Ask your assistant to write the
+  instructions first:
+
+  ```prompt
+  Write instructions for a reusable "MVP spec" assistant. Input: one product idea. Output: the
+  riskiest assumption, the one core feature, the core user flow in 3-5 steps, success criteria
+  I could measure with my first 10 users, and a mandatory "Not yet" non-goals list. Include a
+  rule that it must not finish until the non-goals list exists and is at least as long as the
+  build list, and that it pushes back when the scope isn't uncomfortably small.
+  ```
+
+  Save the result where you'll reach for it: a skill or custom command in Claude Code, Cursor or
+  Codex; or, with no code, a ChatGPT custom GPT or Project, a Claude Project, or a Gemini Gem.
+  Run it on your own idea first and keep that spec (as `docs/mvp-spec.md` in your repo, or in a
+  doc): the next lesson builds from it. Then run it on a neutral idea, such as "a booking tool
+  for a small yoga studio", and check that both outputs come back in the same shape.
+
+  Success: two half-page specs, yours and the neutral one, each with a non-goals list at least as
+  long as the build list, and no hand-editing of the instructions between runs.
+selfCheck:
+  - q: "Your MVP spec has eight features 'because users will expect them' (login, profiles, notifications, dark mode…). What do you do?"
+    a: "Ask which single feature tests the riskiest assumption and move the rest to the 'Not yet' list. 'Users will expect it' is a guess; if nobody uses the core feature, the other seven were wasted."
+  - q: "Your riskiest assumption is 'busy managers will act on a weekly AI summary of their team's tickets'. You don't code. What's the cheapest MVP?"
+    a: "A concierge or Wizard-of-Oz version: write the summaries yourself (with an assistant's help) and email them to a few managers for three weeks, then see who acts on them or asks for more. You test the assumption with no software."
+  - q: "You asked an assistant to scope your MVP and it returned a polished plan with twelve features. What went wrong, and how do you re-prompt?"
+    a: "Assistants tend to add sensible-sounding scope unless told otherwise. Re-prompt with a hard limit (*one* core feature), ask it to argue *against* each feature, and require a cut list at least as long as the build list."
+backupResources:
+  - label: "How to Build MVPs That Don't Suck — Train To Code"
+    url: "https://www.youtube.com/watch?v=B1gyA-TFgLA"
+    type: "video · builder angle"
+  - label: "Y Combinator — Startup Library (MVP & early product)"
+    url: "https://www.ycombinator.com/library"
+    type: "reference"
+tags:
+  - building-products
+  - mvp
+  - spec
+  - scope
+---
+
+Your idea passed validation. Now resist the urge to build *everything*. The MVP is the
+**smallest version that delivers the core value and tests your biggest assumption.** Getting
+this scope right is the difference between learning in days and disappearing for months.
+
+## What an MVP is (and isn't)
+
+- It **is** one core feature, done well enough to give real users real value, so you can
+  learn.
+- It **isn't** a shrunken version of the whole vision. Ten half-built features teach you
+  nothing, because when nobody comes back you can't tell which one failed.
+
+The job of the MVP is to **learn**, fast. Impressing people is a later problem.
+
+## An MVP doesn't have to be software
+
+People hear "product" and think "app". But the first version only has to test the assumption,
+and several shapes do that with little or no code:
+
+- **Fake door.** A landing page that describes the product with a signup button (the last
+  lesson). Tests demand.
+- **Concierge MVP.** You deliver the result by hand to a handful of users. If your product is
+  "personalized meal plans", you write them yourself in a doc. Tests whether people value the
+  outcome.
+- **Wizard of Oz.** It *looks* automated to the user (a form, an email), but a human does the
+  work behind the curtain. Tests the experience before you build the engine.
+- **Single-feature product.** Real software that does exactly one job. Tests whether people
+  use it again without you nudging them.
+
+Pick the cheapest shape that answers your riskiest question. **If you don't code,** the first
+three are fully open to you, and plenty of products started that way.
+
+## Scope by cutting
+
+1. **List everything** you imagine the product doing. Get it all out; this list is usually
+   long.
+2. **Name the riskiest assumption**: the belief that, if wrong, kills the idea. It's usually
+   about behaviour ("people will paste their data in every week") more than technology.
+3. **Find the one feature that tests it.** Only that feature goes on the build list.
+4. **Move everything else to "not yet".** Write the cut list down. It's as important as the
+   build list, because it stops future-you (and your AI assistant) from quietly re-adding
+   things.
+5. **Define success** as something you can count with your first ten users, set before you
+   build.
+
+If your scope doesn't feel **uncomfortably small**, cut more.
+
+## Worked example: an invoice-chasing tool for freelancers
+
+Idea: help freelance designers get paid on time.
+
+1. **Full list:** invoice creation, client portal, automatic reminders, late fees, payment
+   links, accounting sync, dashboards, team accounts, mobile app. Nine features.
+2. **Riskiest assumption:** "Freelancers will let a tool email their clients for them." Many
+   may worry it looks pushy. If they won't, the product is dead.
+3. **One feature:** forward an unpaid invoice to an email address, and a polite reminder goes
+   to the client after a due date you set.
+4. **Not yet:** the other eight. Creating invoices can wait; they already have a way to do
+   that.
+5. **Success:** at least 6 of the first 10 users forward a second invoice within a month. That
+   number is a judgment call you write down in advance.
+6. **Cheapest shape:** a Wizard of Oz first. You read the forwarded emails and send the
+   reminders by hand for two weeks before automating anything.
+
+Notice that the spec now fits on half a page, and the cut list is longer than the build list.
+
+## Using AI without letting it pad the scope
+
+Assistants are good scoping partners when you aim them well. They spot hidden assumptions,
+draft the user flow and write success criteria. Left alone, though, they tend to suggest
+"sensible" extras: authentication, settings, analytics. Steer them: give a hard limit of one
+feature, ask them to argue *against* each feature, and ask "what's the cheapest way to test
+this without software?" The fuller spec format (user stories, acceptance criteria) is its own
+lesson (→ idea-to-spec).
+
+> 💡 **Try it:** paste your feature list into any assistant with: "Which ONE of these tests my
+> riskiest assumption, which is [assumption]? Argue against keeping each of the others." Read
+> the arguments and cross out at least three features.
+
+## Common failure modes
+
+- **Months pass, still not shipped** → the MVP is a miniature of the full vision → cut to one
+  feature and set a ship date.
+- **Users try it once and leave, and you don't know why** → too many features, so no clear
+  signal → strip back to the core and measure only that.
+- **The MVP proves the tech works but not that anyone cares** → you tested feasibility instead
+  of the riskiest *behaviour* → rewrite the assumption around what users must do.
+- **Cut features sneak back in** → no written "Not yet" list → keep it in the spec and in your
+  assistant's instructions.
+
+A sharp, tiny MVP spec is the launchpad. Next: building it, which in the AI era can genuinely
+happen in a weekend.

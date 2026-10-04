@@ -1,0 +1,246 @@
+---
+title: "The core loop"
+subtitle: "Explore → plan → code → commit"
+summary: "Run every coding task through explore, plan, code and commit, with a runnable check that proves the work is actually done."
+changeNote: "New: a quick audit of which loop step you skip most, a pass/fail check for your next change, and a plan-first work order that adds an edge-case test."
+section: foundations
+pillar: claude-code
+order: 3
+level: beginner
+estMinutes: 13
+taskMinutes: 30
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "xJQuF02NAK8"
+  published: "2026-05-17"
+  year: 2026
+  minutes: 3
+  title: "The Explore → Plan → Code → Commit workflow in Claude Code"
+  channel: "Claude"
+  why: "Made by Anthropic (the official Claude channel), so it presents their own recommended workflow. That's an advantage here: it's three minutes on exactly the four steps this lesson teaches, with no setup detour, and the same loop appears in the official best-practices docs. Longer third-party workflow videos (one is in the backups) cover more modes but bury this one."
+readAfter:
+  - label: "Best practices for Claude Code — official docs"
+    url: "https://code.claude.com/docs/en/best-practices"
+    kind: "docs"
+applyIt: |
+  Hold your recent AI-assisted work up against the loop. Take the last two or three changes you
+  made with an assistant (in a repo, a script, a spreadsheet formula, a document it drafted)
+  and mark which of the four beats actually happened:
+
+  - **Explore:** did it read the real files or data first, or guess?
+  - **Plan:** did you see and approve a plan before the first edit?
+  - **Code:** did it stick to that plan, or drift without a decision?
+  - **Commit:** is there a saved, named checkpoint you could roll back to?
+
+  Circle the beat you skip most. Then, for the area you'll touch next, write the one runnable
+  check that would prove a change there worked: the test command, the build, or a concrete
+  "open the page and confirm X" if there are no tests yet.
+
+  Success: your most-skipped beat named, and one pass/fail check written down for your next
+  change.
+toolkit: |
+  - **Write the loop into your instruction file.** Add one rule to your project's CLAUDE.md (or
+    AGENTS.md, `.cursor/rules`, Copilot instructions): "For anything non-trivial, explore and
+    plan first, wait for approval, then implement." Every session, and every subagent, inherits
+    the loop instead of one-shotting.
+  - **Turn your Definition of Done into the loop's verifier.** List the exact check commands in
+    the instruction file (`npm run build && npm run lint && npm test`, `pytest`, `go test ./...`)
+    and tell the agent to run them *as it codes* and paste the pass/fail. Never accept "done"
+    from prose.
+  - **Bank good plans.** When a plan is worth keeping, save it to `docs/plans/` in the repo and
+    commit it with a `type: description` message, so the next session (yours or the agent's)
+    picks up exactly where you stopped.
+  - **Add a second, independent verifier for risky diffs.** Run `/code-review`, a reviewer
+    subagent, or a different tool (Codex, Copilot code review) on the change in a fresh context
+    before you commit (→ codex-inside-claude-code).
+  - **Make the check non-optional later.** A Stop hook can refuse to end a turn until tests pass;
+    the mechanics live in → hooks-automation. Here, just wire the *habit* into how you drive every
+    repo.
+recap:
+  - emoji: "🎰"
+    title: "The beginner's mistake"
+    text: "Typing a wish and hoping for code is the beginner move. Hand Claude a repeatable loop and its output stops being a gamble."
+  - emoji: "🔍"
+    title: "Step one touches nothing"
+    text: "First let it read the files, tests, and spec with zero edits, so the plan is built on the real codebase — not a guess about it."
+  - emoji: "🗺️"
+    title: "What plan mode can't do"
+    text: "Shift+Tab into plan mode and Claude researches, then hands you a written plan it can't act on until you approve. Reading that plan is the cheapest place to kill a wrong approach."
+  - emoji: "⚙️"
+    title: "While it implements"
+    text: "Implement with tests and lint running as it goes, and don't let it drift from the plan without an explicit decision."
+  - emoji: "📌"
+    title: "Why the loop ends in git"
+    text: "Close every loop with a real commit. Git history is the context — and the rollback point — the next session inherits."
+  - emoji: "✅"
+    title: "The habit above all others"
+    text: "The top habit: a test, build, or lint that returns pass/fail. An agent that can verify itself corrects itself instead of stopping at 'looks done'."
+  - emoji: "🧠"
+    title: "The resource that runs out"
+    text: "Quality drops as context fills. Feed it the right context cheaply, and re-plan the moment reality contradicts the plan."
+task: |
+  Run one real change through the full loop instead of one-shotting it (about 30 minutes, in
+  your own project or a small open-source starter app with a test command). Pick something
+  with a sharp edge, where a wrong guess has real consequences: input validation on a form, a
+  date or timezone calculation, a discount rule. Enter plan mode first (`Shift+Tab` until the
+  footer shows plan mode) and hand Claude the loop as a work order:
+
+  ```prompt
+  Explore→plan→code→commit, one real change: [describe it, e.g. "reject sign-ups with a
+  disposable email domain"]. Read only the files this change touches and their tests — edit
+  nothing. Constraints: [the rules that must not break, e.g. "existing users can still log in;
+  error messages stay generic"]. Then write a plan: exact files, the order you'll change them,
+  the test command that proves it, and one new test for the edge case most likely to break.
+  Wait for my approval before any code.
+  ```
+
+  Read the plan critically, *then* approve, let it implement, and make it run the tests and
+  show you the output **before** the commit. **No tests yet?** Make phase 0 "add one test for
+  the current behavior", so the loop has a verifier before it touches anything.
+
+  Success: one `type: description` commit that names the change, with green test output you saw
+  before it was made and every constraint still holding.
+selfCheck:
+  - q: "You ask for a 'quick' rename that touches about a dozen call sites. Skip the plan?"
+    a: "No — you can't describe that diff in one sentence, and the risk is it edits the wrong call sites. Shift+Tab into plan mode, get the file list and order as a plan, read it, then approve."
+  - q: "Claude says the change 'should work now.' What do you do before you believe it?"
+    a: "Don't accept the prose. Make it run a real check — tests, typecheck, lint, build, or a screenshot diff — and show the pass/fail output. An agent that can verify itself corrects itself; if you can't verify it, don't ship it."
+  - q: "Halfway through coding, reality contradicts the plan. What's the move?"
+    a: "Stop and re-plan — don't let it improvise a drift. Deviating from the plan should be an explicit decision you make, not silent freelancing you reverse-engineer later."
+  - q: "Why bother with a real commit message on a tiny agentic change to an app people use daily?"
+    a: "Git history is the context the next session (you and the agent) inherits, and on an app people use daily it's your rollback point. A loop that doesn't end in a clean commit didn't really close."
+mcq:
+  - q: "You open a session on a large repo and type 'investigate how payments work'. Twenty minutes later the context is half full and the plan is vague. What went wrong?"
+    options:
+      - "Plan mode was off, so it couldn't produce a plan"
+      - "The model tier was too small for a repo this large"
+      - "The exploration had no scope, so it read far too much"
+      - "It should have started editing to learn the code faster"
+    answer: 2
+    explain: "An unscoped 'investigate' burns context on hundreds of files and leaves a plan built on noise; name the folder and the question, or hand a big read to a subagent. Plan mode controls whether it edits, not how much it reads."
+  - q: "You want Claude to research a risky part of the codebase before any change, and you worry it might run something destructive while exploring. What does plan mode give you?"
+    options:
+      - "It reads and explores freely; anything more needs your OK"
+      - "It can't run any commands at all until you leave plan mode"
+      - "It runs any command, but only against a sandbox copy"
+      - "It runs exploring commands, then edits once the plan is done"
+    answer: 0
+    explain: "Plan mode is read-only for your source: it can read files, search and run commands to explore, and anything past a read still stops for your approval, as in Manual mode. It isn't a blanket block on commands, and it never starts editing on its own when the plan is written; you approve first."
+  - q: "You need to change a discount rule in code that has no tests. What should the first phase of the loop be?"
+    options:
+      - "Make the change, then click through the app to check"
+      - "Ask Claude to be extra careful, since there are no tests"
+      - "Write a full test suite for the whole module first"
+      - "Add one test that pins down the current behaviour"
+    answer: 3
+    explain: "Phase 0 gives the loop a verifier before anything changes: one test of today's behaviour turns 'looks done' into pass/fail. A full suite is a separate project, and a manual click-through leaves you as the only check."
+  - q: "Mapping a legacy module means reading about 80 files. How do you keep your main session sharp for the plan and the code?"
+    options:
+      - "Read all 80 files in this session, then compact it"
+      - "Hand the read to a subagent that returns a summary"
+      - "Skip exploring and plan from the file names alone"
+      - "Use low effort so it skims each file more quickly"
+    answer: 1
+    explain: "A subagent burns its own context on the big read and sends back findings, so your main window stays lean for planning and coding. Planning from file names skips Explore, which is how a plan ends up solving the wrong problem."
+backupResources:
+  - label: "Every Claude Code Workflow Explained (& When to Use Each) — Simon Scrapes"
+    url: "https://www.youtube.com/watch?v=38t5UBCa4OI"
+    type: "video"
+  - label: "How Claude Code works — the agentic loop under the hood (official docs)"
+    url: "https://code.claude.com/docs/en/how-claude-code-works"
+    type: "docs · official"
+tags:
+  - claude-code
+  - workflow
+  - plan-mode
+  - verification
+---
+
+The biggest mistake new users make is treating Claude Code like a vending machine:
+type a request, hope for code. The operators who get great results hand it a **loop**
+instead. Anthropic's canonical version is **Explore → Plan → Code → Commit**, and it
+maps onto the agent loop under every session — *gather context → take action → verify
+results*. Learn the loop and you stop guessing and start shipping output you trust.
+
+## 1. Explore (read-only)
+
+Before a single edit, let the agent *understand*. Point it at the relevant files, the
+code around them, the tests, and any spec — and tell it not to touch anything yet. You
+want it loaded with real context before it forms an opinion, because a plan written from
+a half-read codebase solves the wrong problem. **Scope** the exploration
+("read `/src/auth` and how sessions work") rather than saying "investigate" — an
+unscoped read burns context on hundreds of files. For big reads, hand it to a subagent
+so findings come back as a summary instead of flooding your window
+(→ `subagents-and-agent-teams`).
+
+## 2. Plan mode (design before doing)
+
+This is the gear that makes the loop work, so learn it properly — later lessons point
+back here for it.
+
+**Plan mode is a read-only permission mode.** Press `Shift+Tab` to cycle Claude Code's
+permission modes — Manual → Accept edits → **Plan** (from a fresh session, that's
+`Shift+Tab` twice) — or launch straight in with
+`claude --permission-mode plan`. In plan mode Claude *researches* — reads files,
+searches, runs commands to explore — then writes you a plan: the files it will change,
+in what order, and how. What it **won't** do is edit your source; anything past
+a read still stops for approval, exactly as in Manual mode. It designs; it doesn't build.
+
+Read that plan critically. This is the cheapest place in the loop to catch a wrong
+approach: rejecting a paragraph costs nothing; unwinding a bad twelve-file diff costs
+your evening.
+Approve, and pick *how* it implements — review each edit, accept edits, or hand it to
+auto mode; keep planning or reject to send it back with your correction.
+
+> 💡 **Try it:** before your next feature, enter plan mode and paste a prompt like this:
+
+```prompt
+Read the files this touches and the tests around them. Don't edit anything.
+Then write a plan: exact files, the order you'll change them, and how I'll
+verify it. Wait for my approval.
+```
+
+**When to skip it:** only when you could describe the entire diff in one sentence — a
+typo, a log line, a rename. Plan when you're unsure of the approach, when the change
+spans multiple files, or when you don't know the code. Turning a good plan into a
+durable, reusable **spec** — the formats, the `SPEC.md`, grading it — is its own skill
+(→ `plan-mode-spec-driven`).
+
+## 3. Code (implement against the plan)
+
+Now let it build — running tests and lint **as it goes**, not at the end. The rule:
+don't deviate from the plan without an explicit decision. If reality contradicts the
+plan, **stop and re-plan** rather than letting it improvise a drift.
+
+## 4. Commit (the handoff)
+
+Finish with a clean commit — a real `type: description` message and, on a shared repo, a
+PR. The git history becomes context for the next session, for you *and* the agent, and
+on a live product it's your rollback point. A loop that doesn't end in a commit didn't
+really close.
+
+## The habit that outranks everything: give it a check it can run
+
+Across every best-practices guide, one habit tops the list: **give Claude a way to
+verify its own work.** The mechanism: Claude stops when the work *looks* done.
+With no check it can run, "looks done" is its only signal, and *you* become the
+verification loop — every mistake waits for you to notice it. Hand it something that
+returns a hard pass/fail — a test suite, a build exit code, a linter, a fixture diff, a
+screenshot compared to the design — and the loop closes itself. Claude does the work,
+runs the check, reads the result, and iterates until it's green.
+
+Don't accept prose ("this should work now") — accept evidence: the command it ran and
+what it returned. If you can't verify it, don't ship it. An agent that can check itself
+corrects itself; TDD is the strongest version, because the check exists *before* the code.
+
+> 💡 **Try it:** End your implementation prompt with the verifier baked in: "run the
+> test suite and fix failures until it passes, then show me the output." Make *green*
+> the stop condition, not your eyeballs.
+
+Engineering the loop *around* that verifier and a stop-rule — `/goal`, Stop hooks,
+evaluators — is its own lesson (→ `loop-engineering`).
+
+And mind your **context**: it fills fast and quality sags as it does. The next lessons —
+CLAUDE.md, skills, MCP — are about feeding the agent the *right* context cheaply,
+which is what makes this loop sing.

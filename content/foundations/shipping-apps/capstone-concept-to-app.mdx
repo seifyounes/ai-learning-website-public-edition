@@ -1,0 +1,229 @@
+---
+title: "Capstone: concept to deployed app"
+summary: "Take one small app from spec to a public URL with one AI feature, tests and feedback from real people."
+changeNote: "New: a 34-minute watch segment on the AI feature and deploy, a pacing worked example, a failure-modes list, and a ten-minute milestone plan before your first sprint."
+section: foundations
+pillar: shipping-apps
+order: 10
+level: advanced
+estMinutes: 90
+taskMinutes: 60
+shortPath: "About 40 min: watch the Generate 3D Design and Worker in Action chapters (from 1:48:11) and read the breakdown. Come back for the Deployment chapter and the task's one-hour first sprint."
+prerequisites: [idea-to-spec, deploying-and-shipping, calling-an-llm-api]
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "JiwTGGGIhDs"
+  published: "2026-02-13"
+  year: 2026
+  minutes: 183
+  start: 6491
+  watchMinutes: 34
+  title: "Build and Deploy a Full-Stack AI App (Completely Free)"
+  channel: "JavaScript Mastery"
+  why: "JavaScript Mastery specializes in long, complete build-alongs, and this one takes a single full-stack AI app from an empty folder to a deployed URL on free tiers, mirroring this capstone's steps in order. The chapters set below are where the app's one AI feature gets built, run and deployed. A faster, one-hour AI build-and-deploy is in the backups."
+  notes:
+    - "Watch the 'Generate 3D Design' and 'Worker in Action' chapters (from 1:48:11, about 34 minutes), then the short 'Deployment' chapter (from 2:59:53)."
+    - "Everything else (setup, auth, uploads) is optional: dip into the chapter that matches the step your own build is on."
+applyIt: |
+  The capstone pays off most on something you'll keep. Spend ten minutes scoping the next real
+  milestone of your own project the capstone way, as a plan, not a build. A good shape touches
+  every layer, like adding accounts and cloud sync to an app that only saves data on one device.
+
+  ```prompt
+  My project is [one line]; its next milestone is [one line]. Cut it to one week: list the
+  layers it touches, the tests it needs, what is a non-goal, and the first thing to deploy.
+  ```
+
+  **If you code:** plan to drive it with your coding agent (Claude Code, Cursor, Codex or
+  Copilot), one step per session, with the spec file as the contract. **If you don't code yet:**
+  plan it in Lovable, Bolt or Replit, which bundle a backend and one-click deploys, and still
+  write the spec first.
+  Success: a one-week milestone with named non-goals and a day-one deploy target.
+toolkit: |
+  - **Start it as a real project, not a throwaway.** Give it its own repo with a `README.md`,
+    an instruction file (AGENTS.md, or CLAUDE.md / GEMINI.md for those agents; `.cursor/rules` or
+    Copilot instructions) and a notes or memory file from line one, so the build inherits your
+    standards immediately.
+  - **Drive it with the prompts you've saved.** The spec interview (→ idea-to-spec), the
+    "argue against my stack" check (→ choosing-your-stack) and the scoped-change prompt all come
+    back here. Before a long session gets compacted, save the decisions to the notes file
+    (→ context-engineering).
+  - **Turn this run into a template.** Once it ships, save the skeleton (instruction file,
+    test gate, secret scan, deploy config) as a GitHub template repo, so your next project
+    starts with the whole pipeline already wired.
+  - **Keep a build log.** One dated line per session (what shipped, what broke, what you'd do
+    differently) in the notes file. It's your memory for the next run and a ready-made story
+    for a portfolio or interview.
+recap:
+  - emoji: "🎯"
+    title: "The right size for a capstone"
+    text: "Tiny and complete: one small idea taken end to end, not a huge app half-built. Finishing exercises every skill; sprawl teaches nothing."
+  - emoji: "📝"
+    title: "What comes before code"
+    text: "A ruthlessly small spec: problem, users, MVP, non-goals. The steering wheel goes on before you touch code."
+  - emoji: "🧩"
+    title: "Two moves before building"
+    text: "Pick a stack (for example Next.js or Expo plus Supabase or Firebase), then generate a running skeleton, so you start from 'it runs'."
+  - emoji: "🔨"
+    title: "How many AI features?"
+    text: "Exactly one, done well: smart search, auto-tagging or a summary, called from the server so the key stays secret."
+  - emoji: "✅"
+    title: "The safety net"
+    text: "AI-written tests for the flows that matter, with every assertion read by you. Then you can ship without holding your breath."
+  - emoji: "🚀"
+    title: "Proof it exists"
+    text: "A public URL a stranger can open: Vercel or similar for web, EAS or a store test track for mobile. Deployed beats perfect-on-your-laptop."
+  - emoji: "🔁"
+    title: "Who sees it, and then what"
+    text: "Three real people, their feedback, and one improvement. The loop from spec to shipped to better is the point."
+  - emoji: "🎓"
+    title: "What you just did"
+    text: "A coding agent built it, prompting steered it, applied AI added the feature, this pillar shipped it. Every pillar in one run."
+task: |
+  Start the capstone with a one-hour first sprint on a fresh idea: spec it, scaffold it and
+  get a walking skeleton onto a public URL. Deploying on day one makes every later step
+  smaller.
+
+  ```prompt
+  Help me start a tiny new app in one sitting of about an hour. Idea: [one line].
+  Interview me until you can write a ruthlessly small spec (problem, users, MVP,
+  non-goals, plus the ONE AI feature it will have, such as smart search, auto-tagging or a
+  summary). Then scaffold it (Next.js + Supabase, or a builder like v0, Lovable or Bolt),
+  build only the core screen, and deploy it to Vercel or the builder's publish button for
+  a public link. Stop me if scope creeps. End with the next three steps, the AI feature
+  first.
+  ```
+
+  No idea? A reading list where you paste a link and get a one-line summary is small, useful
+  and has an obvious AI feature.
+  Success: a stranger can open a public URL and use the core screen, and the spec names the one
+  AI feature you'll add in the next session.
+selfCheck:
+  - q: "Halfway through the capstone you think of a second AI feature and a social sharing page, both great. What do you do?"
+    a: "Write both into the spec's non-goals or a v2 list, and keep going. The capstone's value comes from finishing one small app end to end; new scope now means nothing ships."
+  - q: "Your AI summary feature works locally, but you notice the call to the model API is made from the browser. Why does that matter before you deploy, and what's the fix?"
+    a: "The API key must be in the client for that call to work, so anyone can extract it and spend on your account. Move the call into a server route or function that holds the key, and have the client call your endpoint instead."
+  - q: "You've built for two weeks and plan to deploy \"once it's finished\". What's the risk, and what should you have done?"
+    a: "Deploy-time surprises (missing environment variables, build differences, secrets in the bundle) all land at once, at the end. Deploying a walking skeleton on day one turns each of those into a small, early fix."
+mcq:
+  - q: "End of session 2: sign-in works and saved links appear in the list. You're keen to start the AI summary feature. What comes first?"
+    options:
+      - "Sign in as two test users and confirm neither sees the other's links"
+      - "Start the AI feature; the access rules get tested in the test session"
+      - "Add the secret scan now so it's in place before any AI code exists"
+      - "Show the app to three people before building anything further"
+    answer: 0
+    explain: "Seeing your own links proves sign-in works, not that the rules keep users apart. Run the two-user test before more code builds on the table, while a hole is cheap to fix. Deferring it to the test session means every later feature sits on rules nobody has checked."
+  - q: "Session 3's goal was the AI summary. At the end of the session it works for most links but fails on some. Session 4 is planned for tests. What do you do?"
+    options:
+      - "Start the tests as planned so the schedule doesn't slip"
+      - "Work on the tests and the summary fixes in the same session"
+      - "Spend session 4 finishing the summary, then move to tests"
+      - "Remove the summary for now and come back to it in a v2"
+    answer: 2
+    explain: "One goal per session, and an unfinished goal carries into the next session before anything new starts. Splitting attention leaves two things half-done, and starting tests means writing them against a feature that's still changing. Dropping it would leave the capstone without its one AI feature."
+  - q: "Your summary route fetches a page's text and sends it to a model. Which guard belongs in that route so one user can't run up your bill?"
+    options:
+      - "Use the cheapest model available so each long page costs less"
+      - "Ask the user to confirm before each summary is generated"
+      - "Run the summary in the browser so the user's device pays for it"
+      - "Cap the page text length and the requests each user can make"
+    answer: 3
+    explain: "Limits on input length and per-user requests bound the worst case no matter how big the page or how busy the user. A cheaper model only lowers the price per call, so the total is still unbounded. Moving the call to the browser would put your API key in the client."
+  - q: "Three people tried your app and you've collected fourteen suggestions. What's the right next step for the capstone?"
+    options:
+      - "Ship every quick suggestion this week while the feedback is fresh"
+      - "Group what they said, then ship one improvement and note lessons"
+      - "Ask ten more people before changing anything, to be more certain"
+      - "Start a v2 spec with every suggestion added in as a requirement"
+    answer: 1
+    explain: "Clustering shows which complaints are really the same problem; one shipped improvement closes the loop from spec to shipped to better. Shipping everything at once brings back the scope creep the capstone avoids. More feedback before acting delays the lesson three people can already teach."
+backupResources:
+  - label: "Build and deploy a full-stack app in under one hour with AI — No Code MBA"
+    url: "https://www.youtube.com/watch?v=wvOOisquWFw"
+    type: "video · faster build"
+  - label: "Vercel — deploy & host (docs)"
+    url: "https://vercel.com/docs"
+    type: "docs · official"
+tags:
+  - shipping-apps
+  - capstone
+  - full-stack
+  - project
+---
+
+This is the one that proves it all clicked: take an idea **from concept to a deployed app** by
+yourself. Not a huge app, but a *small, complete* one, shipped end to end. Expect it to take
+several sessions over a week or two. The video runs about three hours, but you only need its
+AI-feature and deployment chapters up front (under 40 minutes); your own build will take longer
+than watching someone else's.
+
+## The full run
+
+Follow the pillar in order:
+
+1. **Spec**: define a tiny, genuinely useful app. Ruthlessly small (→ idea-to-spec).
+2. **Stack**: for example Next.js for web or Expo for mobile, plus Supabase or Firebase for
+   the backend (→ choosing-your-stack).
+3. **Scaffold**: generate a skeleton with an AI builder (v0, Lovable, Bolt) or your coding
+   agent, then move into Claude Code, Cursor, Codex or Copilot for the real work.
+4. **Build**: frontend and backend, wired to your spec, with owner-only access rules. Add
+   **one AI feature** (smart search, auto-tagging, a summary) using the Applied AI engineering
+   pillar (→ calling-an-llm-api).
+5. **Test**: have AI write tests for the key flows, and read what they assert.
+6. **Deploy**: Vercel or a similar host for web, EAS or a store test track for mobile. Get a
+   public link.
+7. **Feedback**: show three real people, gather input, make one improvement.
+
+## Worked example: pacing a reading-list app
+
+Here's how the task's suggested idea (paste a link, get a one-line summary) breaks into
+sessions. Each session ends with a commit and a deploy, so the public link always works.
+
+1. **Session 1, about an hour:** spec interview, scaffold, one screen that lists saved links,
+   deployed to a public URL. Ugly is fine; live is the point.
+2. **Session 2:** sign-in and a database table for links, with owner-only access rules. Run the
+   two-user test from the backend lesson (→ backend-database-with-ai) before moving on.
+3. **Session 3:** the AI feature. A server route receives the link, fetches the page text,
+   asks a model for a one-line summary, and saves it. The API key lives only on the server.
+   Add a sensible limit (a cap on text length and on requests per user) so a long page or a
+   busy user can't run up your bill.
+4. **Session 4:** tests for "save a link" and "summary appears", plus the secret scan from the
+   deploy lesson. Read every assertion.
+5. **Session 5:** three people use it. Cluster what they say, ship one improvement, write down
+   what you learned.
+
+Each session has one goal. If a session's goal isn't done, the next session finishes it rather
+than starting something new.
+
+> 💡 **Try it:** Before your first session, write your capstone's non-goals list: five things
+> this app will *not* do in v1. Keep it at the top of the spec. It's the list you'll lean on
+> every time a good idea shows up mid-build.
+
+## Common failure modes
+
+- **Scope creep halfway through** → every new idea feels small → park it in the non-goals list
+  and finish the current milestone first.
+- **Deploying only at the end** → environment-variable, build and secret problems all surface
+  at once → deploy a walking skeleton in session 1 and keep it deployed.
+- **The AI feature calls the model from the browser** → the key has to ship to the client →
+  move the call to a server route or function.
+- **Never showing anyone** → it's never quite "ready" → book the three conversations when you
+  start, not when you finish.
+
+## Why this is the whole course
+
+Look at what you just used: a **coding agent** to build, **prompting and mental models** to
+steer it, **applied AI engineering** for the feature, and this pillar for building and
+deploying, with **automations** and your **second brain** optionally supporting the process.
+This capstone *is* the course, assembled.
+
+## You finished the Foundations 🎉🎈
+
+If this is your last foundations pillar, take it in: you can now drive coding agents well,
+run a second brain, automate workflows, build AI features yourself, and ship real web and
+mobile apps, across the major tools. Whether you're aiming for an AI engineering role,
+building your own products, or bringing AI into the job you already have, the foundations are
+now yours. Next stop, whenever you're ready: the **Applications**, putting all of this to work
+in marketing, products, companies, and agency or freelance work.

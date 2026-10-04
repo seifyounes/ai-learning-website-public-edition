@@ -1,0 +1,315 @@
+---
+title: "Capture & ingest"
+subtitle: "You dump, the agent files"
+summary: "Set up one-hotkey capture into an inbox on laptop and phone, and file each day's captures into dated notes with or without an agent."
+changeNote: "New: a no-code filing route through a chat Project, a map of your own capture points, one-tap phone capture and a 7-minute watch range."
+section: foundations
+pillar: obsidian
+order: 4
+level: beginner
+estMinutes: 14
+taskMinutes: 45
+reviewedOn: "2026-10-03"
+status: published
+video:
+  videoId: "2p_ahJnmS6U"
+  published: "2025-10-16"
+  year: 2025
+  minutes: 9
+  start: 0
+  watchMinutes: 7
+  title: "QuickAdd: The Secret to Effortless Obsidian Journaling"
+  channel: "Mike Schmitz"
+  why: "Nine and a half minutes of mechanics for the half of this lesson that decides whether any of it works: getting a thought into the vault without stopping to file it. Many capture videos show the result; Schmitz builds one QuickAdd capture macro end to end and skips no setting, including the trailing newline (`\\n`) that stops repeat captures collapsing onto one line. He then runs the same macro on his phone. Near the end he pitches a paid membership; you don't need it."
+  notes:
+    - "Watch from the start to about 8:40, skipping 1:28 to 3:20: about seven minutes."
+    - "Skip his roll-up trick (1:28 to 3:20): it needs a beta plugin outside the community directory, and an AI does roll-ups later in this pillar."
+    - "His demo captures into a journal with fixed headings. Point the same macro at `inbox/` instead, as the lesson explains."
+    - "From about 8:40 he pitches a paid membership. The starter vault he links is free, and you need neither."
+    - "He shows both the Windows and Mac shortcuts."
+readAfter:
+  - label: "QuickAdd — official plugin documentation (capture, format syntax, tokens)"
+    url: "https://quickadd.obsidian.guide/"
+    kind: docs
+  - label: "Obsidian Help — Daily notes (folder, date format, template)"
+    url: "https://help.obsidian.md/plugins/daily-notes"
+    kind: docs
+applyIt: |
+  Capture only works if it reaches the places your thinking actually happens. Map yours before
+  you wire anything: write down the three places a thought most often arrives in your week and
+  dies there. **If you study:** a lecture, a group-project call, the bus home. **If you code:**
+  the middle of a debugging session, a code review, a standup. **At work:** a client meeting, a
+  hallway conversation, the end of a long email thread.
+
+  For each, pick the route that costs one or two keystrokes: the laptop hotkey, the phone's
+  toolbar button, or the Web Clipper (articles go to `sources/`, not `inbox/`). Then name the
+  one question your current capture habit asks you ("which folder?", "which tag?") that it
+  shouldn't.
+
+  **With a chat assistant (no code):** make "the end of an AI chat" one of your three places,
+  and save this line where you'll see it: "List the decisions from this chat as dated
+  one-liners I can paste into my notes."
+
+  Success: three capture points, each with a route, and the one question you'll stop asking.
+
+  **With a coding agent:** make "the end of an agent session" one of your three places, and
+  decide the one-line request that turns a session's decisions and gotchas into dated
+  one-liners for `inbox/`.
+
+  Success: three capture points, each with a route, including the end of an agent session.
+toolkit: |
+  - **Give your AI chats a capture prompt.** Save "List the decisions from this chat as dated
+    one-liners I can paste into my notes" as a text snippet or in a note of reusable prompts, and
+    run it at the end of any chat that decided something. Paste the result into `inbox/` with
+    your QuickAdd hotkey.
+  - **Put capture one tap away on your phone.** In the mobile app, add your QuickAdd capture
+    command to the mobile toolbar (Settings → Mobile), and set "Default location for new notes"
+    to `inbox/` (Settings → Files and links) so any quick note lands in the loading dock.
+  - **Split capture from filing in your assistant too.** Keep a raw scratch note for things you
+    tell the assistant, and keep a Project's standing instructions (ChatGPT, Claude) or a Gemini
+    Gem's for cleaned-up rules only. Raw notes never go straight into the instructions.
+  - **Do the filing pass on a fixed day.** Put a weekly reminder in your calendar or phone, and
+    keep the manual filing steps from this lesson as a checklist note so the pass takes minutes.
+recap:
+  - emoji: "🧱"
+    title: "Why journaling usually dies"
+    text: "Schmitz has journaled daily for five years — but only after the capture step stopped being a trip to the right note. The habit failed on friction, not motivation."
+  - emoji: "⚡"
+    title: "What the macro does"
+    text: "A QuickAdd capture macro takes typed text from anywhere in the vault and appends it under a named heading in today's note. You never navigate there."
+  - emoji: "📅"
+    title: "How it finds today's note"
+    text: "The file-path field holds a folder plus a date token, so the macro always resolves to today — and will build the note from your template if it does not exist yet."
+  - emoji: "↩️"
+    title: "The setting that ruins it"
+    text: "Without an escaped newline at the end of the capture format, every entry you add lands on the same line. It is the one setting that quietly ruins the whole thing."
+  - emoji: "🏷️"
+    title: "Free structure"
+    text: "Typing the tag into the macro's format costs you nothing at capture time and makes the pile findable later. Structure you get for free is the only structure that survives."
+  - emoji: "📱"
+    title: "The phone half"
+    text: "Rebuild the identical capture on the phone and the evening dump takes about five minutes — which is the only reason it happens at all."
+  - emoji: "🤖"
+    title: "Where this pillar parts ways"
+    text: "He then reviews by hand through embedded query notes. That is the seam this pillar cuts differently: from here, the agent reads the pile and does the filing."
+task: |
+  Wire capture, use it for a day, then run your first **Ingest**: turn the pile into dated
+  notes.
+
+  **1 · Capture (identical on both routes).**
+
+  - Turn on the **Daily Notes** core plugin and point its folder at `daily/`. You write to
+    `inbox/`; the dated notes are assembled from it later.
+  - Install **QuickAdd**, add a *capture* choice and configure it as the video does, with one
+    change: set the file path to `inbox/` + the `{{date:YYYY-MM-DD}}` token instead of a
+    journal heading. Keep the trailing `\n` in the format. Click the lightning-bolt icon so the
+    command appears in the palette, then bind it in Settings → Hotkeys.
+  - Recreate the same macro in the mobile app. It depends on the sync decision from lesson 2;
+    without sync it fails silently and you learn nothing until you need the note.
+  - Capture all day: every stray thought about your course, project or job, raw, unsorted,
+    unlinked. Aim for at least five real items.
+
+  **2 · Ingest.**
+
+  **With a chat assistant (no code):**
+
+  - Turn on the **Templates** core plugin and set its template folder (e.g. `templates/`). Make
+    a note there called `Daily` containing `# {{title}}` and, below it, `## Captured`. In the
+    Daily Notes settings, set that note as the template, then bind "Open today's daily note"
+    in Settings → Hotkeys.
+  - Add the filing rule to `vault-rules.md` and to your Vault Project's instructions, so the
+    two copies match:
+
+  ```prompt
+  Filing rule: when I paste items from my inbox, return each day's daily note as one markdown
+  block: "# YYYY-MM-DD", then "## Captured" with one bullet per item. Keep my wording exactly,
+  add nothing, and wrap project and tool names in [[ ]]. Date an item by a date written in it,
+  else by the inbox file's date, which I'll give you with the paste. After the blocks, give me
+  one line for index.md per day and one dated line for log.md with the item count.
+  ```
+
+  - Open today's inbox file, select all and copy (Ctrl+A, Ctrl+C; Cmd on a Mac). Paste it into
+    a new chat in your Vault Project, under this:
+
+  ```prompt
+  File these inbox items using my filing rule. Keep my wording exactly and add nothing.
+  They come from inbox/[YYYY-MM-DD].md:
+  [pasted inbox items]
+  Success: one daily-note block per day, every item placed once, plus one index.md line per
+  day and one log.md line with the count.
+  ```
+
+  - Open today's note with your hotkey and paste the block's bullets under `## Captured`
+    (create a note in `daily/` for any other day it names). Add its lines to `index.md` and
+    `log.md`.
+  - Compare the bullets with the inbox, item by item. Anything it got wrong is a rule missing
+    from `vault-rules.md`: add it there and to your Project's instructions, not in your head.
+    Clear the inbox only after every item checks out. (Prefer to file by hand on day one? Do
+    this exact pass without the chat; doing it once is how you'll judge the AI's version.)
+
+  Success: one hotkey captures into `inbox/` on laptop and phone, a day's captures sit in a
+  dated note in your words, `index.md` and `log.md` record the pass, and you cleared `inbox/`
+  only after checking it.
+
+  **With a coding agent:**
+
+  - Have the agent write the filing rules into the vault's rules note before the first ingest,
+    so they don't live only in tonight's prompt:
+
+  ```prompt
+  Read vault-rules.md. Propose, as a diff and without writing, a "Capture and ingest" section:
+  inbox/ is mine and you never delete from it; you file each item into daily/YYYY-MM-DD.md
+  under a ## Captured heading, keeping my wording exactly; you date an item by a date written
+  in it, else by the file's modified date; you wrap project and tool names in [[ ]]; and you
+  log every pass in log.md. Wait for my approval before writing. Success: an approved section
+  in vault-rules.md and no other file touched.
+  ```
+
+  - Then run the ingest from a terminal at the vault root:
+
+  ```prompt
+  Work in my Obsidian vault; this folder is the vault root. Read vault-rules.md, then every
+  file in inbox/.
+
+  For each captured item, work out which day it belongs to — a date written in the item, else
+  the file's modified date — and append it as a bullet under a `## Captured` heading in
+  daily/YYYY-MM-DD.md, creating that note if it is missing. Keep my wording exactly, add
+  nothing, and wrap project and tool names in [[ ]].
+
+  Then update index.md with one line per day you touched, and append a dated line to log.md
+  with the count.
+
+  Leave every inbox/ file where it is; finish by listing which ones are now filed so I delete
+  them myself.
+
+  Success: every item is in a dated note, index.md and log.md are updated, and inbox/ is intact.
+  ```
+
+  - Read what it produced. Anything it got wrong is a rule missing from `vault-rules.md` — add
+    it there, not in your head, and run it again tomorrow.
+
+  Success: one hotkey captures into `inbox/` on laptop and phone, a day's captures sit in a
+  dated note in your words, `index.md` and `log.md` record the pass, and `inbox/` is still
+  intact until you clear it.
+selfCheck:
+  - q: "You set up a capture hotkey, but you notice you hesitate before using it: 'which tag? which project does this belong to?' After a week you've captured three things. What's wrong, and what's the fix?"
+    a: "Filing has leaked back into capture. Capture must ask you nothing: raw text into `inbox/`, no tag, no project, no decision. Sorting is a separate job for later (the agent's, in this pillar). The two fail for opposite reasons — capture dies from friction, filing dies from boredom — so doing both at once means you do neither for long."
+  - q: "Why does the Ingest prompt leave every file in `inbox/` untouched?"
+    a: "Because it is your raw material and the agent has no business deleting it on a first pass. It writes new dated notes, then hands you the list of what is now filed so you clear the inbox yourself. Same reason the video's macro appends rather than overwrites: additive operations are recoverable, destructive ones are not."
+  - q: "You capture a decision on your phone and nothing appears on the laptop. Two likely causes — which one is a capture-setup problem?"
+    a: "Either sync was never set up (the sync choice from → install-and-vault-setup, and it fails silently), or the macro's file path resolves to a folder that does not exist on mobile. The second is the capture-setup problem: the date token and the target folder must match on every device, because a capture route you cannot trust is worse than none — you stop writing things down twice."
+backupResources:
+  - label: "How to Quick Capture Notes & Ideas in Your Obsidian Vault — Prakash Joshi Pax"
+    url: "https://www.youtube.com/watch?v=rv3kRIYK-GE"
+    type: "video · alternative approach"
+  - label: "Karpathy's LLM wiki — the gist where Ingest, Query and Lint come from"
+    url: "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f"
+    type: "reference · source"
+tags:
+  - obsidian
+  - capture
+  - daily-notes
+  - ingest
+  - claude-code
+---
+
+A second brain lives or dies on one thing: **do ideas actually get in?** Linking is
+useless if your notes are empty. But "get things in" is really two jobs that people
+jam into one and then quietly abandon — and separating them is what this lesson is
+for.
+
+## Two jobs, two owners
+
+**Capture** is yours. Type the thought, close the box, get back to work. It has to be
+stupid and fast, because the moment it asks you a question — which folder, which tag,
+which note — you stop doing it.
+
+**Filing** is the AI's. Reading the pile, deciding which day each scrap belongs to,
+writing it into the right note, updating the index, logging the pass. That work is
+boring, repetitive, and never finished, which is exactly why you skip it and exactly
+why a model doesn't. A coding agent does it straight in the files; a chat assistant
+drafts the filed notes and you paste them in, which is slower but the same split.
+
+Andrej Karpathy calls this first move **Ingest**: you drop raw material in, the agent
+reads it, files it, and updates the vault's bookkeeping. Everything below is that one
+operation, done for the first time.
+
+## The human half — capture into `inbox/`
+
+Two routes, both frictionless:
+
+1. **A QuickAdd capture macro.** The video builds it. One change for our vault: point
+   the file path at `inbox/` plus the `{{date:YYYY-MM-DD}}` token rather than a
+   heading inside a journal. Click the lightning-bolt icon so it shows up in the
+   command palette (`Ctrl+P` on Windows), then give it a hotkey. That's idea to
+   captured without leaving what you were doing.
+2. **The official Obsidian Web Clipper.** For articles, docs, and papers — one click
+   drops a clean markdown copy into the vault. Send those to `sources/`, not `inbox/`:
+   `sources/` is raw material the agent reads and never edits, and it stays immutable.
+
+Daily Notes stays on, pointed at `daily/`. You just won't write there much any more —
+that folder is increasingly assembled from what you dumped, by an agent or by a paste
+from your chat assistant.
+
+One setting from the video is worth repeating because it silently breaks everything:
+end the capture format with `\n`. Without it your second capture of the day lands on
+the same line as the first, and by Thursday you have one enormous bullet.
+
+## The AI half — Ingest
+
+Point a coding agent at the vault root and it does the pass you were never going to do:
+
+- reads every file in `inbox/`
+- appends each item to the right `daily/YYYY-MM-DD.md`, keeping your words
+- updates `index.md` so the vault's catalog knows those notes exist
+- appends one dated line to `log.md` recording the ingest
+
+That's four files touched from one dumb capture — the reason the split pays. Note what
+it does *not* do yet: nothing gets written into `wiki/`, and no concept pages get
+created. That's a later rung. Ingest v1 does dates and the index, nothing clever.
+
+**Don't code?** Two no-code routes do the same job. Paste the day's inbox into your Vault
+Project in ChatGPT, Claude or Gemini with the task's chat prompt and ask for the finished daily
+note as one markdown block, then paste it in. Or skip AI entirely: point a second QuickAdd
+capture at today's daily note under `## Captured`, so items you already know the day of land
+in the right place directly.
+
+## Keep the inbox yours
+
+The prompt in the task tells the agent to leave `inbox/` exactly as it found it and to
+hand you a list instead. That's deliberate. On a first run you don't yet know what it
+gets wrong, and a bad pass that also deleted your captures is unrecoverable. Let it
+prove itself for a week, then loosen the rule in `vault-rules.md` if you want the inbox
+drained automatically. On the chat route the same rule means you clear the inbox only
+after you've checked the pasted notes against it.
+
+That's the pattern for every prompt in this pillar: **additive first, destructive only
+after it's earned.**
+
+> 💡 **Try it:** set a two-minute timer and dump every loose thought in your head into one
+> inbox file, one line each, no formatting, no sorting. Most people get five to ten lines.
+> Each one was costing you attention; now it's on disk.
+
+## When it gets something wrong
+
+It will. It'll date something to the wrong day, or flatten a note you meant as two.
+The fix is never to correct the output by hand and move on — it's to write the rule
+into `vault-rules.md`, the vault's schema file, so the next run is right. With a chat
+assistant, the rule also goes into your Project's or Gem's instructions, which is the
+copy it actually reads. The schema is where you argue with the AI once instead of
+every day.
+
+## Common failure modes
+
+- **Captures pile onto one enormous line** → the capture format has no trailing `\n` → add
+  it and test with two captures in a row.
+- **Phone captures never reach the laptop** → sync isn't set up, or the mobile macro points at
+  a folder that doesn't exist there → fix sync first, then match the path on every device.
+- **The inbox grows forever** → nothing ever files it → run the Ingest prompt (or the manual
+  pass) on a fixed day, even if it's only weekly.
+- **The AI files something on the wrong date** → a rule is missing → add the rule to
+  `vault-rules.md` (and your Project's instructions) rather than fixing the output by hand.
+
+Capture relentlessly; let the AI file. Next: the folders your *own* notes live in once
+they graduate out of the daily pile — and, more importantly, which parts of the vault
+those folders are allowed to touch.
