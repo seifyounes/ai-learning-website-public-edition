@@ -7,6 +7,8 @@
 recall recap, a hands-on task and a self-check. There's no sign-up, and your progress stays in
 your browser.
 
+**Live site: [ai-learning-website-eta.vercel.app](https://ai-learning-website-eta.vercel.app/)**
+
 ![The home page: a sheet of grid paper with the course title block, the headline and three routes by goal](docs/screenshots/home.png)
 
 ## Who it's for
