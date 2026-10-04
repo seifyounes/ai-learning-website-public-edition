@@ -155,6 +155,14 @@ change held to the checks above.
 Found a mistake, a dead link or something out of date? Every lesson has a **Report it on
 GitHub** link that opens an issue with the page filled in.
 
+## License
+
+- **Code** (everything outside `content/`): [MIT](LICENSE). Reuse it freely.
+- **Lesson text** (`content/`): [CC BY-NC 4.0](content/LICENSE.md). Share and adapt it for
+  non-commercial use with credit; selling it needs permission.
+- **Videos and linked articles** belong to their creators and publishers and aren't covered by
+  either license.
+
 ## Credits
 
 Videos are embedded from YouTube and belong to their creators. Each lesson names the channel and

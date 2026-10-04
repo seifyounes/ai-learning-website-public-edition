@@ -152,6 +152,19 @@ export default function AboutPage() {
           Archivo and Atkinson Hyperlegible (SIL Open Font License).
         </p>
         <p>Built with Next.js, TypeScript and Tailwind CSS.</p>
+        <p>
+          The lesson text is licensed under{" "}
+          <a
+            href="https://creativecommons.org/licenses/by-nc/4.0/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-print underline"
+          >
+            CC BY-NC 4.0
+          </a>
+          : share and adapt it for non-commercial use with credit. The site&rsquo;s code is
+          MIT-licensed.
+        </p>
       </Section>
 
       <div className="mt-12 flex flex-wrap gap-3">
