@@ -1,0 +1,212 @@
+---
+title: "Populations, samples and estimates"
+subtitle: "Why every eval score is an estimate of a number you never see"
+summary: "Separate the true rate you care about from the estimate your sample gives, and judge whether an eval set even samples the right population."
+changeNote: "Reshaped into lesson 3 of the probability and statistics track, now about populations versus estimates; sampling, Bayes and testing moved to their own lessons."
+section: math
+pillar: probability-statistics
+order: 3
+level: intermediate
+estMinutes: 20
+taskMinutes: 25
+prerequisites:
+  - normal-distribution-bell-curve
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "vikkiwjQqfU"
+  published: "2019-07-01"
+  year: 2019
+  minutes: 15
+  title: "Population and Estimated Parameters, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "This lesson rests on one idea: an eval score is an estimate computed from a limited sample, not the true rate. This StatQuest teaches exactly that split (populations versus the parameters you estimate from them) slowly, with pictures and almost no jargon. It targets the precise gap that makes eval scores noisy, and every later lesson in the track, from standard error to hypothesis tests, is a way of measuring that gap."
+  notes:
+    - "7:15 Why we estimate parameters at all: the goal is results that hold for anyone measuring the same population, not a description of five values."
+    - "9:18 Repeating the experiment gives different estimates, then 10:18 shows estimates from 2, 3 and 5 values getting closer to the truth."
+readAfter:
+  - label: "Statistics Fundamentals (full playlist) — StatQuest"
+    url: "https://www.youtube.com/playlist?list=PLblh5JKOoLUK0FLuzwntyYI10UQFUhsY9"
+    kind: course
+applyIt: |
+  **Before you trust any quality number, name the population it is supposed to describe and ask
+  whether your sample came from it.** Take one number you or your team quote: an eval pass rate,
+  a "users like it" rating, a vendor's benchmark score.
+
+  1. Write one sentence: "This is an estimate of [the true rate] for [which inputs, which users,
+     which time period]."
+  2. Write where the sample actually came from and how many items it has.
+  3. List one way the sample differs from the population (older traffic, one language, only easy
+     cases, hand-picked examples).
+  4. Decide: keep the number, re-sample, or quote it with the caveat.
+
+  **If you build software:** sample eval items at random from recent real inputs, and record the
+  date range next to the score. **If you don't code:** when a tool or vendor quotes a score, ask
+  what data it was measured on before comparing it with your own experience.
+
+  Success: one quality number now has a written population, a sample description and a verdict.
+toolkit: |
+  - **Stop concluding from n=3.** Running a reworked prompt, Custom GPT or Gem three times and
+    eyeballing it is a sample of three. Before you decide a custom-instruction change "works",
+    run more trials or a before/after on the same inputs.
+  - **Refresh your test inputs.** Keep the inputs you test prompts on in a notes file, and swap in
+    recent real examples every month or two so the sample keeps matching what you actually do.
+recap:
+  - emoji: "🌍"
+    title: "The population"
+    text: "The population is every unit you could measure: every cell in a liver, every store in a chain. A histogram of all of it gives true probabilities, like the share of cells above a count."
+  - emoji: "📐"
+    title: "Parameters describe it"
+    text: "The curve that fits the population has parameters: a mean and standard deviation for a normal curve, a rate for an exponential, shape and rate for a gamma."
+  - emoji: "🧪"
+    title: "We only see a sample"
+    text: "Measuring everything is rarely affordable, so we estimate the population parameters from a small sample, such as five cells out of billions."
+  - emoji: "🔁"
+    title: "Why aim at the population"
+    text: "Someone repeating the experiment gets different measurements from the same population. Insights about the population carry over to their experiment and future ones; a description of five values doesn't."
+  - emoji: "🤖"
+    title: "The ML view"
+    text: "In machine learning terms, the sample is your training data and the population curve is what you're trying to predict."
+  - emoji: "🎲"
+    title: "Estimates move"
+    text: "Repeat the experiment and the estimated mean and SD change, and neither run matches the true values exactly. With 2, then 3, then 5 measurements, the estimates creep closer to the truth."
+  - emoji: "📈"
+    title: "Quantify the confidence"
+    text: "More data, more confidence. Statistics puts a number on that confidence with p-values and confidence intervals, which tell you whether two runs' estimates really differ."
+task: |
+  Watch estimates move in a spreadsheet where you secretly know the truth.
+
+  1. In A1:A400 type `=IF(RAND()<0.85,1,0)`. That's a "prompt" with a true pass rate of 85%:
+     the population parameter, which normally you'd never see.
+  2. In C1 type `=AVERAGE(A1:A20)` (a sample of 20), in C2 `=AVERAGE(A1:A100)` and in C3
+     `=AVERAGE(A1:A400)`.
+  3. Recalculate 10 times (F9 in Excel; in Google Sheets edit any cell). Each time, copy the
+     three estimates into a log below as values.
+  4. For each sample size, note the lowest and highest estimate you saw.
+
+  **If you code:** `[sum(random.random() < 0.85 for _ in range(n)) / n for _ in range(10)]` for
+  n = 20, 100 and 400 gives the same table.
+
+  Success: a table showing that n = 20 estimates swing by many points while n = 400 estimates stay
+  within a few points of 85%, with nothing about the "prompt" changed.
+selfCheck:
+  - q: "A teammate built the eval set from 40 examples the team found hard during development. The prompt scores 70% on it. A manager reads that as '70% of customers get a good answer'. What do you tell them?"
+    a: "The 70% estimates the pass rate on hard, hand-picked cases, not on customer traffic. The sample wasn't drawn from the population the manager cares about, so the number may be far off in either direction. Sample at random from real traffic to estimate that."
+  - q: "You and a colleague each grade 50 different random conversations from last week. You get 84% good, they get 90%. They think your grading is too harsh. What else could explain it?"
+    a: "Two random samples of 50 from the same population will give different estimates by chance alone. Before blaming the grading, have both of you grade the same 20 conversations; if you agree on those, the gap is most likely sampling variation."
+mcq:
+  - q: "Your support chatbot's eval set came from your first customers, all in one country. You open the bot to another country whose customers ask different questions in other languages. What happens to your eval score?"
+    options:
+      - "It still holds, because the model itself hasn't changed"
+      - "It likely overstates quality for the new users' traffic"
+      - "It likely understates quality, as more data helps models"
+      - "It only stops being valid if the model gets retrained"
+    answer: 1
+    explain: "An eval score estimates performance on the population it was sampled from. Shift the traffic (new market, language or kinds of question) and the estimate quietly expires, usually in the flattering direction because the eval covers what you already handle. Refresh the eval set from current traffic."
+  - q: "A model vendor reports 92% on a public coding benchmark. Your team's own 200 real tickets give 71%. Which reading fits best?"
+    options:
+      - "The vendor's figure is wrong, since your sample is larger"
+      - "Your grading must be wrong, as public benchmarks are audited"
+      - "Average the two to get about 81% as the best overall figure"
+      - "Both can be right: they estimate rates for different populations"
+    answer: 3
+    explain: "Each number estimates the pass rate on the population its sample came from: benchmark problems in one case, your tickets in the other. Neither cancels the other, and averaging mixes two different quantities. For your decision, your own representative sample is the relevant estimate."
+  - q: "You want the pass rate of a summarizer on all of next quarter's documents. Which of these is the population parameter, as opposed to an estimate?"
+    options:
+      - "The true pass rate across every document next quarter"
+      - "The pass rate on the 300 documents you graded this week"
+      - "The average of the pass rates from your last three evals"
+      - "The pass rate reported in the model's own documentation"
+    answer: 0
+    explain: "The parameter is the quantity for the whole population you care about, which you can't measure directly. Every number you actually compute, including an average of several evals, is an estimate of it from some sample."
+  - q: "To save time, you estimate a classifier's accuracy on the first 100 emails of the morning. Mornings are mostly newsletters; afternoons are mostly customer requests. What's the main risk?"
+    options:
+      - "100 emails is too few to estimate any accuracy at all"
+      - "The estimate is fine, since every email is equally likely"
+      - "The sample may not represent the day's full email mix"
+      - "Accuracy can't be estimated without a labelled training set"
+    answer: 2
+    explain: "An estimate only describes the population if the sample is drawn from all of it. Morning-only emails over-represent newsletters, so the accuracy can be far off for customer requests. Draw randomly across the whole day. Sample size matters too, but a large biased sample is still biased."
+backupResources:
+  - label: "Go deeper: Binomial distributions | Probabilities of probabilities, part 1 (3Blue1Brown, 13 min)"
+    url: "https://www.youtube.com/watch?v=8idr1WZ1A7Q"
+    type: "video"
+  - label: "Seeing Theory — interactive probability & stats (Brown University)"
+    url: "https://seeing-theory.brown.edu/"
+    type: "interactive · play with every concept"
+tags:
+  - math
+  - probability
+  - statistics
+  - evals
+---
+
+**You need:** averages and percentages. → normal-distribution-bell-curve first.
+
+There are two kinds of number in every measurement. There is the **true value** for everything
+you care about, which you almost never see, and there is the **estimate** you compute from the
+data you managed to collect. An eval score, a satisfaction rating and a benchmark result are all
+estimates. Keeping the two apart is the first habit of anyone who evaluates AI systems.
+
+## Population and parameters
+
+The **population** is the full set you want to describe: every question your chatbot will ever
+get, every document next quarter, every user of a feature. Its true mean and standard deviation
+are its **parameters**, usually written with Greek letters (μ, σ). For a pass/fail check the
+parameter is the true pass rate.
+
+You can't measure the whole population: future traffic doesn't exist yet, and grading everything
+costs too much. If you come from machine learning, the mapping is direct: your data is the
+sample, and the population is what the model is supposed to work on.
+
+## Samples and estimates
+
+So you measure a **sample** and compute statistics from it: a sample mean (x̄), a sample
+standard deviation (s), a pass rate p̂. These are **estimates** of the parameters. The
+different notation is a reminder that they are guesses.
+
+Two facts follow:
+
+1. **Different samples give different estimates.** Grade 50 random conversations, then another
+   50, and the two pass rates won't match even though nothing changed.
+2. **Bigger samples give estimates closer to the truth.** The rest of this track measures how
+   close: standard error, confidence intervals, hypothesis tests.
+
+## Worked example: three samples of one prompt
+
+Suppose a prompt's true pass rate on your traffic is 85% (in real life you wouldn't know this).
+You draw three random samples:
+
+| Sample size | Passes | Estimate |
+|---|---|---|
+| 20 | 16 | 80% |
+| 100 | 87 | 87% |
+| 400 | 338 | 84.5% |
+
+All three are honest estimates of the same 85%. The 20-item one is 5 points off, which is
+ordinary for so few items. The 400-item one is half a point off. If you'd compared a new prompt
+against the 20-item result, you could have "found" a 5-point improvement that was only sampling.
+
+## The sample must come from the right population
+
+Size isn't everything. An eval set built from hand-picked hard cases, from one month's traffic or
+from one language estimates the pass rate **for that population**. When real traffic shifts (new
+users, new kinds of question), the score stops describing it, usually in the flattering
+direction. This is **distribution shift**, and it's a common reason quality drops while a
+dashboard stays green.
+
+## Common mistakes
+
+- **Quoting an estimate as a fact.** "The bot is 87% accurate" should be "87% on these 100
+  examples from March".
+- **Reading disagreement between two samples as a mistake.** Some disagreement is guaranteed.
+- **Hand-picking the sample.** Interesting cases make good tests but a biased estimate of
+  overall quality. Keep them separate from a random sample.
+- **Never refreshing the eval set.** Re-sample from current traffic on a schedule.
+
+## Where you'll see it in AI
+
+Every eval and benchmark (→ evaluation-metrics), every A/B test of prompts or models, and every
+claim from a leaderboard. Training data is itself a sample: a model learns the patterns in the
+data it saw, which is why a mismatch between training data and real use hurts performance. Next,
+→ mean-variance-standard-deviation shows how to compute the estimates themselves.

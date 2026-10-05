@@ -11,7 +11,7 @@ import { BackCell, Cell, TitleBlock } from "@/components/TitleBlock";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [{ section: "foundations" }, { section: "applications" }];
+  return [{ section: "foundations" }, { section: "applications" }, { section: "math" }];
 }
 
 export async function generateMetadata({
@@ -44,7 +44,7 @@ export default async function SectionPage({
           <Cell label="Section" className="col-span-2 min-[760px]:col-span-1">
             <h1 className="print-display block pt-2 text-graphite">{meta.title}</h1>
           </Cell>
-          <Cell label="Pillars">
+          <Cell label={section === "foundations" ? "Pillars" : "Tracks"}>
             <span className="qty text-quantity-large text-graphite">{navSection.pillars.length}</span>
           </Cell>
           <Cell label="Lessons">

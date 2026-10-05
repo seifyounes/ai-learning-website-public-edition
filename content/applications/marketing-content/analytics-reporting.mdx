@@ -113,7 +113,7 @@ task: |
   hand to a stakeholder, all re-runnable from the shown working.
 selfCheck:
   - q: "Your product's conversion rate dropped 5 points this week, measured on a small group of new users. Which of the four questions do you run first — and what would make you NOT react?"
-    a: "The funnel query first: confirm the number and its base. On a group that small, a 5-point swing is likely sampling noise (→ probability-statistics-for-ai), so you don't react until the drop persists or the cohort comparison shows a real driver, like a release or campaign that landed that week."
+    a: "The funnel query first: confirm the number and its base. On a group that small, a 5-point swing is likely sampling noise (→ standard-error-vs-deviation), so you don't react until the drop persists or the cohort comparison shows a real driver, like a release or campaign that landed that week."
   - q: "Why does the funnel → cohort → drop-off → decision order matter? What goes wrong if you start with drop-off?"
     a: "Funnel gives the magnitude, cohort gives the driver, drop-off gives the location, and decisions need all three. Start at drop-off and you'll optimize the most visible step, not the most costly one: users bailing at a screen only 5% ever reach doesn't move trial-to-paid."
   - q: "A client pays you for a weekly AI-generated analytics report. What must be in it for it to drive decisions instead of vibes?"
@@ -254,7 +254,7 @@ Small groups produce big swings by chance. If 100 people convert at 20%, the pla
 for the "true" rate is roughly 12% to 28% at 95% confidence, so a 5-point change from one
 week to the next can easily be noise. Before reacting, check the base, wait to see whether the
 change persists, and look for a driver (a release, a campaign, a price change) in the cohort
-split (→ probability-statistics-for-ai).
+split (→ standard-error-vs-deviation).
 
 ## What a useful report contains
 

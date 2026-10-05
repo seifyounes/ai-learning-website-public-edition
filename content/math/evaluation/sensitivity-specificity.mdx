@@ -1,0 +1,215 @@
+---
+title: "Sensitivity and specificity"
+subtitle: "Two rates that say how well a model catches positives and clears negatives"
+summary: "Turn a confusion matrix into sensitivity and specificity, compute them per class, and choose a model by which rate matters more."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript, with a worked example and a quiz."
+section: math
+pillar: evaluation
+order: 2
+level: beginner
+estMinutes: 16
+taskMinutes: 20
+prerequisites:
+  - confusion-matrix
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "vP06aMoz4v8"
+  published: "2019-12-02"
+  year: 2019
+  minutes: 12
+  title: "Machine Learning Fundamentals: Sensitivity and Specificity"
+  channel: "StatQuest with Josh Starmer"
+  why: "The confusion matrix gave you counts; this lecture turns them into the two rates you can compare across models. It reuses the same heart-disease models from the previous lesson, so you see two models trade one rate against the other, then walks through the per-class version for a three-class table, which is what you need for any classifier with more than two labels."
+  notes:
+    - "2:05 The two formulas: sensitivity = TP ÷ (TP + FN), specificity = TN ÷ (TN + FP)."
+    - "4:47 The decision rule: pick the higher-sensitivity model when catching positives matters more, the higher-specificity one when clearing negatives does."
+    - "5:49 With three or more classes there is no single value: each class gets its own sensitivity and specificity."
+applyIt: |
+  **When someone quotes one accuracy number for a detector, ask for the two rates instead.** AI
+  writing detectors, fraud flags, medical screening apps and content filters are all sold on
+  single numbers, and the two rates tell you who gets hurt by each kind of mistake.
+
+  1. Find one detector or classifier you rely on, or one you're evaluating at work or for a
+     project.
+  2. Look up (or measure on 30–50 cases you can check) its sensitivity on the class you care
+     about and its specificity on everything else.
+  3. Translate each rate into people or items per week: "it misses about 1 in 5 real cases" and
+     "it wrongly flags about 1 in 20 clean ones".
+  4. Decide which of those two sentences is worse for you, and write it down as the rate to
+     watch.
+
+  **If you build software:** for a classifier with several labels, print a per-class report
+  (scikit-learn's `classification_report` shows recall, which is sensitivity, for every class).
+  **If you don't code:** ask the vendor or the paper for both rates. If they only give accuracy,
+  treat that as a gap in the evidence.
+
+  Success: two plain-language sentences about one real detector's misses and false flags, and
+  the rate you'll watch.
+recap:
+  - emoji: "🔁"
+    title: "Back to the four boxes"
+    text: "Start from the confusion matrix: true positives, true negatives, false negatives and false positives for the heart-disease models."
+  - emoji: "🎯"
+    title: "Sensitivity catches positives"
+    text: "Sensitivity is TP ÷ (TP + FN): the share of patients who really had heart disease that the model found."
+  - emoji: "🛡️"
+    title: "Specificity clears negatives"
+    text: "Specificity is TN ÷ (TN + FP): the share of healthy patients the model correctly left alone."
+  - emoji: "⚖️"
+    title: "Two models, two strengths"
+    text: "Logistic regression scored 0.81 and 0.85; the random forest scored 0.83 and 0.83. Choose by which rate matters more for the decision you're making."
+  - emoji: "🎬"
+    title: "One rate per class"
+    text: "With three classes, compute each class against all the others. One class can sit at 6% sensitivity while the table as a whole hides it."
+  - emoji: "📌"
+    title: "The rule to keep"
+    text: "Catching positives matters most → favour sensitivity. Clearing negatives matters most → favour specificity."
+task: |
+  Compute per-class rates for a three-class model.
+
+  A hypothetical support-ticket router was tested on 150 tickets. Rows are the true queue,
+  columns the predicted queue (order: billing, technical, account):
+
+  ```python
+  labels = ["billing", "technical", "account"]
+  m = [[40,  5,  5],   # truly billing
+       [ 3, 60,  7],   # truly technical
+       [10,  2, 18]]   # truly account
+
+  total = sum(map(sum, m))
+  for i, name in enumerate(labels):
+      tp = m[i][i]
+      fn = sum(m[i]) - tp                      # rest of the row
+      fp = sum(m[r][i] for r in range(3)) - tp # rest of the column
+      tn = total - tp - fn - fp
+      print(f"{name}: sensitivity {tp/(tp+fn):.2f}, specificity {tn/(tn+fp):.2f}")
+  ```
+
+  1. On paper, compute sensitivity and specificity for "account" first. Remember the axes here
+     are the opposite of the lecture's: truth is on the rows.
+  2. Run the code (any online Python runner) or rebuild it in a spreadsheet, and check your
+     numbers.
+  3. Write one sentence: which queue would you improve first, and which cell tells you what to
+     fix?
+
+  Success: account comes out at sensitivity 0.60 and specificity 0.90, and you named the cell
+  (true account, predicted billing: 10 tickets) that drives it.
+selfCheck:
+  - q: "An AI-writing detector advertises '98% specificity'. A teacher concludes it catches 98% of AI-written essays. What's wrong?"
+    a: "Specificity is about the negatives: 98% of human-written essays are correctly cleared, so about 2 in 100 honest students get flagged. It says nothing about how many AI-written essays it catches; that's sensitivity."
+  - q: "Your intent classifier has 12 intents and looks fine overall, but users of one rare intent keep getting routed wrong. What do you compute?"
+    a: "Per-class sensitivity for that intent (one class against all the others). A rare class can have very low sensitivity while overall numbers stay high because the common intents dominate."
+  - q: "Two screening models: A has sensitivity 0.95 and specificity 0.70; B has 0.85 and 0.92. Follow-up checks are cheap but missing a case is serious. Which do you lean towards, and what would change your mind?"
+    a: "A, because missed cases are the costly error and follow-ups are cheap. If false alarms became expensive (scarce reviewers, or a huge volume of negatives), B's higher specificity could win."
+mcq:
+  - q: "Model A has sensitivity 0.81 and specificity 0.85; model B has 0.83 and 0.83. It's a first-pass screen where a missed case is the expensive error. Which do you pick?"
+    options:
+      - "A, because its two rates add up to the higher total"
+      - "A, because higher specificity means fewer misses"
+      - "Neither: the rates are too close to tell them apart"
+      - "B, because it catches more of the real positives"
+    answer: 3
+    explain: "Sensitivity is the rate that counts missed positives, so when misses are the costly error you favour the higher one. Specificity is about clearing negatives, not about misses, and summing the two rates ignores which error matters."
+  - q: "A chatbot's intent classifier scores well overall. The 'cancel my plan' intent is 4% of traffic. What should you compute before trusting it?"
+    options:
+      - "Sensitivity for 'cancel my plan' versus the rest"
+      - "Specificity averaged across every intent equally"
+      - "The overall share of intents it gets right per day"
+      - "Sensitivity for the most common intent in traffic"
+    answer: 0
+    explain: "With many classes each one gets its own rates, and a rare class can be missed most of the time while the overall picture looks fine. The common intents dominate any overall number, so they tell you least about the rare one."
+  - q: "A school is told an AI-writing detector has '99% specificity'. What does that number tell them?"
+    options:
+      - "It catches 99% of the essays that were written by AI"
+      - "About 1 in 100 human-written essays gets flagged"
+      - "99% of the essays it flags really were written by AI"
+      - "It is right about 99% of all the essays it reads"
+    answer: 1
+    explain: "Specificity is measured on the negatives, here human-written essays: 99% are cleared and about 1% are wrongly flagged. How many AI essays it catches is sensitivity, and the share of flags that are right is a different metric again (next lesson)."
+  - q: "After a change, a screening model's sensitivity rose from 0.80 to 0.95 and its specificity fell from 0.90 to 0.70. The team calls it a pure win. What's the problem?"
+    options:
+      - "Sensitivity cannot really rise without more training data"
+      - "Specificity matters only when there are more than two classes"
+      - "It triples the false-flag rate, which may outweigh the gain"
+      - "The two rates were probably measured on different classes"
+    answer: 2
+    explain: "The false-flag rate went from 10% to 30% of negatives. Whether catching more positives is worth that depends on what each error costs and how many negatives flow through. Sensitivity can rise from a threshold change alone, with no new data."
+backupResources:
+  - label: "Google ML Crash Course: accuracy, recall, precision and related metrics"
+    url: "https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall"
+    type: "docs"
+tags:
+  - math
+  - evaluation
+  - sensitivity
+  - specificity
+  - metrics
+---
+
+**You need:** the four boxes from → confusion-matrix.
+
+A confusion matrix gives you counts, and counts are hard to compare when two test sets have
+different sizes. **Sensitivity** and **specificity** turn the table into two rates that answer
+the two questions anyone affected by a model actually asks: "if I'm a real case, will it find
+me?" and "if I'm not, will it leave me alone?"
+
+## The two formulas
+
+- **Sensitivity = TP ÷ (TP + FN).** Of everything that really is positive, the share the model
+  caught. Machine-learning code usually calls this **recall** or the **true-positive rate**.
+- **Specificity = TN ÷ (TN + FP).** Of everything that really is negative, the share the model
+  correctly cleared. One minus specificity is the **false-positive rate**, which you'll plot in
+  → evaluation-metrics.
+
+Each rate uses one "truth" group only. Sensitivity ignores the negatives completely, and
+specificity ignores the positives. That's why you need both.
+
+## Worked example: two models, two strengths
+
+The lecture's two heart-disease models, on the same test patients:
+
+1. **Logistic regression:** TP = 139, FN = 32, TN = 112, FP = 20.
+   Sensitivity = 139 ÷ 171 ≈ **0.81**. Specificity = 112 ÷ 132 ≈ **0.85**.
+2. **Random forest:** TP = 142, FN = 29, TN = 110, FP = 22.
+   Sensitivity = 142 ÷ 171 ≈ **0.83**. Specificity = 110 ÷ 132 ≈ **0.83**.
+
+The forest finds 3 more sick patients; logistic regression wrongly flags 2 fewer healthy
+ones. Neither is "better" in general. If the model is a first screen and a miss means a sick
+person goes home, the forest wins. If a false flag means an invasive follow-up, logistic
+regression wins.
+
+## More than two classes: one rate per class
+
+With three or more labels there's no single sensitivity. You treat each class as "this one
+vs. all the others" and compute its own pair:
+
+- Its **TP** is its diagonal cell.
+- Its **FN** is the rest of its true row or column (the real cases sent elsewhere).
+- Its **FP** is everything else predicted as this class.
+- Its **TN** is everything left.
+
+In the lecture's movie example, one class gets a sensitivity of just 12 ÷ 207 ≈ **0.06**: the
+model almost never finds those people. A single overall number would have hidden that.
+
+## Common mistakes
+
+- **Reading specificity as "how often a flag is right".** It's the share of negatives cleared.
+  How trustworthy a flag is comes next, in → precision-recall-tradeoff.
+- **Reporting one class's rates for a multi-class model.** Every class needs its own pair, and
+  the rare classes are usually the weak ones.
+- **Judging a change by one rate.** A threshold change that lifts sensitivity almost always
+  costs specificity. Report both, before and after.
+- **Forgetting volume.** A 2% false-positive rate on a million negatives is 20,000 false
+  flags.
+
+## Where you'll see it in AI
+
+- **Classifier reports:** recall per class is sensitivity per class; it's the first thing to
+  check on an intent router or moderation model.
+- **ROC curves:** the y-axis is sensitivity and the x-axis is one minus specificity
+  (→ evaluation-metrics).
+- **Checking an LLM judge:** its agreement with human labels is measured as a true-positive
+  rate and a true-negative rate, exactly these two numbers (→ eval-from-real-traces).
+- **Detectors sold on one number:** AI-text detectors and safety filters need both rates before
+  you can say who gets hurt.

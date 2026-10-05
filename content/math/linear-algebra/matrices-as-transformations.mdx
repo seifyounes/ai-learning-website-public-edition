@@ -1,0 +1,226 @@
+---
+title: "Matrices as linear transformations"
+subtitle: "A matrix is a function that moves space, and its columns tell you how"
+summary: "Read a matrix's columns as where the basis vectors land, multiply a matrix by a vector without memorizing, and count a layer's parameters."
+changeNote: "New lesson in the linear algebra track, written from the lecture's transcript; takes in the matrix and parameter-count material from lesson 1."
+section: math
+pillar: linear-algebra
+order: 3
+level: intermediate
+estMinutes: 16
+taskMinutes: 30
+prerequisites:
+  - span-and-basis-vectors
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "kYB8IZa5AuE"
+  published: "2016-08-07"
+  year: 2016
+  minutes: 11
+  title: "Linear transformations and matrices | Chapter 3, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "This is the chapter that makes the rest of linear algebra click: a matrix stops being a grid of numbers and becomes a movement of space whose columns record where the basis vectors land. That reading is exactly how to think about a weight matrix in a neural network layer, and it turns matrix-vector multiplication from a memorized rule into a linear combination you can picture."
+  notes:
+    - "2:34 the two conditions for a transformation to be linear: lines stay straight and the origin stays put."
+    - "3:35 the key move: record only where the two basis vectors land and every other vector follows."
+    - "6:17 packaging those landing spots as the columns of a matrix; 7:54 rotation and shear as examples; 8:59 dependent columns squash the plane onto a line."
+applyIt: |
+  **Every layer you hear about is a matrix moving vectors, so read model sizes as matrix
+  shapes.** That turns "a 7B model" or "a 4,096-wide hidden layer" into something you can count
+  and reason about.
+
+  1. Pick an open model you've heard of and open its model card or config page (Hugging Face
+     lists the hidden size and the number of layers for most open models).
+  2. Find the hidden size d. One d × d weight matrix holds d² numbers: work that out for your
+     model.
+  3. Compare it with the total parameter count. Write one line on roughly how many d × d
+     matrices that total is "worth".
+
+  **If you build software:** print the shapes of a small model's weights (for example with
+  `for n, p in model.named_parameters(): print(n, p.shape)` in PyTorch) and match a few to the
+  layers you know. **If you don't code:** the config page and a calculator are enough.
+
+  Success: one model, its hidden size, the size of one d × d matrix, and a one-line comparison
+  with its total parameter count.
+toolkit: |
+  - **Ask for the basis-vector reading.** When a chat assistant explains a matrix, ask it to
+    "say where each basis vector lands, column by column, before giving the result." It forces
+    the explanation into the picture this lesson builds.
+  - **Set up a shape tutor.** In a ChatGPT or Claude Project, or a Gemini Gem: "Give me a matrix
+    and a vector and ask me to predict the output before you show it." A few rounds a week keep
+    the habit alive.
+  - **Keep your always-on instructions short.** Every token of a custom instruction or a
+    Project's instructions passes through the model's weight matrices on every turn. Trim to the
+    lines that actually steer (→ models-and-effort).
+recap:
+  - emoji: "🎬"
+    title: "Transformation means function"
+    text: "A transformation takes a vector in and gives a vector out. Picture it as movement: every point of the plane sliding to where its output lands."
+  - emoji: "📏"
+    title: "What makes it linear"
+    text: "Lines stay straight and the origin stays fixed. Equivalently, grid lines stay parallel and evenly spaced. Curving lines or moving the origin breaks linearity."
+  - emoji: "🎯"
+    title: "Follow two vectors only"
+    text: "Because grid lines stay even, a vector that was −1 of one basis vector plus 2 of the other lands at −1 times where the first landed plus 2 times where the second landed."
+  - emoji: "🔲"
+    title: "Columns are landing spots"
+    text: "Four numbers describe a 2D linear transformation: where each basis vector lands. Stack them as the two columns of a 2 × 2 matrix."
+  - emoji: "✖️"
+    title: "Matrix times vector"
+    text: "Scale each column by the matching coordinate of the vector and add. That's the whole rule, and it's the same linear combination idea as before."
+  - emoji: "🔄"
+    title: "Rotations, shears, squashes"
+    text: "A 90° turn has columns (0, 1) and (−1, 0); a shear keeps one column fixed. If the two columns line up, the whole plane is squashed onto a single line."
+task: |
+  Watch a matrix move a grid, then build one tiny "layer".
+
+  **In Python (25 minutes, free Google Colab works).**
+
+  ```python
+  import numpy as np
+  import matplotlib.pyplot as plt
+
+  def show(M, title):
+      xs, ys = np.meshgrid(np.arange(-3, 4), np.arange(-3, 4))
+      pts = np.stack([xs.ravel(), ys.ravel()])  # 2 x 49 grid points
+      out = M @ pts
+      plt.figure(figsize=(4, 4))
+      plt.scatter(pts[0], pts[1], s=8, c="lightgray")
+      plt.scatter(out[0], out[1], s=8)
+      plt.arrow(0, 0, M[0, 0], M[1, 0], color="green", width=0.05)  # where (1, 0) lands
+      plt.arrow(0, 0, M[0, 1], M[1, 1], color="red", width=0.05)    # where (0, 1) lands
+      plt.title(title); plt.axis("equal"); plt.show()
+
+  show(np.array([[0, -1], [1, 0]]), "rotate 90 degrees")
+  show(np.array([[1, 1], [0, 1]]), "shear")
+  show(np.array([[1, 2], [2, 4]]), "dependent columns")
+
+  W = np.array([[2, -1], [1, 3]])
+  b = np.array([1, -2])
+  x = np.array([3, 2])
+  print("W @ x:", W @ x)
+  print("by columns:", 3 * W[:, 0] + 2 * W[:, 1])
+  print("layer:", np.maximum(0, W @ x + b))  # ReLU(W x + b)
+  ```
+
+  Before each `show`, predict where the green and red arrows will point. Then answer in one
+  line each: why the two printed `W @ x` lines match, and what the bias b does to the origin.
+
+  **No code?** On paper, apply W = [[2, −1], [1, 3]] to (3, 2) by scaling the columns and
+  adding, then to (1, 0) and (0, 1), and check that those two outputs are the columns.
+
+  Success: your predictions match the plots (or your paper check works), W @ x is (4, 9), and
+  you can say why adding b means the map no longer fixes the origin.
+selfCheck:
+  - q: "In a trained layer with a 768 × 768 weight matrix, one column turns out to be all zeros. What does the layer do with that input coordinate?"
+    a: "A column is where one basis vector lands, so that input direction is sent to the zero vector: whatever value the input has in that coordinate, it contributes nothing to the output. The layer ignores that coordinate entirely, which is worth investigating."
+  - q: "A teammate calls a weight matrix 'just a table of learned numbers'. What practical thing do you get from reading it as a transformation instead?"
+    a: "You can predict and debug it: each column tells you where one input direction goes, so you can ask which inputs it stretches, squashes or ignores, and whether two columns are redundant. The table view gives none of those questions."
+mcq:
+  - q: "A model is described as '7B parameters'. In linear-algebra terms, what are the seven billion things?"
+    options:
+      - "The number of training tokens it read in pretraining"
+      - "The count of neurons summed across all of its layers"
+      - "The entries of its weight matrices and bias vectors"
+      - "The number of dimensions in each embedding vector"
+    answer: 2
+    explain: "Parameters are the learned numbers inside the weight matrices (plus biases) that every forward pass multiplies through. Training tokens are a separate figure, usually counted in trillions; each neuron owns many weights; embedding width is a few thousand at most. More parameters means bigger matrices, so more memory and compute per token."
+  - q: "A network layer computes ReLU(W·x + b). Which part stops a stack of these layers from collapsing into one linear map?"
+    options:
+      - "The ReLU, because it bends straight lines"
+      - "The bias b, because it shifts every output"
+      - "The weight matrix W, because it's learned"
+      - "The input x, because it changes per example"
+    answer: 0
+    explain: "W·x is linear, and adding b only shifts everything (it moves the origin but keeps lines straight), so without the activation, layers combine into one affine map. ReLU bends lines, which is what lets depth add expressive power."
+  - q: "A 2 × 2 matrix has columns (1, 2) and (2, 4). You apply it to every point of the plane. What happens?"
+    options:
+      - "The plane is rotated and stretched but stays a full plane"
+      - "Every point is sent to the origin and nothing remains"
+      - "Only the points along the x-axis move, others stay put"
+      - "The whole plane is squashed onto one line through the origin"
+    answer: 3
+    explain: "The second column is twice the first, so both basis vectors land on the same line and every output is a combination of them: a line. A rotation needs independent columns, and nothing goes to the origin unless both columns are zero."
+  - q: "You know a linear map sends (1, 0) to (2, 1) and (0, 1) to (−1, 3). A colleague says you can't know where (3, 2) goes without running the map. What do you say?"
+    options:
+      - "Right, a map can treat every new input differently"
+      - "Wrong, it lands at 3·(2, 1) + 2·(−1, 3) = (4, 9)"
+      - "Right, you'd need at least three known points first"
+      - "Wrong, it lands at (3·2, 2·3) = (6, 6) by entries"
+    answer: 1
+    explain: "Linearity means a combination of inputs maps to the same combination of outputs, so the two basis images decide everything: (6 − 2, 3 + 6) = (4, 9). Multiplying matching entries is not how a matrix acts, and a non-linear map is the only kind that needs more samples."
+backupResources:
+  - label: "Mathematics for Machine Learning — free book, ch. 2.7 (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+  - neural-networks
+---
+
+Stop seeing a matrix as a grid of numbers. A matrix is a **function that moves space**:
+it rotates, stretches, shears or squashes every vector at once. That one shift is the reason
+"a neural network layer" stops being mysterious, because a layer's weights are exactly such a
+function, learned from data.
+
+## What makes a transformation linear
+
+A transformation takes a vector in and gives a vector out. It is **linear** when two things hold:
+straight lines stay straight, and the origin stays where it is. Picture a grid drawn on the
+plane: after a linear transformation its lines are still parallel and evenly spaced, even if
+they're tilted or stretched.
+
+That rule has a big consequence. If v = −1·(first basis vector) + 2·(second basis vector)
+before the move, then after it v lands at −1·(where the first landed) + 2·(where the second
+landed). So you never need to track every point. **Where the basis vectors land decides
+everything.**
+
+## The matrix is the record of where they land
+
+In two dimensions that's four numbers: two for where (1, 0) lands and two for where (0, 1)
+lands. Write them as the two **columns** of a 2 × 2 matrix. To apply the matrix to a vector,
+scale each column by the matching coordinate and add.
+
+## Worked example: one matrix, two ways
+
+Let W have columns (2, 1) and (−1, 3), and apply it to x = (3, 2).
+
+1. **By columns.** 3·(2, 1) + 2·(−1, 3) = (6, 3) + (−2, 6) = **(4, 9)**.
+2. **By rows** (the rule you may have memorized). Row one is (2, −1): 2·3 + (−1)·2 = 4. Row two
+   is (1, 3): 1·3 + 3·2 = 9. Same answer.
+
+The column reading tells you *why* it works. The row reading is often faster to compute and
+leads straight to the dot product in → dot-product-duality.
+
+Now scale up. A layer that maps a 4,096-wide vector to another 4,096-wide vector needs a
+4,096 × 4,096 matrix: **16,777,216** weights, plus 4,096 biases. Stack enough layers like that
+and you reach the billions behind a "7B model". Every forward pass multiplies through all of
+them, which is why bigger matrices mean more memory and more compute per token.
+
+## Where linearity stops
+
+A neural-network layer computes `activation(W·x + b)`. Only `W·x` is linear. Adding the bias b
+shifts every output, so the origin moves (the map is called affine). The activation, such as
+ReLU, bends straight lines. That bend is what lets stacked layers represent more than a single
+matrix could (→ neural-networks).
+
+## Common mistakes
+
+- **Reading rows as the "meaning".** Columns are where input directions go; read them first.
+- **Calling a layer linear.** With a bias and an activation it isn't; only the matrix part is.
+- **Ignoring dependent columns.** If columns line up, the map squashes space and some input
+  differences can never be recovered (→ rank-column-null-space).
+- **Multiplying entry by entry.** A matrix acts by combining columns, not by pairing numbers.
+
+## Where you'll see it in AI
+
+- **Every dense layer** is a learned matrix applied to a vector (→ neural-networks).
+- **Queries, keys and values** in attention are three matrices applied to each token's vector
+  (→ transformers-attention).
+- **Parameter counts and cost:** model size is the sum of its matrices' entries
+  (→ models-and-effort).
+
+Next, → matrix-multiplication-composition shows what happens when you apply one matrix after
+another.

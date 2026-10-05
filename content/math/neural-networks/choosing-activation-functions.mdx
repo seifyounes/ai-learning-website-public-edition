@@ -1,0 +1,203 @@
+---
+title: "Choosing activation functions"
+subtitle: "Sigmoid, tanh, ReLU and leaky ReLU, and where each one belongs"
+summary: "Pick an activation for hidden and output layers, and explain why ReLU-style functions train faster than sigmoid in deep networks."
+changeNote: "New lesson in the neural networks track, written from the lecture's transcript, with worked slope numbers and a quiz."
+section: math
+pillar: neural-networks
+order: 3
+level: intermediate
+estMinutes: 16
+taskMinutes: 20
+prerequisites:
+  - layer-forward-pass
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "Xvg00QnyaIY"
+  published: "2017-08-25"
+  year: 2017
+  minutes: 11
+  title: "Activation Functions (C1W3L06)"
+  channel: "DeepLearningAI"
+  why: "The last lesson wrote every layer as g(W·x + b) and left g open. Here Andrew Ng fills it in: he compares sigmoid, tanh, ReLU and leaky ReLU on one board, explains the flat-slope problem that slows learning, and ends with a plain rule of thumb for hidden and output layers. It is short, practical and in the same notation as the previous lecture."
+  notes:
+    - "2:04 Why tanh beats sigmoid in hidden layers: its outputs average closer to zero, much like centring your data."
+    - "4:08 The shared weakness of sigmoid and tanh: for very large or very small z the slope is close to zero, which slows gradient descent."
+    - "5:42 The rules of thumb: sigmoid for a binary output layer, ReLU as the default for everything else."
+    - "9:46 When unsure, try several activations and compare them on a held-out development set."
+applyIt: |
+  **The activation at a model's output decides what kind of answer you get back, so read it
+  before you read the numbers.** A sigmoid output gives an independent probability per label; a
+  softmax output gives one distribution that sums to 1; a linear output gives an unbounded number.
+
+  1. Pick one model whose outputs you use or plan to use: a classifier, a moderation score, a
+     scoring API, an LLM's next-token probabilities.
+  2. Find out (from the docs, the code or the model card) what its last layer applies.
+  3. Write down what that implies: can two labels both be "yes"? Does a score of 0.9 mean a
+     probability, or only a ranking?
+
+  **If you build software:** default to ReLU (or the GELU-style variant your framework's model
+  family uses) in hidden layers, and choose the output activation from the task: sigmoid for
+  yes/no or multi-label, softmax for one-of-many, linear for a number.
+  **If you don't code:** when a tool shows a "confidence" score, ask whether its scores for
+  different labels are meant to add up to 1. The answer tells you how to compare them.
+
+  Success: one model you rely on, its output activation, and one sentence on how that changes
+  the way you read its scores.
+recap:
+  - emoji: "〰️"
+    title: "Sigmoid is only one option"
+    text: "So far each layer applied a sigmoid after z = W·x + b. In general that slot holds a function g, and it can differ from layer to layer."
+  - emoji: "↕️"
+    title: "Tanh usually beats sigmoid in hidden layers"
+    text: "Tanh is a shifted sigmoid that runs from −1 to 1. Its outputs centre near zero, which makes the next layer's job a little easier."
+  - emoji: "🎯"
+    title: "Sigmoid keeps the output job"
+    text: "For a yes/no prediction you want an output between 0 and 1, so the output layer can use sigmoid while the hidden layers use something else."
+  - emoji: "🐢"
+    title: "Flat ends slow learning"
+    text: "When z is very large or very small, sigmoid and tanh are almost flat. Their slope nears zero, so gradient descent creeps."
+  - emoji: "📐"
+    title: "ReLU: max(0, z)"
+    text: "Slope 1 for positive inputs, 0 for negative ones. It is the common default for hidden layers, and networks with it tend to learn faster."
+  - emoji: "🪜"
+    title: "Leaky ReLU and trying options"
+    text: "Leaky ReLU gives negative inputs a small slope instead of zero. When unsure, try a few activations and compare them on held-out data."
+task: |
+  Measure the flat-slope problem yourself. A spreadsheet works; so do these few lines of Python.
+
+  1. For z = −4, −1, 0.5, 2 and 4, compute each function's value and slope:
+     sigmoid σ(z) with slope σ(z)(1 − σ(z)); tanh(z) with slope 1 − tanh(z)²; ReLU with slope 1
+     for z > 0 and 0 otherwise.
+  2. Multiply the sigmoid's best possible slope (0.25 at z = 0) by itself 10 times. That is a
+     rough upper limit on how much a gradient can shrink through 10 sigmoid layers from the
+     activations alone.
+  3. Write two sentences: which function would you put in the hidden layers of a 10-layer
+     network, and why?
+
+  ```python
+  import math
+
+  sig = lambda z: 1 / (1 + math.exp(-z))
+  for z in (-4, -1, 0.5, 2, 4):
+      s, t = sig(z), math.tanh(z)
+      relu_slope = 1 if z > 0 else 0
+      print(f"z={z:>4}  sigmoid {s:.3f} slope {s*(1-s):.4f}  "
+            f"tanh {t:.3f} slope {1-t*t:.4f}  relu slope {relu_slope}")
+  print("0.25 ** 10 =", 0.25 ** 10)
+  ```
+
+  Success: a table of slopes for the five inputs, the value of 0.25¹⁰, and your two-sentence
+  choice for the hidden layers.
+selfCheck:
+  - q: "You're building a support-ticket classifier where one ticket can be both 'billing' and 'urgent'. What activation goes on the output units, and what goes in the hidden layers?"
+    a: "A sigmoid on each output unit, so each label gets its own probability between 0 and 1 and several can be high at once (a softmax would force them to compete). ReLU, or a close variant, in the hidden layers."
+  - q: "A colleague's deep network with sigmoid in every hidden layer barely improves after many epochs, while the loss of a shallow copy falls fine. What's a likely cause, and what change would you try first?"
+    a: "The sigmoids saturate: for large positive or negative z their slope is near zero, and gradients shrink as they pass back through each layer, so early layers hardly learn. Switch the hidden layers to ReLU (or leaky ReLU) and keep sigmoid only at the output if the task is yes/no."
+mcq:
+  - q: "A model must tag photos with any of 20 labels, and one photo can carry several. Which output activation fits?"
+    options:
+      - "Softmax across all 20 output units"
+      - "ReLU on each of the 20 output units"
+      - "Tanh on each output, then thresholded at 0"
+      - "Sigmoid on each of the 20 output units"
+    answer: 3
+    explain: "Each label is its own yes/no question, so each output needs an independent probability between 0 and 1: a sigmoid per unit. Softmax is tempting, but it makes the 20 scores sum to 1, so labels compete and two can't both be near certain."
+  - q: "Inputs reaching a sigmoid hidden layer are often around z = ±6. What happens to learning in that layer?"
+    options:
+      - "It speeds up, since outputs are close to 0 or 1"
+      - "It slows down, since the slope there is nearly 0"
+      - "It is unaffected, since only the output layer counts"
+      - "It becomes unstable, since the slope grows huge"
+    answer: 1
+    explain: "At z = 6 the sigmoid's slope is about 0.0025, so the gradient passed back through that unit is almost nothing and its weights barely move. Confident-looking outputs near 0 or 1 are exactly the saturated region where learning stalls."
+  - q: "Half the units in a ReLU layer output 0 for a given input. Should you worry?"
+    options:
+      - "No, other units still pass gradient through"
+      - "Yes, the layer has stopped learning entirely"
+      - "Yes, so switch the whole network to sigmoid"
+      - "No, because ReLU's slope is 1 for all inputs"
+    answer: 0
+    explain: "For any one input, many ReLU units sit at zero and that's normal: enough units are active to carry gradient, and different inputs switch on different units. It becomes a problem only if a unit is zero for every input (a 'dead' unit). ReLU's slope is 0 for negative inputs, not 1 everywhere."
+  - q: "You can't decide between ReLU and leaky ReLU for a new model's hidden layers. What's the sound way to choose?"
+    options:
+      - "Use leaky ReLU, since it never has a zero slope"
+      - "Use whichever the largest recent model used"
+      - "Train both and compare on a held-out dev set"
+      - "Use ReLU, since leaky ReLU is rarely different"
+    answer: 2
+    explain: "There's no rule that settles it in advance for every dataset; the practical answer is to try both and keep whichever does better on data the model didn't train on. Leaky ReLU fixes zero slopes for negative inputs, but that doesn't guarantee better results on your task."
+backupResources:
+  - label: "Activation functions in PyTorch's documentation"
+    url: "https://pytorch.org/docs/stable/nn.html#non-linear-activations-weighted-sum-nonlinearity"
+    type: "reference · the full list, including GELU and SiLU used in recent language models"
+tags:
+  - math
+  - neural-networks
+  - activation-functions
+  - deep-learning
+---
+
+Every layer computes z = W·x + b and then applies an activation g. This lesson is about choosing
+g. The choice decides two things: what range of values the layer can output, and how easily
+gradients pass back through it during training. The second one is why most hidden layers today
+use ReLU or a close relative rather than the sigmoid early networks used.
+
+## The four candidates
+
+- **Sigmoid:** σ(z) = 1 / (1 + e^(−z)), output between 0 and 1. Its slope peaks at 0.25 when
+  z = 0 and fades towards zero on both sides.
+- **Tanh:** output between −1 and 1, centred on zero. Mathematically a stretched and shifted
+  sigmoid. In hidden layers it usually beats sigmoid, because outputs that average near zero are
+  easier for the next layer to work with.
+- **ReLU:** max(0, z). Slope 1 for any positive input, 0 for any negative input. Cheap to compute
+  and it doesn't flatten out for large positive z.
+- **Leaky ReLU:** max(0.01z, z). Like ReLU, but negative inputs keep a small slope, so a unit
+  never goes completely flat.
+
+## Worked example: how flat is flat?
+
+Compute the slope of each function at a moderate input and a large one.
+
+| z | sigmoid slope | tanh slope | ReLU slope |
+|---|---|---|---|
+| 0.5 | 0.235 | 0.786 | 1 |
+| 4 | 0.018 | 0.0013 | 1 |
+
+At z = 4, a sigmoid passes back about 2% of the gradient it receives, and tanh about 0.1%. Now
+stack layers. Backpropagation multiplies these slopes layer by layer, and even the sigmoid's best
+case is 0.25. Through 10 layers that is at most 0.25¹⁰ ≈ 0.000001 from the activations alone.
+The early layers get almost no signal, so they learn very slowly. ReLU's slope of 1 on positive
+inputs avoids that shrinkage, which is a large part of why it became the default.
+
+## A rule of thumb
+
+- **Hidden layers:** ReLU by default; leaky ReLU is a reasonable alternative.
+- **Output layer:** sigmoid for a yes/no prediction; a linear output for a number (→
+  why-nonlinearity covers this case).
+- **Unsure?** Train with two or three choices and compare them on a held-out dev set. It's hard
+  to know in advance which one suits a given dataset.
+
+ReLU's zero slope for negative inputs sounds like the same problem, but in practice enough
+units are positive for any input to keep learning going.
+
+## Common mistakes
+
+- **Sigmoid in every hidden layer out of habit.** It works in tiny networks and stalls deep ones.
+- **ReLU at the output of a classifier.** Its output isn't bounded to 0–1, so it can't be read
+  as a probability.
+- **Softmax for multi-label tasks.** Softmax makes the outputs compete; independent labels need
+  independent sigmoids.
+- **Reading a saturated sigmoid as confidence.** An output of 0.999 is also a unit whose
+  gradient is nearly gone.
+
+## Where you'll see it in AI
+
+- **Language models** use smooth ReLU-like functions in their MLP blocks: GPT-2 used GELU, and
+  several open model families use SwiGLU, a gated variant (→ transformers-attention).
+- **Next-token prediction** ends in a softmax over the vocabulary, the one-of-many version of
+  the output rule above (→ makemore-bigram-model builds one).
+- **Classifiers and moderation scores** you call through an API end in a sigmoid or a softmax,
+  and the threshold you set on those scores trades precision against recall
+  (→ evaluation-metrics).

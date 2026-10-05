@@ -7,8 +7,8 @@
  *   node scripts/check-links.js            # videos + links, exit 1 on any failure
  *   node scripts/check-links.js --videos   # videos only
  *   node scripts/check-links.js --durations [--write]
- *        print each primary and lecture video's length and year; --write stores video.minutes,
- *        video.year and video.published, and minutes and year on each lectureTrack entry
+ *        print each primary video's length and year; --write stores video.minutes, video.year
+ *        and video.published
  *   Any other argument is a lesson path or folder that limits the run (e.g. one lesson file).
  *
  * Sites that block bots (403/429 from a HEAD and a GET) are reported as warnings, not failures.
@@ -142,28 +142,6 @@ function setVideoField(raw, key, value) {
     : raw.replace(/(\n  videoId: [^\n]+\n)/, `$1  ${key}: ${value}\n`);
 }
 
-/** Set minutes and year on one lecture (`  - videoId: "ID"`) inside the lectureTrack list. */
-function setLectureFields(raw, id, fields) {
-  const lines = raw.split("\n");
-  const start = lines.findIndex((l) => /^lectureTrack:/.test(l));
-  if (start < 0) return raw;
-  let end = lines.findIndex((l, i) => i > start && /^\S/.test(l));
-  if (end < 0) end = lines.length;
-  const item = lines.findIndex((l, i) => i > start && i < end && new RegExp(`^  - videoId: "?${id}"?\\s*$`).test(l));
-  if (item < 0) return raw;
-  let itemEnd = lines.findIndex((l, i) => i > item && i < end && /^  - /.test(l));
-  if (itemEnd < 0) itemEnd = end;
-  for (const [key, value] of Object.entries(fields)) {
-    const at = lines.findIndex((l, i) => i > item && i < itemEnd && new RegExp(`^    ${key}: `).test(l));
-    if (at >= 0) lines[at] = `    ${key}: ${value}`;
-    else {
-      lines.splice(item + 1, 0, `    ${key}: ${value}`);
-      itemEnd++;
-    }
-  }
-  return lines.join("\n");
-}
-
 async function main() {
   const args = process.argv.slice(2);
   const files = lessons(args.filter((a) => !a.startsWith("--"))).map((file) => ({ file, rel: path.relative(ROOT, file).replace(/\\/g, "/"), raw: fs.readFileSync(file, "utf8") }));
@@ -183,13 +161,6 @@ async function main() {
         if (year) next = setVideoField(next, "year", year);
         if (published) next = setVideoField(next, "published", `"${published}"`);
       }
-      for (const l of Array.isArray(f.fm.lectureTrack) ? f.fm.lectureTrack : []) {
-        if (!l?.videoId) continue;
-        const info = await videoInfo(l.videoId);
-        const lm = info.secs ? Math.max(1, Math.round(info.secs / 60)) : null;
-        console.log(`${String(lm ?? "?").padStart(4)} min  ${info.year ?? "????"}    lecture ${l.videoId}  ${l.title ?? ""}`);
-        if (write && lm) next = setLectureFields(next, l.videoId, info.year ? { minutes: lm, year: info.year } : { minutes: lm });
-      }
       if (write && next !== raw) fs.writeFileSync(f.file, next);
     });
     return;
@@ -204,11 +175,6 @@ async function main() {
     if (f.fm.video?.videoId) {
       add(videos, f.fm.video.videoId, `${f.rel} (primary)`);
       claim(f.fm.video.videoId, f.fm.video.channel);
-    }
-    for (const l of Array.isArray(f.fm.lectureTrack) ? f.fm.lectureTrack : []) {
-      if (!l?.videoId) continue;
-      add(videos, l.videoId, `${f.rel} (lecture)`);
-      claim(l.videoId, l.channel);
     }
     const links = [...(f.fm.readAfter || []), ...(f.fm.backupResources || [])];
     for (const l of links) {

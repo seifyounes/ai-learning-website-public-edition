@@ -1,0 +1,217 @@
+---
+title: "Bayes' theorem and base rates"
+subtitle: "Why an accurate detector can still raise mostly false alarms"
+summary: "Use Bayes' theorem, worked in counts, to judge what a flag from a detector, filter or AI grader really means given how rare the problem is."
+changeNote: "New final lesson in the probability and statistics track, written from the lecture's transcript; the base-rate worked example and quiz moved here."
+section: math
+pillar: probability-statistics
+order: 12
+level: intermediate
+estMinutes: 20
+taskMinutes: 25
+prerequisites:
+  - conditional-probability-counts
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "9wCnvr7Xw4E"
+  published: "2021-08-15"
+  year: 2021
+  minutes: 14
+  title: "Bayes' Theorem, Clearly Explained!!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "The last lesson computed conditional probabilities from a full table. This StatQuest derives Bayes' theorem from that same table with a little algebra, then shows why it matters: usually you don't have the whole table, only one conditional probability and some rates, and Bayes turns those into the conditional you actually need. That's the situation every time you read a flag from a detector or filter."
+  notes:
+    - "0:30 A quick review of the conditional probability table. Skip ahead if the last lesson is fresh."
+    - "5:08 The bet: solve for a conditional probability without the joint probability. The derivation that follows is Bayes' theorem."
+    - "9:11 Why it's useful: with only partial data and a guessed rate, Bayes still gives an answer, as good as the guess."
+applyIt: |
+  **Before you trust or mute any automated flag, put its numbers through Bayes.** Take one
+  automated check you or your team rely on: an AI moderation flag, a fraud or spam alert, an AI
+  grader's "fail", an AI reviewer's warning, a hallucination detector.
+
+  ```prompt
+  A check I use flags about [X]% of the items it sees. Its maker says it catches [Y]% of real
+  problems and wrongly flags [Z]% of good items. Real problems are about [B]% of items (my best
+  guess). Using Bayes' theorem in counts per 10,000 items, tell me what share of flags are real,
+  whether that matches the flag rate I see, and two ways to raise the share (threshold, second
+  check, narrowing what it runs on). Show the arithmetic.
+  ```
+
+  **If you build software:** log a random sample of flagged and unflagged items for hand review,
+  so you can measure the base rate and the share of real flags instead of guessing. **If you
+  don't code:** review the next 20 flags by hand and count how many were real; that's your
+  measured share.
+
+  Success: one check you rely on has a computed share of real flags, compared with what you see.
+toolkit: |
+  - **Read automated flags through base rates.** Whether it's an AI moderation flag, a fraud or
+    spam alert, an AI grader or an AI reviewer on documents or code, real problems are often rare
+    per item, so even a sharp checker throws mostly false positives. Tune the threshold or add a
+    second check before muting it.
+  - **Ask "how rare is it?" first.** When a tool or vendor quotes accuracy, ask for the base rate
+    in your own data before estimating how many of its alerts will be real.
+recap:
+  - emoji: "🍬"
+    title: "Back to the table"
+    text: "In StatLand, 14 people are sorted by whether they love candy and whether they love soda. Dividing by 14 turns each count into a probability."
+  - emoji: "🔍"
+    title: "Probability scaled by knowledge"
+    text: "P(no candy and soda | loves soda) is 5 of the 7 soda lovers, about 0.71. A conditional is an event's probability scaled by what you already know."
+  - emoji: "🔄"
+    title: "Different knowledge, different answer"
+    text: "Know instead that the person doesn't love candy, and the same event gets 5 of 8, about 0.63. Same numerator, different scaling."
+  - emoji: "🎲"
+    title: "The bet"
+    text: "Can you get these conditionals without the joint probability? Multiply each one out, notice both equal the same joint probability, and set them equal."
+  - emoji: "✨"
+    title: "Bayes' theorem"
+    text: "Rearranging gives Bayes' theorem: one conditional probability can be computed from the reverse conditional and the two individual probabilities."
+  - emoji: "🤔"
+    title: "Why bother?"
+    text: "With the whole table, Bayes adds nothing. Usually you only know one conditional and some rates, some of them guesses, and Bayes still gives an answer, about 0.75 in the example."
+  - emoji: "📐"
+    title: "One event, two views"
+    text: "In standard notation the two conditionals look like different events, but they describe the same cell of the table, seen with different knowledge."
+task: |
+  Build a Bayes calculator and watch the base rate drive the result.
+
+  1. In a spreadsheet, put the base rate in B1 (start with 0.02), the detector's catch rate in B2
+     (0.95) and its false-alarm rate in B3 (0.05).
+  2. In B5, the share of flags that are real:
+     `=B2*B1/(B2*B1+B3*(1-B1))`
+  3. Try base rates of 0.005, 0.02, 0.10 and 0.30 and write down B5 each time.
+  4. Set the base rate back to 0.02 and find the false-alarm rate needed for half of all flags to
+     be real.
+
+  ```python
+  def share_real(base, catch=0.95, false_alarm=0.05):
+      return catch * base / (catch * base + false_alarm * (1 - base))
+
+  for base in (0.005, 0.02, 0.10, 0.30):
+      print(base, round(share_real(base), 3))
+  ```
+
+  Success: four shares of real flags, one per base rate, and the false-alarm rate that gets you to
+  50% at a 2% base rate.
+selfCheck:
+  - q: "A moderation filter you added flags about 40 messages a day, and on review almost all are harmless. Its vendor says it's 95% accurate. Is the tool broken, and what do you check first?"
+    a: "Probably not broken: if harmful messages are rare, even a 95%-accurate filter produces mostly false alarms, because the clean majority generates more false positives than the rare bad cases generate true ones. Check the base rate, then tune the threshold or add a second-stage check rather than muting it."
+  - q: "You move the same hallucination detector from a simple FAQ bot (about 1% hallucinations) to a research assistant on hard questions (about 15%). The team expects the same flag quality. What changes?"
+    a: "The share of real flags rises sharply, because the base rate is higher. With a 95% catch rate and 5% false alarms, it goes from about 16% of flags being real to about 77%. The detector didn't change; the population did, so re-measure precision whenever traffic changes."
+mcq:
+  - q: "A hallucination detector catches 95% of hallucinations and wrongly flags 5% of clean responses. Hallucinations are 2% of traffic. A response gets flagged. What's the best reading?"
+    options:
+      - "Probably clean: only about 3 in 10 flags are real"
+      - "Almost certainly bad: the detector is 95% accurate"
+      - "About 90% likely bad: 95% minus the 5% error rate"
+      - "Still only 2% likely bad: the base rate doesn't move"
+    answer: 0
+    explain: "In 10,000 responses, 200 are hallucinations and 190 get flagged; 9,800 are clean and 5% of them (490) get flagged too. So 190 of 680 flags are real, about 28%. The flag does move the probability (from 2% to 28%), but the clean majority still produces most of the flags."
+  - q: "The same detector (95% catch rate, 5% false alarms) is used on a hard research task where 20% of answers are hallucinations. What share of its flags are real now?"
+    options:
+      - "Still about 28%, since the detector itself hasn't changed"
+      - "About 95%, since a higher base rate makes it fully accurate"
+      - "About 83%, since real problems now make up most flags"
+      - "About 20%, since the flag share tracks the base rate"
+    answer: 2
+    explain: "Per 10,000 answers: 2,000 hallucinations give 1,900 true flags; 8,000 clean answers give 400 false flags. 1,900 ÷ 2,300 ≈ 83%. The share of real flags depends on the base rate, so the same tool can be noisy in one setting and reliable in another."
+  - q: "A response flagged by the detector (28% likely bad) goes to a second, independent detector with the same catch and false-alarm rates, which also flags it. About how likely is it bad now?"
+    options:
+      - "About 28%, since a second check can't add new information"
+      - "About 56%, since two flags double the original probability"
+      - "About 95%, the second detector's own catch rate"
+      - "About 88%, since the 28% now acts as the new base rate"
+    answer: 3
+    explain: "Bayes chains: the first result becomes the prior for the second. Per 10,000 flagged items, 2,800 are bad and 2,660 get flagged again; 7,200 are clean and 360 get flagged again. 2,660 ÷ 3,020 ≈ 88%. This is why a second-stage check on flagged items works so well."
+  - q: "You want to know what share of an AI grader's 'fail' verdicts are right, but nobody knows how common real failures are in your data. What's the sensible move?"
+    options:
+      - "Use the grader's accuracy as the answer, since base rates are optional"
+      - "Hand-label a random sample to estimate the base rate, then apply Bayes"
+      - "Assume a 50% base rate, since that's the neutral choice"
+      - "Skip Bayes, because it only works when every number is known"
+    answer: 1
+    explain: "Bayes works with estimates, and the answer is only as good as the guessed base rate. A small random hand-labelled sample gives a defensible estimate. Assuming 50% is still a guess, and usually a poor one when failures are rare."
+backupResources:
+  - label: "Go deeper: The medical test paradox, and redesigning Bayes' rule (3Blue1Brown, 21 min)"
+    url: "https://www.youtube.com/watch?v=lG4VkPoG3ko"
+    type: "video"
+  - label: "Seeing Theory, chapter 5: Bayesian inference (Brown University)"
+    url: "https://seeing-theory.brown.edu/bayesian-inference/"
+    type: "interactive · from prior to posterior"
+tags:
+  - math
+  - probability
+  - bayes
+  - guardrails
+---
+
+**You need:** conditional probability. → conditional-probability-counts first.
+
+**Bayes' theorem** reverses a conditional probability. A detector's maker tells you how often it
+flags real problems, P(flag | problem). What you need is the reverse: given a flag, how likely is a
+real problem, P(problem | flag)? Bayes connects the two, and the piece people forget is the **base
+rate**: how common the problem is to begin with. When the problem is rare, even an accurate
+detector produces mostly false alarms.
+
+## The theorem
+
+From the last lesson, both conditionals share the same joint probability:
+
+- P(A and B) = P(A | B) × P(B)
+- P(A and B) = P(B | A) × P(A)
+
+Set them equal and divide:
+
+**P(A | B) = P(B | A) × P(A) ÷ P(B)**
+
+With a full table of counts, you don't need it: just divide within the row. Its value shows up
+when you only have partial information, like a detector's catch rate and a guess at how common the
+problem is. The answer is then only as good as that guess.
+
+## Worked example: a hallucination detector
+
+The detector catches 95% of hallucinations and wrongly flags 5% of clean answers. Hallucinations
+are 2% of traffic. Work in counts, not formulas:
+
+1. **Imagine 10,000 answers.** 200 are hallucinations; 9,800 are clean.
+2. **True flags:** 95% of 200 = 190.
+3. **False flags:** 5% of 9,800 = 490.
+4. **Share of flags that are real:** 190 ÷ (190 + 490) ≈ **28%**.
+
+The formula gives the same thing: 0.95 × 0.02 ÷ (0.95 × 0.02 + 0.05 × 0.98) = 0.019 ÷ 0.068 ≈ 0.28.
+
+Roughly seven in ten flags are false alarms, from a "95% accurate" tool. That's not a broken
+detector; it's arithmetic. Your options:
+
+- **A stricter threshold**, which lowers false alarms at the cost of some missed cases.
+- **A second-stage check on flagged items.** The 28% becomes the new base rate, and a second
+  independent check with the same rates lifts it to about 88%.
+- **A review queue sized for the real flag volume**, not for the number of real problems.
+
+## The base rate moves everything
+
+| Base rate | Share of flags real |
+|---|---|
+| 0.5% | about 9% |
+| 2% | about 28% |
+| 10% | about 68% |
+| 30% | about 89% |
+
+Same detector, four different experiences. That's why a filter that works well in one product can
+flood another with false alarms, and why precision must be re-measured when traffic changes.
+
+## Common mistakes
+
+- **Reading the catch rate as the share of real flags.** They're reverse conditionals.
+- **Ignoring the base rate.** Ask how common the problem is before trusting any flag.
+- **Muting a noisy tool.** Tune the threshold or add a second check instead.
+- **Treating a guessed base rate as known.** Estimate it from a random, hand-labelled sample.
+
+## Where you'll see it in AI
+
+Guardrails, moderation and hallucination detectors, fraud and anomaly alerts, AI graders and
+reviewers, and the precision of any classifier when the positive class is rare
+(→ evaluation-metrics). Bayesian reasoning also underpins methods that update beliefs as data
+arrives, and naive Bayes classifiers. This lesson closes the track; for the math of how models
+learn from data, continue with → derivative-as-nudge-ratio.

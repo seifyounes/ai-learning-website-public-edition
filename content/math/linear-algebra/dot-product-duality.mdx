@@ -1,0 +1,214 @@
+---
+title: "The dot product"
+subtitle: "Alignment, projection, and the operation behind every attention score"
+summary: "Compute a dot product and read it as projection and alignment, see every linear score as a dot product, and explain how attention scores scale."
+changeNote: "New lesson in the linear algebra track, written from the lecture's transcript; takes in the attention material, a self-check and a quiz question from lesson 1."
+section: math
+pillar: linear-algebra
+order: 8
+level: intermediate
+estMinutes: 19
+taskMinutes: 25
+prerequisites:
+  - nonsquare-matrices-dimensions
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "LyGKycYT2v0"
+  published: "2016-08-24"
+  year: 2016
+  minutes: 14
+  title: "Dot products and duality | Chapter 9, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "Most courses give the dot product as a formula on day one. This chapter waits until matrices are understood, then shows why multiplying coordinates and adding measures projection and alignment, and why any linear function that outputs a single number is secretly a dot product with some vector. That second idea is how to read a neuron, a linear probe or an attention score: each one is a fixed vector asking how much an input points its way."
+  notes:
+    - "0:50 the numerical rule; 1:24 the projection picture, and why the sign tells you same, perpendicular or opposite directions."
+    - "4:29 linear maps from 2D to the number line, recorded as 1 × 2 matrices that look like vectors tipped on their side."
+    - "7:32 projecting onto a diagonal number line, and why its matrix entries are the coordinates of the unit vector; 12:09 duality summed up."
+applyIt: |
+  **Every weighted score you compute is a dot product, so the "best" item is the one pointing
+  most along the weight vector.** That's duality in everyday work, and it's exactly how a neuron
+  or a linear probe scores its input.
+
+  1. Pick a weighted score you already use: a course grade (weights times marks), a vendor or
+     candidate rubric, a lead score, a prioritization matrix.
+  2. Write the weights as one vector and two items as two vectors, then compute each score with
+     `=SUMPRODUCT(weights, item)` in a spreadsheet.
+  3. Ask two questions and write the answers down: which item is most aligned with the weights,
+     and what a negative weight does to an item that is strong on that criterion.
+
+  **If you build software:** find one dot product in code you use (a similarity score, a
+  ranking function, a model's logits) and note what the fixed vector "asks". **If you don't
+  code:** the spreadsheet version is the whole exercise.
+
+  Success: one weighted score rewritten as a dot product, computed for two items, with a line on
+  what the weight vector rewards.
+recap:
+  - emoji: "🔢"
+    title: "The rule"
+    text: "Pair up the coordinates of two same-length vectors, multiply each pair, add them up. (1, 2)·(3, 4) = 3 + 8 = 11."
+  - emoji: "🔦"
+    title: "The picture"
+    text: "Project one vector onto the line through the other and multiply the two lengths. Positive means roughly the same direction, zero means perpendicular, negative means opposite."
+  - emoji: "⚖️"
+    title: "Order doesn't matter"
+    text: "Projecting w onto v or v onto w gives the same number. With equal lengths it's mirror symmetry, and scaling either vector scales the result the same way in both views."
+  - emoji: "📏"
+    title: "Maps to a number line"
+    text: "A linear function from 2D vectors to numbers keeps evenly spaced dots evenly spaced. Its matrix is 1 × 2, which looks just like a vector tipped on its side."
+  - emoji: "↘️"
+    title: "Projection is such a map"
+    text: "Projecting onto a diagonal number line through a unit vector is linear, and by symmetry its matrix entries are that unit vector's coordinates. Applying it is a dot product."
+  - emoji: "🪞"
+    title: "Duality"
+    text: "Every linear map from vectors to single numbers is a dot product with one specific vector, and every vector defines such a map. A vector can be read as a function."
+task: |
+  Compute dot products three ways, then build a tiny attention score table.
+
+  **In Python (20 minutes, free Google Colab works).**
+
+  ```python
+  import numpy as np
+
+  def dot(u, v):
+      return sum(a * b for a, b in zip(u, v))
+
+  v, w = np.array([1.0, 2.0]), np.array([3.0, 4.0])
+  print("by hand:", dot(v, w), " numpy:", v @ w)
+  proj = (v @ w) / np.linalg.norm(v)              # length of w's shadow on v
+  print("projection x length:", proj * np.linalg.norm(v))
+
+  q = np.array([1.0, 0.0, 2.0])
+  K = np.array([[2.0, 1.0, 1.0], [0.0, 3.0, -1.0], [1.0, 1.0, 1.0]])
+  scores = K @ q                                   # one dot product per key
+  weights = np.exp(scores) / np.exp(scores).sum()  # softmax
+  print("scores:", scores, " weights:", weights.round(3))
+
+  Q = np.random.randn(5, 3)
+  S = Q @ K.T                                      # a 5 x 3 table of dot products
+  print(np.isclose(S[2, 1], dot(Q[2], K[1])))      # True
+  ```
+
+  Then double the length of the second key (multiply that row of K by 2), rerun, and write one
+  line on what happened to its score and its weight.
+
+  **No code?** In a spreadsheet, put q in one row and each key in the rows below, and compute
+  each score with `=SUMPRODUCT(...)`. Check that you get 4, −2 and 3.
+
+  Success: all three methods give 11; the scores are 4, −2 and 3; and you can say why a longer
+  key changes its score.
+selfCheck:
+  - q: "A classmate's attention code has two nested loops that compute one query-key dot product at a time, and it crawls on long inputs. They think attention needs a special GPU kernel to be fast. What do you tell them?"
+    a: "Start with the maths, not a kernel: a matrix product is exactly a table of row-by-column dot products, so the whole score table is one QKᵀ, then a softmax, then one more product with V. Swap the loops for those matrix multiplications and the work runs on the operation GPUs are built for; specialised kernels only optimise that further. That's why attention is a handful of matmuls in practice, and why its cost scales with the sizes of those matrices."
+  - q: "A sentiment classifier is a single linear layer from a 768-dimensional embedding to one number, then a threshold. A colleague asks what the model 'looks for'. How does duality help you answer?"
+    a: "The layer is a dot product with one fixed 768-dimensional weight vector (plus a bias). It scores each input by how far it points along that vector, so the weight vector is the 'positive sentiment' direction the model learned. Inputs perpendicular to it get the same score as the bias alone."
+mcq:
+  - q: "In attention, Q and K are each (n × d) for n tokens, so the score matrix QKᵀ is (n × n). What does that shape tell you about long prompts?"
+    options:
+      - "A 2× longer prompt gives about 2× as many scores"
+      - "Score count is fixed by d, not by prompt length"
+      - "Only nearby tokens are scored, so length is cheap"
+      - "A 2× longer prompt gives about 4× as many scores"
+    answer: 3
+    explain: "An n × n matrix holds n² scores: every token against every token. Double n and the score count quadruples, which is why long context is expensive. The width d sets the cost of each score, not how many there are, and standard attention compares all pairs, not just neighbours (sliding-window variants exist, but they are a deliberate change to the architecture)."
+  - q: "A query's dot product with one key is exactly 0, while other keys score −3 and 2. Before softmax, how should you read the 0?"
+    options:
+      - "That key will get zero attention weight after softmax"
+      - "That key is perpendicular: more weight than −3, less than 2"
+      - "That key is ignored, since zero means no shared tokens"
+      - "That key gets the most weight, as the most neutral score"
+    answer: 1
+    explain: "A zero dot product means the vectors are perpendicular, which is a middle score, not a cutoff. Softmax turns scores into weights by exponentiating, so e⁰ = 1 still gives a share; only lower scores like −3 get less. Dot products of learned vectors say nothing about shared tokens."
+  - q: "A linear probe maps a model's 768-dimensional hidden state to one 'is this a question?' score. What does duality say about it?"
+    options:
+      - "It's a dot product with one fixed 768-dim vector"
+      - "It needs a separate weight for every pair of inputs"
+      - "It reads only the largest coordinate of the state"
+      - "It can't be written as a vector, only as a table"
+    answer: 0
+    explain: "Any linear map from vectors to a single number is a dot product with one specific vector, so the probe is a learned direction in the hidden-state space. Pairwise weights would make it quadratic, not linear, and a linear map uses every coordinate, weighted."
+  - q: "A bug multiplies one document's embedding by 3 before it's stored. Search ranks by raw dot product. What happens to that document?"
+    options:
+      - "Nothing, since the direction of its vector is unchanged"
+      - "Its scores fall to a third, so it drops out of results"
+      - "Its score with every query triples, keeping each sign"
+      - "It only changes its rank for queries in other languages"
+    answer: 2
+    explain: "Scaling one vector scales every dot product with it by the same factor, so its positive scores triple and it can jump to the top. The direction is unchanged, which is exactly why ranking by cosine (dividing out the lengths) would be immune to this bug."
+backupResources:
+  - label: "Mathematics for Machine Learning — free book, ch. 3 (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+  - attention
+---
+
+The dot product is the single operation most of modern AI leans on. Similarity search, attention
+scores, a neuron's input, a model's next-token scores: each one is a dot product, or a big table
+of them computed as a matrix product. This lesson gives you the two ways to read it: as
+**alignment**, and as a **vector acting like a function**.
+
+## The rule and the picture
+
+**The rule:** pair up the coordinates of two same-length vectors, multiply each pair, add.
+(1, 2)·(3, 4) = 1·3 + 2·4 = 11.
+
+**The picture:** project one vector onto the line through the other, then multiply the length of
+that shadow by the length of the vector you projected onto. That gives three cases:
+
+- **Positive** when the two point roughly the same way.
+- **Zero** when they're perpendicular.
+- **Negative** when they point roughly opposite ways.
+
+The order doesn't matter: v·w = w·v. And scaling either vector scales the dot product by the
+same factor, so a longer vector gets bigger scores in both directions.
+
+## Duality: a vector is a function
+
+A linear function that turns a vector into a single number is recorded, like any linear map, by
+where the basis vectors land. Each lands on one number, so the matrix is 1 × n, which is just
+a vector tipped on its side. Applying it is a dot product.
+
+So **every linear function from vectors to a single number is a dot product with one specific
+vector**, and every vector defines such a function. Reading a vector this way is what makes
+neurons readable: a neuron's weight vector is a fixed direction that asks "how much does the
+input point my way?"
+
+## Worked example: three attention scores
+
+A query and three keys, each in three dimensions: q = (1, 0, 2), k₁ = (2, 1, 1),
+k₂ = (0, 3, −1), k₃ = (1, 1, 1).
+
+1. **Scores.** q·k₁ = 2 + 0 + 2 = **4**. q·k₂ = 0 + 0 − 2 = **−2**. q·k₃ = 1 + 0 + 2 = **3**.
+2. **Softmax** turns scores into weights that sum to 1: e⁴ ≈ 54.6, e⁻² ≈ 0.14, e³ ≈ 20.1, total
+   ≈ 74.8, so the weights are about **0.73, 0.002 and 0.27**.
+
+Key 1 aligns best with the query and gets most of the attention; key 2 points partly away and
+gets almost none. Real attention also divides scores by the square root of the vector width
+before the softmax (→ transformers-attention).
+
+Stacking queries as rows of Q and keys as rows of K, the whole table of scores is one product:
+**QKᵀ**, where entry (i, j) is query i dotted with key j. For n tokens that table is n × n. At
+1,000 tokens it holds a million scores per attention head per layer; at 2,000, four million.
+
+## Common mistakes
+
+- **Reading zero as "no weight".** A zero score is a middle value; softmax still gives it a
+  share.
+- **Ranking by raw dot product without thinking about length.** Longer vectors score higher
+  against everything; dividing out the lengths gives cosine similarity
+  (→ cosine-similarity-search).
+- **Assuming attention cost grows linearly.** The score table is n × n, so doubling a prompt
+  roughly quadruples it. Trim, summarize or retrieve instead of pasting everything.
+- **Mixing up the dot product with entry-by-entry multiplication.** The dot product adds the
+  products into one number.
+
+## Where you'll see it in AI
+
+- **Attention scores** are query-key dot products (→ transformers-attention).
+- **Neurons and linear probes** are dot products with learned weight vectors (→ neural-networks).
+- **Next-token scores:** the output head dots the final hidden vector with one row per token in
+  the vocabulary.
+- **Similarity search** ranks by normalized dot products (→ cosine-similarity-search).

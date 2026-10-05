@@ -1,0 +1,206 @@
+---
+title: "Derivative rules you can see"
+subtitle: "The power rule, 1/x and sine, built from pictures of tiny nudges"
+summary: "Differentiate powers, 1/x and sine with the standard rules, explain why each rule holds, and apply them to a squared-error loss."
+changeNote: "New lesson in the calculus track, written from the lecture's transcript, with a worked example on a squared-error loss and a quiz."
+section: math
+pillar: calculus
+order: 2
+level: beginner
+estMinutes: 43
+taskMinutes: 20
+prerequisites:
+  - derivative-as-nudge-ratio
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "S0_qX4VJhMQ"
+  published: "2017-04-30"
+  year: 2017
+  minutes: 18
+  title: "Derivative formulas through geometry | Chapter 3, Essence of calculus"
+  channel: "3Blue1Brown"
+  why: "You need a handful of derivative rules to work out a loss gradient by hand, and this lecture shows why they hold instead of handing you a table. Growing a square and a cube by a sliver makes the power rule visible, and the habit it teaches, dropping anything that contains a nudge squared, is the same habit you'll use for the chain rule next."
+  notes:
+    - "Around 2:30–4:20: the growing square. Watch for why the tiny corner square (dx²) gets ignored; that one idea carries the whole video."
+    - "Around 10:00 the lecture leaves the derivative of 1/x as an exercise. The worked example below gives the answer, so try it before reading on."
+applyIt: |
+  **The power rule is the reason squared-error losses and L2 penalties have such simple
+  gradients.** Use it to predict how a training setting behaves before you run anything.
+
+  1. Find one squared quantity in a tool you use: mean squared error in a regression report, an
+     L2 penalty (often called weight decay) in a training config, or a "squared distance" in a
+     similarity search.
+  2. Write its derivative with the power rule: the gradient of `(error)²` is `2 × error`, and the
+     gradient of `λw²` is `2λw`.
+  3. Read the consequence in plain words: big errors get pushed much harder than small ones, and a
+     weight-decay penalty pulls each weight toward zero in proportion to its size.
+
+  **If you build software:** when a regression model chases a few outliers, the `2 × error` term
+  is why; try an absolute-error or Huber loss and compare.
+  **If you don't code:** add one line to your notes explaining why squared error punishes a few
+  big misses more than many small ones.
+
+  Success: you can state the gradient of one squared term you actually use and what it does to
+  training.
+recap:
+  - emoji: "🧰"
+    title: "Why learn the formulas"
+    text: "Real phenomena are modelled with powers, trig functions and exponentials, so fluency with their derivatives gives you a language for rates of change. The aim is to see why each rule holds."
+  - emoji: "⬛"
+    title: "Grow a square"
+    text: "Widen a square of side x by dx. The new area is two thin strips of x·dx plus a tiny corner of dx², so the change is about 2x·dx and the derivative of x² is 2x."
+  - emoji: "🧊"
+    title: "Grow a cube"
+    text: "Widen a cube the same way. Almost all the new volume sits in three thin slabs of x²·dx, so the derivative of x³ is 3x²."
+  - emoji: "⬇️"
+    title: "The power rule"
+    text: "Expanding (x + dx)ⁿ, the terms with a single dx give n·xⁿ⁻¹·dx and everything else holds dx² or more. So the derivative of xⁿ is n·xⁿ⁻¹."
+  - emoji: "💧"
+    title: "1/x as a puddle"
+    text: "Picture a rectangle of area 1 with width x and height 1/x. Widening it forces the height down, and working out how much gives the derivative of 1/x."
+  - emoji: "⭕"
+    title: "Sine on the unit circle"
+    text: "Take a tiny step along the unit circle. The rise in height divided by the step is adjacent over hypotenuse of a small similar triangle, which is cos θ."
+task: |
+  **Derive four rules, then check them numerically (20 minutes).**
+
+  1. On paper, sketch the growing square for x = 3, dx = 0.1. Compute the exact new area
+     (3.1² = 9.61), the two strips (2 × 3 × 0.1 = 0.6) and the corner (0.01). Confirm the strips
+     account for almost all of the change.
+  2. Use the power rule to write the derivative of x⁴, 1/x (that is x⁻¹), √x (x^0.5) and the toy
+     loss (w − 3)² = w² − 6w + 9.
+  3. Check each one at a point with a nudge:
+
+     ```python
+     import math
+
+     h = 1e-5
+     checks = {
+         "x^4 at 2": (lambda x: x ** 4, 2.0),
+         "1/x at 2": (lambda x: 1 / x, 2.0),
+         "sqrt at 4": (lambda x: math.sqrt(x), 4.0),
+         "loss at 0": (lambda w: (w - 3) ** 2, 0.0),
+         "sin at 1": (math.sin, 1.0),
+     }
+     for name, (f, x) in checks.items():
+         print(name, round((f(x + h) - f(x - h)) / (2 * h), 4))
+     ```
+
+  Success: your hand answers match the printed values: 32, −0.25, 0.25, −6 and cos(1) ≈ 0.5403.
+selfCheck:
+  - q: "A regression model's squared-error loss is dominated by three examples with errors of 10, while most examples have errors near 1. By how much more does each outlier push the gradient than a typical example, and what could you change?"
+    a: "The gradient of error² is 2 × error, so an error of 10 pushes with 20 against about 2 for a typical example: ten times more. If the outliers are noise, switch to a loss that grows more slowly for big errors (absolute or Huber) or clean the data."
+  - q: "A training config adds an L2 penalty λw² to the loss. Without running anything, what does this penalty do to a weight of 4 compared with a weight of 0.5?"
+    a: "Its gradient is 2λw, so it pulls the weight of 4 toward zero eight times harder than the weight of 0.5. Large weights shrink fastest; small ones are barely touched."
+  - q: "You expand (x + dx)³ and get eight terms. A classmate keeps all of them when computing the derivative. Which ones can you drop, and why?"
+    a: "Drop every term with dx² or dx³. After dividing by dx they still contain dx, so they vanish as the nudge shrinks. Only the 3x²·dx terms survive, giving 3x²."
+mcq:
+  - q: "You widen a square of side 5 by dx = 0.01. Which description of the new area is right?"
+    options:
+      - "About 0.1, almost all of it from the two thin strips"
+      - "About 0.01, which is dx times the original side of 5"
+      - "About 0.25, since the area grows as the side squared"
+      - "Exactly 0.1001, and all of it comes from the corner"
+    answer: 0
+    explain: "The two strips add 2 × 5 × 0.01 = 0.1 and the corner adds 0.0001, so the total is 0.1001, nearly all from the strips. That is the derivative 2x = 10 at work: the change is about 10 times dx."
+  - q: "A loss is L(w) = 4w² − 8w + 3 and training currently sits at w = 1. What is the derivative there, and what should training do next?"
+    options:
+      - "It's 4, so raising w would raise the loss"
+      - "It's −8, so raising w would lower the loss"
+      - "It's 0, so w = 1 is already the bowl's bottom"
+      - "It's 8, so w is too large and should shrink"
+    answer: 2
+    explain: "Term by term, the derivative is 8w − 8, which is 0 at w = 1: the bottom of the bowl, so there's nothing to fix. The tempting 8 comes from differentiating 4w² and forgetting that −8w contributes −8; only the constant 3 disappears."
+  - q: "Why does the derivative of x³ come out as exactly 3x² rather than something close to it?"
+    options:
+      - "The edge and corner pieces are measured and found to be small"
+      - "The pieces with dx² or dx³ vanish after dividing by dx in the limit"
+      - "A cube's volume grows by three square faces of area x² each"
+      - "The power rule is a convention chosen to keep the algebra simple"
+    answer: 1
+    explain: "Divided by dx, the edge and corner pieces still carry a dx, so they disappear as dx shrinks; that's why the answer is exact. The three faces explain the 3x², but they're exact only because the rest vanishes in the limit."
+  - q: "The derivative of sin θ is cos θ. At which point is sin θ changing fastest as θ increases from 0?"
+    options:
+      - "At θ = π/2"
+      - "At θ = π/4"
+      - "At θ = 0"
+      - "At every θ"
+    answer: 2
+    explain: "The rate of change of sine is cos θ, which is largest (1) at θ = 0. At the peak π/2 the rate is cos(π/2) = 0: the height has stopped rising. Being high is not the same as rising fast."
+tags:
+  - math
+  - calculus
+  - derivatives
+---
+
+**You need:** → derivative-as-nudge-ratio (a derivative as the ratio a small nudge settles
+toward).
+
+The one idea of this lecture: **derivative rules aren't a table to memorise; each one falls out
+of asking what a tiny nudge does to the quantity, and then ignoring anything that contains the
+nudge squared.** For AI work, a few of these rules are enough to work out the gradient of the
+losses you'll meet, starting with squared error.
+
+## The square and the cube
+
+Picture `x²` as a square with side `x`. Widen the side by `dx` and the new area is two thin
+strips (`x·dx` each) plus a tiny corner (`dx²`). The corner is a small number squared, so it's
+negligible: the change is about `2x·dx`, and the derivative of `x²` is `2x`.
+
+A cube of side `x` works the same way. Nearly all the new volume sits in three thin slabs of
+`x²·dx`; the edges and the corner carry `dx²` or `dx³`. So the derivative of `x³` is `3x²`.
+
+The general pattern, the **power rule**: the derivative of `xⁿ` is `n·xⁿ⁻¹`. Expanding
+`(x + dx)ⁿ`, there are `n` ways to pick a single `dx`, each giving `xⁿ⁻¹·dx`; every other term
+holds `dx²` or more and drops out.
+
+## Two more shapes
+
+- **1/x** is the height of a rectangle of area 1 and width `x`. Widen it and the height must drop
+  to keep the area at 1. Working it through (the lecture leaves it to you) gives `−1/x²`, which
+  matches the power rule applied to `x⁻¹`.
+- **sin θ** is a height on the unit circle. A tiny step `dθ` along the circle raises the height
+  by about `cos θ · dθ`, because the tiny triangle is similar to the big one. So the derivative
+  of `sin θ` is `cos θ`.
+
+## Worked example with real numbers
+
+**The square.** At `x = 3` with `dx = 0.01`, the exact new area is `3.01² − 9 = 0.0601`. The two
+strips give `2 × 3 × 0.01 = 0.06`; the corner gives `0.0001`. The ratio `0.0601 / 0.01 = 6.01`
+is within 0.01 of the derivative `2x = 6`, and the gap is the corner.
+
+**1/x.** At `x = 2` the rule says `−1/x² = −0.25`. Check: `1/2.01 = 0.497512`, a change of
+`−0.002488` for a nudge of 0.01, a ratio of `−0.2488`. Close, and closer for smaller nudges.
+
+**A toy loss.** `L(w) = (w − 3)² = w² − 6w + 9`. Rule by rule: `w²` gives `2w`, `−6w` gives `−6`,
+the constant 9 gives 0. So `L'(w) = 2w − 6`.
+
+| w | L(w) | L'(w) | meaning |
+|---|---|---|---|
+| 0 | 9 | −6 | raise w |
+| 3 | 0 | 0 | bottom |
+| 5 | 4 | 4 | lower w |
+
+The sign tells training which way to move; the size grows with the distance from the best value.
+That's the whole reason squared error is popular: its gradient is simple and proportional to the
+error.
+
+## Common mistakes
+
+- **Keeping the dx² terms.** They vanish in the limit; keeping them makes the rule look inexact.
+- **Dropping the linear term.** Only constants differentiate to zero; `−6w` becomes `−6`.
+- **Confusing "high" with "rising fast".** `sin θ` is highest at `π/2`, where its rate is 0.
+- **Memorising without the picture.** When a rule slips your mind, rebuild it from a nudge.
+
+## Where you'll see it in AI
+
+- **Squared-error losses** in regression and in many evals: gradient `2 × error`
+  (→ calculus-for-optimization).
+- **L2 penalties / weight decay:** the gradient `2λw` shrinks big weights fastest
+  (→ adam-optimizer touches on how optimizers apply it).
+- **Activation functions** such as sigmoid and tanh are built from exponentials; their
+  derivatives come from the same kind of rules (→ backprop-chain-rule-calculus).
+
+Next: → chain-rule-and-product-rule shows how to combine these rules when functions are added,
+multiplied and nested, which is every neural network.

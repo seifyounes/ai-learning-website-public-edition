@@ -1,0 +1,203 @@
+---
+title: "The chain rule (and sums and products)"
+subtitle: "How derivatives combine when functions are added, multiplied and nested"
+summary: "Differentiate sums, products and nested functions, and use the chain rule to get a one-weight model's loss gradient by hand."
+changeNote: "New lesson in the calculus track, written from the lecture's transcript; takes over the original lesson's chain-rule example and adds a quiz."
+section: math
+pillar: calculus
+order: 3
+level: beginner
+estMinutes: 45
+taskMinutes: 25
+prerequisites:
+  - derivative-rules-by-geometry
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "YG15m2VwSjA"
+  published: "2017-05-01"
+  year: 2017
+  minutes: 16
+  title: "Visualizing the chain rule and product rule | Chapter 4, Essence of calculus"
+  channel: "3Blue1Brown"
+  why: "A neural network is functions nested inside functions, so the chain rule is the one calculus rule training can't do without. This lecture shows it as nudges passing along three number lines, which is the picture backpropagation uses later in the track. The sum and product rules come first and take a few minutes; the chain rule from about 8:50 is the part to watch twice."
+  notes:
+    - "From about 8:50: the three-number-line picture of sin(x²). Follow one nudge from the top line to the bottom; that's backprop on a two-step chain."
+    - "Around 13:50: the dh terms 'cancel'. The lecture stresses this reflects real nudges, not just notation. Keep that reading for the backprop lesson."
+applyIt: |
+  **Whenever an output depends on an input through a middle step, the effect multiplies through
+  the chain.** That's how you reason about a pipeline without running it.
+
+  1. Pick a two-step chain from your work: price → number of sign-ups → revenue; prompt length →
+     tokens → API cost; a model's raw score → a sigmoid → a probability.
+  2. Estimate each link's rate on its own ("each extra 1,000 tokens adds X to the cost"; "each
+     extra word adds about Y tokens").
+  3. Multiply the rates to get the end-to-end effect, then check it once with a real nudge.
+
+  **If you build software:** this is exactly what autograd frameworks (PyTorch, JAX,
+  TensorFlow) do for you; when a gradient looks wrong, print each link's local derivative and
+  find the one that's off.
+  **If you don't code:** do it in a spreadsheet with one column per stage of the chain.
+
+  Success: you've predicted an end-to-end change by multiplying two local rates, and a real
+  nudge confirmed it within a few percent.
+recap:
+  - emoji: "🧩"
+    title: "Three ways to combine"
+    text: "Most functions are built by adding, multiplying or nesting simpler ones. Subtraction and division reduce to these, so three rules cover nearly everything."
+  - emoji: "➕"
+    title: "Sums: changes stack"
+    text: "Nudge x and the height of sin x + x² changes by the change in sin plus the change in x². So the derivative of a sum is the sum of the derivatives."
+  - emoji: "📦"
+    title: "Products: a growing box"
+    text: "Picture sin x times x² as a box's area. A nudge adds two thin strips, left·d(right) and right·d(left); the corner piece is negligible."
+  - emoji: "🔢"
+    title: "Constants just scale"
+    text: "Multiplying a function by a constant multiplies its derivative by the same constant: the derivative of 2·sin x is 2·cos x."
+  - emoji: "⛓️"
+    title: "Nesting: follow the nudge"
+    text: "For sin(x²), a nudge to x moves x², which moves sin(x²). Multiply the outer derivative, taken at the inner value, by the inner derivative: cos(x²)·2x."
+  - emoji: "✂️"
+    title: "Why the dh cancels"
+    text: "Writing dg/dh × dh/dx, the middle nudges cancel. That reflects how a change really travels through a chain of steps, not a notation trick."
+  - emoji: "🏋️"
+    title: "Fluency takes practice"
+    text: "Knowing the rules and applying them in messy cases are different skills. The pictures explain where the rules come from; practice builds the speed."
+task: |
+  **Get a neuron's gradient by the chain rule, then check it (25 minutes).**
+
+  A one-input neuron predicts `p = sigmoid(w × x)` and its loss is `(p − y)²`. Take `w = 0.5`,
+  `x = 2`, `y = 1`.
+
+  1. On paper, write the chain: `w → z = w·x → p = sigmoid(z) → loss`. Write each link's local
+     derivative: `dz/dw = x`, `dp/dz = p(1 − p)` (the sigmoid's derivative), `dloss/dp = 2(p − y)`.
+  2. Compute the forward values (`z = 1`, `p ≈ 0.7311`), then multiply the three links.
+  3. Check your answer with a nudge:
+
+     ```python
+     import math
+
+     def loss(w, x=2.0, y=1.0):
+         p = 1 / (1 + math.exp(-w * x))
+         return (p - y) ** 2
+
+     h = 1e-6
+     print((loss(0.5 + h) - loss(0.5 - h)) / (2 * h))
+     ```
+
+  No Python? Use a spreadsheet with `=1/(1+EXP(-A1*2))` for p.
+
+  Success: your chain-rule product is about −0.2115 (that's −0.5379 × 0.1966 × 2) and the nudge
+  check prints the same value to four decimals.
+selfCheck:
+  - q: "Each extra paragraph in a prompt adds about 120 tokens, and each 1,000 tokens costs 0.3 cents. A colleague wants to add 5 paragraphs. Use the chain rule to estimate the extra cost per call."
+    a: "Cost per paragraph = (cents per token) × (tokens per paragraph) = 0.0003 × 120 = 0.036 cents. Five paragraphs add about 0.18 cents per call. Rates multiply along the chain."
+  - q: "A layer computes f(x) = x · sigmoid(x) (a common activation called SiLU or Swish). A teammate writes its derivative as sigmoid'(x) alone. What did they miss?"
+    a: "It's a product, so it needs both strips of the box: sigmoid(x) + x · sigmoid'(x). Taking only the derivative of one factor drops the other strip."
+  - q: "You compute the derivative of sin(x²) at x = 1.5 as cos(1.5) × 3. Where's the slip?"
+    a: "The outer derivative must be taken at the inner value: cos(x²) = cos(2.25), not cos(1.5). The right answer is cos(2.25) × 3 ≈ −1.88."
+mcq:
+  - q: "A model's loss is L = (w·x − y)². With x = 2, y = 6 and w = 1, what is dL/dw?"
+    options:
+      - "dL/dw = −8"
+      - "dL/dw = −16"
+      - "dL/dw = 16"
+      - "dL/dw = −4"
+    answer: 1
+    explain: "Outer derivative 2 × (w·x − y) = 2 × (−4) = −8, times the inner derivative d(w·x − y)/dw = x = 2, gives −16. Stopping at −8 forgets the inner link; the square doesn't force a positive gradient, since the sign comes from the error."
+  - q: "A value passes through three steps, each of which roughly halves any small nudge to its input. How does a nudge at the start show up at the end?"
+    options:
+      - "About 1/2 of its starting size"
+      - "About 2/3 of its starting size"
+      - "About 1/8 of its starting size"
+      - "The same as its starting size"
+    answer: 2
+    explain: "The chain rule multiplies the local rates: 0.5 × 0.5 × 0.5 = 0.125. That multiplication is also why gradients can shrink as they pass back through many layers of a deep network."
+  - q: "f(x) = g(x) · h(x). At some x, g = 3, g' = 1, h = 2 and h' = 4. What is f'(x)?"
+    options:
+      - "4, the product of the derivatives g' · h'"
+      - "5, the sum of the derivatives g' + h'"
+      - "10, the sum g · h + g' · h'"
+      - "14, the two strips g' · h + g · h'"
+    answer: 3
+    explain: "Product rule, read off the growing box: g'·h + g·h' = 1 × 2 + 3 × 4 = 14. Multiplying the two derivatives (4) is the classic slip; it would be the area of the negligible corner piece, not the two strips."
+  - q: "Why can a network's training code get the gradient of the loss for a weight deep inside the network?"
+    options:
+      - "Each step's local derivative is known and the chain rule multiplies them"
+      - "The weight's effect is measured by nudging it and rerunning the network"
+      - "Deep weights affect the loss directly, so one derivative is enough"
+      - "The loss is a simple polynomial in each weight, so the power rule works"
+    answer: 0
+    explain: "Every layer is a simple function with a known local derivative, and the chain rule multiplies them along the path from the weight to the loss. Nudging each weight would work but needs one extra run per weight, far too slow for millions of weights."
+tags:
+  - math
+  - calculus
+  - chain-rule
+---
+
+**You need:** → derivative-rules-by-geometry (power rule, and that sin's derivative is cos).
+
+The one idea of this lecture: **when one function sits inside another, a nudge to the input
+passes through each step, and the final change is the product of the steps' local rates.**
+That's the chain rule. A neural network is a long chain of simple functions, and
+backpropagation is the chain rule applied from the loss back to every weight.
+
+## Three ways to combine functions
+
+- **Sum:** the change in `sin x + x²` is the change in `sin x` plus the change in `x²`. The
+  derivative is `cos x + 2x`.
+- **Product:** think of `sin x · x²` as the area of a box. A nudge adds a strip `sin x · d(x²)`
+  along one side and `x² · d(sin x)` along the other; the corner is negligible. Derivative:
+  `sin x · 2x + x² · cos x` ("left d-right plus right d-left").
+- **Composition:** for `sin(x²)`, put three number lines in a row: `x`, then `h = x²`, then
+  `sin(h)`. A nudge `dx` makes `dh ≈ 2x·dx`, which makes `d(sin h) ≈ cos(h)·dh`. Multiply:
+  `cos(x²) · 2x`.
+
+```diagram
+x
+│  × 2x
+▼
+h = x²
+│  × cos(h)
+▼
+sin(h)
+```
+
+## Worked example with real numbers
+
+**The lecture's function.** At `x = 1.5`: the inner value is `h = 2.25`, the inner rate is
+`2 × 1.5 = 3`, and the outer rate is `cos(2.25) ≈ −0.628`. Chain rule:
+`−0.628 × 3 ≈ −1.885`. A nudge check (x to 1.501) gives about −1.889, matching to two decimals.
+
+**A one-weight model.** It predicts `w × x`; the loss is `(w·x − y)²`. One example: `x = 2`,
+`y = 6` (so the best weight is 3).
+
+1. Name the inside: `e = w·x − y`, the error. Then `loss = e²`.
+2. Local rates: `dloss/de = 2e` (power rule) and `de/dw = x` (constant times w).
+3. Multiply: `dloss/dw = 2e · x = 2(2w − 6) · 2 = 8w − 24`.
+
+At `w = 1`: the error is −4 and the gradient is −16. Check with a nudge: at `w = 1.01` the loss
+is `(2.02 − 6)² = 15.8404`, down 0.1596 from 16, a ratio of −15.96. The negative sign says
+"raise w", which moves it toward 3. → calculus-for-optimization takes this exact gradient and
+runs gradient descent with it.
+
+## Common mistakes
+
+- **Evaluating the outer derivative at x instead of the inner value.** It's `cos(x²)`, not
+  `cos(x)`.
+- **Dropping the inner factor.** `2(w·x − y)` alone forgets `× x`.
+- **Multiplying derivatives for a product.** `(gh)'` is `g'h + gh'`, never `g'h'`.
+- **Treating the rules as separate tricks.** Real expressions layer all three; peel them one
+  layer at a time.
+
+## Where you'll see it in AI
+
+- **Backpropagation** is the chain rule run backwards through every layer, reusing the
+  intermediate values (→ backprop-chain-rule-calculus).
+- **Vanishing gradients:** rates multiply along the chain, so many factors below 1 shrink the
+  gradient that reaches early layers (→ neural-networks).
+- **Gated activations** like SiLU (`x · sigmoid(x)`) need the product rule; frameworks apply it
+  automatically.
+
+Next: → partial-derivatives-many-inputs extends this to functions of many inputs, which is what
+a loss over millions of weights is.

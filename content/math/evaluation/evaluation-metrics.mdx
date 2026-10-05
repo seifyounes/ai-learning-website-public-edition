@@ -1,0 +1,221 @@
+---
+title: "Thresholds, ROC curves and AUC"
+subtitle: "See every threshold at once, compare models by AUC, and know when the curve flatters"
+summary: "Draw a ROC curve from a model's scores, read AUC as ranking quality, and choose an operating threshold by the cost of each error."
+changeNote: "Reshaped into the ROC and AUC lesson of the evaluation track; confusion-matrix, precision and LLM-judge material moved to their own lessons."
+section: math
+pillar: evaluation
+order: 4
+level: intermediate
+estMinutes: 20
+taskMinutes: 20
+prerequisites:
+  - precision-recall-tradeoff
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "4jRBRDbJemM"
+  published: "2019-07-11"
+  year: 2019
+  minutes: 16
+  title: "ROC and AUC, Clearly Explained!"
+  channel: "StatQuest with Josh Starmer"
+  why: "Josh Starmer builds the threshold and the ROC curve one step at a time, and shows how sliding the threshold traces the curve, which is the exact skill this lesson needs. It's 16 minutes, light on maths and heavy on pictures, so it works whether or not you've studied statistics. It closes the classic-metrics half of the track by tying sensitivity, specificity and precision into one picture."
+  notes:
+    - "2:01 A model outputs a probability; a threshold turns it into a yes/no call, and 0.5 is only one choice."
+    - "7:08 The axes: true-positive rate (sensitivity) up the side, false-positive rate (1 − specificity) along the bottom."
+    - "14:19 When negatives vastly outnumber positives, swap the false-positive rate for precision."
+applyIt: |
+  **Any AI system that outputs a score has a threshold, and the threshold is a decision you
+  own.** Moderation APIs return category scores, retrieval returns similarity scores, a
+  classifier returns a confidence. Someone picks the cutoff, often by leaving the default.
+
+  1. Pick one score-based decision in your work or project: a moderation cutoff, a "send to a
+     human if confidence is below X" rule, a similarity cutoff for search results.
+  2. Collect 40–60 cases with the score and the right answer (label them by hand if needed).
+  3. Sort them by score. Try three cutoffs and, for each, count catches, misses and false
+     alarms.
+  4. Pick the cutoff whose error mix you can live with, and write one sentence on why.
+
+  **If you build software:** store the raw score with each decision, so you can redraw the curve
+  and move the cutoff later without a redeploy of the model.
+  **If you don't code:** a spreadsheet sorted by score is enough; each cutoff is a row where you
+  count what sits above and below it.
+
+  Success: three cutoffs compared on the same cases, one chosen, and the reason written down.
+recap:
+  - emoji: "📈"
+    title: "Scores, not answers"
+    text: "Logistic regression gives each mouse a probability of being obese. To classify, you need a threshold that turns probability into yes or no."
+  - emoji: "🎚️"
+    title: "The threshold moves the errors"
+    text: "At 0.5 a few mice are misclassified. Drop the threshold to 0.1 and every obese mouse is caught, at the price of more false positives; raise it and the reverse happens."
+  - emoji: "🧮"
+    title: "Too many tables"
+    text: "Every threshold gives its own confusion matrix. Rather than comparing dozens of tables, plot each one as a single point."
+  - emoji: "📍"
+    title: "The ROC graph"
+    text: "Each threshold becomes a point: true-positive rate up, false-positive rate across. Points to the left of the diagonal beat guessing."
+  - emoji: "🔲"
+    title: "The area as one number"
+    text: "AUC is the area under that curve. A model whose curve encloses more area ranks positives above negatives more reliably."
+  - emoji: "⚠️"
+    title: "When ROC flatters"
+    text: "When negatives vastly outnumber positives, as with a rare disease, use precision instead of the false-positive rate, because precision ignores the huge pile of true negatives."
+task: |
+  Draw a ROC curve and compute AUC from eight scores.
+
+  ```python
+  pos = [0.95, 0.80, 0.60, 0.35]   # scores the model gave real positives
+  neg = [0.70, 0.40, 0.20, 0.10]   # scores it gave real negatives
+
+  for t in [0.9, 0.75, 0.65, 0.5, 0.38, 0.3, 0.15, 0.0]:
+      tpr = sum(s >= t for s in pos) / len(pos)
+      fpr = sum(s >= t for s in neg) / len(neg)
+      print(f"threshold {t:.2f}: FPR {fpr:.2f}, TPR {tpr:.2f}")
+
+  wins = sum(p > n for p in pos for n in neg)
+  print("AUC =", wins / (len(pos) * len(neg)))
+  ```
+
+  1. Before running it, plot the eight (FPR, TPR) points on paper or graph paper and join them.
+  2. Run the code (any online Python runner works) or rebuild it in a spreadsheet, and check
+     your points.
+  3. Count by hand: of the 16 positive–negative pairs, how many have the positive scored higher?
+     Compare that share with the printed AUC.
+  4. Pick the threshold you'd ship if a false alarm costs ten times more than a miss.
+
+  Success: the curve drawn, AUC = 0.8125 matched by your pair count (13 of 16), and a threshold
+  chosen with a one-line reason.
+selfCheck:
+  - q: "Your fraud flagger has a ROC-AUC of 0.95, yet the review team says most flags are false alarms. Fraud is 0.5% of transactions. How can both be true, and what do you look at instead?"
+    a: "With rare positives, the false-positive *rate* stays tiny even when false positives outnumber true catches, so ROC-AUC looks excellent while precision is poor. Look at the precision-recall curve and the precision at the threshold you actually use."
+  - q: "A teammate says, 'Model A has the higher AUC, so ship it at the default 0.5 threshold.' What two things are wrong with that plan?"
+    a: "AUC averages over every threshold, but users experience one; the curves can cross, so B may be better at the false-positive rate you can afford. And 0.5 is arbitrary: the threshold should be picked from the curve by the cost of each error."
+  - q: "Two thresholds produce exactly the same confusion matrix on your test set. What does that tell you?"
+    a: "No test example has a score between them, so they're the same point on the ROC curve. Only thresholds that move at least one example across the line change anything."
+mcq:
+  - q: "A classifier has AUC = 0.92. What's the correct reading?"
+    options:
+      - "It's correct on 92% of all the examples it scores"
+      - "Positives outrank negatives in 92% of random pairs"
+      - "Its precision is 92% at the default threshold of 0.5"
+      - "92% of the true positives are caught by the model"
+    answer: 1
+    explain: "AUC is threshold-free ranking quality: pick a random positive and a random negative, and the model scores the positive higher 92% of the time. That makes it good for comparing models before you choose an operating point. It is not accuracy, precision or recall, which all depend on one threshold, the one your users actually experience."
+  - q: "Model A has AUC 0.88 and model B has 0.84. You can only afford a 1% false-positive rate, and at that point B catches more positives. Which do you ship?"
+    options:
+      - "A, because a higher AUC means better at every threshold"
+      - "A, but move its threshold until it matches B's catches"
+      - "Neither, until both are retrained to cross 0.90 AUC"
+      - "B, because you operate at that point, not on average"
+    answer: 3
+    explain: "AUC summarizes the whole curve, but curves can cross, and you only ever run at one threshold. At the false-positive rate you can afford, B is better. Moving A's threshold to match B's catches would push its false-positive rate above your limit."
+  - q: "A screening model for a serious condition outputs a probability. A follow-up test is cheap and harmless. Where should the threshold go?"
+    options:
+      - "Exactly 0.5, so the two kinds of error stay balanced"
+      - "High, so that nobody is sent for a needless follow-up"
+      - "Low, so nearly every real case is sent for follow-up"
+      - "Wherever the model's overall accuracy is the highest"
+    answer: 2
+    explain: "When a miss is serious and a false alarm costs little, you lower the threshold and accept more false positives to catch nearly every real case. A high threshold suits the reverse costs, and maximum accuracy just favours the majority class."
+  - q: "A moderation model flags 0.2% of posts. Its ROC-AUC is 0.97. Before calling it production-ready, what do you check?"
+    options:
+      - "Precision at the threshold you will actually use"
+      - "Whether its AUC is still 0.97 on the training data"
+      - "Its specificity, since negatives are 99.8% of posts"
+      - "That the ROC curve passes through the point (1, 1)"
+    answer: 0
+    explain: "With 0.2% positives, even a tiny false-positive rate can produce more false flags than true ones, and ROC-AUC won't show it. Precision at the operating threshold (or the precision-recall curve) does. Specificity is near 1 almost by default here, and every ROC curve ends at (1, 1)."
+backupResources:
+  - label: "Google ML Crash Course: ROC and AUC (interactive)"
+    url: "https://developers.google.com/machine-learning/crash-course/classification/roc-and-auc"
+    type: "docs · interactive threshold widgets"
+  - label: "Google ML Crash Course: classification module"
+    url: "https://developers.google.com/machine-learning/crash-course/classification"
+    type: "docs · interactive threshold widgets"
+tags:
+  - math
+  - evaluation
+  - metrics
+  - roc
+  - auc
+---
+
+**You need:** sensitivity from → sensitivity-specificity and precision from
+→ precision-recall-tradeoff.
+
+Most classifiers don't output "yes" or "no". They output a score, and **someone chooses the
+threshold** that turns it into a decision. Each threshold gives a different confusion matrix.
+The ROC curve puts all of them on one picture, and AUC sums that picture up as one number for
+comparing models. The threshold you finally run at is a product decision, not a default.
+
+## From one table to a curve
+
+Every threshold produces two rates:
+
+- **True-positive rate (TPR)** = sensitivity = TP ÷ (TP + FN), on the y-axis.
+- **False-positive rate (FPR)** = 1 − specificity = FP ÷ (FP + TN), on the x-axis.
+
+A threshold so low that everything is "yes" sits at (1, 1); one so high that nothing is "yes"
+sits at (0, 0). Every threshold in between is a point, and joining them gives the curve. The
+diagonal is a coin flip. The further the curve bows towards the top-left corner, the better
+the model separates the two classes.
+
+## Worked example: eight scores
+
+A model scores four real positives (0.95, 0.80, 0.60, 0.35) and four real negatives (0.70,
+0.40, 0.20, 0.10). Say "yes" when the score is at or above the threshold:
+
+1. Threshold 0.75: two positives caught, no negatives. Point (0, 0.5).
+2. Threshold 0.5: three positives, plus the 0.70 negative. Point (0.25, 0.75).
+3. Threshold 0.3: all four positives, plus two negatives. Point (0.5, 1).
+
+Now AUC. It equals the share of positive–negative pairs where the positive gets the higher
+score. Of the 4 × 4 = 16 pairs, the positive wins 4 + 4 + 3 + 2 = **13**, so AUC = 13 ÷ 16 ≈
+**0.81**. That reading is the useful one: pick a random positive and a random negative, and
+the model ranks them correctly 81% of the time. 0.5 is guessing, 1.0 is perfect separation.
+
+## The threshold is a product decision
+
+Compare models by AUC; *operate* at the one threshold whose error mix matches your costs. If a
+miss is dangerous and a follow-up is cheap, lower it. If false alarms burn people's time or
+trust, raise it. Write the reason down, because the next person will ask why it isn't 0.5.
+
+## When ROC flatters
+
+The false-positive rate divides by all the negatives, so when negatives are plentiful it stays
+tiny. Take a hypothetical 100,000 transactions with 500 frauds. A threshold that catches 400
+frauds (TPR 0.8) at an FPR of 2% looks excellent on a ROC plot. But 2% of 99,500 honest
+transactions is **1,990** false alarms, so precision is 400 ÷ 2,390 ≈ **17%**: five of every six
+flags are wrong. For rare positives, read the precision-recall curve and the precision at
+your real threshold.
+
+```diagram
+TPR
+1 |    .------
+  |   /
+  |  |
+  | /
+0 +----------- FPR
+  0          1
+```
+
+## Common mistakes
+
+- **A great ROC-AUC and a flood of false alarms** → rare positives make the FPR look small →
+  read the PR curve and the precision at your threshold.
+- **Reading AUC as accuracy.** It's ranking quality across all thresholds; it says nothing about
+  any single cutoff.
+- **Shipping the highest-AUC model blindly.** Curves can cross. Compare at the FPR you can afford.
+- **The threshold was never chosen, just inherited** → pick it from the curve, by cost.
+
+## Where you'll see it in AI
+
+- **Moderation and safety classifiers:** category scores with a cutoff you set.
+- **Retrieval:** a similarity cutoff for which chunks reach the model is a threshold on a score
+  (→ embeddings-vector-databases).
+- **Calibration:** a threshold only means what you think if scores are calibrated
+  (→ conditional-probability-counts).
+- **Model selection:** AUC to shortlist, then one operating point, then one agreed number for the
+  team (→ single-number-metric).

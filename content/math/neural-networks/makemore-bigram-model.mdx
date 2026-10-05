@@ -1,0 +1,243 @@
+---
+title: "Your first language model: makemore"
+subtitle: "Next-character prediction, the negative log-likelihood loss and softmax"
+summary: "Train a character-level bigram language model two ways, by counting and by gradient descent, and read its loss as a measure of prediction quality."
+changeNote: "New lesson in the neural networks track, written from the lecture's transcript, with a tested bigram task on real data and a quiz."
+section: math
+pillar: neural-networks
+order: 9
+level: advanced
+estMinutes: 75
+taskMinutes: 30
+shortPath: "About 40 min: read the breakdown, then run the task's script and change SMOOTH to 0. Come back to watch from 50:13 (the loss, smoothing and the neural-network version) in a second sitting."
+prerequisites:
+  - micrograd-from-scratch
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "PaCmpygFfXo"
+  published: "2022-09-07"
+  year: 2022
+  minutes: 118
+  start: 3013
+  watchMinutes: 67
+  title: "The spelled-out intro to language modeling: building makemore"
+  channel: "Andrej Karpathy"
+  why: "This is where the track meets language models. Karpathy trains a model that predicts the next character of a name, first by counting, then as a one-layer network trained with the loop from the micrograd lesson, and shows both land on the same loss. The part this lesson needs starts at the loss; the first 50 minutes build the counting model and are worth watching if you have time."
+  notes:
+    - "0:00–50:13 (optional) Loading 32,000 names, counting character pairs into a 27 × 27 table, sampling new names, and normalizing rows with broadcasting."
+    - "53:15 Likelihood, log-likelihood and the average negative log-likelihood: the loss, about 2.45 on the training set."
+    - "1:00:55 An unseen pair gives probability 0 and infinite loss; adding fake counts (smoothing) fixes it."
+    - "1:47:56 Multiplying a one-hot vector by W just picks out one row of W, so W is the table of log-counts."
+applyIt: |
+  **The "loss" an LLM is trained on, and the one a fine-tuning dashboard shows you, is this
+  lecture's average negative log-likelihood of the next token.** Reading it correctly stops you
+  from over- or under-reacting to the numbers.
+
+  1. Find a loss or perplexity number from a model you use or study: a fine-tuning run's
+     training and validation loss, a model card, or a course notebook.
+  2. Turn it into a feel for uncertainty: e^loss (the perplexity) is roughly how many equally
+     likely options the model is choosing between at each step.
+  3. Compare training and validation loss. If training keeps falling while validation rises, the
+     model is memorising its examples; stop earlier or add data.
+
+  **If you build software:** when you fine-tune, log validation loss per epoch next to a few
+  sample outputs; the number and the samples together tell you when to stop.
+  **If you don't code:** in a hosted fine-tuning dashboard, the two curves and the gap between
+  them are the main things to read.
+
+  Success: one loss number you've seen, converted to a perplexity, with a sentence on what the
+  training–validation gap says.
+recap:
+  - emoji: "📇"
+    title: "Make more names"
+    text: "The dataset is about 32,000 names. The goal is a model that produces new, name-like strings, one character at a time."
+  - emoji: "🔢"
+    title: "Count character pairs"
+    text: "A bigram model looks only at the previous character. Count every pair, with a '.' marking start and end, in a 27 × 27 table, then normalize each row into probabilities to sample from."
+  - emoji: "📉"
+    title: "Score with negative log-likelihood"
+    text: "Multiply the probabilities the model gave to the real next characters, take logs to make it a sum, flip the sign and average. Lower is better; the counting model scores about 2.45."
+  - emoji: "🧈"
+    title: "Smooth away the zeros"
+    text: "A pair never seen in training gets probability 0 and infinite loss. Adding a fake count to every cell keeps every probability above zero."
+  - emoji: "🧠"
+    title: "The same model as a network"
+    text: "One-hot encode the input character, multiply by a 27 × 27 weight matrix to get logits, exponentiate and normalize (softmax) to get probabilities, and train with gradient descent."
+  - emoji: "🪞"
+    title: "Both routes meet"
+    text: "Gradient descent reaches about the same loss as counting. The one-hot product just picks a row of W, so W ends up as the log of the count table."
+  - emoji: "🚀"
+    title: "Why bother with the network"
+    text: "Weight regularization plays the role of smoothing, and unlike a table, the network scales to longer contexts. From here up to transformers, only the forward pass changes."
+task: |
+  Train the counting version on the real dataset, see infinite loss appear and disappear, and
+  confirm that softmax of the log-counts gives the same probabilities. Python 3 only; the script
+  downloads the names file (about 228 KB) from the lecture's GitHub repository.
+
+  ```python
+  import math, urllib.request
+
+  URL = "https://raw.githubusercontent.com/karpathy/makemore/master/names.txt"
+  names = urllib.request.urlopen(URL).read().decode().split()
+  SMOOTH = 1                                   # fake count added to every pair
+
+  chars = "." + "abcdefghijklmnopqrstuvwxyz"   # "." marks the start and end of a name
+  idx = {ch: i for i, ch in enumerate(chars)}
+  counts = [[SMOOTH] * 27 for _ in range(27)]
+  for name in names:
+      seq = "." + name + "."
+      for a, b in zip(seq, seq[1:]):
+          counts[idx[a]][idx[b]] += 1
+  probs = [[c / sum(row) for c in row] for row in counts]
+
+  def avg_nll(words):
+      pairs = [(a, b) for w in words for a, b in zip("." + w + ".", w + ".")]
+      p = [probs[idx[a]][idx[b]] for a, b in pairs]
+      return float("inf") if 0 in p else -sum(math.log(x) for x in p) / len(p)
+
+  print("names:", len(names), " uniform loss:", round(math.log(27), 3))
+  print("training loss:", round(avg_nll(names), 3))
+  print("'andrej', 'andrejq':", round(avg_nll(["andrej"]), 3), round(avg_nll(["andrejq"]), 3))
+
+  # The network view: logits are a row of W = log(counts), and softmax gives that row back.
+  W = [[math.log(c) if c else -math.inf for c in row] for row in counts]
+  exps = [math.exp(z) for z in W[idx["a"]]]
+  softmax = [e / sum(exps) for e in exps]
+  print("softmax matches counting:",
+        all(abs(s - p) < 1e-12 for s, p in zip(softmax, probs[idx["a"]])))
+  ```
+
+  1. Run it. Compare the training loss with the uniform loss of ln 27.
+  2. Set SMOOTH = 0 and run again. Which name now gets an infinite loss, and why?
+  3. Set SMOOTH = 1000. What happens to the training loss, and which direction is the model
+     being pushed?
+  4. Write the perplexity (e^loss) for the uniform model and for yours.
+
+  **No internet?** Replace the download line with a list of 20 or more names you type in.
+  Success: a training loss near 2.45, an explanation of the infinite loss, and the two
+  perplexities (about 27 and about 11.6).
+selfCheck:
+  - q: "A colleague's fine-tuned model reports a validation loss of 0. Before celebrating, what do you suspect, using what this lecture says about the loss?"
+    a: "A loss of 0 means probability 1 on every correct next token, which is close to impossible on real held-out data. Suspect that the validation set overlaps the training set, or that the loss is computed on the wrong tokens (for example only on easy, fully predictable ones)."
+  - q: "Your bigram model gives a training loss of 2.45 and a loss of 3.0 on a single unusual name. Explain the gap to a non-technical teammate."
+    a: "The loss is the average surprise per character. Across all names the model is, on average, about as unsure as picking among 11–12 letters. The unusual name contains pairs the model rarely saw, so it assigned them low probability and was more surprised, which raises that name's loss."
+mcq:
+  - q: "A bigram model scores a new name and returns an infinite loss. What does that tell you?"
+    options:
+      - "The name contains a pair the model rates at zero"
+      - "The name is longer than any name in training"
+      - "Training diverged and the weights are now inf"
+      - "The loss was summed instead of averaged"
+    answer: 0
+    explain: "Negative log-likelihood is −log(probability), and log(0) is minus infinity, so one pair with probability zero makes the whole loss infinite. Smoothing (fake counts) or, in the network version, regularization keeps every probability above zero. A summed loss would be large, not infinite."
+  - q: "After training, your 27-character model's loss is 3.29. What should you conclude?"
+    options:
+      - "It's strong, since 3.29 is close to the maximum"
+      - "It's slightly better than a model using bigrams"
+      - "It has overfit and should be stopped earlier"
+      - "It has learned almost nothing beyond guessing"
+    answer: 3
+    explain: "A model that gives every character probability 1/27 has a loss of ln 27 ≈ 3.30. A loss of 3.29 is barely better than that uniform guess, so training or the data pipeline likely has a problem. The counting bigram model reaches about 2.45, and lower is better."
+  - q: "In the network version, the input is a one-hot vector and the first step is one-hot × W. A teammate calls this wasteful. What is the cheaper equivalent?"
+    options:
+      - "Multiply by W's transpose instead of W itself"
+      - "Look up the row of W for that character directly"
+      - "Average all rows of W, then apply the softmax"
+      - "Replace W with the count table and skip training"
+    answer: 1
+    explain: "A one-hot vector has a single 1, so the product just copies out one row of W. Real models do exactly this lookup and call W an embedding table. Using the count table only works for bigrams; the trained W generalizes to richer models."
+  - q: "You add 0.01 × mean(W²) to the network's loss and raise the factor to 100. What happens to the model's predictions?"
+    options:
+      - "They become sharper and closer to the data"
+      - "They become random, changing on every run"
+      - "They flatten toward uniform probabilities"
+      - "They stay the same; only training is slower"
+    answer: 2
+    explain: "The penalty pulls every weight toward zero, and all-zero logits give a uniform softmax. A strong penalty therefore acts like adding huge fake counts: predictions flatten toward 1/27 each. A small penalty plays the role of gentle smoothing."
+backupResources:
+  - label: "makemore source code and the names dataset on GitHub"
+    url: "https://github.com/karpathy/makemore"
+    type: "code · the dataset and the finished models from the lecture series"
+  - label: "Go deeper: Building makemore Part 2: MLP (Andrej Karpathy, 76 min)"
+    url: "https://www.youtube.com/watch?v=TCH_1BHY58I"
+    type: "video"
+  - label: "Go deeper: Building makemore Part 3: Activations & Gradients, BatchNorm (Andrej Karpathy, 116 min)"
+    url: "https://www.youtube.com/watch?v=P6sfmUTpUmc"
+    type: "video"
+tags:
+  - math
+  - neural-networks
+  - language-models
+  - training
+  - python
+---
+
+A language model does one thing: given what came before, it assigns a probability to every
+possible next token. This lecture builds the smallest real example, a model that predicts the
+next character of a name from the previous one, and introduces the loss every LLM is trained
+on: **the average negative log-likelihood** of the true next token.
+
+## Two ways to build the same model
+
+**By counting.** Pad each name with a "." at both ends, count every pair of neighbouring
+characters into a 27 × 27 table, and divide each row by its total. Row "a" now holds the
+probability of each character following "a". Sampling from rows one character at a time
+generates new names.
+
+**As a network.** Turn the previous character into a one-hot vector of length 27, multiply by
+a 27 × 27 weight matrix W to get 27 **logits**, exponentiate them, and divide by their sum. That
+last step, the **softmax**, turns any 27 numbers into probabilities. Train W with the loop from
+the micrograd lesson (→ micrograd-from-scratch): forward, loss, backward, update.
+
+Both routes reach a training loss of about 2.45. They are the same model: multiplying a one-hot
+vector by W just picks out one row of W, so the trained W is the log of the count table.
+
+## Worked example: scoring predictions
+
+**The loss.** For each true next character, take the probability the model gave it, take the
+log, flip the sign, and average. Suppose a model scores the name "ava" (pairs .a, av, va, a.)
+with probabilities 0.14, 0.02, 0.25 and 0.20:
+
+- logs: −1.97, −3.91, −1.39, −1.61; sum −8.87
+- average negative log-likelihood: 8.87 ÷ 4 ≈ **2.22**
+
+The rare pair "av" contributes most. If any pair had probability 0, its log would be minus
+infinity and the loss would be infinite, which is why the lecture adds fake counts (smoothing).
+
+**The baselines.** A model that knows nothing gives each character 1/27, a loss of ln 27 ≈
+**3.30**. The bigram model's 2.45 is better. e^2.45 ≈ **11.6** is its perplexity: on average
+it's about as unsure as choosing among 11–12 equally likely characters, instead of 27.
+
+**Softmax on numbers.** Logits (2.0, 1.0, −1.0) exponentiate to (7.39, 2.72, 0.37), which sum
+to 10.48, giving probabilities (0.71, 0.26, 0.04). If the true character is the second one, its
+loss is −ln 0.26 ≈ 1.35.
+
+## Smoothing and regularization
+
+Fake counts make the table's predictions more uniform; more counts, flatter predictions. The
+network has a matching knob: add a penalty such as 0.01 × mean(W²) to the loss. Zero weights
+mean a uniform softmax, so the penalty pulls predictions towards uniform, and its strength
+plays the same role as the number of fake counts.
+
+The table can't grow: with 10 previous characters, the number of combinations explodes. The
+network version can, by changing only the forward pass. That's the path the rest of the series
+takes, up to a transformer.
+
+## Common mistakes
+
+- **Reading the loss without a baseline.** Compare with ln(vocabulary size) for a uniform guess.
+- **Expecting a loss of 0.** On real held-out data it would mean perfect prediction; suspect a
+  leak between training and validation data instead.
+- **Treating probability 0 as harmless.** One zero makes the loss infinite and can break
+  sampling; smooth or regularize.
+
+## Where you'll see it in AI
+
+- **Every LLM's training loss** is this average negative log-likelihood, computed over
+  next-token predictions with a vocabulary of tens of thousands of tokens
+  (→ transformers-attention).
+- **Embedding tables:** one-hot × W as a row lookup is exactly how models turn token IDs into
+  vectors (→ embeddings-vector-databases).
+- **Temperature and sampling** reshape the softmax before drawing the next token, which is why
+  the same prompt can give different answers (→ calling-an-llm-api).

@@ -1,0 +1,239 @@
+---
+title: "Gradient boosting"
+subtitle: "Small trees added one at a time, each fixing what the last ones missed"
+summary: "Explain how gradient boosting builds trees on residuals with a learning rate, tune it without overfitting, and know when it beats an LLM."
+changeNote: "New lesson closing the machine learning track, written from the lecture's transcript, with the classical-ML-versus-LLM map moved here from the first lesson."
+section: math
+pillar: machine-learning
+order: 10
+level: intermediate
+estMinutes: 22
+taskMinutes: 30
+prerequisites:
+  - random-forests-bagging
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "3CC4N4z3GJc"
+  published: "2019-03-25"
+  year: 2019
+  minutes: 16
+  title: "Gradient Boost Part 1 (of 4): Regression Main Ideas"
+  channel: "StatQuest with Josh Starmer"
+  why: "Gradient boosting is the method most teams reach for on tabular data, and this lecture shows its main idea without the heavy maths: start from the average, fit a small tree to the errors, add a scaled-down copy of it, repeat. Every number is on screen, and the role of the learning rate ties straight back to the gradient descent lesson. It closes the track by joining trees, residuals and small steps into one model."
+  notes:
+    - "3:38 How gradient boosting differs from AdaBoost: it starts from a single leaf and builds larger, fixed-size trees."
+    - "6:12 Pseudo-residuals: the errors of the current prediction become what the next tree predicts."
+    - "8:45 One full tree fits the training data too well; scaling each tree by a learning rate of 0.1 takes small steps instead."
+applyIt: |
+  **Knowing what boosted trees are good at decides which tool you reach for, and "classical ML or
+  an LLM API" is a real-money call.** Structured columns → a boosted tree (cheap, fast,
+  explainable); unstructured language → a foundation model. Take four prediction or automation
+  ideas from your own project, job or studies and route each one before anyone writes code. No
+  ideas yet? Use a small online shop: predict which customers stop buying, write product
+  descriptions, auto-tag incoming support emails, forecast next month's orders.
+
+  ```prompt
+  My data looks like this: [the columns, or the kind of documents]. Route these four ideas to
+  classical ML or an LLM API: [idea 1], [idea 2], [idea 3], [idea 4]. One line each: the tool,
+  why (structured vs unstructured input, cost per prediction, explainability) and the baseline
+  it must beat.
+  ```
+
+  **At work:** bring the table to the next meeting where someone proposes "let's use AI for
+  this"; it reframes the conversation around data type and cost. **If you code:** save it as
+  `docs/ml-decisions.md` in your repo so your coding assistant reads it too.
+  Success: every row names the tool and why, and every prediction from a table of columns
+  starts with classical ML.
+toolkit: |
+  - **Write the tool boundary into your custom instructions.** One line in ChatGPT, Claude or
+    Gemini custom instructions or a Project ("tabular predictions → classical ML first; LLMs for
+    unstructured language") stops an assistant from proposing an LLM on a dozen numeric columns.
+  - **Default to the cheapest tool that works.** Pick a smaller model over the flagship, a
+    checklist or formula over an agent, and prompting over a fine-tune. Foundation models already
+    ran the training recipe at enormous scale, so spend your time adapting and evaluating, not
+    training.
+  - **Keep a tabular baseline template.** Save a notebook or prompt that loads a table, splits it
+    by time or at random, and fits logistic regression and a boosted tree, so "what's the
+    baseline?" takes minutes to answer.
+recap:
+  - emoji: "🎯"
+    title: "Boosting for numbers"
+    text: "Gradient boosting can predict a continuous value such as weight from mixed inputs. Despite the name, it's a different method from linear regression."
+  - emoji: "🪵"
+    title: "Not quite AdaBoost"
+    text: "AdaBoost chains one-split stumps with different amounts of say. Gradient boosting starts from a single leaf, then adds larger trees of a fixed size, all scaled by the same amount."
+  - emoji: "➗"
+    title: "Start with the average"
+    text: "The first prediction for everyone is the average of the target. If you stopped here, every person would get the same guess."
+  - emoji: "📐"
+    title: "A tree on the errors"
+    text: "Compute each row's error against the current prediction (the pseudo-residual) and fit a small tree to predict those errors. Rows sharing a leaf get the average of their errors."
+  - emoji: "🐾"
+    title: "Small steps win"
+    text: "Adding the whole tree fits the training data too well. Scaling it by a learning rate such as 0.1 moves each prediction a little in the right direction, which does better on new data."
+  - emoji: "🔁"
+    title: "Repeat until it stops helping"
+    text: "New residuals, new tree, add it scaled. Stop at the maximum number of trees or when the residuals stop shrinking much. A prediction is the average plus every scaled tree."
+task: |
+  Build gradient boosting from scratch in about 25 lines of NumPy and watch the learning rate
+  and the number of trees trade off. Each "tree" here is a stump (one split) to keep it short.
+  Run it in a free Google Colab notebook:
+
+  ```python
+  import numpy as np
+
+  rng = np.random.default_rng(0)
+  x = rng.uniform(0, 10, 200)
+  y = 20 + 3 * x + 8 * np.sin(x) + rng.normal(0, 3, 200)   # a wiggly truth plus noise
+  x_tr, y_tr, x_te, y_te = x[:150], y[:150], x[150:], y[150:]
+
+  def fit_stump(x, r):
+      """Best single split of x for predicting residuals r: (threshold, left value, right value)."""
+      best = None
+      for t in np.unique(x)[1:]:
+          left, right = r[x < t], r[x >= t]
+          sse = ((left - left.mean()) ** 2).sum() + ((right - right.mean()) ** 2).sum()
+          if best is None or sse < best[0]:
+              best = (sse, t, left.mean(), right.mean())
+      return best[1:]
+
+  def boost(learning_rate, n_trees):
+      start = y_tr.mean()                       # step 1: predict the average
+      pred_tr, pred_te = np.full(150, start), np.full(50, start)
+      for i in range(1, n_trees + 1):
+          t, lv, rv = fit_stump(x_tr, y_tr - pred_tr)   # a tree on the residuals
+          pred_tr += learning_rate * np.where(x_tr < t, lv, rv)
+          pred_te += learning_rate * np.where(x_te < t, lv, rv)
+          if i in (1, 10, 50, 200, 1000):
+              print(f"  {i:>4} trees: train {np.mean((pred_tr - y_tr) ** 2):6.1f}  "
+                    f"test {np.mean((pred_te - y_te) ** 2):6.1f}")
+
+  for lr in (1.0, 0.1):
+      print("learning rate", lr)
+      boost(lr, 1000)
+  ```
+
+  1. With learning rate 1.0, at how many trees is the test error lowest? What happens to train
+     and test error after that?
+  2. With 0.1, how many trees does it take to reach a similar test error, and does the test
+     error climb as much by 1,000 trees?
+  3. The noise added to `y` has a variance of 9 (standard deviation 3). Why can no number of
+     trees get the test error much below about 9?
+
+  **No code?** Work the body's delivery-time example by hand for a second round: compute the new
+  residuals, average them per leaf, and add 0.1 × that average to each prediction.
+
+  Success: you can name the best tree count for each learning rate, explain why the fast one
+  overfits sooner, and say why the error has a floor.
+selfCheck:
+  - q: "Your manager wants to use an LLM to score sales leads from 20 CRM columns (company size, industry, pages visited, emails opened). What do you propose first, and what would change your mind?"
+    a: "A gradient-boosted tree on the columns, compared with a logistic regression baseline and scored on later leads than it was trained on. It's cheap per prediction and its drivers can be inspected. An LLM earns a place only if there's unstructured text (call notes, emails) that carries signal the columns miss, and it has to beat the tree on the same held-out leads."
+  - q: "A boosted model uses 5,000 deep trees and a learning rate of 0.5. Training error is near zero and validation error is worse than a random forest's. What do you change?"
+    a: "It's overfitting: big steps and many deep trees let it chase noise in the residuals. Lower the learning rate (0.05–0.1), keep the trees small, and use early stopping: track validation error as trees are added and keep the count where it bottoms out, chosen on validation data or cross-validation."
+mcq:
+  - q: "You need to predict which subscribers will cancel, from 14 structured columns (logins in the last 30 days, plan type, support tickets, payment history). What's the strongest first choice?"
+    options:
+      - "Gradient-boosted trees, checked against a baseline"
+      - "A deep neural network trained on all 14 columns"
+      - "A fine-tuned LLM that reads each row as a sentence"
+      - "K-means clustering to sort customers into churn groups"
+    answer: 0
+    explain: "On structured, tabular data, gradient-boosted trees routinely match or beat deep models while costing little per prediction and staying inspectable. Logistic regression gives you a baseline to beat. K-means ignores the cancel/stay labels you already have, and LLMs earn their cost on unstructured language, not a dozen numeric columns."
+  - q: "With learning rate 1.0, validation error is lowest at 40 trees and rises after. With 0.1, it's lowest at 400 trees and slightly lower. What explains the difference?"
+    options:
+      - "The slower rate needs ten times as much data to work"
+      - "The faster rate skips the residuals step entirely"
+      - "Small steps leave room for later trees to correct"
+      - "The slower rate uses deeper trees to compensate"
+    answer: 2
+    explain: "Each tree at rate 1.0 commits fully to its estimate of the residuals, noise included, so overfitting arrives fast. At 0.1 each tree only nudges predictions, so later trees can refine earlier ones, which tends to generalize better, at the cost of more trees. Both rates use the same data, residuals and tree size."
+  - q: "What is the key difference between a random forest and gradient boosting?"
+    options:
+      - "Forests use deep trees; boosting can't use trees"
+      - "Boosting votes; a forest adds up its predictions"
+      - "Forests need a learning rate; boosting doesn't"
+      - "Boosting builds trees in sequence on errors"
+    answer: 3
+    explain: "A forest grows independent trees in parallel and averages them, which mainly cuts variance. Boosting grows each small tree to fix what the current ensemble gets wrong, which steadily reduces bias. It's boosting that has the learning rate, and both use trees."
+  - q: "Validation error stops improving at 600 trees, then slowly rises up to 3,000. What should the final model use?"
+    options:
+      - "All 3,000 trees, since training error is lowest there"
+      - "About 600 trees, chosen by watching validation error"
+      - "A single tree, since boosting is overfitting here"
+      - "3,000 trees with every tree's depth halved instead"
+    answer: 1
+    explain: "This is early stopping: keep the number of trees where validation error bottomed out. Training error always keeps falling as trees are added, so it can't choose the count. Shrinking depth might help too, but it doesn't remove the need to pick the count on held-out data."
+backupResources:
+  - label: "Go deeper: XGBoost Part 1 (of 4): Regression (StatQuest with Josh Starmer, 26 min)"
+    url: "https://www.youtube.com/watch?v=OtD8wVaFm6E"
+    type: "video"
+  - label: "scikit-learn user guide — Gradient boosting"
+    url: "https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosted-trees"
+    type: "docs · reference"
+tags:
+  - math
+  - machine-learning
+  - gradient-boosting
+  - tabular-data
+---
+
+A random forest grows many trees independently and averages them. **Gradient boosting grows
+small trees one after another, each trained on what the model so far still gets wrong, and adds
+each one in at a small, scaled-down step.** It's the gradient descent loop from earlier in this
+track, with trees as the steps, and it's the usual first choice for predictions from tables.
+
+## The loop
+
+1. **Start** with one prediction for everyone: the average of the target.
+2. **Compute residuals:** real value minus current prediction for each row.
+3. **Fit a small tree** (often 8 to 32 leaves) to predict those residuals. Each leaf's value is
+   the average residual of the rows in it.
+4. **Add the tree, scaled** by a learning rate such as 0.1.
+5. **Repeat** from step 2 until you hit the tree limit or validation error stops improving.
+
+The prediction for a new case is the average plus every tree's scaled output.
+
+## Worked example: delivery times
+
+Four orders took 30, 50, 40 and 80 minutes. Orders 1 and 3 were short-distance; 2 and 4 long.
+
+- **Start:** predict the average, **50**, for all. Residuals: −20, 0, −10, +30. Sum of squared
+  residuals: 400 + 0 + 100 + 900 = **1,400**.
+- **Tree 1** splits on distance. Short leaf: average of −20 and −10 = **−15**. Long leaf:
+  average of 0 and 30 = **+15**.
+- **Add it at learning rate 0.1:** short orders 50 − 1.5 = **48.5**; long orders
+  50 + 1.5 = **51.5**.
+- **New residuals:** −18.5, −1.5, −8.5, +28.5. Sum of squares: 342.25 + 2.25 + 72.25 + 812.25
+  = **1,229**, down from 1,400.
+
+At learning rate 1.0 the same tree would jump straight to 35 and 65. On four rows that looks
+better; on real data, committing fully to each tree's guess means also committing to its noise.
+Many small steps, each corrected by the next tree, generalize better.
+
+## Classical ML or a foundation model?
+
+- **Structured data** (columns of numbers and categories): logistic regression as the baseline,
+  then gradient-boosted trees or a random forest. Cheap, fast, inspectable.
+- **Unstructured data** (language, images, audio): foundation models, called through an API or
+  fine-tuned. Training them from scratch is a lab's job.
+- **Mixed:** often both. An LLM turns text into a few columns or an embedding, and a tree makes
+  the prediction.
+
+## Common mistakes
+
+- **High learning rate, many trees.** Fast overfitting. Lower the rate and add trees.
+- **Choosing the number of trees by training error.** It always falls; use validation error and
+  stop early.
+- **Deep trees.** Boosting works with small trees; deep ones fit noise in the residuals.
+- **Skipping the baseline.** A boosted tree still has to beat logistic regression and the
+  majority class (→ machine-learning-fundamentals).
+
+## Where you'll see it in AI
+
+- **Production tabular models** (risk, pricing, churn, ranking features) are very often boosted
+  trees, in libraries such as XGBoost, LightGBM and CatBoost.
+- **Gradient descent, again.** Each tree is a step down the loss, like the parameter updates in
+  → fitting-by-gradient-descent and the training of → neural-networks.
+- **Evaluating the result** uses the tools in → evaluation-metrics, and the routing above
+  decides when an LLM is worth its cost.

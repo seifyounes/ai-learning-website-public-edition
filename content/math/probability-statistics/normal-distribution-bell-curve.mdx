@@ -1,0 +1,188 @@
+---
+title: "The normal distribution"
+subtitle: "Two numbers, one bell curve, and the 95% band you'll use all track long"
+summary: "Describe a bell curve by its mean and standard deviation, and use the 68-95-99.7 rule to tell a normal wobble from a real outlier."
+changeNote: "New lesson in the probability and statistics track, written from the lecture's transcript, with a worked rerun example and a quiz."
+section: math
+pillar: probability-statistics
+order: 2
+level: beginner
+estMinutes: 10
+taskMinutes: 20
+prerequisites:
+  - reading-probability-distributions
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "rzFX5NWojp0"
+  published: "2017-10-09"
+  year: 2017
+  minutes: 5
+  title: "The Normal Distribution, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "The bell curve is the shape behind every noise band and confidence interval later in this track, so it comes second, right after the idea of a distribution. This short StatQuest shows how the mean sets the centre and the standard deviation sets the width, with two curves side by side, which is exactly the reading skill you need before you put error bars on an eval score."
+applyIt: |
+  **Whenever a number you track wobbles from run to run, the bell curve tells you how big a
+  wobble is normal.** Take one repeated measurement from your work: an eval score from reruns
+  of the same prompt, the time an AI step takes in an automation, or a weekly quality rating.
+
+  1. Collect at least 10 values of it under unchanged conditions.
+  2. Compute the mean and the standard deviation (a spreadsheet's `AVERAGE` and `STDEV`).
+  3. Write down the band mean ± 2 SD. That is roughly where 95% of future values should land if
+     nothing changes.
+  4. From now on, investigate only values outside the band.
+
+  **If you build software:** log the value with a timestamp so the band can be recomputed
+  automatically. **If you don't code:** keep the values in a spreadsheet column and add the
+  band as two extra cells.
+
+  Success: one number you watch has a written "normal range", and you know what would count as a
+  real change.
+recap:
+  - emoji: "🔔"
+    title: "The bell shape"
+    text: "The normal (Gaussian) distribution is a symmetric, bell-shaped curve. For heights, the y-axis shows how likely it is to see someone short, average or tall."
+  - emoji: "📍"
+    title: "Centred on the mean"
+    text: "A normal curve is always centred on the average value. Newborn heights centre near 20 inches, adult heights near 70."
+  - emoji: "↔️"
+    title: "Width is the SD"
+    text: "The standard deviation sets the width: about 0.6 inches for newborns, about 4 for adults. Newborn heights cluster tightly; adult heights spread out."
+  - emoji: "📏"
+    title: "Wider means shorter"
+    text: "More possible values means less chance for any single one, so a wide curve is low and a narrow curve is tall."
+  - emoji: "🎯"
+    title: "The 95% rule"
+    text: "About 95% of measurements fall within two standard deviations of the mean: 20 ± 1.2 inches for newborns, 70 ± 8 for adults."
+  - emoji: "✏️"
+    title: "Two numbers draw it"
+    text: "To draw a normal curve you need the mean (where the centre goes) and the standard deviation (how wide it is)."
+  - emoji: "🌍"
+    title: "Why it's everywhere"
+    text: "Heights, weights, commute times and much more look normal, and the reason, the central limit theorem, is also what makes the curve so useful in statistics."
+task: |
+  Measure the normal wobble of one AI output and draw its band.
+
+  1. Pick a short task with a gradeable answer, such as "rate this review's sentiment from 1 to
+     10" or "count the action items in this email". Use one fixed input.
+  2. Run the same prompt 12 times in a chat app or playground (new chat each time, default
+     settings) and record the 12 numbers in a spreadsheet column.
+  3. Compute `=AVERAGE(A1:A12)` and `=STDEV(A1:A12)`, then the band mean − 2 SD to mean + 2 SD.
+  4. Run it 3 more times. Do the new values land inside the band?
+
+  **If you code:** do the same with an API call in a loop and `statistics.mean` and
+  `statistics.stdev` from Python's standard library.
+
+  Success: a mean, a standard deviation and a ± 2 SD band for one prompt, plus a sentence on
+  whether the 3 new runs fit inside it.
+selfCheck:
+  - q: "Two prompts for the same grading task both average 7.0 out of 10 across 20 reruns. Prompt A has a standard deviation of 0.4, prompt B of 1.8. Which do you put in production, and why?"
+    a: "Prompt A. Both are centred at the same place, but A's narrow curve means almost every run lands between about 6.2 and 7.8, while B's runs can land anywhere from about 3.4 up to the top of the scale. For grading you want consistency, so the width matters as much as the average."
+  - q: "Your automation's AI step usually takes 4.0 seconds with a standard deviation of 0.5. Today one run took 5.2 seconds. Do you open an incident?"
+    a: "No. 5.2 is 2.4 standard deviations above the mean: unusual but not alarming for a single run. Watch whether runs keep landing above 5 seconds. A steady pattern outside the band is the signal, not one value just past it."
+mcq:
+  - q: "Across many reruns, an eval score averages 82% with a standard deviation of 1.5 points. A teammate reports a run at 86% and calls it a breakthrough. What's the best first reading?"
+    options:
+      - "Normal wobble: anything within 5 points of the mean is noise"
+      - "Unusual: about 2.7 SDs above the mean, so check what changed"
+      - "A breakthrough, since 86% beats every earlier recorded run"
+      - "Impossible to judge without knowing the eval's sample size"
+    answer: 1
+    explain: "(86 − 82) ÷ 1.5 ≈ 2.7 standard deviations, beyond the 2-SD band that holds about 95% of runs, so it is unusual and worth a look before celebrating. A fixed '5 points' rule ignores the width; here the SD tells you how wide normal is."
+  - q: "Two models get the same average score on your task, but model A's scores across reruns have half the standard deviation of model B's. What does that tell you?"
+    options:
+      - "Model A is better on average, since a lower SD raises the mean"
+      - "Model B is better, because a wider spread shows more creativity"
+      - "Model A is more consistent; their typical results are the same"
+      - "Nothing at all, because the SD only matters for small datasets"
+    answer: 2
+    explain: "The mean and the standard deviation are separate facts: same centre, different width. A's results cluster tighter around the same average, which matters when every user gets one draw. Spread isn't a quality score, and it doesn't move the mean."
+  - q: "A dashboard flags any daily error rate more than 2 standard deviations from its mean, assuming roughly normal daily rates. In a quiet month with no real change, how many false flags should you expect?"
+    options:
+      - "About 1 or 2, since roughly 5% of normal days fall outside 2 SDs"
+      - "None, because a 2-SD band covers every value from a normal curve"
+      - "About 15, since half the days land above the mean by chance"
+      - "About 10, since a 2-SD rule flags roughly a third of the days"
+    answer: 0
+    explain: "Roughly 5% of values from a normal curve fall outside 2 standard deviations, so 30 days give about 1.5 false flags. The band doesn't cover everything; that is why some alerts in a quiet month are expected. About a third falls outside 1 SD, not 2."
+backupResources:
+  - label: "Introductory Statistics 2e, 6.1: The standard normal distribution (OpenStax)"
+    url: "https://openstax.org/books/introductory-statistics-2e/pages/6-1-the-standard-normal-distribution"
+    type: "free textbook · z-scores and the 68-95-99.7 rule"
+tags:
+  - math
+  - statistics
+  - normal-distribution
+  - evals
+---
+
+**You need:** averages and square roots. → reading-probability-distributions first.
+
+The normal distribution is the bell curve: values pile up around a centre and thin out evenly
+on both sides. It matters for AI work because it describes how **averages** wobble, and an eval
+score, a pass rate or a mean latency is an average. Learn to read one bell curve and you can
+tell a real change from ordinary noise.
+
+## Two numbers describe the whole curve
+
+- **The mean (μ)** puts the peak. The most common values sit near it.
+- **The standard deviation (σ)** sets the width. Small σ: tall and narrow, values packed close
+  to the mean. Large σ: short and wide.
+
+The total area under the curve is always 1, so a narrow curve has to be taller. Two groups can
+share the same mean and still look completely different: newborn heights cluster tightly,
+adult heights spread out more.
+
+## The 68-95-99.7 rule
+
+For any normal curve, roughly:
+
+- **68%** of values fall within 1 σ of the mean,
+- **95%** within 2 σ,
+- **99.7%** within 3 σ.
+
+That turns "is this surprising?" into arithmetic. Measure how many standard deviations a value
+sits from the mean, which is called its **z-score**: z = (value − mean) ÷ σ. Beyond 2 is
+unusual, beyond 3 is rare.
+
+## Worked example: is this rerun a breakthrough?
+
+You rerun the same eval 20 times with sampling switched on. Scores average **82.0%** with a
+standard deviation of **1.5 points**.
+
+1. **The 95% band:** 82.0 ± 2 × 1.5 = **79% to 85%**. That's the normal wobble.
+2. **A run at 84%:** z = (84 − 82) ÷ 1.5 ≈ 1.3. Inside the band. Nothing happened.
+3. **A run at 86%:** z = (86 − 82) ÷ 1.5 ≈ 2.7. Outside the band. Worth asking what changed
+   (the input set, the model version, a config) before claiming a win.
+4. **A run at 77%:** z ≈ −3.3. Rare. Something likely broke.
+
+The same logic works for a latency, a cost per request, or a judge's score, as long as the
+values look roughly bell-shaped.
+
+```diagram
+      _-^-_
+    _/     \_
+ __/         \__
+|  |  |  |  |  |
+-2σ    μ     +2σ
+  95% inside
+```
+
+## Common mistakes
+
+- **Comparing only means.** Two prompts with the same average can differ hugely in spread, and
+  users get single draws, not averages.
+- **Using a fixed threshold.** "5 points is noise" is wrong on a narrow curve and too strict on a
+  wide one. Measure σ.
+- **Assuming everything is normal.** Response lengths, latencies and costs often have a long
+  right tail. Averages of them still tend toward a bell, as → central-limit-theorem shows, but
+  single values may not.
+- **Expecting zero false alarms.** A 2-σ alert fires on about 1 in 20 ordinary readings.
+
+## Where you'll see it in AI
+
+Noise bands around eval scores (→ standard-error-vs-deviation and
+→ confidence-intervals-for-evals). Network weights are often initialized by drawing small
+random numbers from a normal distribution, and diffusion image models are trained by adding
+Gaussian (normal) noise to images and learning to remove it. Standardizing features to z-scores
+before training is the same subtraction and division as above.

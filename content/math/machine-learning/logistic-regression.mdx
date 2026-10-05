@@ -1,0 +1,224 @@
+---
+title: "Logistic regression"
+subtitle: "From predicting a number to predicting a probability of yes"
+summary: "Turn a score into a probability with the S-curve, fit it by maximum likelihood, and read the log loss that also trains language models."
+changeNote: "New lesson in the machine learning track, written from the lecture's transcript, with a worked example, a code task and a quiz."
+section: math
+pillar: machine-learning
+order: 6
+level: intermediate
+estMinutes: 15
+taskMinutes: 25
+prerequisites:
+  - fitting-by-gradient-descent
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "yIYKR4sgzI8"
+  published: "2018-03-05"
+  year: 2018
+  minutes: 9
+  title: "StatQuest: Logistic Regression"
+  channel: "StatQuest with Josh Starmer"
+  why: "Most useful predictions are yes/no: will this customer leave, is this email spam, is this answer correct. This nine-minute lecture shows how logistic regression bends the straight line into an S-curve that outputs a probability, how it's used to classify, how to tell a useless input from a useful one, and why it's fitted by maximum likelihood instead of least squares. It's the bridge from the regression lessons to every classifier after it."
+  notes:
+    - "2:49 The switch: predicting true/false instead of a number, with an S-shaped curve running from 0 to 1."
+    - "4:27 Mixing numeric and yes/no inputs, and testing whether each input actually helps the prediction."
+    - "6:05 Why least squares doesn't apply, and the idea of maximum likelihood."
+applyIt: |
+  **Most yes/no questions in your work deserve a probability, not just a yes or no.** A
+  probability lets you choose the cut-off to match what a wrong answer costs. Pick a yes/no
+  decision from your own project, job or course: approve or review, likely to churn or not,
+  spam or not, pass or needs attention.
+
+  1. List three to five inputs you'd have *before* the outcome is known.
+  2. Decide what a false alarm costs and what a miss costs. If a miss is much worse, the
+     cut-off should sit well below 50%.
+  3. Write down the baseline: how often the answer is "yes" overall.
+
+  **If you build software:** start with scikit-learn's `LogisticRegression` and
+  `predict_proba`; it's the standard baseline any fancier classifier, an LLM included, should
+  beat. **If you don't code:** when an AI tool or vendor gives you a yes/no output, ask whether
+  it can give a score or probability instead, and who chose the cut-off.
+  Success: you have the inputs, a cut-off justified by costs, and a baseline rate for one real
+  decision.
+recap:
+  - emoji: "📈"
+    title: "What linear regression gave us"
+    text: "A fitted line can measure how strongly two things are related, test whether that's significant, and predict a number for a new case. Prediction makes it a machine learning method."
+  - emoji: "➕"
+    title: "More inputs, mixed types"
+    text: "Multiple regression adds more inputs, which can be numbers or categories, and lets you check whether the extra inputs improve the prediction."
+  - emoji: "〽️"
+    title: "Predict yes or no"
+    text: "Logistic regression predicts whether something is true. It fits an S-shaped curve that runs from 0 to 1, read as the probability of yes."
+  - emoji: "✂️"
+    title: "From probability to class"
+    text: "To classify, pick a cut-off: above 50%, call it yes; below, call it no."
+  - emoji: "🔍"
+    title: "Is each input pulling its weight?"
+    text: "Test whether each input's effect differs from zero. An input that doesn't help can be dropped, saving time and data."
+  - emoji: "🎲"
+    title: "Fitted by maximum likelihood"
+    text: "There are no residuals to square. Instead, compute how probable the observed outcomes are under a candidate curve, shift the curve, and keep the one that makes them most probable."
+task: |
+  Score candidate S-curves by likelihood, then let gradient descent find the best one. Data:
+  hours a customer used a product last week, and whether they renewed (1) or not (0).
+
+  | Hours | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+  |---|---|---|---|---|---|---|---|---|
+  | Renewed | 0 | 0 | 0 | 1 | 0 | 1 | 1 | 1 |
+
+  ```python
+  import math
+
+  hours   = [0, 1, 2, 3, 4, 5, 6, 7]
+  renewed = [0, 0, 0, 1, 0, 1, 1, 1]
+
+  def log_likelihood(b0, b1):
+      total = 0.0
+      for x, y in zip(hours, renewed):
+          p = 1 / (1 + math.exp(-(b0 + b1 * x)))   # probability of "renewed"
+          total += math.log(p if y == 1 else 1 - p)
+      return total
+
+  for b0, b1 in [(-3.5, 1.0), (-7.0, 2.0), (-1.0, 0.5)]:
+      print(f"b0={b0}, b1={b1}: log-likelihood {log_likelihood(b0, b1):.3f}")
+
+  # Let gradient descent find the best curve (the previous lesson's loop)
+  b0 = b1 = 0.0
+  for step in range(5000):
+      g0 = g1 = 0.0
+      for x, y in zip(hours, renewed):
+          p = 1 / (1 + math.exp(-(b0 + b1 * x)))
+          g0 += p - y
+          g1 += (p - y) * x
+      b0, b1 = b0 - 0.05 * g0, b1 - 0.05 * g1
+  print(f"fitted: b0={b0:.2f}, b1={b1:.2f}, log-likelihood {log_likelihood(b0, b1):.3f}")
+  ```
+
+  1. Which of the three hand-picked curves has the highest (least negative) log-likelihood?
+  2. The steepest curve, (−7, 2), is *not* the best. Look at the customers at 3 and 4 hours and
+     explain why a very confident curve gets punished.
+  3. At how many hours does the fitted curve cross 50%? (Solve b0 + b1 × hours = 0.)
+
+  **No code?** In a spreadsheet, put hours in A and renewed in B. In C, the probability
+  `=1/(1+EXP(-(-3.5+1*A2)))`; in D, `=LN(IF(B2=1,C2,1-C2))`; sum column D. Repeat with −7 and 2.
+
+  Success: you found the best of the three curves, explained why the steepest one lost, and
+  computed the fitted 50% point (about 3.5 hours).
+selfCheck:
+  - q: "A fraud classifier outputs a probability. Missing a fraud costs about 50 times more than flagging a good transaction for review. Should you keep the default 50% cut-off?"
+    a: "No. With misses that much more expensive, flag at a much lower probability, accepting more false alarms to catch more fraud. Pick the exact cut-off on held-out data by counting the cost of each type of mistake at several thresholds (→ evaluation-metrics)."
+  - q: "Your logistic model's input 'customer's star sign' has an effect statistically indistinguishable from zero. A colleague wants to keep it 'just in case'. What's the argument for dropping it?"
+    a: "It isn't helping predictions, it costs data collection and storage, and every extra input gives the model one more way to fit noise in a small dataset. Drop it and confirm the held-out score doesn't fall."
+mcq:
+  - q: "A model predicts 0.9 for an email that turns out to be legitimate (not spam). Another predicts 0.6 for the same email. Under log loss, which is penalised more?"
+    options:
+      - "Both equally, since both called it spam at 50%"
+      - "The 0.6 model, because it was less decisive"
+      - "The 0.9 model, as confident misses cost far more"
+      - "Neither, since log loss only scores the right class"
+    answer: 2
+    explain: "Log loss charges −ln(probability given to what actually happened): −ln(0.1) ≈ 2.3 against −ln(0.4) ≈ 0.9. Confident mistakes are punished hard, which is why the loss pushes models toward honest probabilities. Accuracy at a 50% cut-off would score both the same."
+  - q: "Why can't logistic regression be fitted with least squares like a straight line?"
+    options:
+      - "Its inputs can be categories as well as numbers"
+      - "It has no residuals of the usual kind to square"
+      - "It can only be fitted on balanced yes/no data"
+      - "Least squares only works when there's exactly one input"
+    answer: 1
+    explain: "The outcomes are 0 or 1 and the curve gives probabilities, so 'distance from the line' isn't the natural measure of fit. Instead you ask how probable the observed outcomes are under the curve and maximise that. Least squares handles categories and many inputs fine."
+  - q: "You fit logistic regression for loan defaults. It predicts 0.08 for an applicant. What does that number mean, if the model is well calibrated?"
+    options:
+      - "About 8 in 100 applicants like this one default"
+      - "This applicant will default on 8% of the loan amount"
+      - "The model is 8% sure about its yes/no answer"
+      - "The applicant scores 8 points on a risk scale"
+    answer: 0
+    explain: "Logistic regression outputs the probability of the 'yes' class. Calibrated means that among many applicants given 0.08, roughly 8% actually default. It is not a fraction of the loan, and it is not a confidence in some separate yes/no call."
+  - q: "An LLM API returns a log-probability of −0.05 for its chosen answer token. What does that tell you?"
+    options:
+      - "The answer has only a 5% chance of being the correct one"
+      - "The model is uncertain and should be retried"
+      - "The token was chosen with a 5% temperature"
+      - "The model gave that token about 95% probability"
+    answer: 3
+    explain: "e^−0.05 ≈ 0.95, so the model put about 95% of its probability on that token. That's the same kind of probability logistic regression produces, over a whole vocabulary instead of two classes. It says how confident the model was, not that it's right."
+backupResources:
+  - label: "Google Machine Learning Crash Course — Logistic regression"
+    url: "https://developers.google.com/machine-learning/crash-course/logistic-regression"
+    type: "interactive · course module"
+tags:
+  - math
+  - machine-learning
+  - logistic-regression
+  - classification
+---
+
+Linear regression predicts a number. Most decisions you'll automate are yes/no: cancel or stay,
+spam or not, fraud or fine. **Logistic regression squeezes a linear score through an S-shaped
+curve so the output is a probability between 0 and 1, and it is fitted by making the outcomes
+you actually saw as probable as possible.** That probability-plus-likelihood idea is the same
+one that trains language models.
+
+## The S-curve
+
+Start with a score, exactly like a line: z = b0 + b1 × x (or more inputs, each with its own
+weight). Then pass it through the **sigmoid**:
+
+```text
+p = 1 / (1 + e^(−z))
+```
+
+Large positive z gives p near 1; large negative z gives p near 0; z = 0 gives exactly 0.5. To
+classify, choose a cut-off. 50% is the default, but the right cut-off depends on what each kind
+of mistake costs.
+
+## Maximum likelihood
+
+There are no residuals to square, so the fit asks a different question: **if this curve were
+true, how probable is the data we actually saw?** Multiply the probability the curve gave each
+real outcome. In practice you add their logarithms (the **log-likelihood**), because products
+of many small numbers vanish. Its negative is called **log loss** or **cross-entropy**.
+
+## Worked example
+
+Three customers, input = logins last month, outcome = cancelled or not.
+
+| Logins | Outcome | Curve A: z = 2 − 0.5x | Curve B: z = 4 − x |
+|---|---|---|---|
+| 0 | cancelled | p(cancel) = 0.88 | p(cancel) = 0.98 |
+| 4 | stayed | p(stay) = 0.50 | p(stay) = 0.50 |
+| 8 | stayed | p(stay) = 0.88 | p(stay) = 0.98 |
+
+Likelihood of A: 0.88 × 0.50 × 0.88 ≈ **0.39**. Likelihood of B: 0.98 × 0.50 × 0.98 ≈
+**0.48**. B makes what happened more probable, so maximum likelihood prefers it. In log terms,
+A's log loss is about 0.95 and B's about 0.73: lower is better.
+
+Steeper isn't always better, though. When the classes overlap, a very steep curve gives the
+cases on the "wrong" side of the cut-off tiny probabilities, and their log loss jumps; the task
+shows this happening. That is the loss doing its job: it rewards honest probabilities, not bold
+ones.
+
+## Common mistakes
+
+- **Treating 50% as sacred.** The cut-off is a business decision; set it from the cost of each
+  error on held-out data.
+- **Reading the output as certainty.** A probability is only trustworthy if the model is
+  calibrated; check that cases scored around 0.8 come true about 80% of the time.
+- **Skipping the baseline.** If 95% of cases are "no", a model must beat always answering "no"
+  (→ machine-learning-fundamentals).
+- **Keeping useless inputs.** An input whose effect is indistinguishable from zero adds cost
+  and room to overfit.
+
+## Where you'll see it in AI
+
+- **Language models** end with a softmax, the many-class version of the sigmoid, and train on
+  the same log loss over the next token (→ neural-networks, → transformers-attention).
+- **Log-probabilities** returned by LLM APIs are these probabilities on a log scale, useful for
+  confidence checks and classification.
+- **Classifiers on embeddings** are often a logistic regression on top of the vectors
+  (→ embeddings-vector-databases).
+- **Metrics** such as precision, recall and ROC curves all start from choosing this lesson's
+  cut-off (→ evaluation-metrics).

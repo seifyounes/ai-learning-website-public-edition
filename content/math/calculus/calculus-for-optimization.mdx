@@ -1,0 +1,215 @@
+---
+title: "Gradient descent: how models learn"
+subtitle: "Cost functions, stepping downhill, learning rates & reading loss curves"
+summary: "Explain training as minimising a cost by stepping against the gradient, pick a sensible learning rate, and diagnose a run from its loss curves."
+changeNote: "Reshaped into lesson 7 of the calculus track around its own lecture; backprop, mini-batch and optimizer material moved to their own lessons."
+section: math
+pillar: calculus
+order: 7
+level: intermediate
+estMinutes: 42
+taskMinutes: 15
+prerequisites:
+  - gradient-steepest-ascent
+  - neural-networks
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "IHZwWFHWa-w"
+  published: "2017-10-16"
+  year: 2017
+  minutes: 21
+  title: "Gradient descent, how neural networks learn | Chapter 2, Deep learning"
+  channel: "3Blue1Brown"
+  why: "Everything earlier in the track (derivatives, partials, the gradient) gets put to work here on a real digit-recognition network. You see the cost surface and the step downhill as animation, so the update rule reads as a picture instead of a formula. It's chapter 2 of the Deep Learning series; chapter 1 is the main video of the neural networks lesson listed as a prerequisite."
+  notes:
+    - "Around 3:30–5:00: the cost function, built from one example's squared errors and then averaged over all training data. That average is the 'loss' on every training dashboard."
+    - "Around 11:30: the gradient [3, 1] read as 'the first input matters three times as much'. It's the most useful reading of a gradient for real work."
+    - "From about 17:20 the video is an interview on memorisation versus generalisation; it's optional but connects to the overfitting curve below."
+applyIt: |
+  **The overfitting curve you'll learn here has a daily analogue: tuning a prompt until it aces
+  the few examples you built it around.** Train-loss down, real quality flat, and the fix is the
+  same as in training: a held-out set you never tuned against. Pick one prompt you reuse (a saved
+  prompt, a custom GPT, a Gemini Gem, a Project's instructions) that turns rough input into
+  structured output, such as meeting notes into action items or a lecture into flashcards.
+
+  Run a 10-minute check. Find three real inputs you did NOT use while writing or tuning it, run
+  the prompt on each, and judge every output against the two or three things a good output must
+  do ("every action item has an owner and a date; nothing invented"). Then write one line in your
+  notes: held up, or overfit, and on which input.
+
+  **If you code:** keep those inputs in a file next to the prompt and rerun them after every edit.
+  **If you don't code yet:** keep them in a doc beside the prompt.
+
+  Success: three unseen inputs run, and a one-line verdict on whether the prompt generalizes.
+toolkit: |
+  - **Run gradient descent in a spreadsheet.** One row per step: weight, loss, gradient, and new
+    weight = weight − learning rate × gradient. Change the learning-rate cell and watch training
+    crawl, settle or blow up. A free Google Colab notebook does the same in a few lines of Python.
+  - **Set up a chat assistant as a calculus tutor.** In a ChatGPT or Claude Project or a Gemini
+    Gem, add the standing instruction "Ask me to attempt each step before telling me; when I'm
+    wrong, point at the line, not the answer." Bring it a chain-rule step or a loss curve.
+  - **Keep a held-out set for every prompt you rely on.** Tuning a saved prompt, Custom GPT or
+    Gem until it aces the handful of cases you keep is the train-loss-down / real-quality-flat
+    trap. Store 5–10 inputs you never tune against and rerun them after edits.
+  - **Save the four-pattern cheat-sheet in your notes.** Loss flat → learning rate too small or
+    data broken; oscillating to NaN → too big; train ↓ while validation ↑ → overfitting, stop
+    early; both plateau high → capacity or data.
+recap:
+  - emoji: "🔢"
+    title: "A network is a function"
+    text: "The digit network turns 784 pixel values into 10 outputs, and about 13,000 weights and biases decide exactly how. Learning means adjusting those numbers."
+  - emoji: "📉"
+    title: "Score the wrongness"
+    text: "For one image, add up the squared gaps between the outputs and the right answer. Average that over all training images and you have the cost: one number for how bad the weights are."
+  - emoji: "⚽"
+    title: "Roll downhill"
+    text: "You can't solve directly for the ideal 13,000 weights, so begin at random and step the way the slope goes down. Where you start decides which valley you end in."
+  - emoji: "🐢"
+    title: "Steps shrink near the bottom"
+    text: "Make each step proportional to the slope and the steps get smaller as the ground flattens, which helps avoid overshooting the minimum."
+  - emoji: "🧭"
+    title: "The negative gradient"
+    text: "With many weights, the negative gradient is the downhill direction. Each entry's sign says which way to nudge that weight; its size says how much that weight matters right now."
+  - emoji: "〰️"
+    title: "Smooth cost, smooth neurons"
+    text: "Stepping downhill needs a smooth cost, which is one reason artificial neurons use continuous activations rather than on/off firing."
+  - emoji: "🧪"
+    title: "Test on unseen data"
+    text: "The trained network gets about 96% of new images right, yet its hidden layers don't find the neat edges hoped for. A low training cost alone doesn't prove the model learned structure."
+task: |
+  Do gradient descent by hand — 10 minutes, no framework. Take f(w) = (w − 3)² (a toy loss
+  with minimum at w = 3). Derivative: f'(w) = 2(w − 3). Start at w = 0, learning rate 0.1, and
+  apply w ← w − lr·f'(w) for 5 steps on paper or in a Python one-liner loop. Then redo it with
+  lr = 1.1 and watch it diverge. No Python? A spreadsheet works: put w in column A, the update
+  formula in the next row, and fill down. You have now personally seen why the learning rate is
+  the first setting to check on any training run.
+  Success: with lr = 0.1, w climbs toward 3 (0.6, 1.08, 1.46…); with lr = 1.1, it swings past 3
+  with growing amplitude, and you can say why.
+selfCheck:
+  - q: "Partway through a training run, the loss stops falling and starts jumping up and down, with some steps making it worse. Using what the gradient tells the optimizer, what's the likely cause and your first fix?"
+    a: "The gradient (the partial derivatives of the loss for every parameter) points toward the steepest *increase*, and each step moves the opposite way, scaled by the learning rate. Steps that are too big overshoot the valley and land higher on the far side, so the loss bounces. Lower the learning rate, or add a schedule that decays it, first."
+  - q: "A fine-tune you started shows a perfectly flat loss for its first 2,000 steps, not even a small dip. Name two likely causes and how you'd tell them apart."
+    a: "A learning rate far too small, or broken data (labels shuffled, masked out or empty, so there's nothing to learn). Run a short trial with the LR ten times higher: if the loss starts moving it was the LR; if not, inspect a few training examples and the loss mask."
+  - q: "Your saved prompt aces the five examples you tuned it on, but people using it report vague results. Which loss-curve pattern is this, and what's the fix?"
+    a: "Train loss down while validation stays flat or worsens: overfitting to the cases you could see. Keep a held-out set of real inputs you never tune against and judge every edit on those."
+mcq:
+  - q: "You start a fine-tune. The loss plummets, then oscillates wildly and shoots up to NaN. What's the most likely culprit?"
+    options:
+      - "The dataset is too large for this many training steps"
+      - "The learning rate is too high, so steps overshoot"
+      - "The GPU ran short of memory and corrupted the weights"
+      - "The model is too small to fit the training data well"
+    answer: 1
+    explain: "This is the classic divergence signature: each oversized step lands on a steeper wall, producing a bigger gradient and a bigger step, a feedback loop that ends in NaN. First move: cut the LR by 3–10× or add warmup. Running out of memory crashes the job rather than making the loss oscillate, and a too-small model plateaus instead of exploding."
+  - q: "Train loss keeps falling. Validation loss fell for a while, then started climbing. What's happening, and what's the right move?"
+    options:
+      - "Underfitting: the model needs more epochs to learn"
+      - "The validation set is corrupt and should be dropped"
+      - "Overfitting: stop near the validation-loss minimum"
+      - "The learning rate is too low to reach the minimum"
+    answer: 2
+    explain: "Diverging train and validation curves are the overfitting signature: the model keeps improving on what it has memorized while getting worse on what it hasn't seen. Early stopping at the validation minimum is the cheapest fix; more data or regularization are the others. Underfitting would show both curves stuck high, and dropping the validation set just hides the problem."
+  - q: "You train the same network twice with the same data and settings but different random starting weights. The runs end at noticeably different losses. What's the most likely explanation?"
+    options:
+      - "Each run rolled downhill into a different valley"
+      - "One run computed its gradients incorrectly"
+      - "The learning rate changed between the two runs"
+      - "Gradient descent always finds the global minimum"
+    answer: 0
+    explain: "Gradient descent only goes downhill from where it starts, so different starting points can settle in different local minima. Nothing guarantees the lowest possible cost. A gradient bug is possible but isn't the first explanation when only the seed changed."
+  - q: "A network reaches near-perfect training accuracy, and you then discover its labels had been randomly shuffled. What does this tell you?"
+    options:
+      - "Shuffled labels must be harmless for this architecture"
+      - "The training loop must have been reading the clean labels"
+      - "Accuracy would be just as high on fresh held-out images"
+      - "Low training cost alone can come from pure memorisation"
+    answer: 3
+    explain: "Big networks have enough weights to memorise random labels, so a low training cost doesn't prove the model learned real structure. On held-out images it would score at chance. That's why every claim about a model is checked on data it never trained on."
+backupResources:
+  - label: "Go deeper: The Problem of Local Optima (DeepLearningAI, 5 min)"
+    url: "https://www.youtube.com/watch?v=fODpu1-lNTw"
+    type: "video"
+tags:
+  - math
+  - calculus
+  - optimization
+  - gradient-descent
+  - fine-tuning
+---
+
+**You need:** → gradient-steepest-ascent (the gradient points uphill) and → neural-networks
+(what weights and layers are).
+
+The one idea of this lecture: **a network "learning" means minimising a cost function by
+repeatedly nudging every weight a little against the gradient.** Once you see it that way,
+training stops feeling like magic and starts feeling like the calculus of the previous six
+lessons, run in a loop.
+
+## From a network to one number
+
+The lecture's network reads a 28×28 image (784 inputs) and produces 10 outputs, with about
+13,000 weights and biases in between. For one training image, the **cost** adds up the squared
+gaps between the 10 outputs and the right answer (1 for the true digit, 0 for the rest). Average
+that over every training image and you get a single number that depends on all 13,000 weights.
+That's the loss curve on every training dashboard.
+
+There's no formula for the best 13,000 weights. So you start from random weights and ask the
+gradient which way is downhill:
+
+```text
+w ← w − learning_rate × ∇loss(w)
+```
+
+Step, recompute, repeat. Where you start decides which valley you end in, and nothing promises
+the lowest one. Read each gradient entry as two facts: the sign says which way to move that
+weight, the size says how much that weight matters right now.
+
+## Worked example: train a one-weight model by hand
+
+A model predicts `w × x`; one example has x = 2 and y = 6, so the perfect weight is 3. The
+loss is `(w × x − y)²` and its gradient, from → chain-rule-and-product-rule, is `8w − 24`.
+
+1. **Learning rate 0.05, start at w = 0.** Gradient −24, so w becomes **1.2**. Next gradient
+   −14.4, so w = **1.92**. Then **2.35**, then about **2.61**. Each step closes 40% of the gap.
+2. **Learning rate 0.3.** Gradient −24, so w jumps to **7.2**, past 3. Next gradient 33.6, so
+   w = **−2.88**. Then about 11.2. The error grows 1.4× per step, flipping sign each time:
+   the "loss exploded to NaN" story at the size of one number.
+
+For this loss each step multiplies the error by `(1 − 8 × lr)`, so anything above lr = 0.25
+diverges. Real models have no tidy formula like that, which is why learning rates are found by
+trial runs and schedules (→ learning-rate-decay-schedules).
+
+> 💡 **Try it:** sketch a U-shaped valley on paper. Draw the update steps for a small LR (short
+> hops down one wall) and a huge LR (leaping across the valley to a HIGHER point on the other
+> wall, then higher again). You've just drawn every "my loss exploded" incident ever filed.
+
+## Reading loss curves
+
+- Loss flat from the start → LR too small, or data/labels broken.
+- Loss oscillates or explodes → LR too high.
+- Train ↓ while validation ↑ → overfitting; stop early or regularise.
+- Both plateau above target → a model or data capacity problem, not an optimiser problem.
+
+The lecture's own result shows why the validation curve matters: the network gets about 96% of
+unseen digits right, yet it confidently labels random noise as a digit, and (from the interview)
+large networks can drive training cost down even on shuffled labels by memorising them.
+
+## Common mistakes
+
+- **Loss turns NaN after a few hundred steps** → LR too high, often with no warmup → cut the
+  LR 3–10×, and turn on gradient clipping if your tool offers it.
+- **Loss never moves** → LR far too small, or labels missing or masked out → run a short LR
+  sweep, and print five training examples exactly as the model sees them.
+- **Judging a run by training loss alone** → it can fall through memorisation; always watch a
+  held-out curve.
+- **Expecting the global minimum** → descent finds *a* valley, and different seeds can find
+  different ones.
+
+## Where you'll see it in AI
+
+- **Every training and fine-tuning run** is this loop (→ fine-tuning-fundamentals).
+- **The gradient itself** is computed by backpropagation (→ backprop-chain-rule-calculus).
+- **Real runs** estimate it on mini-batches (→ mini-batches-and-epochs) and use smarter steps
+  (→ momentum-optimizer, → adam-optimizer).
+- **Evals** exist because training loss can lie (→ evaluation-metrics).

@@ -1,0 +1,192 @@
+---
+title: "Mean, variance and standard deviation"
+subtitle: "Computing the centre and spread of your data, and the n − 1 that trips up code"
+summary: "Compute a mean, variance and standard deviation by hand and in code, and know when to divide by n − 1 instead of n."
+changeNote: "New lesson in the probability and statistics track, written from the lecture's transcript, with a worked rerun example and a quiz."
+section: math
+pillar: probability-statistics
+order: 4
+level: beginner
+estMinutes: 20
+taskMinutes: 20
+prerequisites:
+  - probability-statistics-for-ai
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "SzZ6GpcfoQY"
+  published: "2019-07-15"
+  year: 2019
+  minutes: 14
+  title: "Calculating the Mean, Variance and Standard Deviation, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "The last lesson separated parameters from estimates; this one shows how to compute both. StatQuest works the formulas with small numbers you can follow by hand, and spends real time on why the sample version divides by n − 1, which is the step most people skip and the one that quietly differs between spreadsheet functions and code libraries."
+  notes:
+    - "7:44 The estimating formula appears. The two changes from the population formula, x̄ instead of μ and n − 1 instead of n, are the whole lesson."
+    - "12:56 The postscript on Excel's VAR.P versus VAR.S is the practical takeaway: for a sample, use the .S version."
+applyIt: |
+  **Any time you report a number from several runs, report its spread too.** A mean alone hides
+  whether every run was close or whether they swung wildly. Take one result you share: an eval
+  score from reruns, a judge's ratings, the cost or time per request.
+
+  1. Collect the individual values, not just the average.
+  2. Compute the mean and the sample standard deviation (`STDEV.S` in a spreadsheet,
+     `statistics.stdev` in Python, `ddof=1` in NumPy).
+  3. Report it as "mean ± SD over n runs", for example "78 ± 5 over 5 runs".
+
+  **If you build software:** check which formula your library uses by default before you log
+  spreads; NumPy and pandas disagree. **If you don't code:** use `STDEV.S`, not `STDEV.P`, for
+  data that is a sample, which is almost always.
+
+  Success: one number you report now carries its standard deviation and its n.
+recap:
+  - emoji: "🎯"
+    title: "Calculated, not estimated"
+    text: "With every value in the population, the mean is simply their average, μ. That's the population mean itself, not an estimate of it."
+  - emoji: "🧪"
+    title: "The sample mean"
+    text: "With only a sample, the same average gives x̄, the estimated mean. It differs from μ, but it gets closer as you collect more data."
+  - emoji: "📏"
+    title: "Population variance"
+    text: "Subtract μ from each value, square the differences so left and right don't cancel, add them up and divide by n. That's the average squared distance."
+  - emoji: "√"
+    title: "Back to real units"
+    text: "Variance comes out in squared units, which you can't draw on the data's axis. Its square root, the standard deviation, is in the original units."
+  - emoji: "➗"
+    title: "Estimating from a sample"
+    text: "Use x̄ instead of μ and divide by n − 1. Distances to the sample mean run smaller than distances to the true mean, so dividing by n would underestimate the spread."
+  - emoji: "📊"
+    title: "Pick the right function"
+    text: "You almost never have the whole population, so use the estimating formula. In Excel that's VAR.S rather than VAR.P."
+task: |
+  Compute a spread by hand, then catch the n versus n − 1 difference in your tools.
+
+  1. Take five eval scores from reruns: 72, 75, 78, 80, 85. On paper, compute the mean, each
+     squared difference from it, the sample variance (÷ 4) and the sample standard deviation.
+  2. Check yourself in code, or in a spreadsheet with `VAR.S`, `STDEV.S` and `STDEV.P`:
+
+  ```python
+  import statistics
+  import numpy as np
+
+  scores = [72, 75, 78, 80, 85]
+  print(statistics.mean(scores), statistics.stdev(scores))  # sample SD
+  print(np.std(scores))          # divides by n by default
+  print(np.std(scores, ddof=1))  # divides by n - 1
+  ```
+
+  3. Write one line on which number you'd report for these five reruns, and why.
+
+  Success: your hand calculation matches `statistics.stdev` (about 4.95), and you can say why
+  `np.std` gives about 4.43.
+selfCheck:
+  - q: "A colleague reports that a new prompt's quality score has 'a variance of 25'. The scores are on a 0 to 100 scale. What do you need to know before you can tell whether that's a lot?"
+    a: "Variance is in squared units, so 25 is not 25 points of spread. Take the square root: a standard deviation of 5 points. Then compare that with the mean and with the gap you're trying to detect; 5 points of spread across runs is large if you're judging a 3-point improvement."
+  - q: "Your logging code uses np.std() to report the spread of three reruns per prompt, and every prompt looks remarkably consistent. What would you check?"
+    a: "np.std divides by n by default, which underestimates spread for a sample, and with n = 3 the bias is large (it shrinks the SD by about 18%). Switch to ddof=1, and note that three runs give a shaky estimate of spread either way."
+mcq:
+  - q: "Five reruns of an eval give 72, 75, 78, 80 and 85. You need the spread to judge how stable the prompt is. Which calculation fits?"
+    options:
+      - "Sum the squared differences from 78 and divide by 5"
+      - "Sum the squared differences from 78 and divide by 4"
+      - "Average the absolute differences from the median 78"
+      - "Take the range, 85 − 72, and divide it by the mean"
+    answer: 1
+    explain: "The reruns are a sample of all possible runs, so the sample variance divides the sum of squared differences (98) by n − 1 = 4, giving 24.5 and an SD near 4.95. Dividing by 5 gives the population formula, which understates spread when you only have a sample."
+  - q: "Why does dividing by n tend to underestimate spread when you compute variance from a sample?"
+    options:
+      - "Squaring makes small differences shrink faster than big ones"
+      - "Small samples usually miss the largest values in the data"
+      - "n is always larger than the true number of independent values"
+      - "Values sit closer to their own sample mean than to the true mean"
+    answer: 3
+    explain: "The sample mean is computed from the same values, so it lands in the middle of them and the squared distances to it are smaller than distances to the true mean would be. Dividing by n − 1 compensates. It isn't about missing extreme values; the bias exists even when the sample is perfectly representative."
+  - q: "Ten reruns of a cost-per-request measurement give a mean of $0.020 and a standard deviation of $0.002. One run, on an unusually long input, cost $0.090. What happens when you include it?"
+    options:
+      - "Both the mean and the SD jump, the SD by far the most"
+      - "The mean rises a little and the SD stays about the same"
+      - "Only the SD changes, since the mean ignores single outliers"
+      - "Neither moves much, as one value is a small share of eleven"
+    answer: 0
+    explain: "The mean shifts by the outlier's excess divided by 11, about $0.006, while squaring makes its $0.07 distance dominate the variance, so the SD grows many times over. Squared distances make variance and SD very sensitive to outliers; consider reporting the median too."
+backupResources:
+  - label: "Introductory Statistics 2e, 2.7: Measures of the spread of the data (OpenStax)"
+    url: "https://openstax.org/books/introductory-statistics-2e/pages/2-7-measures-of-the-spread-of-the-data"
+    type: "free textbook · worked examples and exercises"
+tags:
+  - math
+  - statistics
+  - variance
+  - evals
+---
+
+**You need:** squares and square roots. → probability-statistics-for-ai first.
+
+Two numbers summarize most data you'll report: where the values sit (the **mean**) and how much
+they spread out (the **standard deviation**). For AI work the spread matters as much as the
+average, because users never see an average. They each get a single run, and the standard
+deviation tells you how far that run can land from the mean.
+
+## The mean
+
+Add the values, divide by how many there are. With the whole population it's the true mean (μ);
+with a sample it's the sample mean (x̄), an estimate that moves with the sample.
+
+## Variance: average squared distance
+
+For each value, take its distance from the mean and **square it**. Squaring stops positive and
+negative distances from cancelling and weighs big misses more heavily. Averaging those squares
+gives the **variance**.
+
+The catch is units: if the values are percentage points, the variance is in "points squared",
+which you can't compare with anything directly.
+
+## Standard deviation: back to real units
+
+Take the square root of the variance and you're back in the data's own units. That's the
+**standard deviation**, the width of the bell curve from → normal-distribution-bell-curve.
+
+## Why a sample divides by n − 1
+
+When all you have is a sample, you measure distances from the sample mean, and the sample mean
+is computed from those same values, so it sits right in their middle. The distances come out
+smaller than distances to the true mean would be, and the variance comes out too small. Dividing
+by **n − 1** instead of n corrects that bias. With 5 values the difference is about 25% in
+variance; with 1,000 it's negligible.
+
+| Formula | Spreadsheet | Python |
+|---|---|---|
+| Sample (÷ n − 1) | `STDEV.S` | `statistics.stdev`, `np.std(x, ddof=1)` |
+| Population (÷ n) | `STDEV.P` | `statistics.pstdev`, `np.std(x)` |
+
+pandas' `.std()` uses n − 1 by default and NumPy's `np.std` uses n, so the same data can report
+two different spreads.
+
+## Worked example: five reruns of an eval
+
+Scores: 72, 75, 78, 80, 85.
+
+1. **Mean:** 390 ÷ 5 = **78**.
+2. **Differences from 78:** −6, −3, 0, 2, 7.
+3. **Squares:** 36, 9, 0, 4, 49. Sum = **98**.
+4. **Sample variance:** 98 ÷ 4 = **24.5**. Sample SD = √24.5 ≈ **4.95** points.
+5. **Population formula, for comparison:** 98 ÷ 5 = 19.6, SD ≈ 4.43.
+
+Report it as "78 ± 5 over 5 runs". Anyone reading that knows a single run could easily land at
+73 or 83, so a 2-point difference between two prompts at this spread means little.
+
+## Common mistakes
+
+- **Reporting a mean without a spread.** "78%" and "78 ± 5%" lead to different decisions.
+- **Using the population formula on a sample.** It makes small samples look more consistent than
+  they are.
+- **Reading variance as if it were in data units.** Take the square root first.
+- **Ignoring outliers.** One extreme value inflates the SD a lot because distances are squared.
+
+## Where you'll see it in AI
+
+Layer normalization and batch normalization inside neural networks compute a mean and variance
+of activations and rescale them. Standardizing input features subtracts the mean and divides by
+the standard deviation. The Adam optimizer keeps running averages of gradients and of their
+squares. And every honest eval report gives "mean ± SD over n runs". Next,
+→ standard-error-vs-deviation separates the spread of the data from the uncertainty of the mean.

@@ -1,0 +1,214 @@
+---
+title: "LLM as a judge"
+subtitle: "Using one model to grade another, and the biases you must control first"
+summary: "Choose between direct scoring and pairwise comparison for an LLM judge, and test it for position, length and self-preference bias before trusting it."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript; the position-bias exercise and quiz question moved here from the ROC lesson."
+section: math
+pillar: evaluation
+order: 10
+level: intermediate
+estMinutes: 11
+taskMinutes: 25
+prerequisites:
+  - llm-error-analysis
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "trfUBIDeI1Y"
+  published: "2025-09-15"
+  year: 2025
+  minutes: 6
+  title: "LLM as a Judge: Scaling AI Evaluation Strategies"
+  channel: "IBM Technology"
+  why: "Reference-free checks need a grader, and reading every output by hand stops scaling quickly. This short lecture covers the two ways to use a model as that grader (a rubric, or picking the better of two answers), why teams use it, and the three biases that can quietly skew its verdicts. It's the right size for this point in the track: the mechanics and the warnings, before the last lesson shows how to check that a judge agrees with you."
+  notes:
+    - "0:34 The two strategies: direct assessment against a rubric, and pairwise comparison of two outputs."
+    - "3:39 The biases: position (favours option A), verbosity (favours longer) and self-enhancement (favours its own outputs)."
+    - "5:14 The basic defence: swap the positions and see whether the verdict changes."
+applyIt: |
+  **Any time you ask an AI to grade or compare work, you're using a biased classifier, so test it
+  before you trust its scores.** It might be a chat assistant ranking two drafts of your essay or
+  cover letter, an AI reviewer on your code changes, or an LLM-as-judge script scoring a
+  chatbot's answers. All of them can carry position bias (favoring whatever's shown first),
+  verbosity bias (longer reads as better) and self-preference: the failure modes this lesson
+  names, wearing a friendly "9/10".
+
+  Run the position-bias check now, in about ten minutes. Paste two drafts of something you've
+  written into a chat assistant and ask which is better and why. Open a fresh chat, paste them in
+  the reverse order and ask again. Repeat once more with a different pair.
+
+  ```prompt
+  Here are two versions of [what they are]. Which is better for [the reader and goal]? Answer
+  "A" or "B" first, then give two reasons.
+  ```
+
+  If the winner flips with the order, write one rule in your notes for every future AI
+  comparison: always run both orders, and treat a flip as "no clear winner".
+
+  Success: two pairs tested in both orders, and a written verdict on whether that judge flips.
+toolkit: |
+  - **Bake judge hygiene into your saved evaluation prompt.** Whatever grades your work (a saved
+    prompt snippet, a Custom GPT, a Gem, a Claude Project), make it run both orderings, cap or
+    normalize length, and list a few items for you to check by hand each time.
+  - **Prefer a yes/no rubric over a 1–10 score.** Ask "does this meet [one specific
+    criterion]? Answer yes or no, then explain", one criterion per question. Binary verdicts are
+    easier to check and to act on.
+  - **Use a different model family to judge.** When comparing outputs from two assistants, grade
+    them with a third, or check a sample yourself, so neither gets a home-team advantage.
+recap:
+  - emoji: "🏋️"
+    title: "Why a judge"
+    text: "Labelling hundreds of chatbot replies or summaries by hand is slow, and word-overlap metrics need a reference. An LLM can grade at scale."
+  - emoji: "📋"
+    title: "Direct assessment"
+    text: "Write a rubric, such as 'Is this summary clear and coherent? Yes or no', and the judge labels each output against it."
+  - emoji: "🆚"
+    title: "Pairwise comparison"
+    text: "Show two outputs and ask which is better. With many outputs, a ranking method turns the comparisons into an order."
+  - emoji: "🧑‍🔬"
+    title: "Which do people prefer?"
+    text: "In IBM's user research, about half preferred direct assessment for control, a quarter preferred pairwise for subjective tasks, and the rest combined them."
+  - emoji: "✨"
+    title: "The upsides"
+    text: "Judges scale, they make it easy to refine criteria as you see more data, and they can grade subjective qualities like 'does this sound natural?'"
+  - emoji: "⚠️"
+    title: "Three biases"
+    text: "Position bias favours a slot, verbosity bias favours length, and self-enhancement bias favours the judge's own outputs."
+  - emoji: "🔄"
+    title: "Stay vigilant"
+    text: "Bias doesn't make a judge useless. Swap positions, check whether verdicts change, and keep watching."
+task: |
+  Test a chat-assistant judge for verbosity bias.
+
+  1. Take 5 short answers you know are good: answers to questions from your studies or work,
+     or replies from an AI you've checked.
+  2. For each, make a padded copy: same facts, plus two sentences of filler ("This is an
+     important question that many people ask…").
+  3. In a fresh chat for each pair, paste both versions (short one as A in half the pairs, as B
+     in the others) and ask:
+
+  ```prompt
+  Which answer is better for a reader who wants a correct, clear answer? Reply "A" or "B" first,
+  then one sentence of reasoning.
+  ```
+
+  4. Count how often the padded version wins. Then add "Do not reward length; extra words that
+     add no information are a flaw" to the prompt and rerun all 5.
+
+  Success: two counts out of 5 (before and after the instruction), and a note on whether this
+  judge rewards length.
+selfCheck:
+  - q: "You must check every reply from a support bot against one rule: never promise a refund. Direct assessment or pairwise comparison?"
+    a: "Direct assessment with a yes/no rubric: each reply either breaks the rule or doesn't, and there's nothing to compare it with. Pairwise suits choosing the better of two versions, especially for subjective qualities."
+  - q: "A judge scores your new prompt's answers higher, but the new prompt also makes answers twice as long. What do you do before believing the improvement?"
+    a: "Suspect verbosity bias. Compare length-matched answers, tell the judge not to reward length, or check a sample by hand. If the win disappears when length is controlled, it was the length."
+  - q: "You compare your assistant (built on vendor X's model) with a rival on vendor Y's, using vendor X's model as judge. What's the risk, and the fix?"
+    a: "Self-enhancement bias: the judge may favour outputs that read like its own. Use a judge from a third model family, and hand-check a sample of verdicts."
+mcq:
+  - q: "You compare two prompts on the same model, using an LLM-as-judge over 400 pairs. Every pair shows prompt A's response first, and the judge prefers A 62% of the time. What's the biggest threat to concluding that prompt A is better?"
+    options:
+      - "The judge prefers outputs written by its own model family"
+      - "400 pairs is too few to tell 62% apart from 50%"
+      - "The judge may favor whichever response it reads first"
+      - "Sampling above temperature zero makes each verdict random"
+    answer: 2
+    explain: "Because A is always shown first, the 62% may be measuring order rather than quality; swap the order on half the pairs and count how often the winner flips. Self-preference is real, but both responses come from the same model, so it tilts toward neither. With 400 pairs one standard error is about 2.5 points, so 62% sits roughly five standard errors from 50% and isn't chance (→ standard-error-vs-deviation). Temperature adds random noise to verdicts, not a steady tilt toward A."
+  - q: "Every output from a medical-information bot must avoid giving dosage advice. You want an automated check on each reply. Which judge setup fits?"
+    options:
+      - "A yes/no rubric applied to each reply on its own"
+      - "Pairwise comparison against yesterday's best reply"
+      - "A 1–10 safety score averaged across each day's replies"
+      - "Pairwise ranking of all replies, then review the bottom"
+    answer: 0
+    explain: "A single rule that each reply passes or fails is direct assessment. Pairwise comparison says which of two is better, not whether either breaks the rule, and a 1–10 average blurs individual violations into a number nobody can act on."
+  - q: "You compare your assistant (on vendor X's model) with a rival (on vendor Y's), and the judge is vendor X's model. Your assistant wins 70% of pairs. What should you do next?"
+    options:
+      - "Accept the win: 70% is far too large to come from bias"
+      - "Rerun with a third-family judge and hand-check some"
+      - "Swap to vendor Y's model as judge and report that result"
+      - "Rerun the same judge at temperature zero to steady it"
+    answer: 1
+    explain: "A judge may favour outputs that resemble its own, so a judge from a third family, plus a hand-checked sample, removes the home advantage. Swapping to vendor Y's judge just flips the bias; temperature zero makes the verdict repeatable, not fair."
+  - q: "After you add 'be thorough' to a prompt, your judge's win rate for it jumps from 50% to 71%, and answers are about twice as long. What's the most likely issue?"
+    options:
+      - "The new prompt made the model's reasoning much stronger"
+      - "The judge is showing position bias towards the new prompt"
+      - "The sample of pairs is too small to show any real change"
+      - "The judge is rewarding length rather than better answers"
+    answer: 3
+    explain: "When win rate rises together with length, verbosity bias is the first suspect. Control length or tell the judge not to reward it, then rerun; if the gain survives, it's real. Position bias depends on order, not on which prompt is new."
+backupResources:
+  - label: "Hamel Husain: Using LLM-as-a-judge for evaluation (field guide)"
+    url: "https://hamel.dev/blog/posts/llm-judge/"
+    type: "article"
+tags:
+  - math
+  - evaluation
+  - llm-as-judge
+  - evals
+---
+
+**You need:** reference-free evals from → llm-app-evals.
+
+When there's no single correct answer, someone has to judge each output, and people don't
+scale. An **LLM judge** reads an output with an evaluation prompt and returns a verdict. It's
+fast and flexible, and it's also a classifier with its own biases. Treat it like any other
+model you ship: measure it before you trust it.
+
+## Two ways to use a judge
+
+- **Direct assessment:** a rubric for one output at a time. "Is this summary faithful to the
+  source? Yes or no." Best for rules and compliance, where each output passes or fails on its
+  own.
+- **Pairwise comparison:** show two outputs and ask which is better. Best for subjective
+  quality, or for choosing between two prompts or models. Many pairwise results can be combined
+  into a ranking.
+
+Some teams combine them: direct assessment to filter out outputs that break the rules, then
+pairwise to pick the best of what's left.
+
+## Why it's popular
+
+It **scales** to thousands of outputs. It's **flexible**: as you see more data and your
+criteria shift, you edit a prompt instead of relabelling everything. And it handles **nuance**
+that word-overlap metrics such as BLEU and ROUGE can't, like "does this sound natural?" when
+there's no reference to compare with.
+
+## Three biases
+
+- **Position bias:** favouring whichever answer appears in one slot, regardless of content.
+- **Verbosity bias:** favouring the longer answer, even when the extra length is repetition.
+- **Self-enhancement bias:** favouring outputs that read like the judge's own model.
+
+## Worked example: a position swap
+
+You compare prompt A and prompt B on 100 questions, and judge each pair **twice**, once in each
+order.
+
+1. In 58 pairs, the same prompt wins both times: A in 34, B in 24.
+2. In 42 pairs, the winner flips with the order. Those verdicts measure position, not quality,
+   so count them as ties.
+3. Among decided pairs, A wins 34 of 58 ≈ **59%**.
+4. Had you shown A first every time, A would have collected its 34 real wins plus all 42
+   position-driven ones: 76%, a much bigger and false lead.
+
+A flip rate of 42% also tells you this judge is unreliable on these questions. Tighten the
+rubric, or hand-check before relying on it.
+
+## Common mistakes
+
+- **One ordering only.** Always randomize or run both orders.
+- **1–10 scores.** Hard to calibrate and hard to act on; yes/no on one criterion is clearer.
+- **The judge grades its own family's work.** Use a different family, or audit by hand.
+- **Trusting it without measuring it.** A judge needs its own eval against human labels, which
+  → eval-from-real-traces shows step by step.
+
+## Where you'll see it in AI
+
+- **Prompt and model comparisons:** pairwise judging is how many teams pick a winner
+  (→ single-number-metric for turning results into one number).
+- **Arena-style leaderboards:** pairwise votes, by people instead of a model, turned into
+  rankings (→ reading-llm-benchmarks).
+- **Production monitoring:** a direct-assessment judge on a sample of live traffic
+  (→ observability-tracing).
+- **Checking the judge:** its verdicts against yours form a → confusion-matrix.

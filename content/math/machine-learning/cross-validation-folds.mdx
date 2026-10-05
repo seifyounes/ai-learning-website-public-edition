@@ -1,0 +1,219 @@
+---
+title: "Cross-validation"
+subtitle: "Rotate the held-out slice so one lucky split can't fool you"
+summary: "Compare models and tune settings with k-fold cross-validation, read the spread across folds, and avoid the leaks that make folds lie."
+changeNote: "New lesson in the machine learning track, written from the lecture's transcript, with a worked example, a code task and a quiz."
+section: math
+pillar: machine-learning
+order: 3
+level: beginner
+estMinutes: 11
+taskMinutes: 25
+prerequisites:
+  - bias-variance-overfitting
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "fSytzGwwBVw"
+  published: "2018-04-24"
+  year: 2018
+  minutes: 6
+  title: "Machine Learning Fundamentals: Cross Validation"
+  channel: "StatQuest with Josh Starmer"
+  why: "The first two lessons split the data once. This six-minute lecture asks the obvious next question, which slice should be the test set, and answers it by using every slice in turn. It covers 4-fold, 10-fold and leave-one-out, and ends with the use you'll need two lessons later: picking a tuning setting such as ridge regression's penalty. It's the shortest clear treatment of the idea we found."
+  notes:
+    - "2:06 Why you can't train and test on the same rows, and why a single 75/25 split leaves you guessing which block to hold out."
+    - "3:41 The rotation: each block takes a turn as the test set and the results are summarized at the end."
+    - "4:45 Leave-one-out and 10-fold, then (5:16) using cross-validation to pick a tuning parameter."
+applyIt: |
+  **Whenever a decision rests on a small labeled set, check that the winner wins on every
+  slice, not just one.** That holds for choosing between two models, two feature sets or two
+  settings. Take a comparison you've made (or are about to make) in your own work and run it
+  across folds.
+
+  1. Split your labeled examples into 5 groups. If rows belong to the same customer, user,
+     patient or document, keep each one's rows in a single group.
+  2. For each group: build or tune on the other four, score on this one. Write down all five
+     scores for each option.
+  3. Compare the averages *and* the spread. If the gap between options is smaller than the
+     fold-to-fold swing, call it a tie and pick the cheaper option.
+
+  **If you build software:** scikit-learn's `cross_val_score` does steps 1–2 in one line, and
+  `GroupKFold` or `TimeSeriesSplit` handle shared customers and dates. **If you don't code:**
+  five filtered copies of a spreadsheet tab do the same job by hand for a formula-based rule.
+  Success: you have five scores per option and a decision that survives the spread.
+recap:
+  - emoji: "🩺"
+    title: "Which method to trust?"
+    text: "Given patient measurements, you could predict heart disease with logistic regression, nearest neighbours or a support vector machine. Cross-validation is how you choose between them."
+  - emoji: "🧪"
+    title: "Data has two jobs"
+    text: "The same data must train the methods (estimate their parameters) and test them. Training on all of it leaves nothing to test with."
+  - emoji: "🎲"
+    title: "Which block is the test?"
+    text: "Training on the first 75% and testing on the last 25% works, but any other quarter could have been the test block, and each choice gives a different answer."
+  - emoji: "🔁"
+    title: "Use every block"
+    text: "Cross-validation gives each block a turn as the test set, trains on the rest each time, and sums up how each method did across all turns."
+  - emoji: "🔟"
+    title: "How many folds"
+    text: "Four blocks is 4-fold. One sample per block is leave-one-out. Ten blocks, 10-fold, is the common choice in practice."
+  - emoji: "🎛️"
+    title: "Tuning with folds"
+    text: "Some methods have a setting you guess rather than estimate, such as ridge regression's penalty. Try several values and keep the one that cross-validates best."
+task: |
+  See how much a single split can mislead, then fix it with folds. Run this in a free Google
+  Colab notebook (scikit-learn is preinstalled). It uses a small built-in medical dataset of 569
+  tumour measurements labelled benign or malignant.
+
+  ```python
+  from sklearn.datasets import load_breast_cancer
+  from sklearn.model_selection import train_test_split, cross_val_score
+  from sklearn.linear_model import LogisticRegression
+  from sklearn.neighbors import KNeighborsClassifier
+  from sklearn.tree import DecisionTreeClassifier
+  from sklearn.pipeline import make_pipeline
+  from sklearn.preprocessing import StandardScaler
+
+  X, y = load_breast_cancer(return_X_y=True)
+
+  # 1. One model, five different single splits
+  for seed in range(5):
+      X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.25, random_state=seed)
+      tree = DecisionTreeClassifier(random_state=0).fit(X_tr, y_tr)
+      print("split", seed, "accuracy", round(tree.score(X_te, y_te), 3))
+
+  # 2. Three methods, compared with 10-fold cross-validation
+  models = {
+      "logistic regression": make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000)),
+      "nearest neighbours": make_pipeline(StandardScaler(), KNeighborsClassifier()),
+      "decision tree": DecisionTreeClassifier(random_state=0),
+  }
+  for name, model in models.items():
+      s = cross_val_score(model, X, y, cv=10)
+      print(f"{name}: mean {s.mean():.3f}  min {s.min():.3f}  max {s.max():.3f}")
+  ```
+
+  1. From part 1, write down the lowest and highest single-split accuracy for the same tree.
+  2. From part 2, rank the three methods by mean. Is the gap between first and second bigger
+     than the min-to-max swing of either one?
+  3. Change `cv=10` to `cv=4` and rerun. Does the ranking hold?
+
+  **No code?** Take any 20-row table where you predict a yes/no column with a simple rule (for
+  example "renewed if logins > 5"). Score the rule on rows 1–5, 6–10, 11–15 and 16–20
+  separately and note how much the four accuracies differ.
+
+  Success: you can state the spread a single split hides, and which method wins across folds.
+selfCheck:
+  - q: "You have 300 labeled rows and want to choose the number of neighbours for a nearest-neighbours classifier. Walk through how you'd use cross-validation and what model you finally ship."
+    a: "Try several values (say 1, 3, 5, 9, 15). For each, run 10-fold cross-validation on the rows and average the fold scores. Pick the value with the best average (or the simplest one within noise of it), then retrain on all the training rows with that value and ship that model. If you also kept a separate test set, score it once at the end."
+  - q: "A colleague runs 2-fold cross-validation because it's fastest. What do they lose compared with 10-fold?"
+    a: "Each model in 2-fold trains on only half the data, so it is weaker than the model you'll actually ship, which makes the scores pessimistic, and two scores give a poor read of the spread. Ten folds train on 90% each time and give ten numbers to average."
+mcq:
+  - q: "You try 40 hyperparameter combinations, pick the best by 10-fold cross-validation on all your data, and report its mean as expected real-world accuracy. What's the problem?"
+    options:
+      - "Ten folds are too few to compare 40 combinations"
+      - "Cross-validation can't be used for hyperparameters"
+      - "The score is optimistic: it chose the winner too"
+      - "The score is pessimistic: each fold had less data"
+    answer: 2
+    explain: "With 40 candidates, the best cross-validation score is partly the luckiest one, so it overstates the real accuracy. Keep a test set that played no part in the search and report that. The fold-size effect is real but small next to this selection effect."
+  - q: "Your support-ticket dataset has several tickets per customer. Random 5-fold cross-validation gives 92%; the model does much worse in production. What's the likeliest cause?"
+    options:
+      - "The same customers sat in training and test folds"
+      - "Five folds was too few for this many tickets"
+      - "The model needed leave-one-out cross-validation"
+      - "Production tickets are longer than the training ones"
+    answer: 0
+    explain: "Tickets from one customer share wording and context, so random folds let the model recognise customers it trained on. Production only sees new customers. Group the folds by customer (GroupKFold in scikit-learn). More folds or leave-one-out would leak the same way."
+  - q: "Across 5 folds, model A scores 83, 84, 84, 85, 84 and model B scores 76, 93, 80, 91, 85. B's mean is 85, A's is 84. What should you conclude?"
+    options:
+      - "B is better, because its mean is higher"
+      - "B is better, because its best fold is far higher"
+      - "A is better, because cross-validation favours low means"
+      - "No clear winner; A is the steadier choice"
+    answer: 3
+    explain: "A one-point gap in means is tiny next to B's fold-to-fold swing of 17 points, so the data can't separate them. A's consistency is worth something: B's bad folds tell you it can do much worse on some data."
+  - q: "You forecast daily demand from three years of history. How should the folds be built?"
+    options:
+      - "Random days in each fold, so every season is covered"
+      - "Train on earlier periods, test on the period after"
+      - "Leave-one-out, testing each day on its own"
+      - "One fold per weekday, so patterns are balanced"
+    answer: 1
+    explain: "A forecast is always used on the future, so each fold should train on the past and test on what follows (forward-chaining, TimeSeriesSplit in scikit-learn). Random days or leave-one-out let the model peek at the days just after each test day."
+backupResources:
+  - label: "Go deeper: Train/Dev/Test Sets (C2W1L01) (DeepLearningAI, 12 min)"
+    url: "https://www.youtube.com/watch?v=1waHlpKiNyY"
+    type: "video"
+  - label: "scikit-learn user guide — Cross-validation"
+    url: "https://scikit-learn.org/stable/modules/cross_validation.html"
+    type: "docs · reference with diagrams"
+tags:
+  - math
+  - machine-learning
+  - cross-validation
+  - model-selection
+---
+
+A single train/test split is one roll of the dice: a different 25% held out gives a different
+score, sometimes a very different one. **Cross-validation removes the luck by giving every part
+of the data a turn as the test set and averaging the results.** It's how you compare methods
+and pick settings when labeled data is scarce, which in applied AI is most of the time.
+
+## How k-fold works
+
+Cut the data into *k* equal blocks (folds). For each fold: train on the other *k − 1*, test on
+this one, write down the score. You end with *k* scores per method. Their **mean** estimates how
+the method does on new data; their **spread** tells you how much to trust the mean.
+
+- **k = 10** is the common default: each model trains on 90% of the data.
+- **Leave-one-out** makes every row its own fold: as much training data as possible, but one
+  model per row, so it's slow on anything large.
+- Smaller *k* is cheaper but trains on less data each time, so scores run a little low.
+
+## Worked example: when one split picks the wrong winner
+
+Two methods, 4-fold cross-validation, accuracy per fold:
+
+| Fold | Method A | Method B |
+|---|---|---|
+| 1 | 0.90 | 0.82 |
+| 2 | 0.70 | 0.80 |
+| 3 | 0.85 | 0.84 |
+| 4 | 0.75 | 0.78 |
+| Mean | 0.80 | 0.81 |
+
+Had you split once and the test block happened to be fold 1, A would win by 8 points. Across all
+four folds the means are within a point, and A swings 20 points between folds while B stays
+within 6. The honest conclusion: no real difference in accuracy, and B is the more predictable
+choice.
+
+## Tuning a setting
+
+Many methods have a knob you choose rather than learn: the penalty strength in
+→ ridge-regularization, the depth of a tree, the number of neighbours. Try a range of values,
+cross-validate each, keep the best, then **retrain once on all the training data** with that
+value. If you have the data for it, keep a separate test set that took no part in any of this
+and score it once at the end; the tuning folds have been looked at too often to be neutral.
+
+## Common mistakes
+
+- **Leaky folds.** Rows from the same customer, patient or document in different folds let the
+  model recognise them. Group the folds.
+- **Random folds on time series.** Train on the past and test on the period after.
+- **Preprocessing before splitting.** Scaling or selecting features on the full dataset lets
+  test rows shape the training. Do it inside each fold (a scikit-learn pipeline does this).
+- **Reading only the mean.** A gap between methods smaller than the fold-to-fold spread is
+  noise.
+
+## Where you'll see it in AI
+
+- **Small labeled sets** are the norm when you build a classifier on top of embeddings
+  (→ embeddings-vector-databases) or fine-tune a small model: cross-validation tells you
+  whether the result is real before you spend more on labels.
+- **Choosing prompts or settings on an eval set** has the same trap as tuning on folds: the
+  version you picked looks better than it is. Keep a held-out set (→ evals-and-testing).
+- **With very large datasets**, a single held-out slice of a few percent already holds
+  thousands of examples, so k-fold matters less; that's the regime the optional
+  train/dev/test lecture below describes.

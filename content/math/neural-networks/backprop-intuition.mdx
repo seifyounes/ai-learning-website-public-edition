@@ -1,0 +1,209 @@
+---
+title: "Backpropagation, intuitively"
+subtitle: "How one wrong answer nudges every weight, and how the nudges add up"
+summary: "Trace how one training example nudges weights, biases and earlier layers, and explain how mini-batches turn those nudges into training steps."
+changeNote: "New lesson in the neural networks track, written from the lecture's transcript, with worked nudges on real numbers and a quiz."
+section: math
+pillar: neural-networks
+order: 6
+level: intermediate
+estMinutes: 18
+taskMinutes: 25
+prerequisites:
+  - why-deep-networks
+  - calculus-for-optimization
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "Ilg3gGewQ5U"
+  published: "2017-11-03"
+  year: 2017
+  minutes: 13
+  title: "Backpropagation, intuitively | Deep Learning Chapter 3"
+  channel: "3Blue1Brown"
+  why: "You now know what a network computes; this is how it learns. 3Blue1Brown returns to the digit network from the first lesson and follows one training image backwards through it, showing which weights move most and why, before any formula appears. It also explains mini-batches, the trick every real training run uses. The calculus version of the same story is in the calculus track."
+  notes:
+    - "1:43 Read each gradient component as a sensitivity: a component of 3.2 against 0.1 means the cost reacts 32 times more to the first weight."
+    - "4:52 The three ways to raise one output neuron: raise its bias, raise its weights, or change the previous layer's activations."
+    - "7:29 Every output neuron's wishes for the previous layer are added together. This sum is what propagates backwards."
+    - "9:38 Mini-batches of about 100 shuffled examples give quick, slightly noisy steps: stochastic gradient descent."
+applyIt: |
+  **Every model you use was shaped by these averaged nudges, so its behaviour mirrors its
+  training examples.** Use that when you prepare data to adapt a model, or when you judge why a
+  model behaves the way it does.
+
+  1. Pick one place where examples shape a model in your work: a fine-tuning dataset, a set of
+     few-shot examples in a prompt, a labelled sheet for a classifier.
+  2. Count how the examples split across the cases you care about. A model trained mostly on
+     one case gets nudged towards that case, the way a network shown only 2s learns to answer
+     "2" for everything.
+  3. Add or rebalance examples for the case that's under-represented, then test again on cases
+     the model didn't see.
+
+  **If you build software:** log the label balance of every training or fine-tuning set next
+  to the run, so a skewed set is visible before you spend compute on it.
+  **If you don't code:** in a spreadsheet of examples, a pivot table by label shows the
+  balance in a minute.
+
+  Success: one dataset or example set with its balance counted and one change made because of it.
+recap:
+  - emoji: "🧭"
+    title: "The gradient as sensitivity"
+    text: "Each component of the gradient says how sensitive the cost is to one weight or bias. A component of 3.2 against 0.1 means a 32 times bigger effect."
+  - emoji: "2️⃣"
+    title: "Start from one example"
+    text: "Feed in one image of a 2. The '2' output should go up and every other output down, each by an amount proportional to how far it is from its target."
+  - emoji: "🔧"
+    title: "Three levers on one neuron"
+    text: "To raise the '2' neuron you can raise its bias, raise its weights, or change the previous layer. Weights from bright neurons matter most, since they're multiplied by larger activations."
+  - emoji: "🔗"
+    title: "Fire together, wire together"
+    text: "The biggest weight increases link neurons that are active with the ones you want more active. It loosely echoes a theory from neuroscience, with caveats."
+  - emoji: "⬅️"
+    title: "Add up the wishes, move back"
+    text: "Each output neuron has wishes for the previous layer, scaled by its weights. Add them up and repeat the same process one layer further back, all the way to the start."
+  - emoji: "⚖️"
+    title: "Average over examples"
+    text: "One example alone would push the network to call everything a 2. Averaging the nudges from every example gives the step proportional to the negative gradient."
+  - emoji: "🎲"
+    title: "Mini-batches make it practical"
+    text: "Shuffle the data, split it into mini-batches of around 100, and step on each one. Steps are noisier but much cheaper, and they still head downhill."
+task: |
+  Run backpropagation's bookkeeping by hand for two examples, then check it in Python. The
+  numbers ignore the activation's slope, so they show the proportions, not exact gradients.
+
+  The previous layer has two neurons; the output layer has a "2" neuron and an "8" neuron.
+  Weights into "2": (0.5, −1.0). Weights into "8": (0.3, 0.7).
+
+  1. Example A (an image of a 2) is worked in the lesson. Example B is an image of an 8: the
+     previous layer's activations are (0.2, 0.8), the outputs are "2" = 0.5 and "8" = 0.4.
+  2. For B, write the wanted change for each output, the four weight nudges (wanted change ×
+     incoming activation), and the wished change for each previous neuron (sum of weight ×
+     wanted change).
+  3. Average A's and B's weight nudges. Which two weights' nudges changed sign once B was
+     included, and why?
+
+  ```python
+  import numpy as np
+
+  W = np.array([[0.5, -1.0],    # weights into the "2" neuron
+                [0.3,  0.7]])   # weights into the "8" neuron
+  examples = [  # (previous activations, outputs now, targets)
+      (np.array([0.9, 0.1]), np.array([0.2, 0.6]), np.array([1, 0])),  # A: a 2
+      (np.array([0.2, 0.8]), np.array([0.5, 0.4]), np.array([0, 1])),  # B: an 8
+  ]
+  weight_nudges = []
+  for a_prev, out, target in examples:
+      want = target - out
+      weight_nudges.append(np.outer(want, a_prev))
+      print("wishes for previous layer:", W.T @ want)
+  print("average weight nudges:\n", np.mean(weight_nudges, axis=0))
+  ```
+
+  Success: your hand values for B match the printout (previous-layer wishes −0.07 and 0.92),
+  and you can name the two weights whose nudges flipped sign after averaging.
+selfCheck:
+  - q: "A network misreads an image of a 2 as a 7. Explain to a classmate, without formulas, why that one mistake changes weights in the first hidden layer and not just the output layer."
+    a: "The output layer wants the '2' neuron up and the '7' neuron down. Each output neuron turns that into wishes for the layer before it, in proportion to its weights; those wishes are added up and become the targets for that layer's weights and biases, and the same step repeats one layer further back. So the error's influence reaches every layer."
+  - q: "A team has 300 labelled examples and wants to train an image classifier from scratch. What does this lecture suggest about their plan?"
+    a: "Backprop only averages what the examples ask for, so the network can only be as good as its labelled data. Training from scratch needs a lot of it; with 300 examples, start from a pretrained model and fine-tune, or collect and label more data first."
+mcq:
+  - q: "After backprop, weight A's gradient component is 3.2 and weight B's is 0.1. What does that tell you?"
+    options:
+      - "A should be set to 3.2 and B to 0.1"
+      - "The cost reacts about 32× more to A's changes"
+      - "A's value is currently 32 times larger than B's"
+      - "B is already trained, so it can be frozen now"
+    answer: 1
+    explain: "Gradient components measure sensitivity: a small change to A moves the cost about 32 times as much as the same change to B. They aren't target values, and they say nothing about the weights' current sizes. A small component means B matters less right now, not that it's finished."
+  - q: "For one image of a 2, the weights into the '2' output neuron from brightly lit neurons get the biggest increase. Why those?"
+    options:
+      - "Bright neurons are the most recently updated"
+      - "Dim neurons have weights that can't change"
+      - "Their biases are larger, so they get priority"
+      - "They're multiplied by bigger activations"
+    answer: 3
+    explain: "A weight's effect on the output is its value times the incoming activation, so a change to a weight from a bright neuron moves the output more. Gradient descent spends its step where it gets the most effect per unit of change. Dim neurons' weights can still change; they just matter less for this example."
+  - q: "A buggy training loop applies the full nudge from one image of a 2 at every step, never using other images. What will the network learn?"
+    options:
+      - "To answer '2' for almost every image"
+      - "To recognise 2s and everything else perfectly"
+      - "Nothing, since one example has zero gradient"
+      - "To recognise every digit, only more slowly"
+    answer: 0
+    explain: "One example only asks for the '2' output to go up and the others down, so following it alone pushes the network towards calling everything a 2. Averaging the wishes of many examples of every digit is what makes the step useful. The gradient for a single example isn't zero; it's just one-sided."
+  - q: "Your training run updates on mini-batches of 100 images and its loss curve zigzags. A teammate wants to switch to full-dataset steps. What do you say?"
+    options:
+      - "Agree: the zigzag shows the gradient is wrong"
+      - "Agree: mini-batches never reach a good minimum"
+      - "Keep mini-batches; noisy steps are expected"
+      - "Shrink batches to 1 image to remove the zigzag"
+    answer: 2
+    explain: "Each mini-batch gives an approximation of the full gradient, so steps wobble, but they are far cheaper, so you take many more of them and still head downhill. Full-dataset steps are smooth but very slow. Smaller batches make the noise worse, not better."
+tags:
+  - math
+  - neural-networks
+  - backpropagation
+  - training
+---
+
+A network learns by adjusting its weights and biases to lower a cost. **Backpropagation** is
+how it works out which way, and by how much, to adjust each of them. Every model you'll use was
+trained this way, and the idea fits in one sentence: start from the output's error, and pass
+each layer's "wishes" back to the layer before it.
+
+## What the gradient is telling you
+
+The gradient has one component per weight and bias. Rather than picturing a direction in 13,000
+dimensions, read each component as a **sensitivity**. If weight A's component is 3.2 and weight
+B's is 0.1, a small change to A moves the cost about 32 times as much as the same change to B.
+Backprop's job is to compute all of these at once.
+
+## Worked example: one image of a 2
+
+Take two neurons in the second-to-last layer, with activations (0.9, 0.1), and two output
+neurons, "2" and "8". Weights into "2" are (0.5, −1.0); weights into "8" are (0.3, 0.7). The
+network currently outputs "2" = 0.2 and "8" = 0.6. These numbers show proportions; real backprop
+also multiplies by the activation function's slope.
+
+1. **Wanted changes at the output:** "2" should rise by 1 − 0.2 = **+0.8**; "8" should fall by
+   0 − 0.6 = **−0.6**. Bigger errors get bigger nudges.
+2. **Weight nudges into "2"** are the wanted change times each incoming activation: 0.8 × 0.9 =
+   **0.72** and 0.8 × 0.1 = **0.08**. The weight from the bright neuron moves nine times more.
+3. **Wishes for the previous layer** add up every output's request, scaled by the weights:
+   - neuron 1: 0.5 × 0.8 + 0.3 × (−0.6) = **+0.22**
+   - neuron 2: −1.0 × 0.8 + 0.7 × (−0.6) = **−1.22**
+
+Neuron 2 should get much dimmer: both outputs agree on that. Those wishes become the targets for
+the layer before, and the same three steps repeat backwards to the input. That is the
+"propagation" in backpropagation.
+
+## From one example to a training step
+
+One example's wishes are one-sided: follow only images of 2s and the network learns to answer
+"2" for everything. So you compute the nudges for many examples and **average** them. The
+average is proportional to the negative gradient, and taking a step along it is one step of
+gradient descent (→ calculus-for-optimization).
+
+Averaging over the whole dataset for every step is slow. The usual shortcut: shuffle the data,
+split it into **mini-batches** of around 100 examples, and take a step per mini-batch. MNIST's
+60,000 training images give 600 steps per pass instead of one. Each step is noisier, but there
+are far more of them. This is **stochastic gradient descent**.
+
+## Common mistakes
+
+- **Thinking backprop is the learning rule.** Backprop computes the gradient; gradient descent
+  (or a variant like Adam) uses it to update the weights.
+- **Expecting a smooth loss curve with mini-batches.** Some zigzag is normal.
+- **Forgetting the data.** All of this averages what labelled examples ask for. Without enough
+  of them, there's nothing good to average.
+
+## Where you'll see it in AI
+
+- **Training and fine-tuning LLMs** runs exactly this loop on mini-batches of text: forward
+  pass, loss, backprop, update (→ fine-tuning-fundamentals).
+- **Training memory:** backprop needs a gradient for every trainable weight plus the saved
+  activations, which is why training needs far more memory than running a model
+  (→ micrograd-from-scratch builds the machinery).
+- **The calculus behind the nudges** is the chain rule, applied layer by layer
+  (→ backprop-chain-rule-calculus, the next lesson).

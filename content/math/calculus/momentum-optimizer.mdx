@@ -1,0 +1,207 @@
+---
+title: "Gradient descent with momentum"
+subtitle: "Averaging recent gradients so the zigzag cancels and progress adds up"
+summary: "Explain how momentum averages recent gradients, compute its velocity by hand, and show it beating plain gradient descent on a stretched loss."
+changeNote: "New lesson in the calculus track, written from the lecture's transcript, with a worked velocity table, a Python task and a quiz."
+section: math
+pillar: calculus
+order: 9
+level: intermediate
+estMinutes: 38
+taskMinutes: 25
+prerequisites:
+  - mini-batches-and-epochs
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "k8fTYJPd3_I"
+  published: "2017-08-25"
+  year: 2017
+  minutes: 9
+  title: "Gradient Descent With Momentum (C2W2L06)"
+  channel: "DeepLearningAI"
+  why: "Plain gradient descent zigzags across narrow valleys, and the zigzag forces a small learning rate. Momentum is the first fix, and it's built into Adam, the default optimizer you'll meet next. Andrew Ng explains it with the contour picture and the two-line update, then gives the practical defaults (β = 0.9, no bias correction) and warns about a variant that changes the right learning rate."
+  notes:
+    - "The lecture uses exponentially weighted averages from earlier in the course. If the averaging step feels unexplained, watch the 'Go deeper' video in the backups first (6 min)."
+    - "Around 7:20: the variant without the (1 − β) factor. It works too, but the learning rate must be retuned; check which form your library uses."
+applyIt: |
+  **Momentum is a setting you'll see in training configs and optimizer menus, and the idea
+  behind it applies to any noisy signal you act on.**
+
+  1. Find the optimizer settings of a training run, notebook or fine-tuning tool you use. Look
+     for "momentum" (SGD) or "beta1" (Adam); the common default is 0.9.
+  2. Translate it: 0.9 means each step follows an average of roughly the last 10 gradients
+     (1 ÷ (1 − 0.9)). 0.99 would average roughly the last 100: smoother, but slower to turn.
+  3. Apply the same reasoning to a noisy metric you track weekly (sign-ups, response quality
+     scores). Decide on a smoothing window before reacting to a single week's swing.
+
+  **If you build software:** in PyTorch, `torch.optim.SGD(params, lr=..., momentum=0.9)` uses the
+  form without the (1 − β) factor, so its learning rate isn't interchangeable with the lecture's
+  version.
+  **If you don't code:** add a 4-week moving average beside one noisy metric in your spreadsheet
+  and compare the two lines.
+
+  Success: you can say what one momentum or beta1 value means as "roughly the last N steps".
+recap:
+  - emoji: "〰️"
+    title: "The zigzag problem"
+    text: "On a loss with long, narrow contours, gradient descent bounces across the valley while inching along it. The bouncing forces a small learning rate."
+  - emoji: "↕️"
+    title: "Two directions, two needs"
+    text: "Across the valley you want slower steps to stop the oscillation; along it you want faster ones. One plain learning rate can't do both."
+  - emoji: "📊"
+    title: "Average the gradients"
+    text: "Keep a running average: v = β·v + (1 − β)·dW, then step with W ← W − α·v instead of the raw gradient."
+  - emoji: "⚖️"
+    title: "Swings cancel, progress adds"
+    text: "Across the valley the gradients alternate in sign and average to nearly zero. Along it they agree, so the average stays large and steps get more direct."
+  - emoji: "🎳"
+    title: "A ball with friction"
+    text: "One intuition: the gradient is acceleration, v is velocity and β acts like friction, so the ball speeds up downhill without speeding up forever."
+  - emoji: "🎛️"
+    title: "Practical defaults"
+    text: "β = 0.9 (roughly the last 10 gradients) works well. Start v at zero, and bias correction is rarely bothered with for momentum."
+  - emoji: "⚠️"
+    title: "Watch the variant"
+    text: "Some write v = β·v + dW without (1 − β). It scales v by about 1/(1 − β), so the learning rate must change to match."
+task: |
+  **Race plain descent against momentum on a stretched bowl (25 minutes, Python).**
+
+  The loss `x² + 100y²` is 100 times steeper in y than in x: a narrow valley.
+
+  ```python
+  def descend(lr, beta, steps=1000):
+      x, y = 3.0, 1.0
+      vx = vy = 0.0
+      for t in range(1, steps + 1):
+          gx, gy = 2 * x, 200 * y             # gradient of x^2 + 100y^2
+          vx = beta * vx + (1 - beta) * gx
+          vy = beta * vy + (1 - beta) * gy
+          x, y = x - lr * vx, y - lr * vy
+          if x * x + 100 * y * y < 1e-4:
+              return t                        # steps to reach a tiny loss
+      return "never"
+
+  print("plain GD, lr 0.009:", descend(0.009, 0.0))
+  print("plain GD, lr 0.011:", descend(0.011, 0.0))
+  print("momentum 0.9, lr 0.1:", descend(0.1, 0.9))
+  print("momentum 0.9, lr 0.2:", descend(0.2, 0.9))
+  ```
+
+  With `beta = 0` the averaging switches off and this is plain gradient descent. After running
+  it, print `y` for the first 10 steps of each method and look at the sign pattern.
+
+  Success: plain descent needs about 315 steps at lr 0.009 and never converges at 0.011, while
+  momentum gets there in about 103 steps at lr 0.1 (and fails at 0.2, so it raises the limit
+  rather than removing it). You can explain the difference using the y-direction gradients.
+selfCheck:
+  - q: "Your training loss falls slowly and the per-step loss curve shows a regular up-down oscillation. Raising the learning rate makes it diverge. Why is momentum a good next thing to try?"
+    a: "That pattern suggests bouncing across a narrow valley: the steep direction caps the learning rate while the gentle direction crawls. Momentum averages the gradients, so the alternating component cancels and the consistent one builds up, letting you move faster without diverging."
+  - q: "You switch a config from momentum 0.9 to 0.99 and the loss now overshoots and takes long detours after the gradient changes direction. Explain using 'roughly the last N steps'."
+    a: "0.9 averages roughly the last 10 gradients; 0.99 roughly the last 100. The velocity remembers old directions much longer, so it keeps moving the old way after the landscape turns. Go back toward 0.9 or lower the learning rate."
+  - q: "You port a training recipe from a paper that used v = β·v + (1 − β)·dW to a library that uses v = β·v + dW, keeping β = 0.9 and the same learning rate. What will happen, and what's the fix?"
+    a: "The library's velocity is about 1/(1 − β) = 10 times larger, so the effective step is about 10 times bigger and training may diverge. Divide the learning rate by about 10."
+mcq:
+  - q: "With β = 0.9, the vertical gradients alternate +10, −10, +10, … while the horizontal ones are a steady +2. After many steps, what does the momentum average look like?"
+    options:
+      - "Vertical about ±10, horizontal about 2"
+      - "Vertical about ±0.5, horizontal about 0.2"
+      - "Vertical about 0, horizontal about 20"
+      - "Vertical about ±0.5, horizontal about 2"
+    answer: 3
+    explain: "Alternating gradients largely cancel: the vertical average settles around ±0.53, about 19 times smaller than the raw ±10. Consistent gradients survive: the horizontal average climbs to 2. The (1 − β) factor keeps it at 2, not 20."
+  - q: "At the very start of training, v is initialised to 0 and β = 0.9. What's true about the first few momentum steps?"
+    options:
+      - "They're unusually large, since v adds the full gradient"
+      - "They're smaller than plain descent while v warms up"
+      - "They're identical to plain gradient descent steps"
+      - "They point the wrong way until v passes through zero"
+    answer: 1
+    explain: "With v starting at 0, the first velocity is only 0.1 of the gradient, so early steps are small until the average fills in (about 10 steps at β = 0.9). Bias correction fixes this; for momentum, people usually just accept the short warm-up."
+  - q: "Why does momentum allow a larger learning rate than plain gradient descent on a narrow valley?"
+    options:
+      - "The oscillating component averages out, so it can't blow up as easily"
+      - "It clips each gradient so no single step can exceed a set size"
+      - "It reduces the learning rate whenever the loss goes up for a step"
+      - "It computes the exact minimum along the valley in a single jump"
+    answer: 0
+    explain: "Plain descent's limit comes from the steep direction, where big steps overshoot and grow. Momentum averages those alternating gradients toward zero, damping the overshoot, so a bigger step size stays stable. It doesn't clip, adapt the rate or solve for the minimum."
+backupResources:
+  - label: "Go deeper: Exponentially Weighted Averages (DeepLearningAI, 6 min)"
+    url: "https://www.youtube.com/watch?v=lAq96T8FkTw"
+    type: "video"
+tags:
+  - math
+  - calculus
+  - optimization
+  - optimizers
+---
+
+**You need:** → mini-batches-and-epochs, and the stretched-bowl zigzag from
+→ gradient-steepest-ascent.
+
+The one idea of this lecture: **step with a running average of recent gradients instead of the
+latest gradient alone.** Components that flip sign from step to step (the bouncing across a
+narrow valley) cancel out; components that agree (the direction along the valley) add up. The
+result is a straighter, faster path, and it usually works better than plain gradient descent.
+
+## Why plain descent zigzags
+
+On a loss whose contours are long, thin ellipses, the gradient points mostly *across* the
+valley. Each step overshoots to the other side, then back. You'd like slow steps across and fast
+steps along, but there's one learning rate, and the steep direction sets its ceiling: go higher
+and the bouncing grows until training diverges.
+
+## The update
+
+On each iteration, compute `dW` on the current mini-batch, then:
+
+```text
+v = β·v + (1 − β)·dW
+W = W − α·v
+```
+
+(and the same for the biases). `v` is an exponentially weighted average of past gradients, and
+`β = 0.9` averages over roughly the last `1 / (1 − β) = 10` of them. Start `v` at zero. The
+physics picture: the gradient is an acceleration, `v` a velocity, and `β < 1` is friction that
+keeps the ball from speeding up forever.
+
+## Worked example with real numbers
+
+Suppose that, in the valley, the vertical gradient alternates +10, −10, +10, … and the
+horizontal gradient is a steady +2. With `β = 0.9` and `v` starting at 0:
+
+| step | vertical v | horizontal v |
+|---|---|---|
+| 1 | 1.00 | 0.20 |
+| 2 | −0.10 | 0.38 |
+| 3 | 0.91 | 0.54 |
+| 4 | −0.18 | 0.69 |
+| 10 | −0.34 | 1.30 |
+| 20 | −0.46 | 1.76 |
+
+The vertical velocity settles into a small wobble around ±0.5, about 19 times smaller than the
+raw ±10. The horizontal velocity climbs toward the full 2. The step now points mostly along the
+valley. Notice the slow start: after 10 steps the horizontal velocity is only 1.30 of 2. That
+lag is what bias correction removes; for momentum, Andrew Ng notes most people skip it because
+the average warms up within about 10 steps.
+
+On the stretched loss `x² + 100y²` from the task, plain descent diverges above a learning rate
+of 0.01 and needs about 315 steps at 0.009. Momentum with `β = 0.9` and a learning rate of 0.1
+gets there in about 103.
+
+## Common mistakes
+
+- **Mixing the two formulas.** Without `(1 − β)`, `v` is about 10 times bigger at `β = 0.9`,
+  so the learning rate must shrink to match.
+- **Turning β up for "more smoothing".** At 0.99 the velocity remembers about 100 steps and
+  overshoots when the landscape turns.
+- **Thinking momentum removes the learning-rate limit.** It raises it; too large still diverges.
+- **Reading the first few steps as "too slow".** That's the average warming up from zero.
+
+## Where you'll see it in AI
+
+- **SGD with momentum** (usually 0.9) is a standard optimizer in vision and many other models.
+- **Adam's first moment** is exactly this average with `β1 = 0.9` (→ adam-optimizer).
+- **Plateaus and saddle points:** accumulated velocity helps carry training across flat regions
+  where the raw gradient is tiny (→ calculus-for-optimization).

@@ -1,0 +1,228 @@
+---
+title: "Eigenvectors and eigenvalues"
+subtitle: "The directions a matrix only stretches, and why they make it simple"
+summary: "Find a 2 × 2 matrix's eigenvectors and eigenvalues, predict what repeated multiplication does, and read PCA as an eigenvector problem."
+changeNote: "New lesson in the linear algebra track, written from the lecture's transcript; the three optional SVD lectures are linked as extra viewing."
+section: math
+pillar: linear-algebra
+order: 11
+level: intermediate
+estMinutes: 22
+taskMinutes: 30
+prerequisites:
+  - change-of-basis-embeddings
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "PFDu9oVAE-g"
+  published: "2016-09-15"
+  year: 2016
+  minutes: 17
+  title: "Eigenvectors and eigenvalues | Chapter 14, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "This chapter closes the track because it uses everything before it: transformations, determinants, null spaces and change of basis. It shows eigenvectors as the directions a matrix only stretches, derives how to find them from a zero determinant, and ends with the eigenbasis, where a matrix becomes diagonal and repeated multiplication becomes easy. That is the groundwork for PCA, for why repeated multiplication explodes or vanishes, and for the SVD."
+  notes:
+    - "1:06 most vectors are knocked off their span; a few only stretch. Those are the eigenvectors, and the stretch factors are the eigenvalues."
+    - "5:18 from A·v = λ·v to finding the λ that makes det(A − λI) zero; 9:06 the method on the opening example."
+    - "10:39 a rotation with no real eigenvectors and a shear with only one line of them; 12:44 the eigenbasis and diagonal matrices."
+applyIt: |
+  **Eigenvectors answer "what does this process do if it repeats?" and "which directions in my
+  data matter most?"** You can use both questions without computing anything by hand.
+
+  1. Pick a process that repeats the same step: customers moving between plans each month,
+     students moving between course levels each term, a recommender that feeds its output back
+     in, or a model applied over many steps.
+  2. Write the step as a small table of fractions (for example, of this month's free users, 80%
+     stay free, 15% upgrade, 5% leave), including where new arrivals go, and ask a chat
+     assistant or NumPy for the eigenvector with eigenvalue 1. Scaled to sum to 1, it's the
+     long-run split the process settles into. (Leave out arrivals and the answer is simply
+     "everyone ends up gone".)
+  3. Write one line on what that long-run split tells you that a single month's numbers don't.
+
+  **If you build software:** run PCA on a set of embeddings you have (scikit-learn's `PCA`) and
+  look at the explained-variance ratio of the first few components. **If you don't code:** the
+  plan-switching table and the assistant's answer are the whole exercise; check the result by
+  hand once.
+
+  Success: one repeating process written as a matrix, its long-run state from the eigenvector
+  with eigenvalue 1, and a line on what it means.
+recap:
+  - emoji: "🏗️"
+    title: "Built on the basics"
+    text: "Eigenvectors feel strange only when the foundations are shaky: matrices as transformations, determinants, linear systems and change of basis all come together here."
+  - emoji: "📌"
+    title: "Vectors that stay on their line"
+    text: "Most vectors get knocked off their own span by a transformation. A few only get stretched or squashed along it. Those are eigenvectors; the stretch factor is the eigenvalue."
+  - emoji: "🌍"
+    title: "Why it helps"
+    text: "For a 3D rotation, the eigenvector is the axis, with eigenvalue 1. Axis plus angle is far easier to think about than nine numbers, and less tied to one coordinate system."
+  - emoji: "🔍"
+    title: "How to find them"
+    text: "A·v = λ·v means (A − λI)·v = 0 for a non-zero v, which needs A − λI to squash space: its determinant must be zero. Solve for λ, then find v."
+  - emoji: "🌀"
+    title: "Not every matrix has them"
+    text: "A 90° rotation knocks every vector off its span, so it has no real eigenvalues. A shear has just one line of eigenvectors; scaling by 2 makes every vector one."
+  - emoji: "🧮"
+    title: "The eigenbasis"
+    text: "If the eigenvectors span the space, use them as the basis. The matrix becomes diagonal, with the eigenvalues on the diagonal, and its 100th power is easy."
+task: |
+  Find eigenvectors by hand, then watch repeated multiplication and PCA find them for you.
+
+  **On paper (10 minutes).** For the matrix with columns (4, 1) and (2, 3), write
+  det(A − λI) = 0, solve for both eigenvalues, and find an eigenvector for each. Check one by
+  multiplying.
+
+  **In Python (20 minutes, free Google Colab works).**
+
+  ```python
+  import numpy as np
+
+  A = np.array([[4.0, 2.0], [1.0, 3.0]])
+  vals, vecs = np.linalg.eig(A)
+  print("eigenvalues:", vals)
+  print("eigenvectors (columns):", vecs.round(3))
+
+  v = np.array([0.3, -0.9])                     # any start
+  for _ in range(30):
+      v = A @ v
+      v = v / np.linalg.norm(v)                 # keep it unit length
+  print("after repeated multiplication:", v.round(3))
+
+  print("0.9^50 =", 0.9 ** 50, "  1.1^50 =", 1.1 ** 50)
+
+  rng = np.random.default_rng(0)
+  x = rng.normal(size=500)
+  data = np.column_stack([x, 0.5 * x + 0.1 * rng.normal(size=500)])
+  cvals, cvecs = np.linalg.eigh(np.cov(data.T))
+  print("variance per direction:", cvals.round(3))
+  print("main direction:", cvecs[:, -1].round(3))
+  ```
+
+  Write one line each on: which eigenvector repeated multiplication found and why; what the two
+  powers say about multiplying by the same matrix over many steps; and what the main direction of
+  the data is.
+
+  **No code?** Do the paper part, then compute 0.9⁵⁰ and 1.1⁵⁰ with a calculator.
+
+  Success: eigenvalues 5 and 2 with eigenvectors along (2, 1) and (1, −1); repeated
+  multiplication lands on ±(0.894, 0.447); and the data's main direction is close to (2, 1)
+  scaled to length 1.
+selfCheck:
+  - q: "Each month, of your free users 80% stay free, 15% upgrade and 5% leave; of paid users 90% stay paid, 5% drop to free and 5% leave; nobody comes back once gone. A manager asks what the user base looks like in the long run. How do eigenvectors answer it?"
+    a: "Write the month as a 3 × 3 matrix acting on (free, paid, gone). Repeating it is taking powers, and the long-run state is the eigenvector with eigenvalue 1, the split that the month leaves unchanged. Here it's everyone in 'gone', because nothing flows back; the other eigenvalues, below 1, tell you how fast you get there. That's a sign to model new sign-ups too."
+  - q: "You plot 768-dimensional embeddings in 2D with PCA and two topics overlap. A colleague concludes the embeddings can't tell the topics apart. What do you check first?"
+    a: "How much variance the first two components explain. PCA keeps the two eigenvectors of the covariance matrix with the largest eigenvalues, the directions of most spread overall, and the topic difference may live in directions it dropped. Check the explained-variance ratio, or measure separation in the full space (for example with a simple classifier)."
+mcq:
+  - q: "A recurrent model multiplies its hidden state by the same weight matrix at every step. Its largest eigenvalue has size 1.1. What do you expect over 50 steps along that direction?"
+    options:
+      - "Signals stay about the same size, since 1.1 is near 1"
+      - "Signals grow about 117×, so values can blow up"
+      - "Signals shrink toward zero after a few dozen steps"
+      - "Signals rotate in a circle without changing size"
+    answer: 1
+    explain: "Along an eigenvector, each step multiplies by the eigenvalue, so 50 steps give 1.1⁵⁰ ≈ 117. Small differences from 1 compound: 0.9⁵⁰ ≈ 0.005 is the vanishing case. That's the linear-algebra root of exploding and vanishing gradients over long sequences."
+  - q: "You want to squeeze 768-dimensional embeddings into 2 dimensions for a plot while keeping as much spread as possible. What does PCA keep?"
+    options:
+      - "The two original coordinates with the largest values"
+      - "The two directions with the smallest eigenvalues"
+      - "The top two eigenvectors of the data's covariance"
+      - "Two random directions, rescaled to unit length"
+    answer: 2
+    explain: "The covariance matrix's eigenvectors are the data's natural axes, and each eigenvalue is the variance along its axis, so the two largest keep the most spread. Original coordinates are an arbitrary basis, and the smallest eigenvalues are the flattest directions."
+  - q: "NumPy returns complex eigenvalues for a 2 × 2 matrix that rotates the plane by 90°. A teammate files a bug. What do you tell them?"
+    options:
+      - "Expected: a rotation knocks every real vector off its line"
+      - "Real bug: every 2 × 2 matrix has two real eigenvalues"
+      - "Real bug: NumPy should return eigenvalue 1 for rotations"
+      - "Expected only if the input matrix wasn't exactly square"
+    answer: 0
+    explain: "No real vector stays on its own span under a 90° turn, so there are no real eigenvectors, and det(A − λI) = λ² + 1 has only the roots ±i. Eigenvalue 1 belongs to the axis of a 3D rotation, not to a 2D one."
+  - q: "The covariance matrix of five features has one eigenvalue of exactly 0. What does that tell you about the features?"
+    options:
+      - "One feature is constant, so it should be scaled up"
+      - "The features are all uncorrelated with each other"
+      - "The data has five independent directions of spread"
+      - "Some combination of features never varies at all"
+    answer: 3
+    explain: "An eigenvalue is the variance along its eigenvector, so zero means one direction (a fixed mix of features) has no spread: the features are linearly dependent. It could be a constant feature, but more often it's a column that equals a combination of others. A zero eigenvalue also makes the determinant zero."
+backupResources:
+  - label: "Go deeper: Singular Value Decomposition (SVD): Overview (Steve Brunton, 7 min)"
+    url: "https://www.youtube.com/watch?v=gXbThCXjZFM"
+    type: "video"
+  - label: "Go deeper: Singular Value Decomposition (SVD): Matrix Approximation (Steve Brunton, 15 min)"
+    url: "https://www.youtube.com/watch?v=xy3QyyhiuY4"
+    type: "video"
+  - label: "Go deeper: 6. Singular Value Decomposition (SVD) (MIT OpenCourseWare, 54 min)"
+    url: "https://www.youtube.com/watch?v=rYz83XPxiZo"
+    type: "video"
+  - label: "Mathematics for Machine Learning — free book, ch. 4.2 and 10 (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+  - pca
+---
+
+Reading a matrix column by column tells you where the basis vectors go, but that depends on the
+basis you happened to pick. **Eigenvectors** describe a transformation in its own terms: the
+directions it only stretches or squashes, never turns. They explain what happens when a step is
+repeated many times, and they are the core of PCA.
+
+## Vectors that stay on their line
+
+Apply a matrix and most vectors get knocked off the line they started on. A few special ones
+land back on their own line, just scaled. Those are **eigenvectors**, and the scale factor is the
+**eigenvalue**: 3 means stretched three times, 0.5 squashed by half, −1 flipped. For a 3D
+rotation, the eigenvector is the axis, with eigenvalue 1.
+
+## Finding them
+
+The definition is **A·v = λ·v**. Move everything to one side: (A − λI)·v = 0, where I is the
+identity. A non-zero v can only land on zero if A − λI squashes space, which means its
+**determinant is zero** (→ determinant-area-scaling). So: find the λ values that make
+det(A − λI) = 0, then for each one, find the vectors A − λI sends to zero (its null space,
+→ rank-column-null-space).
+
+Not every matrix cooperates. A 90° rotation turns every vector, so it has no real eigenvectors;
+a shear has only one line of them.
+
+## Worked example: a 2 × 2 matrix and its powers
+
+Let A have columns (4, 1) and (2, 3), so its rows are (4, 2) and (1, 3).
+
+1. **Eigenvalues.** det(A − λI) = (4 − λ)(3 − λ) − 2·1 = λ² − 7λ + 10 = (λ − 5)(λ − 2), so
+   **λ = 5 and λ = 2**.
+2. **Eigenvectors.** For λ = 5, A − 5I has rows (−1, 2) and (1, −2), which sends **(2, 1)** to
+   zero. Check: A·(2, 1) = (8 + 2, 2 + 3) = (10, 5) = 5·(2, 1). For λ = 2, the eigenvector is
+   **(1, −1)**: A·(1, −1) = (2, −2).
+3. **Powers.** Write (3, 0) = 1·(2, 1) + 1·(1, −1). Then A¹⁰·(3, 0) = 5¹⁰·(2, 1) + 2¹⁰·(1, −1)
+   = 9,765,625·(2, 1) + 1,024·(1, −1). The eigenvalue-5 direction completely dominates.
+
+That's the **eigenbasis** idea: in the basis of eigenvectors, the matrix is diagonal (here 5 and
+2 on the diagonal), so its powers just raise each eigenvalue to that power. Note also that
+5 × 2 = 10 is the determinant.
+
+## Common mistakes
+
+- **Expecting every matrix to have real eigenvectors.** Rotations don't.
+- **Treating the eigenvector's length as meaningful.** Any non-zero multiple is also an
+  eigenvector; only the direction matters.
+- **Ignoring eigenvalues near 1.** Over many steps, 1.1 grows about 117-fold in 50 steps, and 0.9
+  shrinks to about 0.005.
+- **Using eigenvectors of a non-square matrix.** They only exist for square ones; the SVD below
+  handles every shape.
+
+## Where you'll see it in AI
+
+- **PCA:** the eigenvectors of a dataset's covariance matrix are the directions of most spread,
+  used to plot and compress embeddings (→ embeddings-vector-databases).
+- **Exploding and vanishing gradients:** multiplying by similar matrices many times amplifies
+  eigenvalues above 1 and kills those below (→ neural-networks).
+- **Ranking and long-run behaviour:** repeated-step processes, from PageRank-style ranking to
+  user-flow models, settle on an eigenvector.
+- **The SVD and low rank:** the three optional lectures below extend this to any matrix and show
+  the best low-rank approximation, the idea LoRA relies on (→ rank-column-null-space).
+
+This completes the linear algebra track. → derivative-as-nudge-ratio picks up how models learn
+the numbers in these matrices.

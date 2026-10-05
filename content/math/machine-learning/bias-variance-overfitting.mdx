@@ -1,0 +1,217 @@
+---
+title: "Bias, variance and overfitting"
+subtitle: "Why a rigid model and a flexible model fail in opposite ways"
+summary: "Tell underfitting from overfitting by comparing training and test error, and pick the fix that matches the problem you actually have."
+changeNote: "New lesson in the machine learning track, written from the lecture's transcript, with a worked example, a code task and a quiz."
+section: math
+pillar: machine-learning
+order: 2
+level: beginner
+estMinutes: 12
+taskMinutes: 20
+prerequisites:
+  - machine-learning-fundamentals
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "EuBBz3bI-aA"
+  published: "2018-09-17"
+  year: 2018
+  minutes: 7
+  title: "Machine Learning Fundamentals: Bias and Variance"
+  channel: "StatQuest with Josh Starmer"
+  why: "The first lesson ended on a puzzle: why did the wiggly curve lose to the straight line? This seven-minute lecture names the two forces behind it, bias and variance, on one small dataset with a train/test split, and ends by naming the three families of fixes this track covers later: regularization, bagging and boosting. Short, picture-first and still how practitioners talk about the problem."
+  notes:
+    - "1:34 Linear regression fits a straight line that can never bend: that inability is bias."
+    - "3:40 Same two models scored on the testing set: the winner flips. The difference in fit between datasets is variance."
+    - "5:44 The three standard ways to find the sweet spot: regularization, boosting and bagging."
+applyIt: |
+  **Every "the model is bad" conversation should start by deciding which side of the trade-off
+  you're on.** Two numbers settle it: the error on training data and the error on held-out data.
+  Find a model, prompt or forecast in your own work and write both numbers down before
+  proposing a fix.
+
+  - **Both errors high and close together:** bias. Give the model more to work with: more
+    flexible model, better input features, longer training.
+  - **Training error low, held-out error much higher:** variance. Give it less freedom or more
+    evidence: more data, regularization, a simpler model, stopping training earlier.
+  - **Both low and close:** you're done tuning; spend the time on better test data instead.
+
+  **If you build software:** log training and validation loss side by side for any model you
+  train or fine-tune, and look at the gap, not just the last number. **If you don't code:** the
+  same check works for a spreadsheet forecast: fit it on last year, score it on this year, and
+  compare the two error totals.
+  Success: you have both numbers for one real model or forecast and a one-line diagnosis.
+recap:
+  - emoji: "🐭"
+    title: "A curved relationship"
+    text: "Weight and height rise together, then height levels off. We don't know the true formula, so we let two methods approximate it, after splitting the data into training and testing sets."
+  - emoji: "📏"
+    title: "The line that can't bend"
+    text: "A straight line can never follow the arc, however carefully it's fitted. That built-in inability to capture the true relationship is called bias."
+  - emoji: "〰️"
+    title: "The line that bends everywhere"
+    text: "A very flexible curve can pass through every training point, so its training error is zero and its bias is low."
+  - emoji: "🔄"
+    title: "The winner flips"
+    text: "Score both on the testing set and the straight line wins. How much a model's fit changes from one dataset to another is called variance."
+  - emoji: "⚖️"
+    title: "Consistent beats lucky"
+    text: "The flexible curve is overfit: great on training data, unpredictable on new data. The straight line gives merely good predictions, but reliably."
+  - emoji: "🎯"
+    title: "Finding the sweet spot"
+    text: "The ideal model has low bias and low variance. Regularization, bagging and boosting are the three standard ways to get there."
+task: |
+  Watch overfitting happen in numbers. Run this in a free Google Colab notebook (or any Python
+  with NumPy). It fits polynomials of rising flexibility to 15 noisy training points and scores
+  each on 5 held-out points:
+
+  ```python
+  import warnings
+  import numpy as np
+  warnings.filterwarnings("ignore")  # degree 12 triggers a fit warning; that's part of the lesson
+
+  rng = np.random.default_rng(0)
+  x = np.sort(rng.uniform(0, 10, 20))
+  y = 3 * np.sqrt(x) + rng.normal(0, 0.8, 20)  # a curved truth plus noise
+  test = np.arange(20) % 4 == 0                 # every fourth point is held out
+  train = ~test
+
+  for degree in [1, 2, 5, 12]:
+      coefs = np.polyfit(x[train], y[train], degree)
+      mse = lambda m: np.mean((np.polyval(coefs, x[m]) - y[m]) ** 2)
+      print(f"degree {degree:2}: train {mse(train):.2f}   test {mse(test):.2f}")
+  ```
+
+  1. Write the four rows in your notes. Training error should fall every time; test error should
+     fall, then explode at degree 12.
+  2. Change the noise from `0.8` to `0.2` and rerun. Which degree wins now, and why does less
+     noise make flexibility less dangerous?
+  3. Change every `20` to `200` (three places) and rerun. Does degree 12 still blow up? Your
+     exact numbers may differ a little from a classmate's; the pattern is what matters.
+
+  **No code?** In Google Sheets, make a scatter chart of a small dataset, add a linear trendline
+  and then a polynomial trendline of degree 6, and compare how each would predict a point just
+  past the last one.
+
+  Success: you can point to the degree where the model started fitting noise, and say what more
+  data did to it.
+selfCheck:
+  - q: "A model's training error is 18% and its validation error is 19%. A careful person doing the task by hand makes about 2% errors. A teammate suggests collecting more data. Is that the right first move?"
+    a: "Probably not. Training and validation errors are close and both far from what's achievable, which is bias: the model can't even fit the data it has. More data mainly helps variance. Try a more flexible model, better features or longer training first."
+  - q: "You fine-tune a model and training loss keeps dropping each epoch, while validation loss bottoms out at epoch 3 and climbs after. What is happening, and what do you keep?"
+    a: "From epoch 3 on the model is fitting quirks of the training examples (variance), so it gets worse on new data. Keep the epoch-3 checkpoint, the point of lowest validation loss; that is early stopping."
+mcq:
+  - q: "Your classifier scores 2% error on training data and 15% on validation data. Which change most directly targets the problem?"
+    options:
+      - "Train the same model for twice as many epochs"
+      - "Collect more data or add regularization"
+      - "Switch to a larger, more flexible model"
+      - "Report the training error, which is more stable"
+    answer: 1
+    explain: "A big gap between training and validation error is variance: the model has learned quirks of the training set. More data or regularization narrows the gap. Longer training or a bigger model usually widens it, and the training error says nothing about new data."
+  - q: "A straight-line forecast misses badly on both last year's data (used to fit it) and this year's. What best describes it?"
+    options:
+      - "High variance, because the errors are large"
+      - "Overfit, because it was fitted to last year"
+      - "Leakage, because both years share a trend"
+      - "High bias: it is too rigid for the pattern"
+    answer: 3
+    explain: "Poor on the data it was fitted to and poor on new data, with similar errors on both, is the signature of bias: the model can't represent the pattern. Large errors alone don't mean variance; variance shows up as a gap between training and new-data error."
+  - q: "Which pairing is correct?"
+    options:
+      - "Underfit: great on train, poor on new · Overfit: poor on both"
+      - "Underfit: only with small data · Overfit: only with big models"
+      - "Underfit: poor on both · Overfit: great on train, poor on new"
+      - "Underfit: poor on new data · Overfit: poor on training data"
+    answer: 2
+    explain: "Underfitting means the model lacks the capacity or training to capture the pattern, so it's bad everywhere. Overfitting means it captured the training set's noise, so it's great on training data and falls apart on held-out data. Either can happen at any dataset or model size."
+  - q: "Two models get the same average test error over five different test samples. Model A's errors range from 9% to 11%; model B's from 2% to 18%. Which should you deploy, all else equal?"
+    options:
+      - "Model A, because its predictions are more consistent"
+      - "Model B, because its best case is much better"
+      - "Either one, because their average test error is the same"
+      - "Neither, because the test samples must be flawed"
+    answer: 0
+    explain: "B's wide swings are variance: you can't predict how it will do on the next batch of real data, which may be its 18% case. With equal averages, the consistent model is the safer choice. The averages being equal doesn't make the risks equal."
+backupResources:
+  - label: "Go deeper: Basic Recipe for Machine Learning (C2W1L03) (DeepLearningAI, 6 min)"
+    url: "https://www.youtube.com/watch?v=C1N_PDHuJ6Q"
+    type: "video"
+  - label: "Google Machine Learning Crash Course — Overfitting"
+    url: "https://developers.google.com/machine-learning/crash-course/overfitting"
+    type: "interactive · course module"
+tags:
+  - math
+  - machine-learning
+  - bias-variance
+  - overfitting
+---
+
+The first lesson's straight line beat the wiggly curve on new data. This lesson explains why:
+**a model can fail by being too rigid (bias) or too sensitive to its particular training data
+(variance), and you fix those two failures in opposite ways.** Get the diagnosis wrong and you
+spend a week on the cure that makes it worse.
+
+## Two ways to be wrong
+
+**Bias** is a model's built-in inability to represent the true pattern. A straight line through
+data that curves will always miss, no matter how carefully you fit it. High bias shows up as
+**underfitting**: poor on the training data, poor on new data, with the two errors close.
+
+**Variance** is how much a model's fit changes when you change the data. A curve flexible
+enough to pass through every training point also passes through its noise, so a different
+sample would give a very different curve. High variance shows up as **overfitting**: great on
+training data, much worse on new data.
+
+The goal is low bias and low variance at once: a model flexible enough for the real pattern
+and stable enough to ignore the noise.
+
+## Worked example: three points, two models
+
+Training data: (1, 1), (2, 3), (3, 2). Testing data: (1.5, 2), (2.5, 2.5), (4, 3).
+
+**The straight line.** Least squares gives y = 1 + 0.5x. Its training predictions are 1.5, 2
+and 2.5, so the squared errors are 0.25 + 1 + 0.25 = **1.5**. On the testing points it predicts
+1.75, 2.25 and 3: squared errors 0.0625 + 0.0625 + 0 = **0.125**.
+
+**The flexible curve.** A parabola through all three training points,
+y = −4 + 6.5x − 1.5x², has training error **0**. On the testing points it predicts 2.375,
+2.875 and −2. The last one is 5 away from the real 3, so its testing error is about
+0.14 + 0.14 + 25 ≈ **25.3**.
+
+On training data the curve wins, 0 against 1.5. On testing data the line wins by a factor of
+about 200. Nothing about the curve looked wrong until it met a point it hadn't seen.
+
+## Reading the two numbers
+
+| Training error | Held-out error | Diagnosis | Try |
+|---|---|---|---|
+| High | High, close to training | Bias | More flexible model, better features, longer training |
+| Low | Much higher | Variance | More data, regularization, simpler model, early stopping |
+| Low | Low, close to training | Fine | Better test data, then ship |
+
+The three classic variance cures each get a lesson in this track: regularization
+(→ ridge-regularization), bagging (→ random-forests-bagging) and boosting, which works on
+bias as well (→ gradient-boosting-trees).
+
+## Common mistakes
+
+- **Diagnosing from one number.** "Error is 15%" says nothing about bias or variance; you need
+  the training error beside it.
+- **Adding data to a biased model.** If it can't fit the data it has, more of the same data
+  won't help much.
+- **Making the model bigger to fix overfitting.** Extra flexibility usually widens the gap.
+- **Judging on training loss alone.** It falls almost every epoch; the validation curve is the
+  one that tells you when to stop.
+
+## Where you'll see it in AI
+
+- **Fine-tuning** is where most practitioners first meet overfitting: training loss falls,
+  validation loss turns up, and the checkpoint before the turn is the one to keep
+  (→ fine-tuning-fundamentals).
+- **Neural networks** are very flexible models, so they lean on the variance cures: more data,
+  dropout, weight decay and early stopping (→ neural-networks).
+- **Prompt engineering** can overfit too: a prompt tweaked until it passes every case in a
+  small eval set may fail on the next real input. Keep a held-out set of cases you don't tune
+  against (→ evals-and-testing).

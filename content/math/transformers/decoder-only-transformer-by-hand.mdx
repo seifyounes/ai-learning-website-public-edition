@@ -1,0 +1,229 @@
+---
+title: "A decoder-only transformer, worked by hand"
+subtitle: "Embeddings, position, masked attention and residuals with small numbers"
+summary: "Walk a prompt through a decoder-only transformer step by step, compute positional encodings, and explain how it generates a reply and stops."
+changeNote: "New lesson in the transformers track, written from the lecture's transcript, with positional-encoding numbers and a quiz."
+section: math
+pillar: transformers
+order: 5
+level: advanced
+estMinutes: 40
+taskMinutes: 30
+prerequisites:
+  - mlp-layers-store-facts
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "bQ5BoolX9Ag"
+  published: "2023-08-27"
+  year: 2023
+  minutes: 37
+  title: "Decoder-Only Transformers, ChatGPTs specific Transformer, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "The 3Blue1Brown chapters gave the geometry at GPT scale. This lecture rebuilds the same model at toy scale, with two-number embeddings you can follow by eye: word embeddings, positional encoding, masked self-attention, residual connections, and how a reply is generated word by word until an end token. It fills in positional encoding, which the earlier chapters treat lightly, and it's the right slower pass before writing the model in code."
+  notes:
+    - "7:09 Word order: why 'Squatch eats pizza' and 'pizza eats Squatch' need positional encoding, built from sine and cosine squiggles."
+    - "12:13 Masked self-attention worked with numbers: queries, keys, dot-product similarities, softmax and the scaled values."
+    - "22:59 Turning each position's numbers into a next-word prediction, then generating the reply from the end-of-sequence token."
+    - "32:16 How a decoder-only transformer differs from the original encoder-decoder transformer."
+applyIt: |
+  **Generation is the model reading its own output back in, one token at a time, until it
+  produces a stop token or hits a length limit.** That explains replies that stop
+  mid-sentence, why a format you start for the model tends to be continued, and why the
+  first words of a reply steer the rest.
+
+  1. Take a task where you need a fixed output format (a table, JSON, a numbered list of
+     exactly five items).
+  2. Run it once with the format only described in words.
+  3. Run it again with the format started for the model: end your prompt with the header row
+     of the table or the opening `{`, and let it continue. Compare how well each run keeps
+     the format.
+
+  **If you build software:** set an explicit maximum output length, check the API's stop or
+  finish reason on every call, and treat "stopped at the length limit" as a failure to handle,
+  not a complete answer. **If you don't code:** when a reply cuts off, ask it to continue from
+  the last full sentence rather than regenerating from scratch.
+
+  Success: two outputs side by side, and one sentence on why starting the format helped or
+  didn't.
+recap:
+  - emoji: "🔢"
+    title: "Words become numbers"
+    text: "A small network turns each word into a few numbers, an embedding. Its weights are learned in training, so similar words end up with similar numbers."
+  - emoji: "〰️"
+    title: "Order needs adding"
+    text: "Attention alone can't tell 'Squatch eats pizza' from 'pizza eats Squatch'. Positional encoding adds values from sine and cosine waves, so each position gets its own pattern."
+  - emoji: "🎯"
+    title: "Masked self-attention"
+    text: "Each word's query is compared with the keys of itself and earlier words only. Softmax turns the similarities into percentages, which decide how much of each word's value to use."
+  - emoji: "↪️"
+    title: "Residual connections"
+    text: "The attention output is added back to the embedding plus position values. This keeps the original information and makes the stack easier to train."
+  - emoji: "🔮"
+    title: "Every position predicts"
+    text: "Each position's numbers go through a fully connected layer and softmax to predict the word after it, which is also how training checks the model against known text."
+  - emoji: "🗣️"
+    title: "Generating the reply"
+    text: "After the prompt, the model reads an end-of-sequence token and predicts the first output word, attending back to the whole prompt. That word is fed back in until the model outputs the end token."
+  - emoji: "⚖️"
+    title: "Versus the original transformer"
+    text: "The original design reads the input with an unmasked encoder and links it to a decoder with encoder-decoder attention. Decoder-only models use one masked stack for both."
+task: |
+  Prove to yourself that attention ignores word order, then fix it with positional encoding.
+
+  ```python
+  import numpy as np
+
+  rng = np.random.default_rng(0)
+  d = 4
+  emb = {w: rng.normal(size=d) for w in ["squatch", "eats", "pizza"]}
+  Wq, Wk, Wv = (rng.normal(size=(d, d)) for _ in range(3))
+
+  def attention(X):
+      Q, K, V = X @ Wq, X @ Wk, X @ Wv
+      s = Q @ K.T / np.sqrt(d)
+      w = np.exp(s) / np.exp(s).sum(axis=1, keepdims=True)
+      return w @ V
+
+  def pos_enc(n):
+      pe = np.zeros((n, d))
+      for pos in range(n):
+          for i in range(0, d, 2):
+              pe[pos, i] = np.sin(pos / 10000 ** (i / d))
+              pe[pos, i + 1] = np.cos(pos / 10000 ** (i / d))
+      return pe
+
+  a = np.array([emb[w] for w in ["squatch", "eats", "pizza"]])
+  b = np.array([emb[w] for w in ["pizza", "eats", "squatch"]])
+
+  # Without positions: the vector computed for "squatch" is identical in both sentences.
+  print(np.allclose(attention(a)[0], attention(b)[2]))
+  # With positions added, it isn't.
+  print(np.allclose(attention(a + pos_enc(3))[0], attention(b + pos_enc(3))[2]))
+  ```
+
+  This uses no mask, as in an encoder, to make the point clean. Then, on paper, compute the
+  positional encoding of position 1 with d = 4 and check it against `pos_enc(3)[1]`.
+
+  Success: the first line prints True, the second False, and you can say why in one sentence.
+selfCheck:
+  - q: "A model trained with a 2,048-token limit is given 1,500 tokens of prompt and asked for a 1,000-token reply. The reply stops abruptly. What happened, in terms of how generation works?"
+    a: "Prompt and reply share the same sequence, because each generated token is appended and fed back in. At 2,048 tokens the sequence hits the limit, so generation stops before the model produces its end token. Shorten the prompt, ask for less, or use a model with a longer context."
+  - q: "A teammate shuffles the order of retrieved paragraphs before sending them, reasoning that 'attention compares everything with everything, so order can't matter'. Are they right?"
+    a: "No. Attention by itself would be order-blind, but positional information is added to every token, and with the causal mask each token can only see what comes before it. Order changes what each token can attend to and how it's encoded, so it can change the answer."
+mcq:
+  - q: "Without positional encoding, what would a decoder-only model lose?"
+    options:
+      - "The ability to tell what order the words came in"
+      - "The ability to look at more than one earlier word"
+      - "The ability to stop generating at the end token"
+      - "The ability to learn embeddings during training"
+    answer: 0
+    explain: "Attention is a weighted sum over the tokens it can see, and a sum doesn't care about order, so 'Squatch eats pizza' and 'pizza eats Squatch' would give each word the same mix. Adding position values breaks that symmetry. Looking at many words, stopping and learning embeddings don't depend on positional encoding."
+  - q: "Why does a decoder-only model mask attention even while it reads the user's prompt, which already exists in full?"
+    options:
+      - "Reading the prompt unmasked would be too slow on GPUs"
+      - "The prompt and reply go through the same masked layers"
+      - "Masking is what removes punctuation from the prompt"
+      - "Unmasked attention would make the prompt too long"
+    answer: 1
+    explain: "In a decoder-only design, one stack of masked self-attention handles both the prompt and the generated tokens, the same way it was trained. The original encoder-decoder transformer read the input with an unmasked encoder instead. Masking has nothing to do with punctuation or prompt length."
+  - q: "A residual connection adds a layer's input to its output. What goes wrong in a deep stack without it?"
+    options:
+      - "Attention can no longer compute dot products"
+      - "Each layer would need its own vocabulary"
+      - "Training gets much harder as signals degrade"
+      - "The model can't produce an end token anymore"
+    answer: 2
+    explain: "Adding the input back gives every layer a direct path for information and gradients, so a deep stack can be trained and each layer only has to learn a refinement. Without it, signals passed through many layers get distorted and training struggles. Dot products, vocabularies and end tokens are unaffected."
+  - q: "During generation, the model outputs 'awesome' as the first word of its reply. What does it do next?"
+    options:
+      - "It returns 'awesome' and waits for the next prompt"
+      - "It rereads the prompt from scratch with a new random seed"
+      - "It picks the second word from the same softmax output"
+      - "It feeds 'awesome' back in and predicts the next token"
+    answer: 3
+    explain: "Generation is a loop: each chosen token is appended to the sequence and the model runs again to predict the following one, until it outputs the end-of-sequence token. Reusing the same softmax output for the second word would ignore the word just chosen."
+backupResources:
+  - label: "Go deeper: Rotary Positional Embeddings: Combining Absolute and Relative (Efficient NLP, 11 min)"
+    url: "https://www.youtube.com/watch?v=o29P0Kpobz0"
+    type: "video"
+tags:
+  - math
+  - transformers
+  - positional-encoding
+  - decoder-only
+---
+
+Modern chat models are **decoder-only transformers**: a single stack of masked self-attention
+and feed-forward layers that reads your prompt and writes the reply with the same weights.
+This lesson rebuilds that stack at toy size, with embeddings of two to four numbers, so you can
+check every step by hand. The one piece the earlier lessons skipped is how the model knows
+**word order**.
+
+## The parts, in order
+
+1. **Word embedding.** Each token is mapped to a short vector by learned weights.
+2. **Positional encoding.** A position-specific vector is added to each embedding.
+3. **Masked self-attention.** Each token blends the values of itself and earlier tokens
+   (→ query-key-value-attention).
+4. **Residual connection.** The attention output is added to its input.
+5. **Output layer.** A fully connected layer and softmax give a probability for every token
+   in the vocabulary. (The original GPT reused the embedding weights in reverse instead.)
+
+The toy model uses one attention cell; the original GPT stacked 12, and real models also put a
+feed-forward layer after each attention step (→ mlp-layers-store-facts). Every position
+predicts the word after it, which is how the model is checked against the known text in
+training.
+
+## Why position must be added
+
+Attention is a weighted sum over the tokens a word can see. Sums don't care about order, so
+without help "Squatch eats pizza" and "pizza eats Squatch" would give "Squatch" exactly the same
+mix. Positional encoding fixes this by adding a different pattern to each position, built from
+sine and cosine waves of different frequencies:
+
+`PE(pos, 2i) = sin(pos / 10000^(2i/d))` and `PE(pos, 2i+1) = cos(pos / 10000^(2i/d))`
+
+Low dimensions use fast waves that change at every position; high dimensions use slow waves
+that tell far-apart positions apart.
+
+## Worked example: the same word at two positions
+
+Take d = 4 and the word "the" with embedding [0.5, 0.5, 0.5, 0.5].
+
+| position | sin(p) | cos(p) | sin(p/100) | cos(p/100) |
+|---|---|---|---|---|
+| 0 | 0.000 | 1.000 | 0.000 | 1.000 |
+| 1 | 0.841 | 0.540 | 0.010 | 1.000 |
+| 2 | 0.909 | −0.416 | 0.020 | 1.000 |
+
+(For d = 4 the second pair divides by 10000^(2/4) = 100.)
+
+- "the" at position 0: [0.5, 0.5, 0.5, 0.5] + [0, 1, 0, 1] = **[0.5, 1.5, 0.5, 1.5]**
+- "the" at position 2: [0.5, 0.5, 0.5, 0.5] + [0.909, −0.416, 0.020, 1.000] =
+  **[1.409, 0.084, 0.520, 1.500]**
+
+Same word, two different vectors, so attention can now treat them differently.
+
+## How the reply is generated
+
+The prompt is processed with the mask, then an end-of-sequence token is appended. The output
+layer at that position predicts the first word of the reply. That word is appended and fed
+back in, the next word is predicted, and so on until the model outputs the end token or a
+length limit stops it. Prompt and reply live in one sequence, which is why they share the
+context limit.
+
+## Common mistakes
+
+- **Thinking attention knows order on its own.** It doesn't; position is added.
+- **Assuming the prompt is read unmasked.** In a decoder-only model the same masked layers read
+  both prompt and reply.
+- **Treating the reply as a separate output.** Every reply token becomes input for the next,
+  and attends back to the prompt, which is how a "Don't" at the start isn't lost.
+
+## Where you'll see it in AI
+
+Context limits that count prompt plus reply, stop reasons in API responses, and positional
+schemes in current open models (rotary embeddings, linked below as extra viewing). You'll
+build the same stack in code in → build-gpt-from-scratch.

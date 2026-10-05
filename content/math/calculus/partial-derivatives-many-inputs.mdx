@@ -1,0 +1,184 @@
+---
+title: "Partial derivatives"
+subtitle: "One input at a time: how a loss responds to each of many weights"
+summary: "Compute a partial derivative by holding the other inputs fixed, and use partials to see which weight of a model the loss is most sensitive to."
+changeNote: "New lesson in the calculus track, written from the lecture's transcript, with a two-weight model example, an errata note and a quiz."
+section: math
+pillar: calculus
+order: 4
+level: beginner
+estMinutes: 35
+taskMinutes: 20
+prerequisites:
+  - chain-rule-and-product-rule
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "AXqhWeUEtQU"
+  published: "2016-05-11"
+  year: 2016
+  minutes: 11
+  title: "Partial derivatives, introduction"
+  channel: "Khan Academy"
+  why: "A model's loss depends on every weight at once, so the single-variable derivative needs one step up: change one input, freeze the rest. This lecture makes that step with the same nudge picture as the earlier lessons (a nudge in the x direction of the input plane, then in the y direction) and works one example fully, at a point and as a general formula. It's short and does exactly the job."
+  notes:
+    - "Around 9:20 the board briefly writes sin(y) for the y-partial before correcting it to cos(y). The right formula is x² + cos(y)."
+    - "Around 9:53 the lecture says plugging in (1, 2) gives 1 + cos(1). It should be 1 + cos(2) ≈ 0.584, as computed earlier near 7:14."
+applyIt: |
+  **A partial derivative answers: if I change only this one thing, how much does the result
+  move?** It's the right question whenever several inputs drive one outcome.
+
+  1. Pick an outcome with several inputs: a model's validation loss (learning rate, batch size,
+     epochs), an AI feature's monthly cost (calls per user, tokens per call, price per token), or
+     a weekly metric you report.
+  2. Change one input by a small, fixed amount while freezing all the others. Record the change
+     in the outcome per unit of input.
+  3. Do the same for each input and compare. Inputs with large partials are your levers;
+     inputs with near-zero partials (at the current settings) can wait.
+
+  **If you build software:** many experiment trackers can sweep one setting while fixing the
+  rest; that's a partial derivative estimated by experiment.
+  **If you don't code:** a spreadsheet with one row per "change one thing" scenario does the
+  same job.
+
+  Success: a ranked list of inputs by how much the outcome moves per unit change in each.
+recap:
+  - emoji: "🗺️"
+    title: "Inputs live on a plane"
+    text: "A function like f(x, y) = x²y + sin y takes a point of the plane and returns one number. Every point of the plane is an input."
+  - emoji: "↔️"
+    title: "Nudge in one direction"
+    text: "Nudge the input in the x direction only and see how the output moves. The ratio is the partial derivative with respect to x."
+  - emoji: "∂"
+    title: "Why 'partial'"
+    text: "The curly ∂ marks a function of several inputs. Each partial tells only part of the story, the change along one direction."
+  - emoji: "📌"
+    title: "Freeze the others"
+    text: "To compute ∂f/∂x at (1, 2), set y = 2 first; what remains is an ordinary derivative in x. That gives 4."
+  - emoji: "🧾"
+    title: "General formulas"
+    text: "Treat the other variables as constants without plugging in numbers: ∂f/∂x = 2xy and ∂f/∂y = x² + cos y."
+  - emoji: "🚀"
+    title: "Beyond graphs"
+    text: "With more inputs you can't draw a graph, but the nudge-and-ratio idea still works. That's what carries over to models with many weights."
+task: |
+  **Partials by hand, then on a two-weight model (20 minutes).**
+
+  1. For f(x, y) = x²y + sin(y), compute ∂f/∂x and ∂f/∂y at (1, 2) by hand. Then check both:
+
+     ```python
+     import math
+
+     def f(x, y):
+         return x ** 2 * y + math.sin(y)
+
+     h = 1e-6
+     print("df/dx", (f(1 + h, 2) - f(1 - h, 2)) / (2 * h))
+     print("df/dy", (f(1, 2 + h) - f(1, 2 - h)) / (2 * h))
+     ```
+
+  2. A model predicts `w1·x1 + w2·x2` with loss `(prediction − y)²`. For x1 = 1, x2 = 3,
+     y = 10, w1 = w2 = 1, compute ∂loss/∂w1 and ∂loss/∂w2 by hand (freeze one weight, use the
+     chain rule on the other).
+  3. Measure the second feature in different units: x2 = 300 and w2 = 0.01, so the prediction
+     is still 4. Recompute both partials and write one sentence on what changed.
+
+  Success: step 1 gives 4 and about 0.584; step 2 gives −12 and −36; step 3 gives −12 and
+  −3,600, and you can say why one learning rate can't suit both weights now.
+selfCheck:
+  - q: "A model uses two features: age in years (around 30) and income in dollars (around 50,000). Before training, why might the partial derivative of the loss for the income weight be vastly larger than for the age weight, and what's the usual fix?"
+    a: "For a linear term the partial includes the feature value as a factor (2 × error × feature), so the income weight's partial is scaled by numbers thousands of times bigger. One learning rate then can't suit both weights. Standardise the features to similar ranges before training."
+  - q: "Your AI feature's monthly cost is calls × tokens per call × price per token. Calls are 10,000, tokens per call are 2,000 and the price is 0.000002 dollars per token. Which partial is larger: cost per extra call, or cost per extra token per call?"
+    a: "Per extra call: 2,000 × 0.000002 = 0.004 dollars. Per extra token per call: 10,000 × 0.000002 = 0.02 dollars. One more token in every call costs five times more than one more call, so trimming prompts is the bigger lever here."
+  - q: "A teammate computes ∂f/∂y for f = x²y + sin(y) and gets 2xy + cos(y). What did they do wrong?"
+    a: "They differentiated x² as if x were the variable. For ∂f/∂y, x is frozen, so x²y differentiates to x² (a constant times y). The right answer is x² + cos(y)."
+mcq:
+  - q: "f(x, y) = 3x + y². At the point (2, 5), what are the two partial derivatives?"
+    options:
+      - "∂f/∂x = 3 and ∂f/∂y = 10"
+      - "∂f/∂x = 6 and ∂f/∂y = 25"
+      - "∂f/∂x = 3 and ∂f/∂y = 5"
+      - "∂f/∂x = 13 and ∂f/∂y = 13"
+    answer: 0
+    explain: "Freeze y, and 3x has slope 3. Freeze x, and y² has slope 2y = 10 at y = 5. The (6, 25) answer evaluates the terms instead of differentiating them; (13, 13) mixes both partials into the total."
+  - q: "You estimate ∂loss/∂w3 by nudging w3 and rerunning, but between the two runs a colleague also changed w5. What's wrong with your estimate?"
+    options:
+      - "Nothing; the nudge to w3 was small enough"
+      - "It measures a total change, not a partial"
+      - "Nothing, as long as w5 moved only a little"
+      - "It's only a problem if w3 and w5 share a layer"
+    answer: 1
+    explain: "A partial derivative freezes every other input. If w5 also moved, the measured change mixes both effects, so you can't attribute it to w3. Small or not, any change to another input contaminates the ratio."
+  - q: "For a model with loss L(w1, w2), you find ∂L/∂w1 = −12 and ∂L/∂w2 = −36. Which reading is right?"
+    options:
+      - "w2 is three times as large as w1 at the moment"
+      - "Raising either weight would raise the loss right now"
+      - "A small rise in w2 lowers the loss about 3× as much"
+      - "w1 has stopped mattering and can be removed"
+    answer: 2
+    explain: "Both partials are negative, so raising either weight lowers the loss, and per unit of nudge w2 has three times the effect. Partials describe sensitivity, not the weights' current values, and −12 is far from zero."
+tags:
+  - math
+  - calculus
+  - partial-derivatives
+---
+
+**You need:** → chain-rule-and-product-rule.
+
+The one idea of this lecture: **with several inputs, you take the derivative along one input at
+a time, holding every other input fixed.** That's a partial derivative. A model's loss is a
+function of all its weights at once, and training needs to know how the loss responds to each
+weight separately. Each of those responses is a partial.
+
+## The picture: nudge in one direction
+
+For `f(x)`, a nudge `dx` moves the output by `df`, and the derivative is their ratio. For
+`f(x, y)`, the inputs are points on a plane. A nudge purely in the x direction moves the output
+by some amount; that ratio is `∂f/∂x` (read "partial f, partial x"). A nudge purely in the y
+direction gives `∂f/∂y`. The curly `∂` is a reminder that each one tells only part of the story.
+
+## How to compute one
+
+Freeze the other inputs and take an ordinary derivative. For `f(x, y) = x²y + sin(y)`:
+
+- **∂f/∂x:** treat y as a constant. `x²y` → `2xy`; `sin(y)` is a constant → 0. So `∂f/∂x = 2xy`.
+- **∂f/∂y:** treat x as a constant. `x²y` → `x²`; `sin(y)` → `cos(y)`. So `∂f/∂y = x² + cos(y)`.
+
+At (1, 2): `∂f/∂x = 4` and `∂f/∂y = 1 + cos(2) ≈ 0.584`. Moving in x changes this function about
+seven times faster than moving in y, at this point.
+
+## Worked example: a two-weight model
+
+A model predicts `w1·x1 + w2·x2` and its loss on one example is `(prediction − y)²`. Take
+`x1 = 1`, `x2 = 3`, `y = 10`, and start at `w1 = w2 = 1`. The prediction is 4 and the error
+`e` is −6.
+
+| partial | formula | value |
+|---|---|---|
+| ∂loss/∂w1 | 2e · x1 | −12 |
+| ∂loss/∂w2 | 2e · x2 | −36 |
+
+Both are negative, so raising either weight lowers the loss. The second weight's effect is three
+times larger simply because its feature is three times larger. Now measure `x2` in different
+units, 300 instead of 3, and set `w2 = 0.01` so the prediction is still 4. The error is still
+−6, the first partial is still −12, but the second becomes `2 × (−6) × 300 = −3,600`. That's why
+practitioners rescale features before training: one learning rate can't suit two partials a
+hundred times apart.
+
+## Common mistakes
+
+- **Moving two inputs at once.** Then you've measured a combined change, not a partial.
+- **Differentiating the frozen variable.** In `∂/∂y`, `x²` is a constant, not `2x`.
+- **Reading a partial as a value.** `∂L/∂w2 = −36` says how sensitive the loss is to w2, not how
+  big w2 is.
+- **Forgetting that partials depend on the point.** Recompute them after every change; 2xy is
+  different everywhere.
+
+## Where you'll see it in AI
+
+- **Training:** a network with a million weights has a million partials of the loss, one per
+  weight (→ gradient-vector-of-partials packs them into one vector).
+- **Feature scaling:** unscaled features give partials of wildly different sizes, which slows
+  gradient descent (→ calculus-for-optimization).
+- **Backprop** computes all these partials efficiently with the chain rule
+  (→ backprop-chain-rule-calculus).

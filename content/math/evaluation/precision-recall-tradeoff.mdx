@@ -1,0 +1,213 @@
+---
+title: "Precision, recall and the accuracy trap"
+subtitle: "Why accuracy lies on rare events, and how a threshold trades precision for recall"
+summary: "Compute accuracy, precision and recall, spot accuracy that hides a useless model, and choose a cutoff by the cost of each error."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript, with the spam-filter example and two quiz questions moved from the ROC lesson."
+section: math
+pillar: evaluation
+order: 3
+level: beginner
+estMinutes: 10
+taskMinutes: 20
+prerequisites:
+  - sensitivity-specificity
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "qWfzIYCvBqo"
+  published: "2021-03-01"
+  year: 2021
+  minutes: 5
+  title: "Never Forget Again! // Precision vs Recall with a Clear Example of Precision and Recall"
+  channel: "Kimberly Fessel"
+  why: "Five minutes and one picture of apples and oranges make the difference between precision and recall hard to forget, and the same picture shows why accuracy collapses when one class is rare. It then slides the decision line to show precision rising as recall falls, which is the trade-off every guardrail and filter in AI work has to settle. It follows sensitivity naturally: recall is the same number under its machine-learning name."
+  notes:
+    - "1:03 Accuracy, then its failure: with 990 oranges and 10 apples, calling everything an orange scores 99%."
+    - "2:07 The memory trick: precision looks only at the apple side of the line, recall looks only at the real apples."
+    - "3:10 Moving the threshold: precision goes to 100% while recall drops to 50%, then the reverse."
+applyIt: |
+  **Every filter you use is making a precision-versus-recall choice, whether anyone chose it or
+  not.** Spam folders, AI moderation, a "needs review" flag on invoices, a model that marks
+  support tickets as urgent: each one has a cutoff that someone set, often by default.
+
+  1. Pick one filter or alert in your work, studies or project.
+  2. Write down the two failures in plain words: "a real X slips through" (a recall failure)
+     and "a fine Y gets flagged" (a precision failure).
+  3. Put a rough cost on each: minutes of someone's time, money, a user's trust, a safety risk.
+  4. Decide which side the cutoff should lean, and check whether the setting today matches.
+
+  ```prompt
+  I run [describe the filter or alert]. A miss means [what happens]. A false flag means [what
+  happens]. Ask me two questions about volume and cost, then tell me whether I should favour
+  precision or recall and how I'd check the current setting.
+  ```
+
+  **If you build software:** log the score, not just the yes/no decision, so you can move the
+  cutoff later without retraining anything.
+
+  Success: one filter with its two failures named, a lean (precision or recall) and a reason.
+toolkit: |
+  - **Build a confusion matrix spreadsheet template.** Four input cells (true positives, false
+    positives, false negatives, true negatives) and formulas for accuracy, precision, recall and
+    F1, such as `=TP/(TP+FP)` for precision. Paste in the counts from any filter, alert or AI
+    grader and see in seconds whether accuracy is hiding the misses.
+  - **Keep the cost-of-being-wrong reflex in your notes.** Expensive misses → maximize recall;
+    expensive false alarms → maximize precision. Apply it to every filter, alert, guardrail and
+    automated reviewer you set up, and never report "96% accuracy" on a stream that is 3% bad.
+  - **Set up a chat assistant as a metrics tutor.** In a ChatGPT or Claude Project or a Gemini
+    Gem, add the standing instruction "When I bring a metrics problem, ask me for my answer and
+    reasoning before telling me, then give one hint at a time." Practise on your own filter
+    examples until the precision-vs-recall call is quick.
+recap:
+  - emoji: "🍎"
+    title: "A classifier with a line"
+    text: "A simple model draws one line: everything on one side is called an apple, everything on the other an orange."
+  - emoji: "🪤"
+    title: "Accuracy and its trap"
+    text: "Accuracy is correct ÷ total, 7 of 10 here. With 990 oranges and 10 apples, calling everything an orange scores 99% and finds no apples at all."
+  - emoji: "🎯"
+    title: "Precision: the apple side"
+    text: "Of everything the model called an apple, how many were apples? 3 of 5, so 60%."
+  - emoji: "🧺"
+    title: "Recall: all the real apples"
+    text: "Of all the real apples, how many did the model call apples? 3 of 4, so 75%."
+  - emoji: "🎚️"
+    title: "Slide the threshold"
+    text: "Move the line one way and precision hits 100% while recall falls to 50%; move it the other way and recall hits 100% while precision falls to 50%."
+  - emoji: "➗"
+    title: "When you need one number"
+    text: "Precision guards against false alarms, recall against misses. The F-score combines them as a harmonic mean."
+task: |
+  Turn one confusion matrix into the right dashboard number.
+
+  ```prompt
+  From these hypothetical guardrail counts for a customer-facing chatbot — 1,000 outputs,
+  3% genuinely bad, 27 of 30 bad ones caught, 40 good ones wrongly blocked — compute accuracy,
+  precision (on "bad"), and recall (on "bad"). Then, given that a bad output reaching a user
+  costs far more than a bland fallback, tell me which single number belongs on the team
+  dashboard and write the one-sentence justification.
+  ```
+
+  Then check the assistant's arithmetic by hand from the four boxes (a sticky note is enough),
+  or put the counts into a spreadsheet so you can change the threshold story and watch the
+  numbers move. You should get accuracy 95.7%, precision about 40% and recall 90%.
+
+  Success: the three metrics computed and checked by hand, plus a one-sentence defence of recall
+  as the dashboard number, including why ~96% accuracy is misleading here.
+selfCheck:
+  - q: "A product manager asks you to 'just make the guardrail more accurate'. What do you ask first, and why?"
+    a: "Which mistake is costlier: a harmful output reaching a user (a miss) or a good output being blocked (a false alarm)? The answer decides whether to push recall or precision and where to set the threshold; 'accuracy' hides that trade-off."
+  - q: "Why is accuracy nearly meaningless for detecting rare events?"
+    a: "With a 1% positive class, always predicting 'negative' scores 99% accuracy while catching nothing. Precision (how many flags are real) and recall (how many real cases you caught) measure what accuracy hides."
+  - q: "You raise a spam filter's cutoff and complaints about lost real emails stop, but more spam reaches inboxes. Which metric went up, which went down, and was it the right move?"
+    a: "Precision went up (fewer real emails flagged as spam) and recall went down (more spam missed). For most inboxes losing a real email costs more than seeing a spam one, so it's usually right, but check how much spam now gets through."
+mcq:
+  - q: "A hallucination detector reports 97% accuracy. Hallucinations are 2% of traffic. What do you demand to see before trusting it?"
+    options:
+      - "Precision and recall on the hallucination class"
+      - "A higher overall accuracy, ideally 99% or above"
+      - "Its accuracy on a larger and more recent test set"
+      - "The detector's confidence score for each flag"
+    answer: 0
+    explain: "A detector that always says 'clean' scores 98% here, so this one is worse than doing nothing on accuracy, and more accuracy wouldn't settle it either. Per-class precision and recall are the honest scorecard under imbalance. A bigger test set reduces noise but not the blind spot, and confidence scores still need calibration (→ conditional-probability-counts)."
+  - q: "You're building the guardrail for a homework-help chatbot used by children. A bad output reaching a child is far costlier than showing a bland fallback. What do you tune for?"
+    options:
+      - "The highest overall accuracy across all outputs"
+      - "High precision on 'bad': never block a good output"
+      - "An even 50/50 balance of the two error types"
+      - "High recall on 'bad': catch nearly every bad one"
+    answer: 3
+    explain: "Asymmetric costs pick the metric. Expensive misses (false negatives) → prioritize recall and accept some falsely blocked good answers. Expensive false alarms (a spam filter eating real mail) → prioritize precision. Overall accuracy and a fixed 50/50 split both ignore which error actually hurts."
+  - q: "An invoice checker flags invoices for a person to review. Reviewers say most flags are fine invoices, and they have started ignoring the flags. What's the right first fix?"
+    options:
+      - "Lower the cutoff so more risky invoices are caught"
+      - "Raise the cutoff and check how much recall it costs"
+      - "Report accuracy instead, since most invoices are fine"
+      - "Add a second reviewer for every flagged invoice"
+    answer: 1
+    explain: "Reviewers ignoring flags is a precision problem: too many flags are false alarms, so the real ones get lost. Raising the cutoff improves precision, and you measure how many real problems it then misses. Lowering the cutoff makes the flood worse."
+backupResources:
+  - label: "Google ML Crash Course: thresholds and the confusion matrix (interactive)"
+    url: "https://developers.google.com/machine-learning/crash-course/classification/thresholding"
+    type: "docs · interactive threshold widgets"
+tags:
+  - math
+  - evaluation
+  - precision
+  - recall
+  - metrics
+---
+
+**You need:** the four boxes from → confusion-matrix and sensitivity from
+→ sensitivity-specificity. Fractions and percentages, nothing more.
+
+Accuracy is the number everyone reaches for, and on rare events it is close to useless. This
+lesson replaces it with two questions you can ask of any filter: **of what you flagged, how much
+was real?** (precision) and **of what was real, how much did you flag?** (recall). Then it shows
+the knob that trades one for the other.
+
+## Three formulas on the same four boxes
+
+- **Accuracy = (TP + TN) ÷ everything.** The share of all calls that were right.
+- **Precision = TP ÷ (TP + FP).** Of everything flagged, the share that was real. Low precision
+  means a flood of false alarms.
+- **Recall = TP ÷ (TP + FN).** Of everything real, the share you caught. It's the same number as
+  sensitivity. Low recall means misses.
+
+Precision is the only one of the three that never looks at the true negatives. That's why it
+stays honest when negatives vastly outnumber positives.
+
+## The accuracy trap
+
+If 98% of emails are fine, a filter that never flags anything is 98% accurate and catches
+nothing. Accuracy rewards agreeing with the majority, so on imbalanced data it mostly measures
+the class balance.
+
+## Worked example: one spam filter, two thresholds
+
+A hypothetical inbox gets 10,000 emails; 500 are spam. The filter gives every email a spam
+score from 0 to 1, and you choose the cutoff.
+
+**Cutoff 0.5.** It catches 450 spam (TP), misses 50 (FN), and wrongly flags 100 real emails
+(FP). The other 9,400 are TN.
+
+1. Accuracy = (450 + 9,400) ÷ 10,000 = **98.5%**.
+2. Precision = 450 ÷ (450 + 100) ≈ **82%**.
+3. Recall = 450 ÷ 500 = **90%**.
+
+**Cutoff 0.8.** It now catches 400 spam, misses 100, and wrongly flags only 20 real emails.
+
+1. Accuracy = (400 + 9,480) ÷ 10,000 = **98.8%**.
+2. Precision = 400 ÷ 420 ≈ **95%**.
+3. Recall = 400 ÷ 500 = **80%**.
+
+Accuracy barely moved, yet the experience changed a lot: 80 fewer real emails lost to the spam
+folder, 50 more spam emails in the inbox. A filter that flags nothing at all would still score
+95%. For a spam filter, losing real mail is usually the costlier mistake, so the 0.8 cutoff
+wins. For a guardrail that blocks harmful replies, you'd lean the other way.
+
+> 💡 **Try it:** say this pair out loud until it's reflexive — "expensive misses → maximize
+> recall; expensive false alarms → maximize precision." Now classify: airport security,
+> spam filter, a chatbot's harmful-reply guardrail, a fraud-refund flagger. (Recall, precision,
+> recall, depends on volume — and that "depends" is where engineering judgment lives.)
+
+## Common mistakes
+
+- **A glowing dashboard and unhappy users** → accuracy reported on imbalanced data → report
+  precision and recall on the class you care about.
+- **Confusing the two denominators.** Precision divides by what you flagged; recall divides by
+  what was real. Say the denominator out loud.
+- **Inheriting the cutoff.** A default of 0.5 is a guess, not a decision. Pick it from the
+  costs and write the reason down.
+- **Quoting precision without recall.** A filter that flags one obvious case has 100%
+  precision and catches almost nothing.
+
+## Where you'll see it in AI
+
+- **Guardrails and moderation:** recall on harmful content is usually the number that matters.
+- **Retrieval for RAG:** "precision@k" and "recall@k" ask how many retrieved chunks are relevant
+  and how many relevant chunks were retrieved (→ rag-fundamentals).
+- **Hallucination and fact checks:** a detector is judged on the hallucination class, never on
+  overall accuracy.
+- **One number for a team:** F1 combines the two, covered in → single-number-metric. The full
+  curve of trade-offs is in → evaluation-metrics.

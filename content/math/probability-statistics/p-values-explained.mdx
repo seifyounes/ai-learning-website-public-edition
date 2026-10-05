@@ -1,0 +1,214 @@
+---
+title: "p-values"
+subtitle: "What a small p-value tells you, what it doesn't, and why 20 prompt variants fool you"
+summary: "Read a p-value correctly, pick a threshold for the cost of a false positive, and avoid the size and many-variants traps in AI evals."
+changeNote: "New lesson in the probability and statistics track, written from the lecture's transcript, with an A/A false-positive simulation and a quiz."
+section: math
+pillar: probability-statistics
+order: 10
+level: intermediate
+estMinutes: 16
+taskMinutes: 25
+prerequisites:
+  - hypothesis-testing-null
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "vemZtEM63GY"
+  published: "2020-03-22"
+  year: 2020
+  minutes: 11
+  title: "p-values: What they are and how to interpret them"
+  channel: "StatQuest with Josh Starmer"
+  why: "The last lesson ended with 'about 4% of the time'; this one explains what that kind of number means. StatQuest shows what the 0.05 threshold really controls (false positives when nothing is different) and ends on the point most often missed: a small p-value says nothing about how big a difference is. Both matter every time someone shows you a 'significant' eval win."
+  notes:
+    - "5:10 What the 0.05 threshold means, then 5:42 an example where both groups get the same drug and a false positive still happens."
+    - "7:13 Choosing a stricter or looser threshold depending on how costly a false positive would be."
+    - "9:18 The key caveat: a small p-value doesn't mean a big difference."
+applyIt: |
+  **Whenever a result is called "significant", ask two follow-up questions: how big is the
+  difference, and how many comparisons were tried to find it?** Take one recent claim from your
+  work or reading: a prompt that "significantly" beat another, an A/B test of an AI feature, a
+  paper's headline result.
+
+  1. Find the effect size: the actual gap, ideally with its confidence interval.
+  2. Decide whether a gap that size matters for your use (cost, latency, user experience).
+  3. Count the variants or metrics that were compared. With many, expect some to look
+     significant by chance.
+  4. Write your verdict: "real and worth it", "real but too small to matter", or "possibly luck".
+
+  **If you build software:** log every variant you test, not just the winner, so you can tell how
+  many comparisons produced it. **If you don't code:** when someone reports a significant win,
+  ask "out of how many tries?"
+
+  Success: one "significant" claim has an effect size, a comparison count and a verdict.
+recap:
+  - emoji: "🧑‍⚕️"
+    title: "One person each proves nothing"
+    text: "Drug A cures one person and drug B fails on another. Allergies, missed doses or placebo could explain it, so we need many people."
+  - emoji: "📊"
+    title: "Obvious and unclear results"
+    text: "With 99.7% versus 0.1% cured, chance can't explain the gap. With 37% versus 31%, it might, and that's where the p-value comes in."
+  - emoji: "🎚️"
+    title: "What a p-value is"
+    text: "A number between 0 and 1. The closer it is to 0, the more confident we can be that the two drugs really differ."
+  - emoji: "🚦"
+    title: "The 0.05 threshold"
+    text: "If there's truly no difference, about 5% of repeated experiments would still give p below 0.05. Give two groups the same drug and you'll sometimes see one."
+  - emoji: "⚠️"
+    title: "False positives"
+    text: "A small p-value when nothing differs is a false positive. Choose a stricter threshold when one would be costly, a looser one when it's cheap."
+  - emoji: "0️⃣"
+    title: "It tests the null"
+    text: "The p-value helps decide whether to reject the null hypothesis that the drugs are the same."
+  - emoji: "📏"
+    title: "Small p, not big effect"
+    text: "A 6-point difference can give p = 0.24 while a 1-point difference in a much bigger study gives p = 0.04. A p-value doesn't measure how large the difference is."
+task: |
+  Run an A/A test: the same prompt twice, many times, and count the "significant" results.
+
+  ```python
+  import random
+  from math import sqrt, erf
+
+  def p_value(x1, x2, n):
+      p1, p2 = x1 / n, x2 / n
+      pooled = (x1 + x2) / (2 * n)
+      se = sqrt(2 * pooled * (1 - pooled) / n)
+      if se == 0:
+          return 1.0
+      z = abs(p1 - p2) / se
+      return 2 * (1 - 0.5 * (1 + erf(z / sqrt(2))))  # two-sided
+
+  false_pos = 0
+  for _ in range(1000):
+      a = sum(random.random() < 0.8 for _ in range(100))  # same prompt...
+      b = sum(random.random() < 0.8 for _ in range(100))  # ...run twice
+      if p_value(a, b, 100) < 0.05:
+          false_pos += 1
+  print("false positives out of 1000:", false_pos)
+  print("p for 84 vs 88 of 100:", round(p_value(84, 88, 100), 3))
+  ```
+
+  1. Run it. Both "prompts" have the same true pass rate, yet some runs come out significant.
+     Expect roughly 50 to 70 of 1,000 (a bit over 5%, because pass counts are whole numbers).
+  2. Change the threshold to 0.01 and run again. What happens to the count?
+  3. Imagine you tried 20 prompt variants against a baseline and shipped the one with the
+     smallest p-value. Using your count, how often would that "winner" be pure luck?
+
+  **No-code path:** ask a chat assistant that runs code to do this simulation and explain the
+  result, then answer step 3 yourself.
+
+  Success: your false-positive counts at 0.05 and 0.01, and a one-line answer to step 3.
+selfCheck:
+  - q: "A teammate tested 15 prompt variants against the current prompt, found one with p = 0.03 and wants to ship it. What do you ask, and what would you do?"
+    a: "Ask how many variants were tried: with 15 comparisons at 0.05, there's roughly a 54% chance at least one looks significant by luck. Re-test the winner alone on fresh examples (ideally paired); if it wins again, it's more likely real."
+  - q: "An A/B test of an AI feature with 200,000 users per arm reports p = 0.01 for a 0.4-point rise in thumbs-up rate. The feature doubles inference cost. How do you read the result?"
+    a: "The improvement is very likely real, because the sample is huge, but it's tiny. A small p-value doesn't say the effect is big. Weigh a 0.4-point gain against doubled cost; it may well not be worth shipping."
+mcq:
+  - q: "A comparison of two prompts gives p = 0.03. Which reading is correct?"
+    options:
+      - "There's a 3% chance the new prompt is no better than the old"
+      - "The new prompt is better on about 97% of the inputs it sees"
+      - "If they were equal, a gap this big would arise about 3% of the time"
+      - "The new prompt's pass rate is about 3 points above the old one"
+    answer: 2
+    explain: "A p-value is computed assuming the null is true: it's how often data at least this extreme would occur if there were no difference. It isn't the probability that the null is true, and it doesn't measure the gap's size or the share of inputs that improved."
+  - q: "You try 20 rewordings of a system prompt, each tested against the original at the 0.05 level. One comes out significant. Before celebrating, what should you recognize?"
+    options:
+      - "With 20 tries, a significant result is likely even by pure chance"
+      - "One significant result out of 20 proves the method is sound"
+      - "The threshold should rise to 0.10, since 20 is a large number"
+      - "Only the variants with p above 0.05 can be trusted as results"
+    answer: 0
+    explain: "Each test has a 5% false-positive rate when nothing differs, so across 20 tests there's about a 64% chance (1 − 0.95²⁰) of at least one fluke. Re-test the winner on fresh data, or use a stricter threshold per comparison. Loosening the threshold makes flukes more likely, not less."
+  - q: "Experiment 1 (200 users) shows a 6-point gain with p = 0.24. Experiment 2 (20,000 users) shows a 1-point gain with p = 0.04. What follows?"
+    options:
+      - "Experiment 1 found the bigger real effect, so it should win"
+      - "Experiment 2 found the bigger effect, as its p-value is lower"
+      - "Both experiments contradict each other, so neither counts"
+      - "Only experiment 2 is significant, and its gain is small"
+    answer: 3
+    explain: "The p-value depends on both the gap and the sample size. Experiment 2's large sample makes a 1-point gain detectable, but the gain stays small. Experiment 1's 6 points might be real or noise; 200 users can't tell. A lower p-value doesn't mean a larger effect."
+  - q: "Your team picks a significance threshold for automatically rolling back an AI model when quality metrics look worse. A false alarm costs an hour of manual review. What's sensible?"
+    options:
+      - "Use 0.00001, since any false alarm at all is unacceptable"
+      - "A looser threshold like 0.1, since false alarms are cheap"
+      - "Always 0.05, because that's the scientific standard"
+      - "No threshold: roll back whenever any metric drops at all"
+    answer: 1
+    explain: "The threshold sets how often you accept a false positive, so it should follow the cost of one. Here false alarms are cheap and missed regressions are costly, so a looser threshold makes sense. 0.05 is a convention, not a law, and a very strict threshold would miss real regressions."
+backupResources:
+  - label: "Go deeper: Statistical Power, Clearly Explained!!! (StatQuest with Josh Starmer, 8 min)"
+    url: "https://www.youtube.com/watch?v=Rsc5znwR5FA"
+    type: "video"
+  - label: "Introductory Statistics 2e, chapter 9: hypothesis testing with one sample (OpenStax)"
+    url: "https://openstax.org/books/introductory-statistics-2e/pages/9-introduction"
+    type: "free textbook · p-values and significance levels"
+tags:
+  - math
+  - statistics
+  - p-values
+  - evals
+---
+
+**You need:** the null hypothesis. → hypothesis-testing-null first.
+
+A **p-value** answers one narrow question: if there were really no difference, how often would
+you see a result at least as extreme as this one? A small p-value means "chance alone would
+rarely do this", which is a reason to reject the null. It's useful, and it's misread constantly,
+including in AI evals and research papers. This lesson is about reading it right.
+
+## What it is and what the threshold controls
+
+The p-value runs from 0 to 1. Close to 0: the data would be surprising if nothing were going on.
+Large: the data is ordinary under "no difference".
+
+You pick a **threshold** in advance, commonly 0.05. Its meaning: when there really is no
+difference, about 5% of experiments will still cross it. Those are **false positives**. The
+threshold is a choice about how many false positives you'll tolerate:
+
+- costly mistake (shipping a medical model, a risky migration): use a much smaller threshold;
+- cheap mistake (triggering a quick manual check): a looser one is fine.
+
+## Two traps
+
+**Size.** A p-value mixes the size of a gap with the amount of data. With 100,000 users per arm,
+a thumbs-up rate moving from 50.0% to 50.5% gives p ≈ 0.025: significant, and possibly not worth
+anything. With 100 examples per prompt, 84% versus 88% gives p ≈ 0.4: not significant, and
+possibly a real 4 points. Always report the gap and its interval alongside the p-value.
+
+**Many tries.** Every test at 0.05 has a 5% chance of a fluke. Test many things and flukes
+become likely.
+
+## Worked example: twenty prompt variants
+
+You write 20 rewordings of a system prompt and test each against the original at 0.05. Suppose
+none of them is truly better.
+
+1. Chance that a single test stays clean: 0.95.
+2. Chance all 20 stay clean: 0.95²⁰ ≈ 0.36.
+3. Chance **at least one** looks significant: 1 − 0.36 ≈ **0.64**.
+
+So in this situation it's more likely than not that you'd "find" a winner that is pure luck. Two
+simple defences: re-test the winner alone on fresh examples, or divide the threshold by the number
+of comparisons (0.05 ÷ 20 = 0.0025 per test, the Bonferroni correction).
+
+The same applies to checking many metrics, many slices of users or many checkpoints of a
+training run: the more you look, the more chance results you'll see.
+
+## Common mistakes
+
+- **"p = 0.03 means a 3% chance the null is true."** No: it's the chance of data this extreme if
+  the null were true.
+- **Treating p > 0.05 as proof of no difference.** It's a failure to reject, often from small n.
+- **Equating a small p-value with a big effect.** Check the size separately.
+- **Reporting only the variant that worked.** Say how many you tried.
+
+## Where you'll see it in AI
+
+Prompt and model comparisons (→ evaluation-metrics), A/B tests of AI features, and research
+papers comparing methods across many benchmarks. The paired 4% from → hypothesis-testing-null is
+a p-value. To know in advance how many examples you need to detect a given gap, see the power
+video linked below. Next, the track turns from comparing averages to reasoning about events, in
+→ conditional-probability-counts.

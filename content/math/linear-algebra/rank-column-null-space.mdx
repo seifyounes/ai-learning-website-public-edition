@@ -1,0 +1,214 @@
+---
+title: "Inverses, rank, column space and null space"
+subtitle: "When a transformation can be undone, what it can output, and why LoRA is cheap"
+summary: "Solve a linear system as 'which input lands here', read rank as the size of a matrix's output, and explain why low-rank updates like LoRA save so much."
+changeNote: "New lesson in the linear algebra track, written from the lecture's transcript; takes in the rank and LoRA material and quiz question from lesson 1."
+section: math
+pillar: linear-algebra
+order: 6
+level: intermediate
+estMinutes: 17
+taskMinutes: 30
+prerequisites:
+  - determinant-area-scaling
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "uQhTuRlWMxw"
+  published: "2016-08-15"
+  year: 2016
+  minutes: 12
+  title: "Inverse matrices, column space and null space | Chapter 7, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "This chapter turns the zero-determinant case into four precise ideas: the inverse (playing a transformation backwards), rank (how many dimensions the output keeps), column space (every possible output) and null space (every input that vanishes). It skips the hand computation on purpose and keeps the geometry, which is the part you need to understand why fine-tuning methods like LoRA work with low-rank matrices."
+  notes:
+    - "1:14 a linear system of equations rewritten as one matrix equation: find the input that lands on a given output."
+    - "3:58 the inverse as rewinding the transformation; 6:36 why a squashing transformation has no inverse."
+    - "7:43 rank as the number of output dimensions; 8:47 column space; 9:56 null space, the inputs that land on zero."
+applyIt: |
+  **Rank tells you how much a matrix really holds, and low-rank fine-tuning bets on that.** You
+  can read the bet straight off a LoRA adapter's settings.
+
+  1. Open any LoRA adapter page on Hugging Face (search "LoRA" in Models) and find its
+     `adapter_config.json`. Note `r` (the rank) and `target_modules` (which weight matrices it
+     changes).
+  2. Look up the base model's hidden size d on its own model card or config.
+  3. For one adapted d × d matrix, compare d² (a full update) with 2·d·r (the two thin LoRA
+     matrices). Write the ratio down.
+
+  **If you build software:** if you fine-tune, try two values of `r` on the same small task and
+  compare quality against adapter size. **If you don't code:** the ratio is the point; it's why
+  one base model can carry many small task-specific adapters.
+
+  Success: one adapter's r, the base model's d, and the full-versus-LoRA parameter ratio for one
+  matrix.
+recap:
+  - emoji: "🧾"
+    title: "Equations as a matrix"
+    text: "A linear system scales unknowns and adds them, so it packs into one equation A·x = v. Solving it means finding the input x that the transformation A sends to v."
+  - emoji: "⏪"
+    title: "The inverse rewinds"
+    text: "If the determinant isn't zero, exactly one x lands on v. Play the transformation backwards from v to find it; that backwards move is the inverse matrix."
+  - emoji: "🪞"
+    title: "Doing, then undoing"
+    text: "The inverse times A gives the identity, the transformation that does nothing and leaves both basis vectors where they started. A 90° turn is undone by a 90° turn back."
+  - emoji: "🚫"
+    title: "Squashed means no inverse"
+    text: "With a zero determinant, space lands on a line or point, and no function can unsquash a line into a plane. A solution exists only if v happens to lie on that line."
+  - emoji: "📏"
+    title: "Rank and column space"
+    text: "Rank is the number of dimensions in the output. The set of all outputs is the column space, the span of the matrix's columns. Full rank means nothing was lost."
+  - emoji: "🕳️"
+    title: "The null space"
+    text: "When a matrix squashes space, a whole line or plane of inputs lands on zero. That set is the null space; it describes every solution of A·x = 0."
+task: |
+  Solve a system both ways, find a null space, then build a LoRA-style update and count it.
+
+  **On paper (10 minutes).** Solve 2x + y = 5 and x + 3y = 5. Then take the matrix with columns
+  (1, 2) and (2, 4): find one vector that it sends to zero, and decide whether A·x = (3, 6) and
+  A·x = (3, 5) have solutions.
+
+  **In Python (20 minutes, free Google Colab works).**
+
+  ```python
+  import numpy as np
+
+  A = np.array([[2.0, 1.0], [1.0, 3.0]])
+  v = np.array([5.0, 5.0])
+  print("solution:", np.linalg.solve(A, v))
+
+  S = np.array([[1.0, 2.0], [2.0, 4.0]])          # columns (1, 2) and (2, 4)
+  print("rank of S:", np.linalg.matrix_rank(S))
+  print("S @ (2, -1):", S @ np.array([2.0, -1.0]))
+
+  d, r = 1024, 8
+  B = np.random.randn(d, r)                     # tall and thin
+  C = np.random.randn(r, d)                     # short and wide
+  delta = B @ C                                 # a full d x d update
+  print("update shape:", delta.shape, "rank:", np.linalg.matrix_rank(delta))
+  print("numbers stored: full", d * d, "vs low-rank", B.size + C.size)
+  ```
+
+  Change r to 1, 32 and 128 and note the rank and the saving each time. Write one line on what
+  the update can't express when r is small.
+
+  **No code?** Do the paper part, then compute 1,024² against 2 × 1,024 × 8 with a calculator.
+
+  Success: x = 2 and y = 1; (2, −1) lands on zero; the update's rank equals r; and you can say
+  what a low-rank update gives up.
+selfCheck:
+  - q: "A text-classification model first projects 768-dimensional embeddings with a learned 768 × 768 matrix that, it turns out, has rank 300. Two different reviews get identical outputs from that layer. How is that possible?"
+    a: "With rank 300, outputs live in a 300-dimensional column space, so a 468-dimensional null space of inputs is sent to zero. Two inputs whose difference lies in that null space produce the same output, and nothing after the layer can tell them apart."
+  - q: "You're choosing the rank r for a LoRA fine-tune of a model on a narrow task, formatting support replies in a house style. Is starting with a small r reasonable, and what would make you raise it?"
+    a: "Yes. A narrow change of style plausibly needs few independent directions, so a small r is cheap and often enough. Raise r if evaluation shows the adapter can't capture the behaviour (quality plateaus well below a full fine-tune), which suggests the needed update has more independent structure."
+mcq:
+  - q: "LoRA replaces a weight update ΔW (4096 × 4096 ≈ 16.8M numbers) with B (4096 × 8) times A (8 × 4096). Where does the saving come from?"
+    options:
+      - "B and A hold ~65K trainable numbers, not 16.8M"
+      - "B and A are stored at lower precision than the base"
+      - "It skips attention layers and trains only the MLPs"
+      - "It quantizes the frozen base model down to 4-bit first"
+    answer: 0
+    explain: "4096×8 + 8×4096 ≈ 65K trainable numbers, about 250× fewer. The bet is that the useful change to the matrix has low rank (little independent structure), and in practice that bet usually pays. Quantizing the base is a separate trick (the Q in QLoRA), and LoRA adapters are commonly attached to the attention matrices, not kept away from them."
+  - q: "A 3 × 3 matrix has determinant 0 and squashes space onto a plane. You need to solve A·x = v. What can you conclude before computing anything?"
+    options:
+      - "There is no solution, since a zero determinant rules one out"
+      - "There is exactly one solution, found with the inverse"
+      - "Solutions exist only if v lies on that plane, and then many"
+      - "There is always a solution, because the plane is 2D"
+    answer: 2
+    explain: "No inverse exists, but a solution can: v must lie in the column space (the plane). If it does, adding any null-space vector to one solution gives another, so there are infinitely many. Ruling out all solutions is the most common over-reach."
+  - q: "Two inputs x₁ and x₂ give exactly the same output from a weight matrix W. What does that tell you?"
+    options:
+      - "W must be the zero matrix, since outputs ignore inputs"
+      - "x₁ and x₂ must be equal; matrices never merge inputs"
+      - "W must have a negative determinant, so it flips space"
+      - "x₁ − x₂ is in W's null space, so W is not full rank"
+    answer: 3
+    explain: "W·x₁ = W·x₂ means W·(x₁ − x₂) = 0, so the difference is a non-zero vector that W sends to zero, and W loses a dimension. W only needs one squashed direction, not to be zero, and a negative determinant means a flip, not a collapse."
+  - q: "A 512 × 512 matrix turns out to have rank 40. Which statement is true?"
+    options:
+      - "Only 40 of its entries are non-zero; the rest are zeros"
+      - "It can be written exactly as a 512×40 times a 40×512 product"
+      - "Its determinant is 40, the number of independent columns"
+      - "It can be inverted, but only on the first 40 coordinates"
+    answer: 1
+    explain: "Rank 40 means its columns span a 40-dimensional space, so every column is a combination of 40 basis columns: that is exactly a tall-times-wide product, the same shape LoRA learns. Rank says nothing about how many entries are zero, and any rank below 512 makes the determinant 0."
+backupResources:
+  - label: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)"
+    url: "https://arxiv.org/abs/2106.09685"
+    type: "paper · the original method"
+  - label: "Mathematics for Machine Learning — free book, ch. 2.6 (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+  - fine-tuning
+---
+
+The determinant told you whether a transformation squashes space. This lesson names what
+happens next: whether you can **undo** it, how much of the output space it actually **reaches**,
+and which inputs it **erases**. One of those words, **rank**, is the reason a whole family of
+fine-tuning methods is cheap.
+
+## Solving equations is "which input lands here?"
+
+A system like 2x + y = 5 and x + 3y = 5 only scales the unknowns and adds them, so it packs into
+one matrix equation A·x = v. Read geometrically: A moves space, and you want the input x that
+lands on v.
+
+If det(A) isn't zero, exactly one input works, and you find it by playing the transformation
+backwards. That backwards move is the **inverse**, A⁻¹. Doing A and then A⁻¹ gives the
+**identity**, the transformation that changes nothing.
+
+If det(A) is zero, there's no inverse: space was squashed onto a line (or plane, or point), and
+no function can spread a line back out into a plane. A solution exists only if v happens to lie
+in what's left.
+
+## Rank, column space and null space
+
+- **Column space:** every possible output, which is the span of the matrix's columns.
+- **Rank:** the number of dimensions of the column space. Full rank means nothing was squashed.
+- **Null space:** every input that lands on the zero vector. For a full-rank matrix it's just
+  zero itself; otherwise it's a whole line, plane or more. Inputs that differ by a null-space
+  vector give the same output.
+
+## Worked example: one full-rank system, one squashed one
+
+**Full rank.** A has columns (2, 1) and (1, 3), so det = 2·3 − 1·1 = 5. The inverse is
+(1/5) times the matrix with rows (3, −1) and (−1, 2). Applied to v = (5, 5): (1/5)·(15 − 5,
+−5 + 10) = **(2, 1)**. Check: 2·2 + 1 = 5 and 2 + 3·1 = 5.
+
+**Rank 1.** S has columns (1, 2) and (2, 4). The second is twice the first, so the column space
+is the line through (1, 2) and the rank is 1. The vector (2, −1) lands on 2·(1, 2) − 1·(2, 4) =
+(0, 0), so the null space is the line through (2, −1). Then S·x = (3, 6) has infinitely many
+solutions, such as (3, 0) and (1, 1), while S·x = (3, 5) has none, because (3, 5) isn't on the
+line.
+
+## Why LoRA is cheap
+
+Fine-tuning changes a big weight matrix W by some update ΔW. **LoRA's bet** is that the useful
+update has **low rank**: it only needs a few independent directions. So instead of learning all
+4,096 × 4,096 ≈ 16.8 million entries of ΔW, it learns a tall 4,096 × 8 matrix times a wide
+8 × 4,096 one: 65,536 numbers, about 256 times fewer. Their product is a full-size matrix of
+rank at most 8. How those tall and wide shapes work is the topic of
+→ nonsquare-matrices-dimensions.
+
+## Common mistakes
+
+- **Concluding "no solution" from det = 0.** There's no inverse; solutions may still exist.
+- **Reading rank as a count of non-zero entries.** It counts independent directions.
+- **Inverting to solve.** Software solves A·x = v directly (more accurate and faster) rather than
+  forming A⁻¹.
+- **Assuming low rank always works.** It's a bet; evaluation tells you whether r is big enough.
+
+## Where you'll see it in AI
+
+- **LoRA and adapters:** low-rank updates for fine-tuning (→ fine-tuning-fundamentals).
+- **Compression:** keeping only the strongest directions of a matrix is the idea behind the SVD
+  lectures linked from → eigenvectors-eigenvalues.
+- **Information loss in layers:** a projection to a lower rank erases its null space, so later
+  layers can't recover it (→ neural-networks).
+- **Least squares:** when there's no exact solution, regression finds the closest point in the
+  column space (→ machine-learning-fundamentals).

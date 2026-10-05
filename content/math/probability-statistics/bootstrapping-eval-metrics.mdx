@@ -1,0 +1,197 @@
+---
+title: "Bootstrapping"
+subtitle: "Resample your own data to see how much any metric would wobble on a rerun"
+summary: "Bootstrap a standard error and a 95% interval for any eval metric, including ones with no formula, using a few lines of code or a spreadsheet."
+changeNote: "New lesson in the probability and statistics track, written from the lecture's transcript, with a paired bootstrap task in Python and a quiz."
+section: math
+pillar: probability-statistics
+order: 7
+level: intermediate
+estMinutes: 15
+taskMinutes: 30
+prerequisites:
+  - central-limit-theorem
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "Xz0x-8-cgaQ"
+  published: "2021-07-05"
+  year: 2021
+  minutes: 9
+  title: "Bootstrapping Main Ideas!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "Formulas for standard errors exist for means and pass rates, but many AI metrics (F1, a median, a win rate from a judge) have no simple one. Bootstrapping handles all of them the same way, and this StatQuest teaches it in four plain steps with a small dataset you can follow by eye. It also sets up the next lesson, which builds confidence intervals straight from bootstrapped means."
+  notes:
+    - "2:04 The resampling step: watch how values get picked again, or not at all, which is what sampling with replacement means."
+    - "4:38 The four steps of bootstrapping in one list. Copy them; they're the whole method."
+    - "7:42 Why bootstrapping matters: it works for any statistic, such as the median, without needing a formula."
+applyIt: |
+  **When an eval reports a metric without error bars, bootstrap it before you act on it.** Take
+  one metric you or your team compare across versions: an F1 score, a judge's win rate, a median
+  latency, an average rating.
+
+  1. Get the per-item results behind the metric (one row per eval item or conversation).
+  2. Resample the rows with replacement, recompute the metric, and repeat a few thousand times.
+  3. Report the standard deviation of those results as the standard error, and the middle 95%
+     as the interval.
+  4. When comparing two versions on the same items, resample items once and compute the
+     *difference* each time, so shared difficulty cancels.
+
+  **If you build software:** add a `bootstrap(metric_fn, rows)` helper to your eval script and
+  print the interval next to every metric. **If you don't code:** paste your per-item results
+  into a chat assistant that can run code and ask for a bootstrap interval on the metric.
+
+  Success: one metric you compare now comes with a bootstrap interval, computed on per-item data.
+recap:
+  - emoji: "💊"
+    title: "One small experiment"
+    text: "A drug is given to 8 people: 5 feel better, 3 feel worse, and the mean response is 0.5. Is that a real effect or random things like health and lifestyle?"
+  - emoji: "🔁"
+    title: "Rerunning is costly"
+    text: "Repeating the whole experiment many times would give a histogram of means showing which results are common and which are rare, but that's slow and expensive."
+  - emoji: "🎲"
+    title: "Resample instead"
+    text: "Pick 8 values at random from the original 8, allowing repeats. That's sampling with replacement, and the result is a bootstrapped dataset of the same size."
+  - emoji: "4️⃣"
+    title: "Four steps"
+    text: "Make a bootstrapped dataset, calculate something (such as the mean), record it, and repeat thousands of times, usually with a computer."
+  - emoji: "📊"
+    title: "Read the histogram"
+    text: "The histogram of bootstrapped means shows how the mean might change on a rerun. Its standard deviation is the standard error, and the middle 95% is a 95% confidence interval."
+  - emoji: "🚫"
+    title: "A first test"
+    text: "Here the 95% interval includes zero, so the data can't rule out that the drug does nothing. That's a simple form of hypothesis testing."
+  - emoji: "🧰"
+    title: "Any statistic works"
+    text: "Formulas exist for the mean's standard error, but bootstrapping works the same for a median or anything else, with no formula needed."
+task: |
+  Bootstrap the difference between two prompts scored on the same items.
+
+  ```python
+  import random
+
+  # 1 = pass, 0 = fail, for prompts A and B on the same 40 items (replace with your own)
+  a = [1]*29 + [0]*11
+  b = [1]*33 + [0]*7
+  random.seed(0)
+  random.shuffle(a); random.shuffle(b)
+
+  n = len(a)
+  diffs = []
+  for _ in range(10_000):
+      idx = [random.randrange(n) for _ in range(n)]  # resample items, keep pairs
+      diffs.append(sum(b[i] - a[i] for i in idx) / n)
+  diffs.sort()
+  print("observed gap:", (sum(b) - sum(a)) / n)
+  print("95% interval:", diffs[250], "to", diffs[9750])
+  ```
+
+  1. Run it as is, then replace `a` and `b` with real pass/fail results from two versions of one
+     of your prompts (at least 20 items, in the same item order).
+  2. Read the interval. If it includes 0, you can't tell the prompts apart yet.
+  3. Change the metric: compute a median of scores or an F1 inside the loop instead of the mean
+     difference. Nothing else in the method changes.
+
+  **No-code path:** paste the two columns of results into a chat assistant that runs code and ask
+  for exactly this paired bootstrap, with the interval for B minus A.
+
+  Success: a 95% interval for B minus A on your own data, and a sentence on whether it includes 0.
+selfCheck:
+  - q: "Your eval reports F1 = 0.81 for a new classifier prompt against 0.78 for the old one, on the same 150 items. There's no formula handy for the standard error of an F1 difference. What do you do before deciding?"
+    a: "Bootstrap it: resample the 150 items with replacement, compute both F1 scores on each resample, and record the difference. After a few thousand rounds, check whether the middle 95% of differences excludes 0. Resampling items as pairs keeps the comparison fair."
+  - q: "A teammate bootstraps a judge's win rate by resampling the 600 individual judgements, but those come from 60 conversations with 10 judgements each. What would you change?"
+    a: "Resample whole conversations instead of single judgements, because judgements within a conversation are related. Resampling individual rows treats them as independent and gives an interval that is too narrow."
+mcq:
+  - q: "You bootstrap an eval's average score from 50 items, but each bootstrapped dataset you build has only 20 items, to save time. What's the problem?"
+    options:
+      - "Nothing changes, as resample size doesn't affect the spread"
+      - "The intervals come out too narrow for the real uncertainty"
+      - "The intervals come out too wide for the real uncertainty"
+      - "The interval's centre is biased, while its width stays right"
+    answer: 2
+    explain: "A bootstrapped dataset must be the same size as the original, because the spread of a mean depends on n. Means of 20 items wobble more than means of 50, so the interval comes out wider than the real uncertainty of your 50-item score. The centre stays about right; the width is what goes wrong."
+  - q: "You want an interval for the median latency of an AI step, and you don't know a formula for the standard error of a median. What's the most practical approach?"
+    options:
+      - "Resample latencies with replacement and take each sample's median"
+      - "Use the standard error of the mean, since medians behave the same"
+      - "Only report the mean instead, because medians can't get intervals"
+      - "Sort the latencies and report the middle 95% of individual values"
+    answer: 0
+    explain: "Bootstrapping works the same for any statistic: resample, compute the median, record it, repeat. The middle 95% of individual latencies describes the spread of single requests, not the uncertainty of the median."
+  - q: "A paired bootstrap of prompt B minus prompt A on the same 80 items gives a 95% interval from −1 to +9 points. What should you conclude?"
+    options:
+      - "B is better, because most of the interval is above zero"
+      - "A is better, because the interval reaches into negatives"
+      - "The prompts are equal, since zero lies inside the interval"
+      - "The gap may be zero: collect more items or keep testing"
+    answer: 3
+    explain: "An interval that includes zero means the data can't rule out no difference. It doesn't prove the prompts are equal; the true gap could be up to 9 points. Leaning positive is a reason to collect more data, not to declare a winner."
+backupResources:
+  - label: "Seeing Theory, chapter 4: frequentist inference, including the bootstrap (Brown University)"
+    url: "https://seeing-theory.brown.edu/frequentist-inference/"
+    type: "interactive · resample and watch the estimate move"
+tags:
+  - math
+  - statistics
+  - bootstrapping
+  - evals
+---
+
+**You need:** means and standard errors. → central-limit-theorem first.
+
+A metric computed once is one draw. You'd like to know how much it would move if you collected a
+fresh eval set, but you can't afford to keep doing that. **Bootstrapping** gets the answer from
+the data you already have: resample it many times and watch how much the metric wobbles. It
+works for any metric, which matters in AI work, where many metrics have no textbook formula for
+their standard error.
+
+## The method in four steps
+
+1. **Make a bootstrapped dataset.** Draw n rows at random from your n rows, *with replacement*:
+   some rows appear twice, some not at all. Keep the same size as the original.
+2. **Calculate the metric** on it: a mean, a median, F1, a win rate.
+3. **Record** the result.
+4. **Repeat** thousands of times.
+
+The recorded results form a histogram of "what the metric might have been". Its standard
+deviation is the **standard error**, and the range covering the middle 95% is a **95%
+confidence interval** (the topic of → confidence-intervals-for-evals).
+
+## Worked example: eight judge scores
+
+A judge rates eight answers: 2, 5, 5, 6, 7, 8, 8, 9. The mean is **6.25**.
+
+- One bootstrapped dataset: 5, 5, 8, 9, 9, 2, 6, 8 → mean **6.5**.
+- Another: 2, 2, 5, 6, 7, 7, 8, 9 → mean **5.75**.
+
+Repeat 100,000 times (a computer takes about a second) and the means have a standard deviation of
+about **0.74**: that's the standard error. The middle 95% runs from about **4.75 to 7.6**. With
+only eight answers, a "6.25 average" is compatible with anything from mediocre to good.
+
+The same loop with the median instead of the mean gives an interval of about 5 to 8, with no new
+formula needed.
+
+## Two rules for AI evals
+
+- **Resample the unit that's independent.** If an eval has many turns per conversation or many
+  questions per document, resample conversations or documents, not single rows. Otherwise the
+  interval comes out too narrow.
+- **Pair comparisons.** To compare prompt A and B on the same items, resample item indices once
+  per round and compute B minus A on that resample. Items that are hard for both cancel out, and
+  the interval for the difference is much tighter than two separate intervals suggest.
+
+## Common mistakes
+
+- **Resampling without replacement.** That just shuffles the data and every "resample" has the
+  same mean.
+- **Changing the size.** Smaller resamples exaggerate the wobble; larger ones hide it.
+- **Treating the bootstrap as new data.** It measures uncertainty in your sample; it can't fix a
+  sample drawn from the wrong population (→ probability-statistics-for-ai).
+- **Too few rounds.** Use thousands; a hundred rounds gives a jumpy interval.
+
+## Where you'll see it in AI
+
+Error bars on eval leaderboards and research results, intervals on F1, BLEU-style scores and
+judge win rates (→ evaluation-metrics), and paired comparisons of prompts or models. The same
+resampling idea appears in bagging, where many models are trained on bootstrapped copies of the
+training data and their predictions are combined, as random forests do.

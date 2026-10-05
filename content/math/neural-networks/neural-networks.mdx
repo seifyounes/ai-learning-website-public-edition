@@ -1,0 +1,225 @@
+---
+title: "What a neural network is"
+subtitle: "Neurons, weights and biases, and what a parameter count tells you"
+summary: "Explain what the weights and biases of a network do, count a model's parameters, and estimate the memory needed to run it."
+changeNote: "Now the first of eight lessons in the neural networks track: reshaped to its own lecture, with a parameter-count example and a sizing quiz."
+section: math
+pillar: neural-networks
+order: 1
+level: intermediate
+estMinutes: 24
+taskMinutes: 20
+prerequisites:
+  - matrices-as-transformations
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "aircAruvnKk"
+  published: "2017-10-05"
+  year: 2017
+  minutes: 19
+  title: "But what is a neural network? | Chapter 1, Deep learning"
+  channel: "3Blue1Brown"
+  why: "It builds a network visually, neuron by neuron, on real handwritten digits, so 'layers learn features' stops being a slogan and becomes something you can watch. It gives you the picture before any framework code, which is the order this track needs, and it opens a free series whose later chapters reappear in this track and in the calculus track, so the notation carries straight over."
+  notes:
+    - "2:43 A neuron here is just a thing that holds a number between 0 and 1, called its activation."
+    - "10:57 The bias: a number added to the weighted sum so a neuron only lights up past a threshold you choose."
+    - "13:32 The compact form: activations as a vector, weights as a matrix, and σ(W·a + b) for a whole layer."
+    - "17:10 A short conversation on why most modern networks use ReLU instead of the sigmoid."
+applyIt: |
+  **Before you download a local model for private, offline or free experimenting, size it in one
+  multiply against the machine you actually own.** Weights ≈ parameters × bytes/param: 7B at fp16
+  ≈ 14 GB (needs a serious GPU), quantized to 4-bit ≈ 3.5 GB (runs on a laptop). That single
+  estimate is the whole local-vs-cloud call.
+
+  Make the call for one real use of yours (summarizing private documents, prototyping a feature,
+  studying offline) in five minutes:
+
+  1. Look up your memory. On Windows, Task Manager → Performance shows GPU memory; on a Mac,
+     "About This Mac" shows the chip and its unified memory.
+  2. Pick one model you're curious about and multiply its size in billions by 0.5 (4-bit) and by
+     2 (fp16) to get GB.
+  3. Leave a few GB of headroom for the context, then write one line in your notes: "Local at
+     4-bit: yes / no. Otherwise: a cloud API, or a smaller model."
+
+  Success: a go/no-go on running that model locally, with the two numbers that decided it.
+toolkit: |
+  - **Keep a sizing line in your notes.** Write your machine's memory next to the rule
+    "billions × 2 = GB at fp16, × 0.5 at 4-bit", so every "can I run this locally?" question
+    takes ten seconds (→ local-open-models).
+  - **See model tiers as a network-size choice.** Bigger model = more parameters = more compute
+    per token = higher price and latency. Whether it's Claude Opus vs Sonnet vs Haiku, a GPT
+    flagship vs its mini, or Gemini Pro vs Flash, route by task difficulty (→ models-and-effort).
+recap:
+  - emoji: "✍️"
+    title: "A hard problem to write by hand"
+    text: "Your brain reads a sloppy 28 × 28 pixel '3' instantly, but writing rules that turn those pixels into a digit is very hard. A network learns them instead."
+  - emoji: "💡"
+    title: "A neuron holds a number"
+    text: "784 input neurons hold pixel brightness from 0 to 1, 10 output neurons score each digit, and two hidden layers of 16 sit in between. Each neuron's number is its activation."
+  - emoji: "🧩"
+    title: "The hope: layers of pieces"
+    text: "Ideally, early hidden neurons spot little edges, later ones spot loops and lines, and the output combines those parts into digits. Whether training produces this is a separate question."
+  - emoji: "⚖️"
+    title: "Weights, then a squish"
+    text: "Each connection has a weight. A neuron takes the weighted sum of the previous layer, adds a bias that sets its threshold, and squishes the result into 0–1 with a sigmoid."
+  - emoji: "🎛️"
+    title: "13,000 knobs"
+    text: "Count every weight and bias and this small network has about 13,000 of them. Learning means finding settings for all of these numbers that solve the task."
+  - emoji: "🧮"
+    title: "One line per layer"
+    text: "Put the activations in a vector and the weights in a matrix, and a layer is σ(W·a + b). The whole network is just a function from 784 numbers to 10."
+  - emoji: "📐"
+    title: "Sigmoid is old school"
+    text: "Early networks used the sigmoid, loosely modelled on neurons firing or not. Most modern deep networks use ReLU, max(0, a), because it proved much easier to train."
+task: |
+  Count a network's parameters, then turn the count into a memory table for your own machine.
+  A spreadsheet works; so does this Python script.
+
+  1. By hand, count the weights and biases of the video's 784 → 16 → 16 → 10 network. Each layer
+     has (inputs × outputs) weights plus one bias per output.
+  2. Run the script with your machine's memory (GPU memory, or unified memory on a Mac).
+  3. Mark the largest model your machine can run, and at which precision.
+
+  ```python
+  def count_params(sizes):
+      return sum(n_in * n_out + n_out for n_in, n_out in zip(sizes, sizes[1:]))
+
+  print("digit network:", count_params([784, 16, 16, 10]))
+
+  memory_gb = 16          # change to your machine's memory
+  headroom_gb = 2         # rough room for the context
+  for name, billions in [("3B", 3), ("7B", 7), ("8B", 8), ("70B", 70)]:
+      for label, bytes_per_param in [("fp16", 2), ("8-bit", 1), ("4-bit", 0.5)]:
+          gb = billions * bytes_per_param
+          verdict = "fits" if gb + headroom_gb <= memory_gb else "too big"
+          print(f"{name:>4} {label:>6}: {gb:5.1f} GB  {verdict}")
+  ```
+
+  **No-code path:** in a spreadsheet, put model sizes in billions down one column and
+  multiply by 2, 1 and 0.5 in three columns; shade the cells that fit under your memory minus a
+  few GB.
+  Success: your hand count matches the script's 13,002, and you can name the largest model your
+  machine runs and at which precision.
+selfCheck:
+  - q: "A friend says the '7B' in a model's name measures how much the model knows. What does the number actually count, and what can you work out from it before downloading anything?"
+    a: "It counts parameters: the weights and biases, about 7 billion of them. It doesn't measure knowledge directly, but it tells you the memory to load the model (about 14 GB at fp16, about 3.5 GB at 4-bit) and roughly how much compute each token costs."
+  - q: "You want to run a 13B model on a laptop GPU with 8 GB of memory. Does it fit at fp16? At 4-bit? What else needs room?"
+    a: "fp16: 13B × 2 bytes ≈ 26 GB, so no. 4-bit: 13B × 0.5 ≈ 6.5 GB, which barely fits the weights and leaves little room for the context's KV cache, so expect short contexts, a spill into slower system RAM, or a move to a smaller model."
+  - q: "A classmate inspects a trained digit network and is surprised that its hidden neurons don't look like clean edge detectors. Did training fail?"
+    a: "Not necessarily. Edges, then loops, then digits is a hope about what the layers might learn, not a guarantee. Training only finds weights that lower the error; how good the network is gets judged on held-out accuracy, not on whether its neurons look tidy."
+mcq:
+  - q: "You retrain the same digit network on a new handwriting dataset. Afterwards, what has changed in the saved model?"
+    options:
+      - "The number of neurons in each hidden layer"
+      - "The activations stored for each training image"
+      - "The formula of the sigmoid function it uses"
+      - "The values of its weights and biases"
+    answer: 3
+    explain: "Learning means finding new settings for the weights and biases; the architecture and the activation function stay as you defined them. Activations aren't saved at all: they're computed fresh for each input."
+  - q: "A 7B-parameter model at fp16 uses 2 bytes per parameter. Roughly how much memory do you need just to load the weights, and what does 4-bit quantization change?"
+    options:
+      - "~14 GB at fp16; about 3.5 GB at 4-bit"
+      - "~7 GB at fp16; about 3.5 GB at 4-bit"
+      - "~28 GB at fp16; 4-bit only changes speed"
+      - "~14 GB at fp16; 4-bit only changes speed"
+    answer: 0
+    explain: "7B × 2 bytes = 14 GB at fp16; 7B × 0.5 bytes ≈ 3.5 GB at 4-bit (real files run a little larger, since some parts stay at higher precision). Quantization stores fewer bytes per weight, which is what moved capable models from server rooms onto laptops, with a modest quality cost. You'll use this directly when running models locally (→ local-open-models)."
+  - q: "A neuron should light up only when its weighted sum is clearly above 10, not whenever it is positive. What do you change?"
+    options:
+      - "Multiply every incoming weight by 10"
+      - "Add ten more neurons to the layer"
+      - "Set its bias to about −10"
+      - "Replace the sigmoid with a ReLU"
+    answer: 2
+    explain: "The bias is added to the weighted sum before the squish, so a bias of −10 moves the point where the neuron turns on from 0 to 10. Scaling the weights changes how steeply it responds and which pattern it favours, but the switch-on point stays at a weighted sum of zero."
+  - q: "You double the width of every hidden layer in a fully connected network, from 512 to 1,024 units. Roughly what happens to the weights between two hidden layers?"
+    options:
+      - "They double, from about 262K to 524K"
+      - "They roughly quadruple, to about 1M"
+      - "They stay the same; only biases grow"
+      - "They grow by 1,024, one per new unit"
+    answer: 1
+    explain: "Weights between two layers number (units in) × (units out): 512 × 512 ≈ 262K becomes 1,024 × 1,024 ≈ 1.05M, four times as many. Both sides of every connection doubled, which is why widening a model raises its memory and compute so quickly."
+backupResources:
+  - label: "Neural networks: full playlist (3Blue1Brown)"
+    url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi"
+    type: "course · chapter 3 has its own lesson in this track; the calculus and transformers tracks use the rest"
+tags:
+  - math
+  - neural-networks
+  - deep-learning
+---
+
+**You need:** matrix-times-vector from → matrices-as-transformations.
+
+Strip the mystique: a neural network is **a function with a very large number of adjustable
+numbers in it**. Each layer takes a weighted sum of the previous layer, adds a bias, and bends the
+result through a simple function. Training means finding values for all those numbers. That's
+the whole picture this track builds on, and it already answers practical questions: the number
+of parameters decides how much memory a model needs and how much each answer costs.
+
+## Neurons, weights and biases
+
+In the lecture's digit recognizer, a **neuron** is something that holds a number, its
+activation. The input layer has 784 neurons, one per pixel of a 28 × 28 image; the output layer
+has 10, one per digit; two hidden layers of 16 sit between.
+
+Each neuron in a layer is connected to every neuron in the layer before, and each connection
+has a **weight**. The neuron computes the weighted sum of the previous layer's activations, adds
+its own **bias**, and squishes the total into the range 0–1. The weights decide which pattern
+the neuron responds to; the bias decides how strong the evidence must be before it switches on.
+Written for a whole layer at once, that's σ(W·a + b): one matrix product, one added vector, one
+squish (→ layer-forward-pass works through it with numbers).
+
+## Worked example: counting the knobs, then sizing a real model
+
+**Count the digit network.** Each layer has (inputs × outputs) weights plus one bias per output:
+
+1. 784 → 16: 784 × 16 + 16 = 12,560
+2. 16 → 16: 16 × 16 + 16 = 272
+3. 16 → 10: 16 × 10 + 10 = 170
+
+Total: **13,002** parameters. Stored as 4-byte numbers, that's about 52 KB.
+
+**Scale up.** A language model with 8 billion parameters runs the same arithmetic, so its
+memory is just parameters × bytes per parameter. On a laptop with a 16 GB GPU:
+
+1. **fp16 (2 bytes):** 8B × 2 = 16 GB. It doesn't fit: nothing is left for the context.
+2. **8-bit (1 byte):** 8B × 1 = 8 GB. Fits, with room for a decent context.
+3. **4-bit (0.5 bytes):** 8B × 0.5 = 4 GB (real files run a little larger). Fits easily, at a
+   small quality cost you should test on your own tasks.
+
+Pick 8-bit if quality matters most, 4-bit if you want long contexts or a second model loaded.
+Quantization means fewer bytes per parameter, and it's the trick that put capable models on
+laptops (→ local-open-models).
+
+## The hope behind the layers
+
+The lecture's motivation for layers: maybe the first hidden layer spots small edges, the next
+combines edges into loops and lines, and the output combines those into digits. Speech and
+language break down the same way, from sounds to syllables to words. That's a hope about what
+training might find, not a guarantee; a later lesson looks at why this kind of hierarchy
+helps (→ why-deep-networks).
+
+The squish matters too. Early networks used the sigmoid; most modern ones use ReLU, max(0, z),
+because deep networks train much more easily with it (→ choosing-activation-functions).
+
+## Common mistakes
+
+- **Reading "7B" as knowledge.** It counts parameters, which tells you memory and cost, not
+  what the model knows.
+- **Forgetting the context's memory.** A model that exactly fills your GPU will fail or crawl
+  on long prompts; leave headroom.
+- **A local model that loads but runs painfully slowly** usually didn't fit in GPU memory and
+  spilled into system RAM. Pick a smaller quantization or a smaller model.
+- **Assuming each neuron has a clear meaning.** Some do; many respond to mixtures of patterns.
+
+## Where you'll see it in AI
+
+- **Model sizes and prices:** every "B" in a model name is this parameter count, and bigger
+  counts mean more compute per token (→ models-and-effort).
+- **Running models locally:** the sizing multiply above is the first step of every local setup
+  (→ local-open-models).
+- **Transformers:** each block contains layers of exactly this form, plus attention
+  (→ transformers-attention).

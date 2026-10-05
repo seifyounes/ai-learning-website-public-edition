@@ -1,0 +1,206 @@
+---
+title: "Evaluating your own LLM app"
+subtitle: "Why testing your system differs from benchmarking a model, and what an eval is made of"
+summary: "Design a first eval for your own AI app or workflow: a test set split by case type, reference-based and reference-free checks, and a regression run."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript, with a worked regression example and a quiz."
+section: math
+pillar: evaluation
+order: 8
+level: intermediate
+estMinutes: 17
+taskMinutes: 35
+prerequisites:
+  - reading-llm-benchmarks
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "K8LLVi5Xrh8"
+  published: "2025-05-11"
+  year: 2025
+  minutes: 12
+  title: "1. Introduction to LLM evaluations in 10 key ideas"
+  channel: "Evidently AI"
+  why: "Benchmarks test a model; this lecture is about testing your system: the model plus your prompts, data and logic. In twelve minutes, it lays out the whole map you need before building anything: when evals are used, why LLMs are harder to test than ordinary code, manual vs automated checks, reference-based vs reference-free evals, and test sets. The next three lessons each take one part of this map and go deep."
+  notes:
+    - "0:35 Benchmarks are like school exams that test general skills; an app has to be tested on the tasks it is meant to solve."
+    - "4:46 Two kinds of eval: reference-based (compare with an expected answer) and reference-free (check qualities such as safety or tone)."
+    - "5:51 Test sets: happy-path inputs, edge cases and adversarial inputs, written by hand, taken from logs or generated."
+applyIt: |
+  **Give one AI workflow you rely on a small test set, so you can tell whether a change helped.**
+  It could be a prompt you reuse every week, a custom GPT or Gem, an AI feature in your app, or
+  an automation that drafts emails.
+
+  1. Collect 15 inputs: about 8 normal ones, 4 awkward edge cases, and 3 that try to make it
+     misbehave.
+  2. For each, write either the expected answer (reference-based) or one check the output must
+     pass (reference-free), such as "cites only the attached document" or "under 120 words".
+  3. Run the current version and record pass or fail for each.
+  4. Next time you change the prompt, model or settings, rerun all 15 and compare, group by
+     group.
+
+  **If you build software:** keep the cases in a file and run them as a script before every
+  prompt change, as you would a unit test suite (→ evals-and-testing).
+  **If you don't code:** keep the cases in a spreadsheet: input, check, and one pass/fail column
+  per version.
+
+  Success: 15 cases with checks, a baseline pass count, and a plan to rerun them on your next
+  change.
+recap:
+  - emoji: "🏫"
+    title: "Systems, not models"
+    text: "Benchmarks are school exams for models. Your app is the model plus prompts and logic, so it has to be tested on the tasks it is meant to do."
+  - emoji: "🧭"
+    title: "Evals answer questions"
+    text: "Evals support decisions: comparing prompts in experiments, red-teaming with tricky inputs, monitoring in production and regression-testing every change."
+  - emoji: "🎲"
+    title: "Why LLMs are harder"
+    text: "Outputs vary for the same input, prompts are brittle, tasks are open-ended, and there are new risks: hallucinations, jailbreaks and data leaks."
+  - emoji: "👀"
+    title: "Start by reading outputs"
+    text: "Manual review comes first and builds your sense of what good means. Automation scales that judgement later; it can't replace it."
+  - emoji: "🔀"
+    title: "Two kinds of check"
+    text: "Reference-based evals compare outputs with expected answers. Reference-free evals score qualities such as safety, tone or staying grounded in context."
+  - emoji: "🗂️"
+    title: "Test sets, by design"
+    text: "Build sets of happy-path, edge-case and adversarial inputs, from hand-written cases, real logs or synthetic generation."
+  - emoji: "🧱"
+    title: "Your criteria, your moat"
+    text: "Pick criteria from failures you actually observe, log every input and output, and the eval set becomes a living spec of what good means for your product."
+task: |
+  Build a 15-case eval for one AI workflow and run it twice.
+
+  1. Choose a workflow you can run in a free chat assistant: for example "summarize a meeting
+     note into three action items" or "answer questions about one attached PDF".
+  2. Write 15 inputs in a spreadsheet: 8 normal, 4 edge cases (very long, empty, mixed
+     languages, a question the document can't answer) and 3 adversarial ("ignore your
+     instructions and…").
+  3. Next to each, write one check: an expected answer, or a rule such as "says it doesn't know"
+     or "exactly three bullets".
+  4. Run all 15 with your current prompt and mark pass or fail. Then run them all again,
+     unchanged.
+  5. Compare the two runs. Note any case that passed once and failed once.
+
+  Success: a pass count per group (normal, edge, adversarial) for both runs, and a list of the
+  cases whose result changed between identical runs.
+selfCheck:
+  - q: "You tweak a prompt to fix one user complaint, and the complaint case now passes. Is it ready to ship?"
+    a: "Not yet. Rerun the whole test set, especially edge and adversarial cases, because a fix in one place can break another. That's regression testing, and it's what the saved test set is for."
+  - q: "Your chatbot answers open questions from customers, and you have no 'correct' answers to compare against. Can you still evaluate it?"
+    a: "Yes, with reference-free checks: does the reply stay within the retrieved context, does it refuse what it should, is it polite, does it hand off when asked. Pick the qualities from failures you've actually seen."
+  - q: "A vendor dashboard offers a ready-made 'coherence score'. Your app uses a current frontier model. Is it worth tracking?"
+    a: "Probably not. Strong current models almost always write coherent text, so it would pass every time and tell you nothing. Track criteria based on failures you've seen in your own outputs instead."
+mcq:
+  - q: "Prompt v2 passes 48 of 60 test cases; v1 passed 49. By group, v2 gains 3 normal cases but loses 2 edge and 2 adversarial ones. What do you do?"
+    options:
+      - "Ship v2: one case is noise, and normal traffic matters most"
+      - "Hold v2: it trades away edge and adversarial cases"
+      - "Ship v2 and add more normal cases so the total goes up"
+      - "Hold both until the test set has at least 500 cases in it"
+    answer: 1
+    explain: "The totals hide that v2 got worse on exactly the cases that protect you from bad outcomes. Reading results by group is why test sets are split. More normal cases would only dilute the signal, and 60 well-chosen cases already show the pattern."
+  - q: "You run the same 15 cases twice with no changes, and 3 cases flip between pass and fail. What does this tell you about your eval?"
+    options:
+      - "The checks are broken and should be rewritten from scratch"
+      - "Only the cases that flipped need to be run in future runs"
+      - "Run each case several times and track its pass rate"
+      - "Set the model to be fully random so results average out"
+    answer: 2
+    explain: "LLM outputs vary for the same input, so one run per case is a noisy sample. Running each case a few times and reporting pass rates shows how reliable a behaviour is. The checks may be fine; the flips may be the system itself."
+  - q: "A support chatbot is live. You want to know each day whether replies stay grounded in the help-centre articles it retrieves. Which kind of eval fits?"
+    options:
+      - "A reference-free check that replies stick to sources"
+      - "A reference-based check against a set of ideal replies"
+      - "A public benchmark of reading comprehension, rerun daily"
+      - "A count of how many replies users rated with a thumbs-up"
+    answer: 0
+    explain: "Live traffic has no pre-written correct answers, so you check a quality of each reply: is it supported by the retrieved text? Reference-based checks need expected answers, a benchmark doesn't test your system, and thumbs-up rates are too sparse and too vague to catch ungrounded replies."
+  - q: "Your team wants to start evals for a new AI feature by choosing metrics from a popular framework's list. What should come first?"
+    options:
+      - "Pick every metric on the list so that nothing is missed"
+      - "Choose the three metrics most other teams seem to report"
+      - "Generate 1,000 synthetic test cases before anything else"
+      - "Read real outputs and note the failures you see"
+    answer: 3
+    explain: "Criteria should come from the failures your system actually has, and you only learn those by reading outputs. Borrowed metrics can measure things that never go wrong for you, and a big synthetic set without known failure modes tests the wrong things."
+backupResources:
+  - label: "Evidently AI: LLM evaluation guide"
+    url: "https://www.evidentlyai.com/llm-guide/llm-evaluation"
+    type: "docs"
+tags:
+  - math
+  - evaluation
+  - evals
+  - llm
+---
+
+**You need:** the idea of a test set from → confusion-matrix and the limits of benchmarks from
+→ reading-llm-benchmarks.
+
+A benchmark tells you how a model does on someone else's exam. Your app is more than the model:
+it's the model plus your prompts, your retrieval, your tools and your business rules. Only an
+eval built from **your** tasks tells you whether **your** system works, and whether the change
+you made yesterday helped or broke something.
+
+## What an eval is for
+
+Evals aren't a separate chore; they answer product questions:
+
+- **Experiments:** is prompt A better than prompt B? Is the new model worth switching to?
+- **Red-teaming:** can tricky or hostile inputs make it do something unsafe?
+- **Monitoring:** once it's live, are users getting stuck, seeing hallucinations, being refused
+  wrongly?
+- **Regression testing:** before a change ships, does everything that worked still work?
+
+## Why LLM apps are harder to test
+
+Ordinary code gives the same output for the same input. LLM apps don't. Prompts are brittle, so
+a punctuation change can shift behaviour. Tasks are open-ended: there are many good emails and
+many bad ones. And there are new failure kinds: made-up facts, jailbreaks, leaked data. So
+you test *ranges* of inputs, and you test qualities, not just functions.
+
+## Two kinds of check
+
+- **Reference-based:** you have an expected answer and compare against it. Ideal for regression
+  tests: extract the invoice total, and check it equals 1,240.00.
+- **Reference-free:** no single right answer, so you check a quality: grounded in the retrieved
+  text, polite, under a length, refuses what it should. This is what you run on live traffic.
+
+Deterministic code checks (does the generated code run, is the JSON valid) are the cheapest and
+most honest. Where judgement is needed, an LLM can grade, which → llm-as-judge covers.
+
+## Worked example: totals hide a regression
+
+A 60-case test set: 40 normal inputs, 15 edge cases, 5 adversarial ones.
+
+| Version | Normal | Edge | Adversarial | Total |
+|---|---|---|---|---|
+| v1 | 36/40 | 9/15 | 4/5 | 49/60 |
+| v2 | 39/40 | 7/15 | 2/5 | 48/60 |
+
+1. Totals: 81.7% vs 80.0%. It looks like a wash.
+2. By group: v2 fixed 3 normal cases and broke 2 edge and 2 adversarial ones.
+3. Adversarial cases are where harm happens, so v2 doesn't ship as it is.
+
+That's why test sets are built in groups and read in groups.
+
+## Start manual, then automate
+
+Read outputs yourself first. It's how you learn what "good" means for this task, and if experts
+can label a few dozen cases, that's worth a lot. Automated evals then scale your judgement; they
+can't invent it. Keep reading logs as you go: the manual and the automated feed each other.
+
+## Common mistakes
+
+- **Borrowing someone else's criteria.** Pick checks from failures you see, not a vendor's list.
+- **One run per case.** Outputs vary; run important cases a few times.
+- **Only happy-path cases.** Edge and adversarial cases are where problems hide.
+- **Not logging inputs and outputs.** Without logs there's nothing to build tomorrow's tests from.
+
+## Where you'll see it in AI
+
+- **Release gates:** an eval suite run before every prompt or model change (→ evals-and-testing).
+- **RAG systems:** checks for grounding and retrieval quality (→ rag-fundamentals).
+- **Finding what to test:** → llm-error-analysis turns real traces into failure categories.
+- **Grading at scale:** → llm-as-judge and → eval-from-real-traces show how to automate a check
+  and prove it agrees with you.

@@ -1,0 +1,200 @@
+---
+title: "Linear combinations, span and basis"
+subtitle: "What you can reach by scaling and adding, and when a vector adds nothing new"
+summary: "Write a vector as a linear combination, find the span of a set of vectors, and spot redundant (linearly dependent) features in data."
+changeNote: "New lesson in the linear algebra track, written from the lecture's transcript, with a worked example and a quiz."
+section: math
+pillar: linear-algebra
+order: 2
+level: intermediate
+estMinutes: 15
+taskMinutes: 25
+prerequisites:
+  - linear-algebra-for-ai
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "k7RM-ot2NWY"
+  published: "2016-08-06"
+  year: 2016
+  minutes: 10
+  title: "Linear combinations, span, and basis vectors | Chapter 2, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "Right after the two vector operations, this chapter asks what they can build. It reframes coordinates as scalars that stretch two basis vectors, then names span, linear dependence and basis with animations that make each one visible. These are the words you need to say what a set of embeddings or features can and can't express, and every later chapter uses them."
+  notes:
+    - "0:45 coordinates as scalars that stretch i-hat and j-hat; at 1:47 the point that a different pair of basis vectors gives a different but valid coordinate system."
+    - "3:52 span defined: the whole plane, a single line, or just the origin."
+    - "5:58 span in three dimensions; 8:05 linear dependence and independence; 9:06 the formal definition of a basis."
+applyIt: |
+  **Redundant columns are linear dependence you can find in your own data.** Whenever one
+  column can be rebuilt by scaling and adding others, it adds nothing a linear model can use,
+  and it can make fitted weights unstable.
+
+  1. Open a dataset or spreadsheet you work with: a sales export, survey results, a feature table
+     for a class project.
+  2. Look for columns that are combinations of others: a total that equals the sum of its
+     parts, the same price in two currencies, a percentage next to the count it came from.
+  3. Write down each one as a formula ("total = subtotal + tax") and decide whether to drop it
+     before modelling or charting.
+
+  **If you build software:** stack the numeric columns into a matrix and compare
+  `numpy.linalg.matrix_rank(X)` with the number of columns; a smaller rank means at least one
+  column is a combination of others. **If you don't code:** the formula list is the result; it
+  also tells you which numbers will always move together in a report.
+
+  Success: at least one column written as a linear combination of others, and a decision on
+  what to do with it.
+recap:
+  - emoji: "🎚️"
+    title: "Coordinates are scalars"
+    text: "The pair (3, −2) means: stretch the unit x-vector by 3, flip and stretch the unit y-vector by 2, then add. A vector is a sum of two scaled vectors."
+  - emoji: "🧱"
+    title: "The basis is a choice"
+    text: "Those two unit vectors are the basis. Pick two other vectors and you get a different, equally valid coordinate system, so numbers always depend on a hidden choice of basis."
+  - emoji: "🎛️"
+    title: "Linear combinations"
+    text: "Scaling vectors and adding them is a linear combination. Fix one scalar and vary the other, and the tip traces a straight line: one way to see the word 'linear'."
+  - emoji: "🗺️"
+    title: "Span: everything you can reach"
+    text: "The span is every linear combination. Two 2D vectors usually span the whole plane; if they line up, only a line; if both are zero, only the origin."
+  - emoji: "📄"
+    title: "Up to three dimensions"
+    text: "Two 3D vectors span a flat sheet through the origin. A third vector either lies on that sheet and adds nothing, or points off it and unlocks all of space."
+  - emoji: "♻️"
+    title: "Dependent or independent"
+    text: "If you can remove a vector without shrinking the span, the set is linearly dependent. A basis is a set of independent vectors that spans the space."
+task: |
+  Find combinations by hand, then check dependence with a few lines of Python.
+
+  **On paper (15 minutes).** Use v₁ = (1, 2) and v₂ = (3, 1).
+
+  1. Find a and b so that a·v₁ + b·v₂ = (−1, 3). Write the two equations, one per coordinate,
+     and solve them.
+  2. Replace v₂ with (2, 4). Can you still reach (−1, 3)? Sketch the span to see why.
+  3. Is (1, 1, 2) in the span of (1, 0, 1) and (0, 1, 1)? Find the combination or show there
+     isn't one.
+
+  **In Python (10 minutes, free Google Colab works).** Each row is one product: price in
+  dollars, price in euros at a fixed 0.9 rate, and units sold.
+
+  ```python
+  import numpy as np
+
+  X = np.array([
+      [10.0, 9.0, 120],
+      [25.0, 22.5, 40],
+      [8.0, 7.2, 300],
+      [40.0, 36.0, 15],
+  ])
+  print("columns:", X.shape[1])
+  print("independent directions:", np.linalg.matrix_rank(X))
+  ```
+
+  The two numbers differ because the euro column is the dollar column scaled by 0.9. Change
+  one euro value slightly (say 9.0 to 9.4) and run it again. Write one line on why a noisy copy
+  of a feature still carries almost no new information.
+
+  Success: a = 2, b = −1 for step 1; you can explain why step 2 fails; and the script shows 2
+  independent directions for 3 columns.
+selfCheck:
+  - q: "A model's output for a token is 0.6·v₁ + 0.3·v₂ + 0.1·v₃, where v₁, v₂, v₃ are three vectors it computed from the context. Someone hopes the output can point in any direction at all. What limits it?"
+    a: "It is a linear combination of those three vectors, so it lies in their span: at most a three-dimensional slice of the space, whatever the vectors' length. Reaching other directions needs other vectors (or a later layer that transforms the result)."
+  - q: "A teammate adds a 'body mass index' column to a dataset that already has height and weight, and expects a linear model to gain a new signal. Is BMI linearly dependent on the other two?"
+    a: "No. BMI is weight divided by height squared, which isn't a scaled sum of the two columns, so it is not a linear combination and can add information a linear model can't build itself. A column like 'weight in pounds' would be dependent: it is the kilograms column times a constant."
+mcq:
+  - q: "You embed 3 example sentences into a 1,024-dimensional space and build new vectors only by scaling and adding those 3. How much of the space can you reach?"
+    options:
+      - "All 1,024 dimensions, given enough combinations"
+      - "About a third of the space, spread evenly around"
+      - "Only the line through the longest of the three"
+      - "At most a 3-dimensional slice through the origin"
+    answer: 3
+    explain: "Linear combinations of three vectors stay in their span, which has at most three dimensions however large the space is. Trying more combinations never escapes it. It is only a line if the three vectors all line up, which is the dependent case."
+  - q: "A spreadsheet has columns subtotal, tax and total, where total is always subtotal + tax. What does the total column add for a linear model?"
+    options:
+      - "Nothing new, because it is a combination of the others"
+      - "A third independent signal that improves the fit"
+      - "Extra signal only if the tax rate changes by region"
+      - "A nonlinear effect the other two columns can't express"
+    answer: 0
+    explain: "Total is exactly 1·subtotal + 1·tax, so the three columns are linearly dependent and total lies in the span of the other two. A varying tax rate doesn't change that identity. Keeping it can make a linear model's weights unstable, since many weightings fit equally well."
+  - q: "Someone says they found four linearly independent vectors in ordinary 3D space. What's the right response?"
+    options:
+      - "Possible, if all four point in very different directions"
+      - "Possible, as long as none of them is the zero vector"
+      - "Impossible: any fourth 3D vector is in the span of three"
+      - "Impossible: 3D space only ever allows two at a time"
+    answer: 2
+    explain: "Three independent vectors already span all of 3D space, so a fourth always lies in their span and is dependent. Different-looking directions don't help. Three at a time is fine, which is why a basis for 3D has exactly three vectors."
+backupResources:
+  - label: "Mathematics for Machine Learning — free book, ch. 2 (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+---
+
+The last lesson gave you two operations: adding vectors and scaling them. This one asks what
+they can build. The answer has a name, the **span**, and it decides what a set of vectors can
+and can't express. That matters in AI because many model outputs are built by mixing a few
+vectors, and many datasets carry columns that add nothing new.
+
+## Coordinates are instructions to scale
+
+Read the vector (3, −2) differently: take the unit vector along x and stretch it by 3; take
+the unit vector along y, flip it and stretch it by 2; add the two. The two unit vectors are the
+**basis**, and the coordinates are the scalars that act on them.
+
+Nothing forces that choice. Any two vectors that don't line up can serve as a basis, and they
+give a different but equally valid set of coordinates for the same arrows. So a list of numbers
+only means something together with the basis it was measured in.
+
+## Linear combinations and span
+
+Scaling some vectors and adding the results is a **linear combination**. The **span** of a set
+of vectors is everything you can reach that way. In the plane, two vectors that point different
+ways span the whole plane; two that line up span only a line.
+
+In three dimensions, two vectors span a flat sheet through the origin. A third vector either
+sits on that sheet (and adds nothing) or points off it (and unlocks all of space). When a vector
+adds nothing, the set is **linearly dependent**: one vector is a combination of the others. When
+each one adds a new direction, the set is **linearly independent**. A **basis** is an
+independent set that spans the whole space.
+
+## Worked example: reaching a target
+
+Take v₁ = (1, 2) and v₂ = (3, 1). Can you reach (5, 5)? You need a and b with
+a·(1, 2) + b·(3, 1) = (5, 5), one equation per coordinate:
+
+1. First coordinate: a + 3b = 5.
+2. Second coordinate: 2a + b = 5, so b = 5 − 2a.
+3. Substitute: a + 3(5 − 2a) = 5, so 15 − 5a = 5 and **a = 2**, then **b = 1**.
+
+Check: 2·(1, 2) + 1·(3, 1) = (2, 4) + (3, 1) = (5, 5). Now swap v₂ for (2, 4). That is just
+2·v₁, so both vectors lie on one line through the origin, and (5, 5) is not on it: no choice of
+a and b works. Same number of vectors, much smaller span.
+
+## Common mistakes
+
+- **Counting vectors instead of directions.** Ten vectors can span only a plane if they all lie
+  on it. What matters is how many are independent.
+- **Assuming a big space means a big span.** Vectors with 1,024 entries still span at most as
+  many dimensions as there are vectors.
+- **Treating coordinates as absolute.** The same arrow has different numbers in a different
+  basis (→ change-of-basis-embeddings).
+- **Calling any related column "dependent".** Linear dependence means an exact scaled sum.
+  Height, weight and BMI are related, but BMI is not a linear combination of the other two.
+
+## Where you'll see it in AI
+
+- **Attention outputs:** each output is a weighted sum of value vectors, so it lies in their
+  span (→ transformers-attention).
+- **Redundant features:** dependent columns make a linear model's weights unstable, because
+  many different weightings give the same predictions (→ machine-learning-fundamentals).
+- **Rank and low-rank tricks:** the number of independent directions in a set is the rank,
+  which → rank-column-null-space turns into the idea behind LoRA.
+- **Embedding spaces:** a model's d-dimensional embeddings use some basis it learned, which is
+  why single coordinates are hard to read.
+
+Next, → matrices-as-transformations shows how a matrix moves every vector at once.

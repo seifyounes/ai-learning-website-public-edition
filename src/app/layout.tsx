@@ -3,7 +3,11 @@ import { Archivo, Atkinson_Hyperlegible_Mono, Atkinson_Hyperlegible_Next } from 
 import "./globals.css";
 import Link from "next/link";
 import TopNav from "@/components/TopNav";
+import KeyMigration from "@/components/KeyMigration";
 import { REPO_URL, SITE_NAME, SITE_URL } from "@/lib/site";
+import { getAllLessons } from "@/lib/content";
+
+const LESSON_COUNT = getAllLessons().length;
 
 // The pad's three hands: printed condensed labels, hyperlegible prose, mono quantities.
 const print = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-print" });
@@ -25,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AI Learning — from near-beginner to applied AI engineer",
     description:
-      "111 lessons: a hand-picked free video on each topic, an original breakdown, and a task you apply to your own work.",
+      `${LESSON_COUNT} lessons: a hand-picked free video on each topic, an original breakdown, and a task you apply to your own work.`,
     type: "website",
     siteName: SITE_NAME,
   },
@@ -33,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AI Learning — from near-beginner to applied AI engineer",
     description:
-      "111 lessons: a hand-picked free video on each topic, an original breakdown, and a task you apply to your own work.",
+      `${LESSON_COUNT} lessons: a hand-picked free video on each topic, an original breakdown, and a task you apply to your own work.`,
   },
 };
 
@@ -52,6 +56,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <TopNav />
+        <KeyMigration />
         {/* The desk with one sheet on it; full-bleed on phones. */}
         <main id="main" className="min-[760px]:px-6">
           <div className="sheet min-h-[70vh]">{children}</div>

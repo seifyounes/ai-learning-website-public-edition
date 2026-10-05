@@ -1,0 +1,234 @@
+---
+title: "Probability distributions"
+subtitle: "The shape of uncertainty, and the object an LLM outputs at every step"
+summary: "Read a distribution as proportions and areas, and see an LLM's next-token output and its temperature knob as that same object."
+changeNote: "New first lesson in the probability and statistics track, written from the lecture's transcript, with a histogram worked example and a quiz."
+section: math
+pillar: probability-statistics
+order: 1
+level: beginner
+estMinutes: 10
+taskMinutes: 25
+prerequisites:
+  - what-is-an-llm
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "oI3hZJqXJuc"
+  published: "2017-04-17"
+  year: 2017
+  minutes: 5
+  title: "The Main Ideas behind Probability Distributions"
+  channel: "StatQuest with Josh Starmer"
+  why: "Every later lesson in this track reasons about distributions: of data, of eval scores, of next tokens. This five-minute StatQuest builds the idea from a plain histogram, so you see that probability is a share of the area, not a formula to memorize. It's short enough to watch twice, and it starts from counts, the same way this track works out every example."
+  notes:
+    - "2:49 The histogram is replaced by a smooth curve. Watch how the curve keeps the same story: rare at the edges, common in the middle."
+    - "3:23 The three advantages of a curve: it covers empty bins, works for any range, and can be built from a mean and standard deviation."
+applyIt: |
+  **Any time you call an LLM, you are drawing one sample from a distribution the model built for
+  that step.** Settings like temperature and top-p change the shape of that distribution before
+  the draw, so they are the first knobs to set on purpose. Take one real use: a support chatbot
+  you're building, a script that drafts product descriptions, or the summaries an assistant
+  writes for you each week.
+
+  ```prompt
+  I use an LLM for [my feature or workflow]. Recommend a temperature for it (consistency vs
+  variety) with a one-line reason, and say whether top-p should stay at its default. Then show,
+  with three made-up logits, how that temperature reshapes the next-token probabilities.
+  ```
+
+  **If you build software:** set temperature explicitly in your API call instead of inheriting
+  the default, and leave a comment saying why. **If you don't code:** API playgrounds (OpenAI,
+  Google AI Studio, Anthropic Console) expose a temperature slider; most consumer chat apps hide
+  it, so note which of your tools let you set it at all.
+
+  Success: one real use of an LLM has a chosen temperature and a written reason.
+toolkit: |
+  - **Set temperature on purpose and write it down.** Where a tool exposes it (API playgrounds,
+    many automation tools' AI steps), use low values for consistent output and higher values for
+    brainstorming, and note the value and the reason next to the prompt.
+  - **Treat a rerun as a second sample.** When an answer surprises you, run the same prompt two
+    or three more times before concluding anything about the model; one draw from a distribution
+    tells you little about its shape.
+recap:
+  - emoji: "📊"
+    title: "Start from a histogram"
+    text: "Measure many people's heights, drop each one into a bin and stack them. Most land in the middle bins; very short and very tall people are rare."
+  - emoji: "🎯"
+    title: "Probability is a share"
+    text: "Pick one measurement at random and it will most likely come from the middle bins, where the bars are tallest. The histogram shows how likely each range of values is."
+  - emoji: "🔬"
+    title: "More data, narrower bins"
+    text: "Measure more people and use narrower bins, and the picture of how values are spread gets more accurate and more precise."
+  - emoji: "〰️"
+    title: "A curve says the same"
+    text: "A smooth curve can approximate the histogram: low where values are rare, high where they're common. It carries the same information."
+  - emoji: "🧩"
+    title: "Curves fill the gaps"
+    text: "An empty bin doesn't mean impossible: the curve still gives it a probability. And it works for any range, not only ranges that match your bin edges."
+  - emoji: "💰"
+    title: "Curves save data"
+    text: "A curve built from the mean and standard deviation of a modest sample is usually good enough, so you don't need a huge number of measurements."
+  - emoji: "🏔️"
+    title: "Both are distributions"
+    text: "Histogram or curve, a distribution shows where measurements are likely (the tall parts) and where they're rare (the low parts)."
+task: |
+  Bin 30 response times into a histogram and read probabilities off it as shares of the data.
+
+  These are 30 response times in milliseconds from a hypothetical eval run. If you have real
+  numbers of your own (API latencies, test-suite durations, page load times), use 30 or more of
+  those instead.
+
+  ```text
+  180 230 255 270 290 310 315 330 340 345 360 365 380 395 410
+  420 430 445 460 480 510 530 560 590 640 700 760 820 990 1250
+  ```
+
+  1. Sort them into 100 ms bins (100–199, 200–299, and so on up to 1200–1299). A value on an
+     edge, like 700, goes in the higher bin. Count each bin and divide by 30 to get its share.
+  2. Draw the histogram: in a spreadsheet, put the bin starts in column A and the counts in
+     column B, then insert a column chart. Paper works too.
+  3. Read off three probabilities: under 400 ms, 700 ms or more, and between 300 and 500 ms. Each
+     one is the sum of the shares of the bins in that range.
+  4. Re-bin just the 300–499 range into 50 ms bins. Each bar now holds fewer values; check that
+     the shares over 300–499 still add up to the same total as before.
+  5. Find the empty bins between 1000 and 1199 ms. Write one sentence on whether a 1,100 ms
+     response is impossible.
+
+  **With code (optional):** with the numbers in a Python list `times`,
+  `Counter(t // 100 * 100 for t in times)` (from `collections`) gives the 100 ms counts in one
+  line.
+
+  Success: your 300–399 bin holds 9 of the 30, you have three range probabilities written as
+  fractions of 30, and you can say why the empty bins still deserve a small chance.
+selfCheck:
+  - q: "You re-bin the same 500 latencies from 100 ms bins into 25 ms bins. A colleague looks at the new chart and says slow requests got rarer, because every bar is shorter. What is wrong with that reading, and how do you compare the two charts fairly?"
+    a: "Narrower bins split the same data across more bars, so each bar holds fewer requests; nothing about the requests changed. Compare shares over the same range (the share between 300 and 400 ms is identical in both charts), or plot share per millisecond so that bar area, not raw height, carries the probability. With only 500 points, 25 ms bins will also look jagged; narrow bins pay off when you have more data."
+  - q: "You log 2,000 response times and someone asks for the probability that the next one is exactly 812 ms. How do you answer, and what would you give instead?"
+    a: "Time is continuous, so a single exact value has essentially zero probability; probability lives on ranges. Give the share of logged responses in a range, such as 800 to 850 ms, or the share above a limit you care about."
+mcq:
+  - q: "You histogram 5,000 answer lengths from your chatbot. One bin (200 to 250 tokens) holds 1,250 answers. A new answer arrives. What is the best estimate of the chance it falls in that bin?"
+    options:
+      - "About 50%, because it either falls in that bin or it doesn't"
+      - "Unknown, until you fit a smooth normal curve to the data"
+      - "About 1 in 12, if the histogram has 12 bins of equal width"
+      - "About 25%, the share of past answers that landed in that bin"
+    answer: 3
+    explain: "A histogram turns counts into probabilities: 1,250 of 5,000 is 25%, which is the estimate for the next answer if traffic hasn't changed. Equal bins don't mean equal chances, and you don't need a fitted curve to read a share off the data."
+  - q: "You histogram 200 eval latencies in 100 ms bins. The 800 to 899 ms bin is empty, though the bins on either side each hold a few requests. A teammate asks whether an 850 ms response can happen. What is the best answer?"
+    options:
+      - "No: a bin with zero observations means a zero chance"
+      - "Yes, rarely: a curve over the data gives it some chance"
+      - "Only once you widen the bins until none of them is empty"
+      - "It can't be judged until a request lands in that bin"
+    answer: 1
+    explain: "An empty bin in a sample of 200 means you didn't happen to see one, not that it can't happen. A curve fitted to the data still puts a small probability on that range, which is one of the reasons the lecture gives for using a curve. Widening the bins hides the gap instead of estimating it."
+  - q: "Your latency histogram uses 100 ms bins with these shares: 200s 10%, 300s 30%, 400s 30%, 500s 10%, 600 and up 20%. The target is a response under 500 ms. What share of requests meets it?"
+    options:
+      - "70%, the bins below 500 ms added up"
+      - "30%, the height of the tallest bar there"
+      - "60%, the two tallest bars, 300s and 400s"
+      - "50%, since 500 ms sits near the middle"
+    answer: 0
+    explain: "Probability over a range is the share of data over it: add every bin below 500 ms, 10 + 30 + 30 = 70%. The tallest bar only tells you where values are most common, and where 500 ms sits on the axis says nothing about how much data lies on each side."
+  - q: "An LLM's temperature divides the logits before softmax: p = softmax(z/T). As T → 0, what happens to the next-token distribution?"
+    options:
+      - "It flattens toward uniform, so output gets more varied"
+      - "It changes nothing at inference; T only matters in training"
+      - "It piles probability on the top token: near-deterministic"
+      - "It cuts low-probability tokens out, just like top-p does"
+    answer: 2
+    explain: "Dividing by a tiny T stretches the gaps between logits, so softmax puts almost all probability on the highest-logit token: greedy, consistent output. Large T shrinks the gaps and flattens the distribution. Top-p is a different knob that truncates the tail; temperature reshapes the whole curve."
+backupResources:
+  - label: "Seeing Theory, chapter 3: probability distributions (Brown University)"
+    url: "https://seeing-theory.brown.edu/probability-distributions/"
+    type: "interactive · drag the parameters"
+tags:
+  - math
+  - probability
+  - distributions
+  - sampling
+---
+
+**You need:** fractions, percentages and reading a bar chart. Nothing else.
+
+A probability distribution tells you how likely each outcome is. You'll meet one every time you
+look at a pile of measurements: response times, answer lengths, eval scores. It is also the
+object a language model builds at every step before it picks the next token. This lesson reads
+one from the ground up: counts in bins first, then a smooth curve, with probability as a share
+of the whole.
+
+## From a histogram to a curve
+
+Collect lots of measurements, for example how long your app takes to answer, sort them into
+bins and stack them up. That histogram already is a distribution. Tall bins hold the common
+values, the thin ends hold the rare ones, and the share of measurements in a bin is your
+estimate of the chance the next measurement lands there. For a range that covers several bins,
+add their shares.
+
+With more data and narrower bins the bars smooth out into a curve. For a smooth curve,
+probability is the **area** under it between two values, which is why a single exact value
+(an answer exactly 812.000 ms long) has essentially zero chance. Curves also save you work: a
+well-chosen curve gives sensible probabilities even for ranges where you happened to collect
+nothing, and for ranges that don't line up with your bin edges.
+
+There are two families:
+
+- **Discrete**: a probability for each separate value. Counts, categories, and tokens.
+- **Continuous**: probability spread over a range. Heights, times, scores.
+
+## Bin width changes the picture, not the data
+
+Halve the bin width and every bar holds roughly half as many measurements, so the chart looks
+shorter and spikier while the data hasn't changed at all. Two rules keep you honest:
+
+- **Compare shares over the same range, not bar heights.** The share of requests between 300 and
+  400 ms is the same whether you drew one 100 ms bar or two 50 ms bars.
+- **Narrow bins need more data.** As the lecture shows, more measurements *and* smaller bins
+  give a sharper, more accurate picture. Narrow bins on a small sample mostly show noise.
+
+## Worked example: 20 response times
+
+Twenty requests to a hypothetical app took (in ms): 212, 268, 305, 318, 341, 356, 372, 389, 402,
+415, 433, 447, 468, 491, 523, 556, 604, 688, 742, 915.
+
+1. **Bin by 100 ms.** 200s: 2 · 300s: 6 · 400s: 6 · 500s: 2 · 600s: 2 · 700s: 1 · 800s: 0 ·
+   900s: 1. Divide by 20 for shares: **10%, 30%, 30%, 10%, 10%, 5%, 0%, 5%**.
+2. **A range is a sum.** Chance the next request takes 300 to 499 ms: 30% + 30% = **60%**.
+   Chance it takes 600 ms or more: 10% + 5% + 0% + 5% = **20%**.
+3. **Re-bin by 50 ms.** 300–349: 3 · 350–399: 3 · 400–449: 4 · 450–499: 2. The bars are shorter,
+   but 3 + 3 + 4 + 2 = 12 of 20 is still **60%** for 300 to 499 ms.
+4. **The empty bin.** Nothing landed in the 800s, but one request took 915 ms, so slow responses
+   clearly happen. A curve drawn over the data gives the 800s a small chance instead of a hard
+   zero.
+
+Notice the shape: a hump around 300 to 500 ms and a long tail to the right. Response times are
+usually lopsided like this, so a symmetric bell curve built from the mean and standard deviation
+would understate the slow requests. Pick a curve shaped like your data.
+
+> 💡 **Try it:** take any 20 or more numbers you have to hand (commute times, test-suite
+> durations, word counts of your last emails), bin them two ways, and check that the share over
+> one range doesn't change.
+
+## Common mistakes
+
+- **Asking for the probability of an exact measurement.** For continuous data, ask about ranges.
+- **Reading bar heights across different bin widths.** Narrower bins make every bar shorter;
+  compare shares over the same range.
+- **Treating an empty bin as impossible.** It means you didn't see one in this sample.
+- **Assuming equal bins mean equal chances.** The chance is the share of data in the bin, not
+  one over the number of bins.
+
+## Where you'll see it in AI
+
+- **Next-token sampling.** At each step an LLM outputs a discrete distribution: one probability
+  per token, summing to 1, made from raw scores (logits) by softmax. Temperature divides the
+  logits first, so low values sharpen the distribution toward the top token and high values
+  flatten it; top-p keeps only the top tokens whose probabilities add up to p. Each token is one
+  draw, so a different answer on a rerun is sampling doing its job. More in → what-is-an-llm.
+- **Latency and length histograms.** Response times, token counts and cost per request are read
+  exactly like the worked example, usually with a long right tail.
+- **Confidence scores.** Classifier outputs are distributions too, and whether they can be
+  trusted is the calibration question in → conditional-probability-counts.
+- **Noise in eval scores.** The bell curve that describes it comes next, in
+  → normal-distribution-bell-curve.

@@ -1,0 +1,206 @@
+---
+title: "Error analysis for LLM apps"
+subtitle: "Read real traces, note what went wrong, group the notes and count them"
+summary: "Run error analysis on an AI system: read real outputs, write a note per failure, group the notes into categories and fix the biggest bucket first."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript, with a worked counting example and a quiz."
+section: math
+pillar: evaluation
+order: 9
+level: intermediate
+estMinutes: 17
+taskMinutes: 40
+prerequisites:
+  - llm-app-evals
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "e2i6JbU2R-s"
+  published: "2025-03-24"
+  year: 2025
+  minutes: 12
+  title: "Error Analysis: The Highest ROI Technique In AI Engineering"
+  channel: "Hamel Husain"
+  why: "Before you build judges and test sets, you need to know what actually goes wrong, and generic metrics won't tell you. Here, the founder of a company running AI leasing assistants explains how reading thousands of real conversations shaped his roadmap, and Hamel Husain sums up the method: look at the data, write notes, group them, count. It's a real case, not a toy, and short enough to watch before you try it yourself."
+  notes:
+    - "4:34 The custom data viewer: read a conversation, mark it good or bad, type a short note on why."
+    - "6:38 A date-handling failure ('two weeks from now') turned into test cases; the guest reports going from 33% to 100% on them."
+    - "10:47 The method in one sentence: look at the data, write notes, categorize them, count which errors occur most."
+applyIt: |
+  **Spend one hour reading what your AI actually produced, before you decide what to measure.**
+  It works on any AI output you can collect: chatbot conversations, AI-drafted emails, meeting
+  summaries, generated code reviews, answers from a custom GPT or Gem.
+
+  1. Gather 30–100 recent real outputs (or your own past chats with an assistant on one kind of
+     task).
+  2. Read each one. If something is wrong, write one short line about what you see ("ignored the
+     date the user gave", "invented a feature"). Don't diagnose yet.
+  3. When you're done, group the lines into 4–6 categories (an AI assistant can propose them;
+     you decide).
+  4. Count each category, and pick the biggest one that matters to fix first.
+
+  **If you build software:** log full traces (inputs, tool calls, outputs) so this review is a
+  query, not an excavation (→ observability-tracing).
+  **If you don't code:** copy outputs into a spreadsheet, one row each, with a "note" column and
+  a "category" column; a pivot table does the counting.
+
+  Success: a count of failures by category from real outputs, and the one category you'll fix
+  first.
+recap:
+  - emoji: "🏢"
+    title: "A real product"
+    text: "The guest's company runs AI assistants for apartment communities over voice, email and text: answering prospects, booking tours, chasing rent."
+  - emoji: "⬛"
+    title: "Launched into a black box"
+    text: "After release, the team couldn't tell whether things were going well. The fix was to look at their own data."
+  - emoji: "🗺️"
+    title: "Data writes the roadmap"
+    text: "Reading thousands of conversations showed what people ask for that the product can't do, and how users assume it works."
+  - emoji: "📝"
+    title: "Notes in a custom viewer"
+    text: "A simple internal tool shows each conversation, including tool calls. Mark it good or bad and type a note on why."
+  - emoji: "🗂️"
+    title: "Group and count"
+    text: "An AI groups the negative notes into categories, such as tour scheduling errors and handoffs to a human that never happened."
+  - emoji: "📅"
+    title: "From bucket to test"
+    text: "Date handling kept failing, so the team wrote test cases for date phrases and iterated until the reported success went from 33% to 100%."
+  - emoji: "🚫"
+    title: "Skip generic scores"
+    text: "Off-the-shelf 'conciseness' or 'hallucination' scores missed the real pain points. The core loop: notes, categories, counts."
+task: |
+  Run a 30-output error analysis.
+
+  1. Collect 30 outputs from one AI task you use: past chat-assistant answers on similar
+     questions, AI-written summaries, or outputs from a feature you're building. Paste them into
+     a spreadsheet, one per row.
+  2. Read each one and write a one-line note in column B if anything is wrong. Leave it blank if
+     it's fine. Aim for what you see, not why it happened.
+  3. Paste all the notes into a chat assistant:
+
+  ```prompt
+  These are notes from reviewing AI outputs, one problem per line. Propose 4–6 categories that
+  group them, with a one-line definition each. Then list which notes go in each category.
+  ```
+
+  4. Edit the categories until they make sense to you, add a category column, and count each
+     one (a pivot table or `=COUNTIF(C:C,"category name")`).
+  5. For the biggest category, work out the ceiling: if you fixed every case in it, what would
+     the failure rate drop to?
+
+  Success: a table of categories with counts, the failure rate now, and the best-case failure
+  rate after fixing the top category.
+selfCheck:
+  - q: "Your team wants to start evaluating a new AI feature with a dashboard of 'helpfulness' and 'toxicity' scores. What do you propose instead, and why?"
+    a: "Read 50–100 real outputs first and note what actually goes wrong. Generic scores may measure things that never fail for you and miss the failures that do; the notes tell you which few things are worth measuring."
+  - q: "In your review, 'markdown symbols in text messages' is the easiest category to fix but has 3 cases; 'booked the wrong date' has 12. Where do you start?"
+    a: "Usually with the date bucket: fixing all 12 removes four times as many failures, and wrong bookings hurt users more. Easy fixes can still go in alongside, but the count and severity set the priority."
+  - q: "While reading outputs, a teammate keeps stopping to debug each failure in depth. Why might that slow the analysis down?"
+    a: "The first pass is about observing and noting, not root-causing. Stopping to debug each case means you see far fewer outputs, and you lose the overall picture of which problems are most common."
+mcq:
+  - q: "Your AI assistant has been live for a month. You have 2,000 conversations and a free afternoon. What's the most useful first move?"
+    options:
+      - "Run a hallucination score over all 2,000 conversations"
+      - "Read about 100 and write a note on each failure you see"
+      - "Ask users to rate their last conversation from 1 to 5"
+      - "Write 50 synthetic test questions from the docs you have"
+    answer: 1
+    explain: "Reading a sample and noting failures shows you what actually goes wrong, which is what every later eval should test. A generic score may miss your real failures, ratings are sparse and vague, and synthetic questions only test what you already thought of."
+  - q: "You reviewed 100 outputs and found 30 failures: wrong dates 12, missed handoffs 8, wrong prices 6, formatting 4. What's the best-case failure rate if you fully fix formatting?"
+    options:
+      - "26%, since the formatting cases are only 4 of the 100"
+      - "18%, since fixing one bucket lifts the others with it"
+      - "0% on formatting cases, so the rate falls to about 4%"
+      - "It can't be known until a judge has scored all of them"
+    answer: 0
+    explain: "Fixing a bucket can at most remove its own cases: 30 − 4 = 26 failures in 100. The same arithmetic says fixing the date bucket could bring the rate to 18%, which is why counting tells you where effort pays off most."
+  - q: "One failure category is 'the bot doesn't know today's date', so 'next Friday' is resolved wrongly. What's the most sensible response?"
+    options:
+      - "Build an LLM judge that grades every reply for date sense"
+      - "Add a 1–5 'temporal reasoning' score to the dashboard"
+      - "Ignore it: date handling is a known model limitation"
+      - "Give the bot the date, then add a few code-checked tests"
+    answer: 3
+    explain: "Some failures have a direct fix, here passing the current date, and a cheap deterministic test (does 'next Friday' resolve to the expected date?) keeps it fixed. An LLM judge or a vague score would cost more and say less."
+  - q: "After an hour of note-taking you have 90 notes, and an assistant proposes 6 categories. Two of them don't match what you saw. What do you do?"
+    options:
+      - "Accept them: the model has read every note in full"
+      - "Start again and write the notes in a stricter format"
+      - "Edit the categories until they match what you saw"
+      - "Add a seventh category called 'other' and move on"
+    answer: 2
+    explain: "The assistant speeds up grouping, but the categories have to make sense to the person who read the outputs. Refining them is part of the method; an 'other' bucket is useful, but it doesn't fix categories that are wrong."
+backupResources:
+  - label: "Go deeper: Carrying Out Error Analysis (C3W2L01) (DeepLearningAI, 11 min)"
+    url: "https://www.youtube.com/watch?v=JoAxZsdw_3w"
+    type: "video"
+  - label: "Hamel Husain: A field guide to rapidly improving AI products"
+    url: "https://hamel.dev/blog/posts/field-guide/"
+    type: "article"
+tags:
+  - math
+  - evaluation
+  - error-analysis
+  - evals
+---
+
+**You need:** the eval vocabulary from → llm-app-evals.
+
+Most teams start evaluating an AI system by picking metrics. Error analysis starts one step
+earlier: **find out what actually goes wrong**, then measure that. It's simple enough to do in a
+spreadsheet, and it's the step most often skipped. The output is a ranked list of real failure
+types, which tells you what to fix and what your evals should test.
+
+## The method
+
+1. **Look at the data.** Read real outputs (whole traces if you have them: the user's message,
+   any tool calls, the reply).
+2. **Write a note** on each one that goes wrong. Describe what you see; don't stop to debug.
+3. **Group the notes** into a handful of categories. An LLM can propose groupings; you decide.
+4. **Count** each category, and work on the biggest one that matters.
+
+In the lecture, this showed one team problems no generic score would have found: tours booked
+for the wrong date, and conversations where the AI should have handed off to a person and
+didn't.
+
+## Worked example: counting sets priorities
+
+You read 100 conversations from a booking assistant and note 30 failures:
+
+| Category | Count |
+|---|---|
+| Wrong date resolved | 12 |
+| Missed handoff to a human | 8 |
+| Wrong price quoted | 6 |
+| Formatting (markdown in SMS) | 4 |
+
+1. Failure rate now: 30 ÷ 100 = **30%**.
+2. Fix every date failure, and the best case is 18 ÷ 100 = **18%**.
+3. Fix every formatting failure instead, and the best case is 26 ÷ 100 = **26%**.
+
+That ceiling, the most a fix can possibly help, tells you where an afternoon of work pays off.
+Weigh it by severity too: one wrong price may cost more than four stray asterisks.
+
+## What it gives you besides a fix list
+
+- **A roadmap:** you see what users ask for that the product can't do yet.
+- **Wrong assumptions:** users rarely use a product the way its builders imagined.
+- **A feel for the model:** after enough reading, you can predict how it will respond, which
+  helps you design prompts, tools and retrieval.
+- **Your eval set:** each category is a candidate check; the noted examples are its first test
+  cases (→ eval-from-real-traces).
+
+## Common mistakes
+
+- **Starting with generic scores.** "Helpfulness" or "conciseness" scores rarely match your real
+  failures.
+- **Debugging during the first pass.** Note and move on; analyse after you've seen the pattern.
+- **Letting the AI decide the categories.** It proposes, you decide.
+- **Doing it once.** Repeat after big changes and on a regular rhythm; new failure types appear.
+
+## Where you'll see it in AI
+
+- **Before building any eval:** categories here become the checks in → llm-app-evals.
+- **Judges:** a frequent, fuzzy category is a good candidate for an → llm-as-judge check.
+- **Tracing tools:** trace viewers exist to make this reading fast (→ observability-tracing).
+- **Classic ML:** the same move, counting mistakes by cause, appears in the optional Andrew Ng
+  lecture below.

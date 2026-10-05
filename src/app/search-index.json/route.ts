@@ -36,7 +36,6 @@ export function GET() {
       plain(l.applyIt),
       plain(l.task),
       ...(l.recap ?? []).map((r) => plain(`${r.title}. ${r.text}`)),
-      ...(l.lectureTrack ?? []).map((t) => plain(`${t.title}. ${t.covers}`)),
     ]
       .join(" ")
       .replace(/[*_`]/g, "");

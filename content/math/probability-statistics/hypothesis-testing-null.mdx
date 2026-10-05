@@ -1,0 +1,195 @@
+---
+title: "Hypothesis testing and the null hypothesis"
+subtitle: "Is prompt B really better, or is the gap just noise?"
+summary: "Frame a prompt or model comparison as a test of the null hypothesis, and use a paired comparison to reject it with fewer examples."
+changeNote: "New lesson in the probability and statistics track, written from the lecture's transcript; the paired A/B task and the two-prompt quiz moved here."
+section: math
+pillar: probability-statistics
+order: 9
+level: intermediate
+estMinutes: 22
+taskMinutes: 40
+prerequisites:
+  - confidence-intervals-for-evals
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "0oc49DyA3hU"
+  published: "2020-07-05"
+  year: 2020
+  minutes: 15
+  title: "Hypothesis Testing and The Null Hypothesis, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "Comparing two prompts or two models is a hypothesis test, whether you call it that or not. This StatQuest builds the logic from repeated small experiments, shows why the honest outcomes are 'reject' or 'fail to reject' and never 'proven', and explains why we test 'no difference' instead of a specific gap. It comes after confidence intervals so the two views of the same question line up."
+  notes:
+    - "4:09 After repeated opposite results, the first hypothesis can be rejected with confidence."
+    - "8:17 The summary of reject versus fail to reject. Note that failing to reject is not the same as proving the hypothesis."
+    - "9:48 The null hypothesis: test 'no difference', which needs no preliminary data to set up."
+applyIt: |
+  **Before you say "the new version is better", state the null hypothesis and say what result
+  would reject it.** Take one change you're about to judge: a reworked prompt, a different model,
+  a new step in an automation, a template for a weekly report.
+
+  1. Write the null: "There is no difference in [metric] between the old and new version."
+  2. Decide the test set before looking at results, and run **both** versions on the **same**
+     inputs.
+  3. Count only the inputs where the versions disagree, and see whether one side wins clearly
+     more of them than a coin flip would.
+  4. Report "rejected" or "failed to reject", never "proven equal".
+
+  **If you build software:** keep a fixed regression set and a script that runs two versions side
+  by side and prints the disagreement counts. **If you don't code:** a two-column spreadsheet of
+  pass/fail marks for the same inputs is enough.
+
+  Success: one change has a written null hypothesis, a paired result and a verdict.
+recap:
+  - emoji: "💊"
+    title: "Results vary"
+    text: "Three people take drug A and recover at different speeds, because of random things like diet, exercise or stress. The same happens with drug B."
+  - emoji: "💡"
+    title: "A hypothesis from a first look"
+    text: "The first experiment suggests A needs 15 fewer hours than B, so that becomes the hypothesis to test by repeating the experiment."
+  - emoji: "❌"
+    title: "Reject it"
+    text: "Repeat after repeat, with every detail double-checked, the results point the other way. That is strong evidence against the hypothesis, so we reject it."
+  - emoji: "🤷"
+    title: "Fail to reject"
+    text: "For drugs C and D, repeats give 12 and 13.5 hours against a hypothesis of 13. Not different enough to reject, not convincing enough to accept: we fail to reject."
+  - emoji: "0️⃣"
+    title: "The null hypothesis"
+    text: "Countless specific gaps are reasonable, so instead we test whether there is no difference at all. That 'no difference' claim is the null hypothesis."
+  - emoji: "🔬"
+    title: "Small gaps, small samples"
+    text: "When tiny random changes can flip which drug looks better, we fail to reject the null. With many more people, the same question can be settled."
+  - emoji: "🆓"
+    title: "No preliminary data needed"
+    text: "A specific hypothesis needs a first experiment to suggest a number. The null doesn't: 'no difference' is always zero."
+task: |
+  Run a paired A/B where the noise is on the table before the winner is.
+
+  ```prompt
+  Build me a tiny paired eval for an AI task I care about: [e.g. "turn a messy customer email
+  into a 3-line summary"]. Take the 20 test inputs I paste below, run prompt A and prompt B on
+  the SAME 20 inputs, and score each output pass/fail against the pass rule I give you. Report
+  A's pass rate, B's pass rate, and how many inputs only A passed and only B passed. Under the
+  null hypothesis of no difference, each of those disagreements is a coin flip: tell me how
+  surprising the split is, whether we can reject the null, and roughly how many inputs I'd need
+  to detect a 5-point gap.
+  ```
+
+  **No-code path:** do it in a spreadsheet. Column A holds 20 real inputs from your work or
+  studies, columns B and C the outputs of each prompt (run them in any free chat app), and
+  columns D and E your pass/fail marks. Count the rows where D and E differ, and how many of
+  those each prompt won.
+
+  Write the n you'd need in your notes; you'll reuse it.
+
+  Success: a per-input paired table, the disagreement counts and a "reject" or "fail to reject"
+  verdict.
+selfCheck:
+  - q: "After testing a new prompt on 30 examples, a teammate says: 'We failed to reject the null, so the two prompts perform the same, and we can drop the old one.' What's wrong with that reasoning?"
+    a: "Failing to reject means the data couldn't rule out 'no difference', not that it showed the prompts are equal. With 30 examples a real gap of several points can easily go undetected. Dropping the old prompt may still be fine for other reasons (cost, simplicity), but not on the claim that they're the same."
+  - q: "You try two prompts on 5 inputs and B looks 20 points better. A colleague proposes testing the hypothesis 'B is 20 points better' on a bigger set. What would you test instead, and why?"
+    a: "Test the null hypothesis that there's no difference. The 20 points came from 5 inputs and is mostly noise; any number near it is just as plausible. Asking whether the bigger set rules out 'no difference' gives a clear yes or no, and the size of the gap is then estimated with an interval."
+mcq:
+  - q: "Prompt A scores 84% and prompt B scores 87%, each run independently on 100 examples. What's the right engineering call?"
+    options:
+      - "Ship B now, because a 3-point gain is still a gain"
+      - "Keep A, since shorter prompts tend to generalize better"
+      - "Merge the two prompts and keep the best lines of each"
+      - "Call it a tie until a paired or larger run confirms it"
+    answer: 3
+    explain: "At n = 100 and a rate near 85%, each score has a standard error of about 3.6 points, so a 3-point gap between two independent measurements doesn't reject the null. Grow n, or compare on identical inputs, which cancels most of the shared noise. Prompt length and merging are guesses, not evidence."
+  - q: "A test of 'no difference between model A and model B' on your eval comes back as 'fail to reject'. Which statement is correct?"
+    options:
+      - "The data doesn't rule out that the models perform the same"
+      - "The data shows the two models perform the same on this task"
+      - "The data shows model B is worse, since it failed the test"
+      - "The test was set up wrongly, because it rejected nothing"
+    answer: 0
+    explain: "'Fail to reject' only says the evidence isn't strong enough to rule out no difference. It's not proof of equality: with few examples a real difference can hide in the noise. Collect more data or report the interval for the difference."
+  - q: "Two prompts are run on the same 200 questions. Both pass most questions, and they disagree on only 12. Why is comparing them on these disagreements more sensitive than comparing two independent pass rates?"
+    options:
+      - "It removes the easy questions, which makes both prompts score lower"
+      - "It doubles the sample, since each question is now scored twice"
+      - "Questions both pass or both fail carry the shared noise and cancel"
+      - "It turns a pass rate into a mean score, which has less variance"
+    answer: 2
+    explain: "Most of the noise in a pass rate comes from which questions happen to be easy or hard. On identical questions that noise is shared, so it cancels, and the only evidence left is where the prompts disagree. The sample isn't larger; the noise is smaller."
+  - q: "Three reruns show prompt B ahead of prompt A by 5, 4 and 6 points. Which hypothesis should you formally test?"
+    options:
+      - "That B is exactly 5 points better, the average of the reruns"
+      - "That there is no difference between prompt A and prompt B"
+      - "That B is at least 6 points better, the largest rerun gap"
+      - "That A is better, since that's the opposite of the reruns"
+    answer: 1
+    explain: "Any specific gap near 4 to 6 is equally plausible, so testing one of them proves little. The null hypothesis of no difference gives a clean question: does the data rule it out? The size of the gap is then estimated with a confidence interval."
+backupResources:
+  - label: "Introductory Statistics 2e, chapter 9: hypothesis testing with one sample (OpenStax)"
+    url: "https://openstax.org/books/introductory-statistics-2e/pages/9-introduction"
+    type: "free textbook · null and alternative hypotheses, worked exercises"
+tags:
+  - math
+  - statistics
+  - hypothesis-testing
+  - evals
+---
+
+**You need:** confidence intervals. → confidence-intervals-for-evals first.
+
+Every "is the new version better?" question in AI work is a **hypothesis test**. Two prompts,
+two models, two retrieval settings: you have noisy scores for each, and you need a rule for when
+a gap is real. Hypothesis testing gives that rule, and its most useful habit is a modest one: you
+either reject a claim or fail to reject it. You never prove it.
+
+## Reject or fail to reject
+
+Results vary from run to run for reasons you don't control: which examples were in the set, how
+the sampler happened to draw. So one result suggests a hypothesis, and repeats test it.
+
+- If the data points clearly against the hypothesis, you **reject** it.
+- If the data is roughly consistent with it, you **fail to reject**. That's weaker than "it's
+  true": other hypotheses would fit the data just as well.
+
+## The null hypothesis
+
+When comparing two versions, there are endless specific claims you could test: B is 3 points
+better, 4 points, 4.5. Instead, test one: **there is no difference**. That's the **null
+hypothesis**. It needs no first experiment to set up, because "no difference" is always zero, and
+it turns the question into a clean yes or no: does the data rule out "no difference"?
+
+With few examples, small random changes can flip which version looks better, so you'll fail to
+reject. With many examples, random flips stop mattering and a real gap can reject the null.
+
+## Worked example: paired versus unpaired
+
+Prompt A passes 168 of 200 questions (84%), prompt B passes 176 of 200 (88%).
+
+**Unpaired view.** Treat them as two independent rates. Each has a standard error of about 2.5
+points, the difference about 3.5. A 4-point gap is barely more than one standard error. **Fail to
+reject.**
+
+**Paired view.** Both ran on the same 200 questions. They agree on 188 (both pass or both fail),
+which tells you nothing about which is better. On the 12 where they disagree, B wins 10 and A wins
+2. Under the null, each disagreement is a coin flip. Ten or more heads out of 12, in either
+direction, happens about **4%** of the time (2 × 79 ÷ 4,096). That's surprising enough to
+**reject** the null at the usual 5% level.
+
+Same data, different verdict. Pairing removes the noise of which questions happen to be easy or
+hard, which is why it's the cheapest upgrade to any eval. How to read that 4% is the subject of
+→ p-values-explained.
+
+## Common mistakes
+
+- **Treating "fail to reject" as "equal".** It means "not shown different", often because n is
+  too small.
+- **Setting the hypothesis from a tiny pilot.** Test the null instead of the pilot's number.
+- **Running prompts on different examples.** You throw away the pairing and need far more data.
+- **Changing the test set after seeing results.** Fix the set first, or the test means nothing.
+
+## Where you'll see it in AI
+
+Prompt and model comparisons on a regression set (→ evaluation-metrics), A/B tests of AI
+features, research papers claiming one method beats another, and judge-based win rates. The
+interval view from → confidence-intervals-for-evals asks the same question: does the interval of
+the difference include zero?

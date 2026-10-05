@@ -1,0 +1,197 @@
+---
+title: "Optimizing and satisficing metrics"
+subtitle: "Maximize one number, set pass/fail limits on the rest"
+summary: "Split what you care about into one metric to maximize and pass/fail limits for the rest, then use that rule to pick a model or setting."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript, with a worked model-choice example and a quiz."
+section: math
+pillar: evaluation
+order: 6
+level: intermediate
+estMinutes: 11
+taskMinutes: 20
+prerequisites:
+  - single-number-metric
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "BH9mlmdXzzI"
+  published: "2017-08-25"
+  year: 2017
+  minutes: 6
+  title: "Satisficing and Optimizing Metrics (C3W1L04)"
+  channel: "DeepLearningAI"
+  why: "One number is not enough when speed, cost or false alarms also matter, and blending them into a weighted formula feels arbitrary. Andrew Ng shows the cleaner rule: maximize one metric and require the others to clear a limit. His running-time and wake-word examples map directly onto choosing a model under a latency or cost budget, which is a decision every AI feature runs into."
+  notes:
+    - "0:30 Accuracy and running time combined into one weighted formula, and why that feels artificial."
+    - "1:33 The definitions: an optimizing metric you push as far as possible, satisficing metrics that only need to be good enough."
+    - "3:06 Wake words: maximize detection subject to at most one false wake-up every 24 hours."
+applyIt: |
+  **Write the rule for your next model or tool choice as one goal and a few limits.** It works for
+  picking a chat assistant for your team, a model for an app feature, or a setting on an
+  automation.
+
+  1. Name the one thing you want as much of as possible (answer quality on your examples,
+     share of tickets resolved, accuracy on your test set).
+  2. Name two or three limits that only have to be met: response time, monthly cost, a privacy
+     requirement, a minimum recall on harmful content.
+  3. Set each limit from what users or the budget actually need, not from what one option
+     happens to deliver.
+  4. Drop every option that breaks a limit, then pick the best of the rest on the one goal.
+
+  **If you build software:** put the limits in your test suite as pass/fail checks (latency,
+  cost per request, guardrail recall) and report the one optimizing number next to them.
+  **If you don't code:** a short table in a doc, one row per option and one column per number,
+  with the limits written above it, is enough.
+
+  Success: a written rule (one goal, two or three limits) and the option it picks.
+recap:
+  - emoji: "⏱️"
+    title: "Accuracy is not the only thing"
+    text: "A cat classifier's accuracy matters, but so does running time: 80, 95 or 1,500 milliseconds per image."
+  - emoji: "🧪"
+    title: "Weighted formulas feel arbitrary"
+    text: "You could score accuracy minus 0.5 × running time, but the weight is a guess, and it lets a big win on one number buy a failure on another."
+  - emoji: "🎯"
+    title: "Optimize one, satisfy the rest"
+    text: "Maximize accuracy subject to running time ≤ 100 ms. Accuracy is optimizing; running time is satisficing: good enough is enough."
+  - emoji: "✅"
+    title: "The rule picks for you"
+    text: "Of the classifiers under 100 ms, B is the most accurate, so B wins. Being faster than the limit earns nothing extra."
+  - emoji: "🗣️"
+    title: "Wake words"
+    text: "A voice assistant maximizes how often it wakes when the wake word is said, subject to at most one false wake-up per 24 hours."
+  - emoji: "🧭"
+    title: "N metrics, one rule"
+    text: "With N things you care about, pick one to optimize and make the other N − 1 thresholds. Then compare on an evaluation set."
+task: |
+  Pick a model with one goal and two limits.
+
+  Here are made-up numbers for four options behind a support chatbot, measured on the same
+  200-question eval set:
+
+  | Option | Pass rate | p95 latency | Cost per 1,000 chats |
+  |---|---|---|---|
+  | Large model | 91% | 6.5 s | $12.00 |
+  | Mid model | 87% | 2.4 s | $4.00 |
+  | Small model | 79% | 1.1 s | $0.80 |
+  | Mid model + retrieval | 89% | 2.9 s | $5.00 |
+
+  1. Write the rule: maximize pass rate, subject to p95 latency ≤ 3 s and cost ≤ $6 per 1,000
+     chats. Which option wins?
+  2. Now try a weighted score: pass rate in points − 2 × latency in seconds. Which wins? Then
+     change the weight from 2 to 0.3 and score them again.
+  3. Rewrite the rule for a case where budget is tight: cost ≤ $1. What does that do?
+  4. Write two sentences on which approach you'd defend to a teammate and why.
+
+  Success: "Mid model + retrieval" picked by the first rule, "Small model" by the tight budget,
+  and the weighted score flipping from Mid model + retrieval (weight 2) to Large model (0.3).
+selfCheck:
+  - q: "Your team scores models with 'quality − 0.3 × cost'. A new model wins by a mile on quality but costs five times your budget. What's wrong with the formula, and what replaces it?"
+    a: "A weighted sum lets a big gain on one number buy a failure on another, and the 0.3 is a guess. Make cost a satisficing limit (must be under budget) and optimize quality among the models that pass it."
+  - q: "You set the latency limit at 2 seconds because that's what your current model does. Why is that a weak way to set it?"
+    a: "The limit should come from what users or the product need. Copying the current model's number bakes in today's choice and may rule out better options, or allow a slow one when users need faster."
+  - q: "Two options both meet every limit; one is far faster than required. Does the extra speed count?"
+    a: "Not under this rule: once a satisficing limit is met, more doesn't earn credit. If extra speed really matters, it belongs in the optimizing metric or in a tighter limit."
+mcq:
+  - q: "You must choose an LLM for a live chat feature. Users drop off if a reply takes over 3 seconds; cost must stay under budget. How should you rank the candidates?"
+    options:
+      - "By a weighted sum of quality, speed and cost per chat"
+      - "By quality alone, then fix speed and cost after launch"
+      - "By speed first, since slow replies lose users at once"
+      - "By quality, among models that meet both limits"
+    answer: 3
+    explain: "Speed and cost have clear 'good enough' lines, so they're satisficing limits; quality is what you want more of, so it's the one to optimize. A weighted sum needs arbitrary weights and can let a slow model win on quality points."
+  - q: "A smart speaker team has two wake-word models. Model A catches 98% of wake words with 3 false wake-ups a day; B catches 95% with 0.5. The limit is 1 false wake-up a day. Which ships?"
+    options:
+      - "B, since only B meets the false wake-up limit"
+      - "A, because detection is the optimizing metric"
+      - "A, but only after its threshold is moved lower"
+      - "Neither, until one model wins on both numbers"
+    answer: 0
+    explain: "A model that breaks a satisficing limit is out, however good its optimizing number. A is excluded and B is the best of the rest. Lowering A's threshold would raise its false wake-ups, not lower them."
+  - q: "Three models all meet your 3-second limit: 0.8 s, 1.9 s and 2.7 s. Their quality scores are 82%, 88% and 86%. Which do you pick under an optimize-and-satisfy rule?"
+    options:
+      - "The 0.8 s model, since being fastest is worth something"
+      - "The 2.7 s model, as it sits closest to the limit you set"
+      - "The 1.9 s model, as it has the best quality of the three"
+      - "Re-test all three: the gaps are too small to choose from"
+    answer: 2
+    explain: "Once the latency limit is met, being faster earns nothing extra; you pick the best quality among the models that pass, here 88%. If speed beyond the limit mattered, it should have been in the optimizing metric or a tighter limit."
+tags:
+  - math
+  - evaluation
+  - metrics
+  - model-selection
+---
+
+**You need:** the single deciding number from → single-number-metric.
+
+A model can be accurate and too slow, cheap and too wrong, sensitive and too noisy. You care
+about several numbers, and a single number can't hold them all. The fix in this lecture is a
+decision rule you'll use for the rest of your career: **optimize one metric, and set pass/fail
+limits on the others.**
+
+## Two kinds of metric
+
+- **Optimizing metric:** the one you want as much of as possible. Quality, accuracy, pass rate,
+  F1.
+- **Satisficing metrics:** the ones that only need to be good enough. Latency under a limit,
+  cost under a budget, false alarms below a rate. Beyond the limit, you don't care.
+
+The rule then picks for you: throw out every option that breaks a limit, and take the best of
+the rest on the optimizing metric.
+
+## Why not a weighted formula?
+
+You could score "accuracy − 0.5 × running time". The trouble is the 0.5: nobody can defend it,
+and it lets a big win on one number cancel a failure on another. A model that is wonderful
+and takes 6 seconds per reply can win a weighted contest and still lose your users. A limit
+says plainly what "too slow" means.
+
+## Worked example: choosing a model under a budget
+
+Made-up numbers for four options behind a support chatbot, all measured on the same eval set:
+
+| Option | Pass rate | p95 latency | Cost per 1k chats |
+|---|---|---|---|
+| Large | 91% | 6.5 s | $12.00 |
+| Mid | 87% | 2.4 s | $4.00 |
+| Small | 79% | 1.1 s | $0.80 |
+| Mid + retrieval | 89% | 2.9 s | $5.00 |
+
+Rule: maximize pass rate, subject to p95 latency ≤ 3 s and cost ≤ $6 per 1,000 chats.
+
+1. Large breaks both limits, so it's out despite the best pass rate.
+2. Mid, Small and Mid + retrieval all pass.
+3. Of those, Mid + retrieval has the highest pass rate (89%), so it wins.
+
+Change one limit and the answer changes: with a budget of $1, only Small passes. That's the
+rule working. The limits encode what the product needs, so changing a need changes the pick.
+
+## Where the limits come from
+
+Set each limit from users, budget or risk: how long people will wait, what a month of traffic
+can cost, how many false alarms a reviewer can handle. Don't set it from whatever your current
+model happens to score.
+
+## Common mistakes
+
+- **Optimizing two things at once.** If two numbers are both "maximize", you're back to an
+  unresolved debate. Make one of them a limit.
+- **Giving credit beyond a limit.** Faster than required isn't a tiebreaker unless you said so in
+  advance.
+- **Too many limits.** Every limit shrinks the field. Keep the ones that would really sink the
+  product.
+- **Limits measured on different data.** Measure every option on the same eval set and the same
+  traffic sample.
+
+## Where you'll see it in AI
+
+- **Model choice:** quality on your own eval set, subject to latency and cost per request
+  (→ choosing-models-providers, → cost-latency-caching).
+- **Guardrails:** maximize helpfulness, subject to recall on harmful content above a floor
+  (→ precision-recall-tradeoff).
+- **Leaderboards:** a high benchmark score is a candidate's optimizing number, not proof it
+  meets your limits (→ reading-llm-benchmarks).
+- **Release gates:** a change ships only if every pass/fail check holds and the main score
+  doesn't drop (→ llm-app-evals).

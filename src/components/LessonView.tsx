@@ -10,7 +10,6 @@ import NotesBox from "./NotesBox";
 import CompleteButton from "./CompleteButton";
 import VideoRecap from "./VideoRecap";
 import InlineMarkdown from "./InlineMarkdown";
-import LectureTrack from "./LectureTrack";
 import { Arrow, BackCell, Cell, TitleBlock } from "./TitleBlock";
 import { reportIssueUrl } from "@/lib/site";
 
@@ -100,6 +99,9 @@ export default function LessonView({
   prev?: LessonNavRef;
   next?: LessonNavRef;
 }) {
+  // Foundations are pillars; Applications and Math & ML are tracks.
+  const unit = lesson.section === "foundations" ? "pillar" : "track";
+
   // Blocks number themselves in reading order, whichever optional ones this lesson has.
   let n = 0;
   const step = () => ++n;
@@ -120,7 +122,7 @@ export default function LessonView({
               </>
             }
           />
-          <Cell label="Pillar" className="hidden sm:col-span-3 sm:flex">
+          <Cell label={unit === "pillar" ? "Pillar" : "Track"} className="hidden sm:col-span-3 sm:flex">
             <Link
               href={`/${lesson.section}/${lesson.pillar}`}
               className="text-body-small text-pencil hover:underline"
@@ -165,7 +167,7 @@ export default function LessonView({
               {reviewedLabel(lesson.reviewedOn)}
             </Link>
           </Cell>
-          <Cell label="In pillar" align="top">
+          <Cell label={`In ${unit}`} align="top">
             <span className="qty text-quantity text-graphite">
               {position.index}
               <span className="text-[14px] text-muted"> / {position.total}</span>
@@ -204,7 +206,6 @@ export default function LessonView({
         <Outline
           items={[
             { href: "#resource", label: "Watch" },
-            ...(lesson.lectureTrack?.length ? [{ href: "#lectures", label: "Lectures" }] : []),
             ...(lesson.recap?.length ? [{ href: "#recap", label: "Recap" }] : []),
             ...(lesson.body ? [{ href: "#breakdown", label: "Breakdown" }] : []),
             ...(lesson.applyIt ? [{ href: "#apply", label: "Apply" }] : []),
@@ -222,17 +223,6 @@ export default function LessonView({
         <PrimaryResource video={lesson.video} />
         <ReadAfter items={lesson.readAfter} />
       </Block>
-
-      {/* 2a. Math & ML subjects: the full lecture series, in watching order */}
-      {lesson.lectureTrack && lesson.lectureTrack.length > 0 && (
-        <Block step={step()} title="Lecture track: the full series" id="lectures">
-          <LectureTrack
-            lectures={lesson.lectureTrack}
-            lessonKey={lesson.key}
-            primaryId={lesson.video?.videoId}
-          />
-        </Block>
-      )}
 
       {/* 2b. Gamified recap — replay the video's ideas one card at a time */}
       {lesson.recap && lesson.recap.length > 0 && (
@@ -327,7 +317,7 @@ export default function LessonView({
       <div className="flex flex-wrap items-center justify-between gap-3 border-t-2 border-print pt-5">
         <CompleteButton lessonKey={lesson.key} />
         <Link href={`/${lesson.section}/${lesson.pillar}`} className="btn-print">
-          <Arrow dir="back" /> Back to pillar
+          <Arrow dir="back" /> Back to {unit}
         </Link>
       </div>
 

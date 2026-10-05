@@ -1,0 +1,197 @@
+---
+title: "What a derivative measures"
+subtitle: "Tiny nudges, the ratio they make, and why every gradient is built from them"
+summary: "Explain a derivative as the ratio a small nudge settles toward, compute one by shrinking the nudge, and read it as a weight's effect on a loss."
+changeNote: "New first lesson in the calculus track, written from the lecture's transcript, with a worked example, a Python task and a quiz."
+section: math
+pillar: calculus
+order: 1
+level: beginner
+estMinutes: 42
+taskMinutes: 20
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "9vKqVkMQHKk"
+  published: "2017-04-29"
+  year: 2017
+  minutes: 17
+  title: "The paradox of the derivative | Chapter 2, Essence of calculus"
+  channel: "3Blue1Brown"
+  why: "Training a model rests on one question: if I nudge this weight, how does the loss move? This lecture builds the derivative from exactly that question, with a car's distance and speed instead of symbols. It also clears up the 'instantaneous rate of change' confusion, so later ideas like a zero gradient don't mislead you. Start the track here even if you passed calculus: the nudge picture is the one the rest of the track uses."
+  notes:
+    - "Around 6:00 the lecture computes speed with a fixed dt of 0.01. That is the same finite-difference trick you'll use in the task to check a derivative numerically."
+    - "From about 10:15 to 13:00 is the t³ example worked through algebra. Pause and redo it on paper; the worked example below uses the same function."
+applyIt: |
+  **Any number that depends on another number has a derivative, and you can estimate it with a
+  nudge.** That's how you find which input in a model, a spreadsheet or a prompt pipeline the
+  output is most sensitive to.
+
+  1. Pick one output you care about: a model's loss, a cost estimate, a forecast in a
+     spreadsheet, the monthly bill of an AI feature.
+  2. Nudge one input by a small amount (say 1%), keep everything else fixed, and record how much
+     the output moved. Divide the output change by the input change.
+  3. Repeat for two or three other inputs and rank them by that ratio. The biggest ratio is
+     where your attention, or your tuning, pays off first.
+
+  **If you build software:** this is the numerical gradient check. When you write a custom loss
+  or layer, compare your derivative to `(f(x + h) - f(x - h)) / (2h)` for a small `h` before you
+  trust it.
+  **If you don't code:** do it in a spreadsheet: one column for the input, one for the nudged
+  input, one for the ratio.
+
+  Success: you can name the input your output is most sensitive to, with the ratio that shows it.
+recap:
+  - emoji: "🚗"
+    title: "Speed needs two moments"
+    text: "A single snapshot of a moving car can't tell you its speed. Speed is distance covered between two times divided by the time between them."
+  - emoji: "⏱️"
+    title: "Make the gap tiny"
+    text: "A speedometer compares two moments very close together, say 0.01 seconds apart. The ratio ds/dt is the slope between two nearby points on the distance graph."
+  - emoji: "📐"
+    title: "The derivative is the limit"
+    text: "The true derivative is what that ratio approaches as dt shrinks toward zero, never dt equal to zero. On the graph it's the slope of the tangent line at one point."
+  - emoji: "🧮"
+    title: "Shrinking makes it simpler"
+    text: "For s(t) = t³ at t = 2, the ratio is 12 plus terms that still contain dt. As dt shrinks those vanish, leaving exactly 12, and in general 3t²."
+  - emoji: "🤔"
+    title: "Is the car moving at zero?"
+    text: "At t = 0 the derivative of t³ is 0, yet the car does move a little right after. Zero derivative means the best constant estimate of the rate there is zero, not that nothing changes."
+  - emoji: "🎯"
+    title: "Best constant approximation"
+    text: "Read 'instantaneous rate of change' as shorthand for the best constant approximation of the rate near a point. That reading avoids the paradox."
+task: |
+  **Watch a ratio settle into a derivative (20 minutes, Python or a spreadsheet).**
+
+  1. Run this, which estimates the derivative of t³ at t = 2 with smaller and smaller nudges:
+
+     ```python
+     def f(t):
+         return t ** 3
+
+     for dt in (0.1, 0.01, 0.001, 0.0001):
+         ratio = (f(2 + dt) - f(2)) / dt
+         print(f"dt = {dt:<7} ratio = {ratio:.6f}")
+     ```
+
+  2. Now change `f` to a toy loss, `(t - 3) ** 2`, and estimate its derivative at t = 1 and at
+     t = 3. Predict the sign of each before you run it.
+  3. Change the formula to the centred version, `(f(2 + dt) - f(2 - dt)) / (2 * dt)`, and see how
+     much faster it reaches 12.
+
+  No Python? Put dt values in column A of a spreadsheet and `=((2+A1)^3-8)/A1` in column B.
+
+  Success: your ratios read 12.61, 12.0601, 12.006001, 12.0006, you can explain why they approach
+  12, and the toy loss gives about −4 at t = 1 and about 0 at t = 3.
+selfCheck:
+  - q: "You nudge one weight of a model from 0.50 to 0.51 and the loss goes from 2.400 to 2.394. What is your estimate of the derivative of the loss with respect to that weight, and what does its sign tell you to do?"
+    a: "Change in loss over change in weight: −0.006 / 0.01 = −0.6. Negative means increasing the weight lowers the loss, so a training step would push this weight up. It's an estimate: a smaller nudge would give a closer value."
+  - q: "A teammate says: 'the derivative of the loss is exactly zero at this weight, so the loss can't change if we move it.' What's wrong with that, using the t³ example?"
+    a: "t³ has derivative 0 at t = 0, but moving t to 0.1 still changes the value (by 0.001). Zero derivative only says the best constant rate estimate near that point is zero. A larger move can still change the loss, and the point need not be a minimum."
+  - q: "Your numerical derivative of a function gives 4.1 with a nudge of 0.1 and 4.01 with a nudge of 0.01. What do you expect with a nudge of 0.001, and why?"
+    a: "About 4.001. The ratio is settling toward 4: the leftover error shrinks roughly in step with the nudge, which is the pattern the t³ example showed."
+mcq:
+  - q: "You estimate a derivative with (f(x + h) − f(x)) / h. With h = 0.5 you get 7.3; with h = 0.05 you get 6.2; with h = 0.005 you get 6.02. What's the best reading?"
+    options:
+      - "About 7.3"
+      - "About 6"
+      - "About 6.5"
+      - "Undefined"
+    answer: 1
+    explain: "The derivative is what the ratio approaches as h shrinks, and these values close in on 6. A large h mixes in curvature, so 7.3 is the least accurate, and averaging keeps that error in. Different values for different h are normal, not a sign that no derivative exists."
+  - q: "A loss has derivative 0 at some weight. Which conclusion is safe?"
+    options:
+      - "This weight is at the loss's minimum and training is done"
+      - "Any change to this weight leaves the loss exactly unchanged"
+      - "Near this weight, small nudges barely change the loss at first"
+      - "The weight has no effect on the loss and can be deleted"
+    answer: 2
+    explain: "Zero derivative means the best constant estimate of the rate is zero right there, so tiny nudges change the loss very little. It doesn't mean a minimum (t³ at 0 is flat but not a minimum), and bigger moves can still change the loss."
+  - q: "In the lecture, the computer draws the velocity curve using dt = 0.01 rather than letting dt reach zero. Why is that fine in practice?"
+    options:
+      - "A small fixed nudge gives a close approximation of the limit"
+      - "Setting dt to zero would give the same answer more slowly"
+      - "Velocity is defined as the ratio at exactly dt = 0.01 seconds"
+      - "Computers can only store numbers that have two decimal places"
+    answer: 0
+    explain: "A small but real nudge gives a ratio very close to the limit, which is the idea behind numerical gradient checks. Setting dt to zero gives 0/0, which has no value, and 0.01 is a practical choice, not part of the definition."
+tags:
+  - math
+  - calculus
+  - derivatives
+---
+
+**You need:** the idea of slope (rise over run) from school algebra. Nothing else.
+
+The one idea of this lecture: **a derivative is the ratio between a tiny change in a function's
+output and the tiny change in input that caused it, taken as that nudge shrinks.** Training a
+model asks this question millions of times: if I nudge this weight, how much does the loss move?
+Every gradient you'll meet in this track is a list of these ratios.
+
+## Why "instantaneous" is a trap
+
+Speed is distance divided by time, and that needs two moments. A single frozen instant has no
+change in it at all. Calculus gets around this by comparing two moments a small gap `dt` apart,
+measuring the distance covered in that gap, `ds`, and asking what `ds / dt` settles toward as the
+gap gets smaller. The answer is the slope of the tangent line at a single point on the distance
+graph.
+
+The gap never becomes zero. Setting `dt = 0` gives 0/0, which means nothing. The derivative is
+the value the ratio *approaches*, and the lecture's suggested reading is: **the best constant
+approximation of the rate near that point.**
+
+## Worked example: shrink the nudge yourself
+
+Take `s(t) = t³` and ask for the rate at `t = 2`. Expanding `(2 + dt)³` gives
+`8 + 12·dt + 6·dt² + dt³`. Subtract 8, divide by `dt`:
+
+```text
+ratio = 12 + 6·dt + dt²
+```
+
+Now plug in real nudges:
+
+| dt | ratio |
+|---|---|
+| 0.1 | 12.61 |
+| 0.01 | 12.0601 |
+| 0.001 | 12.006001 |
+
+Every leftover term still contains `dt`, so as the nudge shrinks it fades and the ratio settles
+on **12**. The same steps at any `t` give `3t²`. The messy details disappear in the limit,
+which is why derivatives end up simpler than the ratios they come from.
+
+Now the same move on a toy loss, `loss(w) = (w − 3)²`, at `w = 1`. The loss is 4. Nudge `w` to
+1.01 and the loss becomes 3.9601: a change of −0.0399 for a nudge of 0.01, a ratio of about −4.
+The sign says "increase w to lower the loss", and the size says the loss responds about four
+times as strongly as the nudge. That is one entry of a gradient, found with nothing but
+subtraction and division.
+
+## The paradox, and the lesson for AI
+
+The derivative of `t³` at `t = 0` is `3 × 0² = 0`. So is the car moving at the start? Over the
+first 0.1 seconds it covers 0.001 m, so it does move, just very slowly compared with the time
+passing. A zero derivative says the best constant estimate of the rate is zero, not that nothing
+happens. Also note that `t³` has no minimum at 0 even though it is flat there. Keep both facts:
+later, a flat spot in a loss can be a valley, a plateau or a saddle.
+
+## Common mistakes
+
+- **Plugging in dt = 0.** You get 0/0. The derivative is a limit, not a substitution.
+- **Reading a zero derivative as "at the minimum".** `t³` is flat at 0 and keeps rising.
+- **Trusting a big nudge.** With `dt = 0.5` the curvature leaks in; use small nudges, or the
+  centred version `(f(x+h) − f(x−h)) / 2h`, which is more accurate for the same `h`.
+- **Forgetting the units.** The ratio is "output per unit of input": loss per unit of weight,
+  metres per second.
+
+## Where you'll see it in AI
+
+- **Training:** each entry of the gradient is one of these ratios for one weight (→ gradient-vector-of-partials,
+  → calculus-for-optimization).
+- **Gradient checks:** engineers verify hand-written backward passes by comparing them to
+  nudge-and-divide estimates (→ backprop-chain-rule-calculus).
+- **Sensitivity analysis:** "which input moves the output most" is the same question, asked of
+  any model or spreadsheet.
+
+Next: → derivative-rules-by-geometry turns the slow nudge-and-limit process into rules you can
+apply in seconds.

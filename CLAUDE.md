@@ -37,8 +37,9 @@ chips, only the sheet casts a shadow, and nothing renders under 12px.
 `content/<section>/<pillar>/<slug>.mdx`. Frontmatter: `title, section, pillar, module, order,
 level, estMinutes, taskMinutes, prerequisites[], reviewedOn, video{videoId,minutes,title,channel,why},
 readAfter[], applyIt, toolkit, recap[], task, selfCheck[], mcq[], backupResources[], tags[]`,
-plus `shortPath` (required over 90 min) and `lectureTrack[{videoId,title,channel,covers,optional}]`
-(required in Math & ML core: the subject's full lecture series; a video lives in one track only).
+plus `shortPath` (required over 90 min). The **Math & ML** section (`content/math/<track>/`) has one
+track per subject and one lesson per core lecture; there `toolkit` is optional and `mcq` (3+) and
+`recap` (4+) are required. A video is the main video of one lesson only; slugs are unique course-wide.
 Adding a lesson needs no code. Cross-lesson pointers are written `(→ lesson-slug)` and render as
 links; any other bare slug fails `npm run check`. `video.minutes` is written by
 `node scripts/check-links.js --durations --write <file>`. Recap titles are cues (the text is

@@ -1,0 +1,222 @@
+---
+title: "Building a GPT in code"
+subtitle: "Self-attention as a masked weighted average, then a full transformer block"
+summary: "Write masked self-attention as matrix code, explain each part of a transformer block, and read a small GPT implementation line by line."
+changeNote: "New lesson in the transformers track, written from the lecture's transcript, focused on the self-attention part of the build, with a code task and a quiz."
+section: math
+pillar: transformers
+order: 6
+level: advanced
+estMinutes: 75
+taskMinutes: 35
+prerequisites:
+  - decoder-only-transformer-by-hand
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "kCc8FmEb1nY"
+  published: "2023-01-17"
+  year: 2023
+  minutes: 116
+  start: 2533
+  watchMinutes: 61
+  title: "Let's build GPT: from scratch, in code, spelled out."
+  channel: "Andrej Karpathy"
+  why: "Every diagram in this track becomes a few lines of PyTorch here. The lesson starts where the build turns to attention: averaging past tokens with a loop, the same thing as one masked matrix multiply, softmax weights, then queries, keys and values, multiple heads, feed-forward layers, residuals and layer norm. The first 40 minutes set up data and a bigram baseline, worth watching if you want to code along."
+  notes:
+    - "42:13 Averaging past context with a loop, then the same result with a lower-triangular matrix multiply and with softmax over a masked grid."
+    - "1:01:50 The core: a single self-attention head with queries, keys and values, then notes on why scores are scaled by the square root of the head size."
+    - "1:22:23 Multiple heads, the feed-forward layer, residual connections and layer norm turn the head into a full transformer block."
+shortPath: "First sitting (about 40 min): watch 42:13 to 1:11:36, from the averaging trick to one working self-attention head, and read the worked example. Come back for heads, residuals and layer norm, then the task."
+applyIt: |
+  **Reading model code is a skill you can now use: most transformer implementations follow
+  the block you just built.** When you meet a model card, a library or a paper, you can find
+  the pieces (embedding, attention with a mask, MLP, residual, norm) and know what each
+  setting changes.
+
+  1. Open the model card or config file of an open model you've heard of (on Hugging Face,
+     look for `config.json`).
+  2. Find the values for the number of layers, the model width, the number of attention
+     heads, the context length and the vocabulary size.
+  3. For each, write one line saying which part of the code it sizes, using the names from
+     this lesson (n_layer, n_embd, n_head, block_size, vocab_size).
+
+  **If you build software:** use those numbers to estimate parameters (about 12 × layers ×
+  width² for the blocks) and the KV cache per token before choosing a model to self-host.
+  **If you don't code:** the same five numbers explain most of the differences between model
+  sizes you see in announcements.
+
+  Success: a five-line table mapping one real model's config to the parts of the block.
+recap:
+  - emoji: "🧮"
+    title: "Averaging the past with a loop"
+    text: "The weakest way to let tokens talk: each position takes the average of itself and every earlier position. Written as a loop it's slow, but it shows the goal."
+  - emoji: "📐"
+    title: "The same thing as one matrix multiply"
+    text: "A lower-triangular matrix whose rows are normalized to sum to 1, multiplied by the token matrix, gives every position its running average in one operation."
+  - emoji: "🎚️"
+    title: "Softmax over a masked grid"
+    text: "Start from a grid of zeros, set future positions to minus infinity, and softmax each row. You get the same averages, but now the weights can depend on the data."
+  - emoji: "🔑"
+    title: "One self-attention head"
+    text: "Each token emits a query and a key; their dot products fill the grid, masked and softmaxed into weights, which then blend each token's value. Scores are scaled by one over the square root of the head size."
+  - emoji: "📝"
+    title: "Notes on attention"
+    text: "Attention is communication between nodes, it knows nothing of position unless you add it, batches never talk to each other, and a decoder masks the future while an encoder doesn't."
+  - emoji: "🧱"
+    title: "From head to block"
+    text: "Several heads run in parallel and are concatenated, a feed-forward layer lets each token process what it gathered, and residual connections plus layer norm keep the deep stack trainable."
+  - emoji: "📈"
+    title: "Scale it up"
+    text: "With more layers, heads, width and context, plus dropout, the same code goes from babbling to text shaped like Shakespeare, with the validation loss falling to about 1.48."
+task: |
+  Rebuild the lecture's attention steps in NumPy, one version at a time, and check they agree.
+
+  ```python
+  import numpy as np
+
+  rng = np.random.default_rng(1337)
+  T, C, H = 4, 8, 16          # tokens, channels, head size
+  x = rng.normal(size=(T, C))
+
+  # Version 1: loop average of the past
+  v1 = np.array([x[: t + 1].mean(axis=0) for t in range(T)])
+
+  # Version 2: lower-triangular matrix, rows normalized
+  tril = np.tril(np.ones((T, T)))
+  v2 = (tril / tril.sum(axis=1, keepdims=True)) @ x
+
+  # Version 3: softmax over a masked grid of zeros
+  def masked_softmax(s):
+      s = np.where(tril == 0, -np.inf, s)
+      e = np.exp(s - s.max(axis=1, keepdims=True))
+      return e / e.sum(axis=1, keepdims=True)
+  v3 = masked_softmax(np.zeros((T, T))) @ x
+
+  print(np.allclose(v1, v2), np.allclose(v2, v3))
+
+  # Version 4: one self-attention head
+  Wq, Wk, Wv = (rng.normal(size=(C, H)) / np.sqrt(C) for _ in range(3))
+  q, k, v = x @ Wq, x @ Wk, x @ Wv
+  wei = masked_softmax(q @ k.T * H ** -0.5)
+  print(wei.round(2))
+  out = wei @ v
+  print(out.shape)
+  ```
+
+  Then answer from the printed `wei`: why is the top-right triangle all zeros, why does every
+  row sum to 1, and why is the first row always [1, 0, 0, 0]?
+
+  **No-code path:** do versions 1 and 2 on paper with T = 3 and one number per token: x = 2,
+  4, 9.
+
+  Success: both checks print True, and you can answer the three questions about `wei`.
+selfCheck:
+  - q: "You train the lecture's model and the very first loss printed is 4.17 with a 65-character vocabulary. A teammate thinks training is already broken. Is it?"
+    a: "No. A model that knows nothing should spread probability evenly over 65 characters, and the loss for that is −ln(1/65) ≈ 4.17. A starting loss near that value means initialization is fine; a much higher one would suggest confidently wrong initial predictions."
+  - q: "You want to turn the lecture's decoder into a model that reads a full sentence to classify its sentiment. Which single line of the attention code would you change, and why?"
+    a: "Remove the masking line that fills future positions with minus infinity. For classification the whole sentence exists up front, so every token may attend to every other token, as in an encoder. The mask exists only for generation, where future tokens must stay hidden."
+mcq:
+  - q: "In the masked-softmax version, the weight grid starts as all zeros. Why rebuild the average this way instead of keeping the fixed triangular matrix?"
+    options:
+      - "Zeros make the matrix multiply run faster on a GPU"
+      - "The grid can later hold data-dependent scores"
+      - "Softmax is needed to stop tokens seeing the future"
+      - "The fixed matrix gives wrong averages for long inputs"
+    answer: 1
+    explain: "With zeros, masked softmax reproduces the plain average, but the zeros are a placeholder: replacing them with query-key scores lets each token decide how much each earlier token matters. The mask, not softmax, hides the future, and the fixed matrix's averages are correct at any length."
+  - q: "Your model's loss stops improving when you go from 4 to 12 blocks, and gradients near the input are tiny. Which part of the block is most likely missing?"
+    options:
+      - "The scaling of scores by one over √head_size"
+      - "The positional embedding table at the input"
+      - "Dropout after the attention and MLP layers"
+      - "The residual connections around each sub-layer"
+    answer: 3
+    explain: "Residual connections give gradients a direct path from the loss back to early layers; without them deep stacks are hard to optimize. Score scaling keeps softmax from saturating, positional embeddings add order, and dropout fights overfitting, but none of them fixes vanishing gradients through depth."
+  - q: "A head's attention weights on one row are [0.0, 0.0, 1.0, 0.0] at initialization, before any training. What's the likely bug?"
+    options:
+      - "The scores weren't scaled, so softmax went one-hot"
+      - "The mask was applied after softmax instead of before"
+      - "The values were multiplied before the keys were made"
+      - "The batch dimension let examples attend to each other"
+    answer: 0
+    explain: "Unscaled dot products of vectors with head size H have variance around H, so a few large scores make softmax nearly one-hot even before training, and learning stalls. Multiplying by H^-0.5 fixes it. Masking after softmax would leave weights on future tokens, which doesn't match this row."
+backupResources:
+  - label: "Go deeper: Let's build the GPT Tokenizer (Andrej Karpathy, 134 min)"
+    url: "https://www.youtube.com/watch?v=zduSFxRajkE"
+    type: "video"
+  - label: "nanoGPT (Andrej Karpathy, GitHub)"
+    url: "https://github.com/karpathy/nanoGPT"
+    type: "code · the full implementation the lecture builds toward"
+tags:
+  - math
+  - transformers
+  - pytorch
+  - self-attention
+---
+
+The earlier lessons drew a transformer; this one writes it. The single idea that makes the
+code short: **self-attention is a weighted average of past tokens, and a weighted average of
+past tokens is one masked matrix multiplication.** Once you see that, a whole GPT is a few
+hundred lines, and model configs, papers and libraries become readable.
+
+## From a loop to a matrix
+
+The lecture builds attention in four versions, each the same computation done better:
+
+1. **Loop.** For each position t, average the vectors of positions 0 to t.
+2. **Triangular matrix.** Make a T × T lower-triangular matrix of ones, divide each row by its
+   sum, and multiply it by the token matrix. One operation, the same averages.
+3. **Masked softmax.** Start from a grid of zeros, fill the upper triangle with minus infinity,
+   softmax each row. Still the same averages, but now the zeros can be replaced by scores.
+4. **Self-attention.** Fill the grid with query-key dot products, scaled by 1/√head_size. Now
+   each token chooses how much each earlier token matters (→ query-key-value-attention).
+
+## Worked example: three tokens
+
+One number per token: x = 2, 4, 9.
+
+The normalized triangular matrix is
+
+```text
+[1    0    0  ]
+[0.5  0.5  0  ]
+[0.33 0.33 0.33]
+```
+
+Multiplying it by [2, 4, 9] gives **[2, 3, 5]**: the running averages 2, (2+4)/2 and
+(2+4+9)/3. Masked softmax of a zero grid gives exactly the same matrix, because softmax of equal
+scores is uniform and e^−∞ = 0.
+
+Now replace row 3's zeros with scores [0, 0, 2]. Softmax gives e^0, e^0, e^2 = 1, 1, 7.39 over a
+total of 9.39, so weights **0.11, 0.11, 0.79**, and the output is 0.11·2 + 0.11·4 + 0.79·9 ≈
+**7.7**: the third token now listens mostly to itself.
+
+A useful sanity number from the build: with 65 possible characters, an untrained model that
+spreads probability evenly has loss −ln(1/65) ≈ **4.17**. That's what the first printed loss
+should be close to.
+
+## From one head to a GPT
+
+- **Multi-head attention:** several smaller heads in parallel, outputs concatenated.
+- **Feed-forward layer:** each token processes what it gathered (→ mlp-layers-store-facts).
+- **Residual connections:** each sub-layer's output is added to its input, giving gradients a
+  direct path back through the stack.
+- **Layer norm:** each token's vector is normalized before each sub-layer, keeping values in a
+  stable range.
+- **Scale-up:** more layers, heads, width and context, plus dropout against overfitting.
+
+## Common mistakes
+
+- **Applying the mask after softmax.** Mask first, with minus infinity, so the weights on
+  future tokens become exactly 0 and rows still sum to 1.
+- **Forgetting the 1/√head_size scale.** Softmax saturates and learning stalls.
+- **Leaving the mask on for encoders.** A classifier that sees the whole input shouldn't mask.
+- **Confusing batch and time.** Tokens attend along time only; separate examples in a batch
+  never mix.
+
+## Where you'll see it in AI
+
+Every open model's code and config, fine-tuning scripts (→ fine-tuning-fundamentals), local
+inference (→ local-open-models), and the caching of keys and values that makes generation
+fast (→ kv-cache-inference).

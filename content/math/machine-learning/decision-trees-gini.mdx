@@ -1,0 +1,209 @@
+---
+title: "Decision trees"
+subtitle: "Build a classifier from yes/no questions, choosing each one by Gini impurity"
+summary: "Build a classification tree by hand with Gini impurity, handle numeric columns with thresholds, and stop a deep tree from memorizing its data."
+changeNote: "New lesson in the machine learning track, written from the lecture's transcript, with a hand-worked example, a pen-and-paper task and a quiz."
+section: math
+pillar: machine-learning
+order: 8
+level: intermediate
+estMinutes: 22
+taskMinutes: 25
+prerequisites:
+  - ridge-regularization
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "_L39rN6gz7Y"
+  published: "2021-04-25"
+  year: 2021
+  minutes: 18
+  title: "Decision and Classification Trees, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "Trees are the building block of random forests and gradient boosting, the two lessons that close this track and the models that still dominate tabular data. This lecture builds a classification tree from a raw table, computing every Gini impurity on screen, including the trick for numeric columns, and ends on why a tree with tiny leaves overfits and how cross-validation sets the limit. After it, a tree will never look like a black box again."
+  notes:
+    - "2:35 Vocabulary: root, internal nodes (branches) and leaves."
+    - "6:45 Gini impurity for one leaf, then the weighted average across both leaves of a split."
+    - "9:54 Numeric columns: sort, take the midpoints between neighbours, and score each midpoint as a threshold."
+    - "15:34 A leaf with one person in it is probably overfit: pruning, or a minimum leaf size chosen by cross-validation."
+applyIt: |
+  **A shallow tree is the most explainable model there is, which makes it a good first model and
+  a good way to understand any table of outcomes.** Take a table from your own work or studies
+  with a yes/no outcome: renewed or not, ticket escalated or not, passed or failed.
+
+  1. Fit a tree limited to depth 2 or 3 (scikit-learn, or a spreadsheet's pivot tables to count
+     each split by hand).
+  2. Read the top split out loud as a sentence: "if sessions are below 4, almost nobody
+     subscribes". Is that a known fact, a surprise worth checking, or a leak (a column known only
+     after the outcome)?
+  3. Check how many rows land in each leaf. A rule based on five rows is a hypothesis, not a
+     finding.
+
+  **If you build software:** `DecisionTreeClassifier(max_depth=3)` plus `sklearn.tree.plot_tree`
+  draws the whole thing. **If you don't code:** a pivot table with the outcome as values and one
+  column as rows shows you the split; compare a few columns by their weighted Gini.
+  Success: you have one tree's top split written as a sentence, with the row counts behind it.
+recap:
+  - emoji: "🌳"
+    title: "Statements and decisions"
+    text: "A decision tree makes a true/false statement and goes left or right on the answer. Classification trees predict categories; regression trees predict numbers."
+  - emoji: "🧩"
+    title: "Mixed inputs are fine"
+    text: "One tree can mix yes/no and numeric questions, ask about the same column twice with different thresholds, and repeat the same outcome in several leaves."
+  - emoji: "🏷️"
+    title: "Root, branches, leaves"
+    text: "The top question is the root, questions in the middle are internal nodes, and the ends with no arrows leaving them are leaves."
+  - emoji: "🧪"
+    title: "Which question goes first?"
+    text: "Try each column as a one-question tree and run the data down it. Leaves with a mix of outcomes are impure."
+  - emoji: "🎯"
+    title: "Gini impurity"
+    text: "For a leaf, one minus the squared share of each class. For a split, the average of its leaves weighted by how many rows each holds. Lowest wins."
+  - emoji: "🔢"
+    title: "Numeric thresholds"
+    text: "Sort a numeric column, try the midpoint between each pair of neighbours as a cut-off, and keep the one with the lowest impurity."
+  - emoji: "✂️"
+    title: "Grow, label, then restrain"
+    text: "Repeat on each branch, label every leaf with its majority class, and watch for leaves holding one or two rows: prune, or set a minimum leaf size by cross-validation."
+task: |
+  Choose a tree's first question by hand. Eight trial users of an app, and whether they
+  subscribed:
+
+  | User | Active 3+ days | Invited a teammate | Sessions | Subscribed |
+  |---|---|---|---|---|
+  | 1 | yes | yes | 12 | yes |
+  | 2 | yes | no | 9 | yes |
+  | 3 | yes | yes | 7 | yes |
+  | 4 | no | yes | 10 | no |
+  | 5 | yes | no | 3 | no |
+  | 6 | no | no | 2 | no |
+  | 7 | no | yes | 5 | yes |
+  | 8 | no | no | 1 | no |
+
+  1. Gini of the whole group before any split (4 yes, 4 no).
+  2. Weighted Gini for splitting on **Active 3+ days**, then on **Invited a teammate**.
+  3. For **Sessions**: sort the values, list the midpoints between neighbours (1.5, 2.5, 4, 6, 8,
+     9.5, 11) and compute the weighted Gini for at least 4, 6 and 9.5.
+  4. Which question becomes the root? How many users land in each of its two branches?
+  5. One branch is already pure. Would you split the other one further with only 5 users in it?
+     Write one sentence for and one against.
+
+  **Check with code (optional):** enter the table in a free Colab notebook and fit
+  `DecisionTreeClassifier(max_depth=1)` from scikit-learn; `export_text` prints the split it
+  chose.
+
+  Success: starting group 0.5, both yes/no columns 0.375, and Sessions < 4 the winner at 0.2.
+selfCheck:
+  - q: "A colleague's tree reaches 100% training accuracy, and many leaves hold a single row. Cross-validated accuracy is 71%. What do you change, and how do you choose the setting?"
+    a: "The tree has memorized the training rows. Limit its growth with a maximum depth or a minimum number of rows per leaf (or prune it), and choose that limit by cross-validation: try several values and keep the one with the best cross-validated accuracy. Expect training accuracy to fall and held-out accuracy to rise."
+  - q: "Your tree's top split is 'account_closed_date is empty'. It predicts churn almost perfectly. Should you celebrate?"
+    a: "No: that column is only filled in after a customer churns, so the tree is reading the answer (leakage). Drop it and refit. A suspiciously perfect first split is one of the quickest leakage alarms a tree gives you."
+mcq:
+  - q: "A tree splits first on customer_id and gets pure leaves straight away. What has happened?"
+    options:
+      - "It found the most informative column in the data"
+      - "Gini impurity can't handle columns with that many values"
+      - "Customer IDs should be one-hot encoded first"
+      - "It can memorize rows by ID; drop identifier columns"
+    answer: 3
+    explain: "A unique ID lets the tree put each customer in their own leaf, which scores perfectly on training data and means nothing for new customers. Drop identifier columns before fitting. Encoding them differently doesn't help; the problem is that they carry no general pattern."
+  - q: "A leaf holding a single training example predicts 'approve'. How much should you trust predictions that land there?"
+    options:
+      - "Fully, since the leaf is perfectly pure"
+      - "Little, since one example is weak evidence"
+      - "As much as the tree's overall accuracy suggests"
+      - "Not at all, since leaves must hold ten or more rows"
+    answer: 1
+    explain: "A pure leaf of one is pure by default, not because of a pattern. Its prediction rests on a single case and is likely overfit, which is why minimum leaf sizes exist. The right minimum isn't a fixed rule like ten; cross-validation chooses it."
+  - q: "You switch from ridge regression to a decision tree. Do you still need to standardize the inputs?"
+    options:
+      - "No: splits depend only on the order of values"
+      - "Yes: Gini impurity is computed from raw values"
+      - "Yes: otherwise large-valued columns dominate"
+      - "No: trees ignore numeric columns altogether"
+    answer: 0
+    explain: "A tree only asks 'is this value above a threshold?', and rescaling a column moves the threshold without changing which rows go where. Ridge needed standardizing because its penalty depends on weight size. Gini is computed from counts of classes, not from the input values."
+  - q: "Splitting a node on column A gives leaves with Gini 0.0 (2 rows) and 0.48 (40 rows). Column B gives 0.30 (21 rows) and 0.30 (21 rows). Which split does Gini choose?"
+    options:
+      - "A, because one of its leaves is perfectly pure"
+      - "Neither, since both leave impure rows behind"
+      - "B, as its weighted average impurity is lower"
+      - "A, because its larger leaf holds more of the data"
+    answer: 2
+    explain: "Weighted Gini for A is (2/42)×0 + (40/42)×0.48 ≈ 0.457; for B it's 0.30. A pure leaf of two rows barely moves the average. Weighting by leaf size is exactly what stops a tree from favouring tiny pure leaves."
+backupResources:
+  - label: "Go deeper: One-Hot, Label, Target and K-Fold Target Encoding, Clearly Explained!!! (StatQuest with Josh Starmer, 15 min)"
+    url: "https://www.youtube.com/watch?v=589nCGeWG1w"
+    type: "video"
+  - label: "A visual introduction to machine learning (R2D3)"
+    url: "https://r2d3.us/visual-intro-to-machine-learning-part-1/"
+    type: "interactive · scroll-through decision trees"
+tags:
+  - math
+  - machine-learning
+  - decision-trees
+  - classification
+---
+
+A decision tree is a flowchart learned from data: a chain of yes/no questions ending in a
+prediction. **Each question is chosen greedily, by trying every column and every cut-off and
+keeping the one that leaves the purest groups.** Trees are easy to read, need no input scaling,
+and are the building block of random forests and gradient boosting, which still lead on most
+spreadsheet-style data.
+
+## Measuring purity
+
+A leaf is **pure** when every row in it has the same outcome. **Gini impurity** puts a number
+on how mixed it is:
+
+```text
+Gini = 1 − (share of yes)²
+         − (share of no)²
+```
+
+A pure leaf scores 0. A 50/50 leaf scores 0.5, the worst for two classes. A split's score is
+the average of its two leaves, **weighted by how many rows each holds**, so a tiny pure leaf
+can't win on its own.
+
+## Worked example: escalated support tickets
+
+Ten tickets, five of which were escalated. Starting Gini: 1 − 0.5² − 0.5² = **0.5**.
+
+**Candidate 1, "customer on premium plan?"**
+
+- Yes: 4 tickets, 3 escalated. Gini = 1 − 0.75² − 0.25² = **0.375**.
+- No: 6 tickets, 2 escalated. Gini = 1 − (1/3)² − (2/3)² ≈ **0.444**.
+- Weighted: 0.4 × 0.375 + 0.6 × 0.444 ≈ **0.417**.
+
+**Candidate 2, "ticket mentions a refund?"**
+
+- Yes: 5 tickets, 4 escalated. Gini = 1 − 0.8² − 0.2² = **0.32**.
+- No: 5 tickets, 1 escalated. Gini = **0.32**.
+- Weighted: **0.32**.
+
+The refund question leaves purer groups, so it becomes the root. The tree then repeats the
+search inside each branch, using only that branch's rows, and labels each final leaf with its
+majority outcome.
+
+For a **numeric** column such as "hours open", sort the values, try the midpoint between each
+neighbouring pair as a threshold, and score each one the same way.
+
+## Common mistakes
+
+- **Letting the tree grow until every leaf is pure.** That's memorization. Set a maximum depth or
+  a minimum leaf size, chosen by → cross-validation-folds.
+- **Feeding it identifiers.** IDs, row numbers and timestamps unique to each row let a tree carve
+  out one leaf per example.
+- **Trusting a perfect first split.** It's often leakage.
+- **Reading a deep tree as an explanation.** Depth 2–3 explains; depth 15 fits.
+
+## Where you'll see it in AI
+
+- **Tabular prediction** in production (churn, fraud, pricing, lead scoring) is very often tree
+  ensembles built from exactly this split search (→ random-forests-bagging,
+  → gradient-boosting-trees).
+- **Explaining a model** to non-specialists: a shallow tree fitted to another model's
+  predictions is a common way to summarise what it learned.
+- **Routing in AI systems** can be a hand-written tree: which requests go to a cheap model,
+  which to a strong one, which to a human. The same purity thinking helps you choose the
+  questions.

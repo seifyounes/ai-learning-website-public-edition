@@ -1,0 +1,213 @@
+---
+title: "The confusion matrix"
+subtitle: "Four boxes that every classification metric is built from"
+summary: "Build a confusion matrix from a model's predictions, read which mistakes it makes, and compare two models cell by cell."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript, with a worked example and a quiz."
+section: math
+pillar: evaluation
+order: 1
+level: beginner
+estMinutes: 12
+taskMinutes: 20
+prerequisites:
+  - machine-learning-fundamentals
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "Kdsp6soqA7o"
+  published: "2018-10-29"
+  year: 2018
+  minutes: 7
+  title: "Machine Learning Fundamentals: The Confusion Matrix"
+  channel: "StatQuest with Josh Starmer"
+  why: "Every metric in this track is arithmetic on one table, so the track starts by building that table slowly. Josh Starmer fills it in for a real heart-disease classifier, compares three models with it, and shows the same table growing to three classes. Seven minutes, no formulas, and it sets up exactly the question the next lessons answer: what to do when two tables look equally good."
+  notes:
+    - "1:32 In this video rows are the prediction and columns are the truth. Many libraries (scikit-learn included) flip that, so always check the axis labels."
+    - "2:34 The random forest's four counts: 142 true positives, 110 true negatives, 29 false negatives, 22 false positives."
+    - "4:41 A three-class example: the table becomes 3 by 3, and the diagonal still holds every correct answer."
+applyIt: |
+  **Before you trust any yes/no system, ask for its four counts, not its score.** That system
+  might be a spam filter, a content-moderation rule, an AI that tags support tickets, or a
+  checker that flags invoices for review.
+
+  1. Pick one automated yes/no decision in your work or project.
+  2. Collect 30–50 recent cases where you know the right answer (check them by hand if you
+     have to).
+  3. Sort every case into one of the four boxes: flagged and right, flagged and wrong, missed,
+     correctly left alone.
+  4. Read the off-diagonal boxes first. Which kind of mistake is more common, and which one
+     would cost more if it happened at ten times the volume?
+
+  **If you build software:** log the system's decision next to the eventual true label, so the
+  four counts can be computed later instead of reconstructed.
+  **If you don't code:** a spreadsheet with a "truth" column and a "decision" column is enough;
+  a pivot table or four COUNTIFS formulas give you the matrix.
+
+  Success: a filled-in 2×2 table for a real decision, and one sentence on which mistake it makes
+  more often.
+recap:
+  - emoji: "🧪"
+    title: "Test before you choose"
+    text: "To pick between methods, split the data, train each method on the training part and run each one on the same test part."
+  - emoji: "🔲"
+    title: "One table per model"
+    text: "Summarize each method's test results in a confusion matrix: one axis for what the model predicted, one for what was actually true."
+  - emoji: "🧩"
+    title: "Name the four cells"
+    text: "True positives and true negatives are the correct calls. False negatives are real cases the model missed; false positives are alarms it raised for nothing."
+  - emoji: "✅"
+    title: "Diagonal good, off-diagonal bad"
+    text: "The diagonal counts correct answers and everything off it counts mistakes. One model's 142, 110, 29 and 22 tell you how often it was right and how it went wrong."
+  - emoji: "⚖️"
+    title: "Compare cell by cell"
+    text: "A model that wins in both correct cells is easy to prefer. When two tables look alike, you need sharper summary numbers, which the next lessons build."
+  - emoji: "🔢"
+    title: "More classes, bigger table"
+    text: "With three possible answers the table is 3 by 3; with 40 it is 40 by 40. The size equals the number of classes, and the diagonal is still the right answers."
+task: |
+  Build a confusion matrix by hand, then check it with code.
+
+  Here are made-up labels for 20 emails (1 = spam, 0 = not spam) and a filter's predictions:
+
+  ```python
+  truth = [1,0,0,1,1,0,0,0,1,0,0,1,0,0,0,1,0,0,1,0]
+  pred  = [1,0,1,1,0,0,0,0,1,0,0,1,1,0,0,1,0,0,1,0]
+
+  cells = {"TP": 0, "FP": 0, "FN": 0, "TN": 0}
+  for t, p in zip(truth, pred):
+      if t == 1 and p == 1:
+          cells["TP"] += 1
+      elif t == 0 and p == 1:
+          cells["FP"] += 1
+      elif t == 1 and p == 0:
+          cells["FN"] += 1
+      else:
+          cells["TN"] += 1
+  print(cells)
+  ```
+
+  1. On paper, go through the 20 pairs and tally the four boxes. Then run the code (any online
+     Python runner works) and compare.
+  2. If you have scikit-learn, run `from sklearn.metrics import confusion_matrix` and
+     `print(confusion_matrix(truth, pred))`. Work out which cell is which: is the top-left
+     number the true positives or the true negatives?
+  3. No code: put the two lists in columns A and B of a spreadsheet and count each box with
+     `=COUNTIFS(A2:A21,1,B2:B21,1)` and its three variations.
+
+  Success: your hand tally matches the code (6, 2, 1, 11), and you can say why scikit-learn's
+  top-left cell is 11.
+selfCheck:
+  - q: "A teammate shows you a 2×2 table from a library with no axis labels and says the model has '11 true positives'. What do you check before agreeing?"
+    a: "Which axis is the truth and which is the prediction, and which class comes first. Libraries differ: scikit-learn puts true labels on the rows and sorts classes, so for 0/1 labels the top-left cell is true negatives, not true positives."
+  - q: "Two models get the same number of answers right on a test set of 300. Are they equally good?"
+    a: "Not necessarily. Look at the off-diagonal cells: one might miss many real cases while the other raises many false alarms. Which is better depends on which mistake costs more in your setting."
+  - q: "Your AI routes support tickets into five queues. What does the confusion matrix look like, and where do you look first?"
+    a: "It is 5 by 5. Look at the largest off-diagonal cells: they show which pairs of queues the router mixes up, which tells you where to add examples or sharpen the instructions."
+mcq:
+  - q: "Your ticket router sends each ticket to billing, technical or account. Users complain that tickets land in the wrong queue. How do you find the fix that helps most?"
+    options:
+      - "Lower the router's confidence cutoff for all three queues"
+      - "Find the biggest off-diagonal cell in the 3×3 matrix"
+      - "Retrain it until the overall share correct goes up"
+      - "Add more examples for whichever queue is the smallest"
+    answer: 1
+    explain: "The largest off-diagonal cell names the exact pair of queues being confused, so you know which examples or instructions to fix. A higher share correct could come from the common queue alone, and the smallest queue may not be the one causing complaints."
+  - q: "A teammate runs scikit-learn on 0/1 labels and gets [[110, 22], [29, 142]]. They report 110 true positives. What happened?"
+    options:
+      - "Nothing: the top-left cell is always the true positives"
+      - "The model's predictions and labels were swapped in the call"
+      - "Top-left is true negatives in this library's layout"
+      - "The table is only correct after it has been normalized"
+    answer: 2
+    explain: "scikit-learn puts the true labels on the rows and sorts the classes, so 0 comes first and the top-left is true negatives; the true positives are 142, bottom-right. Swapping arguments would transpose the table but would not move true positives to the top-left."
+  - q: "Model A gets 252 of 300 test cases right; model B gets 245. B misses 10 real positives, A misses 29. Missing a positive is very costly here. Which do you pick?"
+    options:
+      - "Model B, because it misses far fewer real positives"
+      - "Model A, because more total correct answers wins"
+      - "Neither, until both are tested on a larger test set"
+      - "Model A, because seven more right answers is decisive"
+    answer: 0
+    explain: "The total correct hides how the errors are split. When a miss is the expensive error, B's 10 false negatives beat A's 29 even though B raises more false alarms. A bigger test set is useful, but a gap of 19 misses already points one way."
+backupResources:
+  - label: "scikit-learn: confusion_matrix reference (axis order explained)"
+    url: "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html"
+    type: "docs"
+tags:
+  - math
+  - evaluation
+  - confusion-matrix
+  - metrics
+---
+
+**You need:** the idea of a training set and a test set from → machine-learning-fundamentals.
+Nothing else.
+
+A classifier makes yes/no calls, and a single "it was right 85% of the time" hides the most
+useful fact about it: **how** it goes wrong. The confusion matrix is the table that keeps that
+fact. Every metric in this track (precision, recall, sensitivity, ROC, F1, and the agreement
+numbers you'll use to check an LLM judge) is arithmetic on its four boxes.
+
+## The four boxes
+
+Take every test example, compare the model's answer with the truth, and drop it into one box:
+
+- **True positive (TP):** the model said yes, and it was yes.
+- **True negative (TN):** the model said no, and it was no.
+- **False positive (FP):** the model said yes, but it was no. A false alarm.
+- **False negative (FN):** the model said no, but it was yes. A miss.
+
+The diagonal (TP and TN) holds the correct calls; the two off-diagonal boxes hold the mistakes.
+"Positive" just means the class you're looking for, such as spam, fraud or a harmful reply. It
+says nothing about whether the outcome is good.
+
+## Worked example: two models on the same test set
+
+The lecture's heart-disease data gives a random forest these counts on 303 test patients:
+
+1. TP = 142, TN = 110, FN = 29, FP = 22.
+2. Correct calls: 142 + 110 = 252, so 252 ÷ 303 ≈ **83%** right.
+3. Of the 171 patients who really had heart disease (142 + 29), it missed **29**.
+4. Of the 132 who didn't (110 + 22), it wrongly flagged **22**.
+
+A k-nearest-neighbours model on the same data found only 107 true positives and 79 true
+negatives, worse in both correct boxes, so the forest wins outright. Logistic regression
+produced a table close to the forest's, and the two raw tables alone don't settle it. That
+gap is what the next three lessons fill: → sensitivity-specificity turns columns into rates,
+→ precision-recall-tradeoff asks how trustworthy each flag is, and → evaluation-metrics looks at
+every threshold at once.
+
+## More than two classes
+
+With three possible answers the table is 3×3; with 40 it's 40×40. The rule doesn't change:
+the diagonal is right, everything else is a specific mix-up. For a model that sorts support
+tickets into "billing", "technical" and "account", the cell at (true technical, predicted
+billing) tells you exactly which confusion to fix.
+
+```diagram
+          truth
+         yes   no
+pred yes  TP   FP
+     no   FN   TN
+```
+
+## Common mistakes
+
+- **Reading the axes wrong.** The lecture puts predictions on the rows; scikit-learn puts the
+  truth on the rows and sorts classes, so its top-left cell for 0/1 labels is TN. Check labels
+  before you read a single number.
+- **Calling "positive" the good outcome.** It's the class you're detecting. A "positive" for
+  fraud is bad news.
+- **Comparing models on total correct only.** Two models with the same diagonal sum can make
+  very different mistakes.
+- **Building the table on training data.** It has to come from data the model never saw, or
+  every box looks better than reality.
+
+## Where you'll see it in AI
+
+- **Guardrails and moderation:** a filter that blocks harmful replies is a classifier; its misses
+  and false blocks are FN and FP.
+- **LLM-as-judge:** to trust an AI grader you compare its pass/fail calls with human labels in a
+  confusion matrix (→ llm-as-judge, → eval-from-real-traces).
+- **Routing and tagging:** multi-class matrices show which intents or categories an LLM
+  classifier mixes up.
+- **Evals in production:** see → evals-and-testing for how these counts feed a test suite.

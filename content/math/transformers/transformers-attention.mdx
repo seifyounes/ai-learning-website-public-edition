@@ -1,0 +1,236 @@
+---
+title: "Inside a transformer: from tokens to probabilities"
+subtitle: "The pipeline behind every model you call, end to end"
+summary: "Trace a prompt through a transformer from tokens to a sampled next token, and explain embeddings, context size, logits, softmax and temperature."
+changeNote: "Reshaped around its own lecture: the pipeline, embeddings and temperature stay; the attention and KV-cache material moved to their own lessons in the track."
+section: math
+pillar: transformers
+order: 2
+level: advanced
+estMinutes: 35
+taskMinutes: 25
+prerequisites:
+  - llm-next-word-prediction
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "wjZofJX0v4M"
+  published: "2024-04-01"
+  year: 2024
+  minutes: 27
+  title: "Transformers, the tech behind LLMs | Deep Learning Chapter 5"
+  channel: "3Blue1Brown"
+  why: "It animates the whole path on a real GPT-style model: tokens, embeddings, the blocks in the middle, and the unembedding back to next-token probabilities, with GPT-3's actual matrix sizes. It explains each step at a pace that builds intuition rather than listing components, and it sets up the three ideas the rest of the track depends on: embeddings as directions, dot products as alignment, and softmax."
+  notes:
+    - "3:06 A high-level preview of how data flows through a transformer: tokens, vectors, attention blocks, MLP blocks, and a distribution over the next token."
+    - "12:31 Embeddings: the embedding matrix, directions that carry meaning (gender, plurality), and the dot product as a measure of alignment."
+    - "20:23 The end of the network: the unembedding matrix, softmax, temperature and what logits are."
+applyIt: |
+  **Everything a model sees is tokens inside a fixed context window, so measure your own text in
+  tokens before you decide what to send.** Tokens are not words: names, numbers, code and
+  non-English text often split into more pieces than you'd guess, and that changes both cost
+  and how much fits.
+
+  1. Take three texts you'd realistically give a model: a typical document from your work or
+     course, a page of code or a spreadsheet export, and a short message in another language
+     you use (if any).
+  2. Paste each into a tokenizer viewer (OpenAI's online tokenizer, or the token counter in
+     your provider's console) and note the token count and the words-per-token ratio.
+  3. Compare the counts with the context window and per-token price of a model you use, and
+     write down how many of each text fit in one call.
+
+  **If you build software:** count tokens with the tokenizer library that matches your model
+  before sending, and trim or chunk inputs on token counts, not characters. **If you don't
+  code:** when a long chat starts "forgetting" early details, assume the early part has fallen
+  out of what the model can use, and restate the key facts.
+
+  Success: a three-row table of token counts and how many copies of each text fit in one call.
+recap:
+  - emoji: "🔁"
+    title: "Predict, sample, repeat"
+    text: "GPT means generative pretrained transformer. It predicts a distribution over the next chunk of text; sample from it, append, and run again, and you get a story or a chat reply."
+  - emoji: "🧩"
+    title: "The flow in one pass"
+    text: "Text is cut into tokens, each token becomes a vector, and the vectors alternate between attention blocks, where they exchange information, and MLP blocks, where each is updated on its own."
+  - emoji: "⚖️"
+    title: "Weights versus data"
+    text: "Almost all the computation is matrices of learned weights multiplying vectors of data. GPT-3's 175 billion weights sit in just under 28,000 matrices of eight kinds."
+  - emoji: "🧭"
+    title: "Embeddings as directions"
+    text: "The embedding matrix gives each token a starting vector. Training makes directions meaningful, so woman minus man roughly matches queen minus king, and dot products measure how aligned two vectors are."
+  - emoji: "🪟"
+    title: "A fixed window"
+    text: "The network processes a fixed number of vectors, its context size: 2,048 for GPT-3. Anything outside the window can't influence the prediction."
+  - emoji: "🎯"
+    title: "Back to words"
+    text: "The unembedding matrix maps the last vector to one score per token in the vocabulary, the logits. Softmax turns them into probabilities."
+  - emoji: "🌡️"
+    title: "Temperature"
+    text: "Dividing the logits by a temperature before softmax changes the spread. Low temperature favours the top token; high temperature gives unlikely tokens more chance, and more risk of nonsense."
+task: |
+  Feel what temperature does to a real distribution, then count where some of GPT-3's
+  parameters live.
+
+  ```python
+  import numpy as np
+
+  tokens = ["Snape", "Lupin", "Quirrell", "banana"]
+  logits = np.array([4.0, 2.5, 2.0, -1.0])
+
+  def softmax(z, T=1.0):
+      e = np.exp((z - z.max()) / T)
+      return e / e.sum()
+
+  rng = np.random.default_rng(0)
+  for T in [0.2, 0.7, 1.0, 1.5]:
+      p = softmax(logits, T)
+      picks = rng.choice(tokens, size=1000, p=p)
+      counts = {t: int((picks == t).sum()) for t in tokens}
+      print(f"T={T}:", p.round(3), counts)
+  ```
+
+  Before running, predict at which temperature "banana" first shows up more than 10 times.
+  Then, on paper: GPT-3 has a vocabulary of 50,257 tokens and 12,288-dimensional embeddings.
+  How many weights are in the embedding matrix, in the embedding plus unembedding matrices,
+  and what fraction of 175 billion is that?
+
+  **No-code path:** do the softmax for T = 1 and T = 0.5 in a spreadsheet with `=EXP(A1/T)`
+  and divide each by the column total.
+
+  Success: your temperature prediction is checked against the counts, and you get about 617
+  million, 1.24 billion and under 1%.
+selfCheck:
+  - q: "Walk the pipeline: what happens between your prompt string and the model's first output token?"
+    a: "Text → tokens → embedding vectors → N transformer blocks (attention mixes information across positions, MLPs transform each position) → final vector → unembedding to logits over the vocabulary → softmax → sample the next token. Then the loop repeats with the new token appended."
+  - q: "Your data-extraction feature returns slightly different JSON fields on identical inputs, and a teammate wants to raise the temperature 'to help it find the right answer'. What do you advise?"
+    a: "The opposite. Temperature divides the logits before softmax; raising it flattens the distribution, so lower-ranked tokens get picked more often and outputs vary more. For extraction, use a low temperature (or 0) so the top token wins at each step, and fix remaining errors with a clearer schema or examples."
+mcq:
+  - q: "At the end of the network, only the last token's vector is turned into next-token probabilities when generating. Why can that one vector be enough?"
+    options:
+      - "The last token is always the most important word in the prompt"
+      - "Attention layers have already let it absorb the earlier context"
+      - "The other vectors are discarded after the embedding step"
+      - "The model only reads the last few tokens of any prompt"
+    answer: 1
+    explain: "By the final layer, attention in every block has let the last position pull in information from all earlier positions, so its vector carries the context needed for the prediction. The other vectors aren't thrown away: they're used during the computation, and in training each one predicts its own next token."
+  - q: "A chatbot with a 2,048-token context window starts contradicting what the user said in turn 2 of a long conversation. What's the most likely cause?"
+    options:
+      - "The model's weights drifted after many replies in one session"
+      - "The temperature rose automatically as the chat grew longer"
+      - "The early turns fell outside the window and no longer count"
+      - "The embeddings of early tokens decayed toward zero over time"
+    answer: 2
+    explain: "The network only processes a fixed number of tokens; once the conversation is longer than that, the earliest turns have to be dropped and can't influence the prediction. Weights don't change during a chat, and temperature is a setting you choose."
+  - q: "You set temperature to 0 for a summarizer and get the same output every time. A colleague says that proves the model is certain of its summary. What's wrong with that reasoning?"
+    options:
+      - "Temperature 0 just takes the top token, however close the race"
+      - "Temperature 0 makes the model reread the source more carefully"
+      - "Temperature 0 switches off softmax and returns raw logits as text"
+      - "Temperature 0 is only possible when the model is very confident"
+    answer: 0
+    explain: "At temperature 0 the highest-scoring token always wins, even if it led the runner-up by a hair. Repeatable output shows the decoding rule, not confidence; to see uncertainty, look at the probabilities or sample at a normal temperature and compare."
+  - q: "In a word-embedding model, the dot product of the 'cats minus cat' direction with 'apples' is higher than with 'apple'. What does that suggest?"
+    options:
+      - "The model has stored a rule that words ending in s are plural"
+      - "Apple and apples have the same embedding with a different length"
+      - "The model has misread apples as a type of cat during training"
+      - "Training made one direction roughly encode being plural"
+    answer: 3
+    explain: "A positive, larger dot product means 'apples' points further along the cats-minus-cat direction, which suggests training settled on a direction that roughly encodes plurality. Nobody wrote a rule; the geometry emerged from data, and the two words have genuinely different vectors."
+backupResources:
+  - label: "Go deeper: Stanford CS25: V4 I Overview of Transformers (Stanford Online, 77 min)"
+    url: "https://www.youtube.com/watch?v=fKMB5UlVY1E"
+    type: "video"
+tags:
+  - math
+  - transformers
+  - embeddings
+  - softmax
+  - architecture
+---
+
+**You need:** dot products (→ dot-product-duality), matrix shapes (→ nonsquare-matrices-dimensions) and the idea of a
+model as a next-word predictor (→ llm-next-word-prediction). No new maths beyond those.
+
+A transformer turns text into a probability for every possible next token, and almost all of
+the work is **matrices of learned weights multiplying vectors of data**. This lesson follows
+one prompt from start to finish so that every later lesson in the track has a place to land:
+attention, the MLP layers, the code and the KV cache are each one box of this pipeline.
+
+## The pipeline in one paragraph
+
+Your prompt becomes **tokens** (words, pieces of words, punctuation), and each token becomes
+an **embedding vector**. The vectors flow through N identical **blocks**. Each block has an
+**attention** step where vectors exchange information (→ query-key-value-attention), then an
+**MLP** where each vector is transformed on its own (→ mlp-layers-store-facts). The last vector
+is **unembedded** into one score per vocabulary token, the **logits**, softmaxed into a
+distribution, and a token is sampled. Append it and run again.
+
+```diagram
+prompt text
+   │
+   ▼
+tokens
+   │ × W_E (embedding)
+   ▼
+vectors, one per token
+   │
+   ▼
+[attention → MLP] × N
+   │
+   ▼
+last vector
+   │ × W_U (unembedding)
+   ▼
+logits, one per token
+   │ softmax(logits / T)
+   ▼
+probabilities → sample
+```
+
+## Embeddings: meaning as direction
+
+The **embedding matrix** W_E has one column per token in the vocabulary. In GPT-3 that's 50,257
+tokens, each with a 12,288-number vector. The values start random and are learned, and
+training tends to make **directions** meaningful: the difference between "woman" and "man" is
+roughly the difference between "queen" and "king". The **dot product** measures how well two
+vectors align: positive when they point the same way, zero when perpendicular, negative when
+opposed. That one operation is the heart of attention in the next lesson.
+
+The model also has a **context size**, the fixed number of vectors it processes at once
+(2,048 for GPT-3). Text outside that window can't affect the prediction.
+
+## Worked example: logits, softmax and temperature
+
+Suppose the last vector, multiplied by the unembedding matrix, gives logits 2, 1 and 0 for
+three candidate tokens. Softmax raises e to each value and divides by the total. Dividing
+the logits by a **temperature** T first changes the spread:
+
+| T | token A | token B | token C |
+|---|---|---|---|
+| 0.5 | 0.867 | 0.117 | 0.016 |
+| 1 | 0.665 | 0.245 | 0.090 |
+| 2 | 0.506 | 0.307 | 0.186 |
+
+At T = 1: e² ≈ 7.39, e¹ ≈ 2.72, e⁰ = 1; total 11.11, so 7.39 / 11.11 ≈ 0.665. Halving T makes
+the leader dominate; doubling it gives the third token twice the chance. At T = 0 the top token
+always wins.
+
+And the parameter count: W_E is 50,257 × 12,288 ≈ **617 million** weights, and the
+unembedding W_U has the same shape transposed, so together about **1.24 billion**, under 1% of
+GPT-3's 175 billion. The rest sits in the attention and MLP blocks.
+
+## Common mistakes
+
+- **Thinking tokens are words.** They're often pieces of words; counts and costs are in tokens.
+- **Reading temperature 0 as certainty.** It's a decoding rule that always takes the top token.
+- **Thinking the embedding is the final meaning.** It's only the starting point; the blocks pull
+  each vector toward a meaning that fits its context.
+- **Forgetting the window.** Whatever falls outside the context size has no effect.
+
+## Where you'll see it in AI
+
+Temperature and token limits in every API, embeddings for search and retrieval
+(→ embeddings-vector-databases), token budgets and context windows (→ tokens-and-context), and
+the rest of this track: attention next, then the MLPs, the code, and the KV cache that makes
+generation fast (→ kv-cache-inference).

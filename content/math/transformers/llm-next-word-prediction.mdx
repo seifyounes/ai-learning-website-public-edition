@@ -1,0 +1,215 @@
+---
+title: "LLMs as next-word predictors"
+subtitle: "The whole system on one page before you open the transformer"
+summary: "Describe what a language model computes, how a chatbot is built on it, and why the same prompt can give different answers."
+changeNote: "New first lesson in the transformers track, written from the lecture's transcript, with a worked sampling example and a quiz."
+section: math
+pillar: transformers
+order: 1
+level: intermediate
+estMinutes: 15
+taskMinutes: 25
+prerequisites:
+  - neural-networks
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "LPZh9BOjkQs"
+  published: "2024-11-20"
+  year: 2024
+  minutes: 8
+  title: "Large Language Models explained briefly"
+  channel: "3Blue1Brown"
+  why: "Before going inside the transformer, you need the outside view: a model that assigns a probability to every possible next word, a chatbot built by asking it to continue a dialogue, and training that tunes billions of parameters. This 8-minute lecture gives exactly that map, and every later lesson in the track zooms into one box of it."
+applyIt: |
+  **Treat every answer as one sample from a distribution, not as the model's single
+  opinion.** Once you see generation as repeated next-word sampling, three habits follow: ask
+  more than once when it matters, lower randomness when you need consistency, and give the
+  model text that makes the right continuation the likely one.
+
+  1. Pick a question from your work or studies where a wrong answer would cost you something
+     (a formula, a policy summary, a code explanation).
+  2. Ask it three times in fresh chats. Where the three answers agree, confidence is higher;
+     where they differ, that is the part to check against a source.
+  3. Rewrite the prompt so the right answer is the natural continuation: paste the source
+     passage first, then ask. Compare the three new answers with the first three.
+
+  **If you build software:** set temperature low (or 0) for extraction and classification
+  calls and keep it higher for brainstorming, and log the setting with every call so you can
+  explain a change in behaviour. **If you don't code:** the "regenerate" button is a free
+  second sample; use it before trusting a surprising answer.
+
+  Success: one question where you can say whether the model's answer was stable across samples.
+recap:
+  - emoji: "🎬"
+    title: "A script with a missing reply"
+    text: "Picture a movie script where the assistant's lines are torn out. A model that predicts the next word well enough can fill them in, one word at a time."
+  - emoji: "🎲"
+    title: "Probabilities, not one answer"
+    text: "The model doesn't pick a word; it gives every possible next word a probability. Sampling from that spread, sometimes taking less likely words, is why the same prompt can give different answers."
+  - emoji: "🤖"
+    title: "How a chatbot is built"
+    text: "Put a description of a helpful assistant first, then the user's message, and let the model continue the text as the assistant would. The chatbot is a framing around a predictor."
+  - emoji: "🎛️"
+    title: "Parameters do the work"
+    text: "The predictions come from a huge number of continuous values called parameters. They start random and are nudged, example after example, by backpropagation until predictions improve."
+  - emoji: "🏋️"
+    title: "Two kinds of training"
+    text: "Pretraining on vast amounts of text teaches next-word prediction. Further training with human feedback then tunes the model toward answers people rate as more helpful."
+  - emoji: "⚡"
+    title: "Why transformers"
+    text: "Older models read text one word at a time. Transformers take it in all at once, turn each piece into a vector, and refine those vectors with attention and feed-forward layers before predicting from the last one."
+  - emoji: "🌀"
+    title: "Designed, then emergent"
+    text: "Researchers design the steps, but the behaviour comes from how training tunes the parameters. That's why it's so hard to say exactly why a model predicts what it does."
+task: |
+  Build the simplest possible next-word predictor and sample from it, so "a distribution over
+  the next word" stops being abstract.
+
+  ```python
+  import random
+  from collections import Counter, defaultdict
+
+  text = """paste two or three paragraphs of any text here, the more the better"""
+  words = text.lower().split()
+
+  # Count which word follows which: a bigram table.
+  follows = defaultdict(Counter)
+  for a, b in zip(words, words[1:]):
+      follows[a][b] += 1
+
+  def next_word_probs(word):
+      counts = follows[word]
+      total = sum(counts.values())
+      return {w: round(c / total, 2) for w, c in counts.most_common(5)}
+
+  print(next_word_probs("the"))
+
+  # Generate 15 words by sampling, then run it again.
+  word = "the"
+  out = [word]
+  for _ in range(15):
+      options = follows[word]
+      if not options:
+          break
+      word = random.choices(list(options), weights=options.values())[0]
+      out.append(word)
+  print(" ".join(out))
+  ```
+
+  Run the generation three times and compare. Then change `random.choices(...)` to always take
+  `options.most_common(1)[0][0]` and run it again.
+
+  **No-code path:** take one paragraph, and in a spreadsheet list every word that follows "the"
+  with its count; divide each count by the total to get probabilities.
+
+  Success: you can point at the line that makes two runs differ, and say what the
+  always-most-likely version loses.
+selfCheck:
+  - q: "A colleague asks the same assistant the same question twice and gets two different answers, so they conclude the tool is broken. What would you tell them?"
+    a: "It isn't broken: the model produces probabilities for the next token and the app samples from them, often picking less likely tokens on purpose so replies sound natural. Different samples give different wording and sometimes different claims. Where answers disagree is exactly where to check a source; a lower temperature makes outputs more repeatable."
+  - q: "Someone says 'the chatbot and the language model are the same thing'. What's the difference, using what this lecture showed?"
+    a: "The language model only continues text. The chatbot is a setup around it: a hidden opening that describes an assistant, the user's message placed in a dialogue, and the model asked to continue as the assistant, plus extra training on human feedback so those continuations are more helpful."
+mcq:
+  - q: "A model gives the next word after 'The capital of Australia is' as 'Canberra' 70%, 'Sydney' 20%, other 10%. Your app samples. Over 100 calls, what should you expect?"
+    options:
+      - "Canberra every time, since it has the highest probability"
+      - "Roughly 20 wrong answers naming Sydney across the calls"
+      - "A different answer every call, since sampling is random"
+      - "Sydney once the model notices it got repeated feedback"
+    answer: 1
+    explain: "Sampling draws from the distribution, so about 20% of calls land on 'Sydney'. Always taking the top word would give Canberra every time, but that's a setting, not what sampling does; the model also doesn't learn from your calls at inference time."
+  - q: "Pretraining makes a model good at continuing internet text. Why isn't that enough to make a good assistant?"
+    options:
+      - "The pretrained model can't read a question until it's fine-tuned"
+      - "Pretraining only covers grammar, so facts must be added later"
+      - "Likely continuations of web text aren't always helpful replies"
+      - "Pretrained models can only produce one word per prompt"
+    answer: 2
+    explain: "Pretraining rewards predicting what text usually comes next, and the most likely continuation of a question on the web may be another question, a rant or an ad. Training with human feedback shifts the model toward replies people judge helpful. Pretraining already teaches plenty of facts and the model can read any text."
+  - q: "Why did transformers make it practical to train on far more text than older language models?"
+    options:
+      - "They read all positions of a passage in parallel"
+      - "They store the training text and look it up later"
+      - "They need far fewer parameters than older designs"
+      - "They skip backpropagation and train in one pass"
+    answer: 0
+    explain: "Earlier models processed text one word after another, so training couldn't use a GPU's parallelism well. A transformer processes every position at once, which turns training into big parallel matrix work. It still trains by backpropagation and doesn't store text verbatim."
+tags:
+  - math
+  - transformers
+  - language-models
+  - sampling
+---
+
+A large language model computes one thing: **given some text, a probability for every possible
+next word** (strictly, the next token). Everything else you see, chat, code, essays, is that one
+prediction run in a loop. Hold onto this before you open the transformer: every part of the
+architecture exists to make that one prediction better.
+
+## From predictor to chatbot
+
+A chatbot is built around the predictor, not inside it. The app writes a short opening that
+describes an assistant, places your message after it like a line in a script, and asks the
+model to continue as the assistant would. The model produces a distribution, the app picks a
+word from it, appends that word, and asks again. The reply you read is dozens or hundreds of
+those picks in a row.
+
+The pick is usually **sampled**, not the single most likely word. Always taking the top word
+tends to produce flat, repetitive text, so apps let less likely words through some of the time.
+That is why the same prompt can give different answers.
+
+## Worked example: sampling one word
+
+Suppose that after "I drink my coffee with", the model's top five next words are:
+
+| next word | probability |
+|---|---|
+| milk | 0.45 |
+| sugar | 0.25 |
+| cream | 0.15 |
+| friends | 0.10 |
+| oat | 0.05 |
+
+These numbers are made up for illustration, but the mechanics are real:
+
+- **Greedy decoding** always takes "milk". Ask 100 times, get "milk" 100 times.
+- **Sampling** takes "milk" about 45 times out of 100, "sugar" about 25, and "friends" about 10.
+  Each choice changes every later prediction, so two replies can drift far apart after a few
+  words.
+- A 300-word reply is about 300 of these draws (more, counted in tokens), each conditioned on
+  everything chosen so far.
+
+## Where the predictions come from
+
+The probabilities come from a function with an enormous number of adjustable numbers,
+**parameters** (or weights). Nobody sets them by hand. Training starts them at random, shows
+the model real text, measures how much probability it gave the word that actually came next,
+and uses backpropagation (→ backprop-intuition) to nudge every parameter so that word becomes a bit
+more likely. Repeated over a vast amount of text, that is **pretraining**. The scale is hard
+to picture: the lecture estimates that a person reading GPT-3's training text nonstop would
+need over 2,600 years. A second stage, reinforcement learning from human feedback, has people
+flag unhelpful answers and tunes the model toward replies they prefer.
+
+The architecture that made this scale is the **transformer**. It reads every position of the
+text at once instead of word by word, turns each token into a vector, and refines those
+vectors through layers of **attention** (tokens exchange information) and **feed-forward
+networks** (each token is transformed on its own). The rest of this track opens those boxes
+one at a time.
+
+## Common mistakes
+
+- **Treating one answer as "what the model thinks".** It's one sample; another sample can
+  differ, and the disagreement is informative.
+- **Assuming the chatbot learns from your chat.** The parameters are fixed while you use it;
+  only what's in the context changes.
+- **Picturing a database lookup.** The model stores no list of facts to retrieve; it produces
+  probabilities from parameters shaped by training.
+
+## Where you'll see it in AI
+
+Temperature and sampling settings in every API, the "regenerate" button, evals that sample
+several times per question (→ evals-and-testing), and the token-by-token generation whose
+speed you'll measure in → kv-cache-inference. The practitioner's view of the same idea is in
+→ what-is-an-llm. Next up, → transformers-attention follows one
+prompt through the whole transformer.

@@ -1,0 +1,205 @@
+---
+title: "Vectors: the shape of an embedding"
+subtitle: "Arrows, lists of numbers, and the two operations everything else is built from"
+summary: "Read an embedding as both an arrow and a list of numbers, and add and scale vectors by hand the way models average and mix them."
+changeNote: "Reshaped into lesson 1 of the linear algebra track: now covers only the vectors lecture, with a new worked example and quiz."
+section: math
+pillar: linear-algebra
+order: 1
+level: intermediate
+estMinutes: 15
+taskMinutes: 25
+prerequisites:
+  - what-is-an-llm
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "fNk_zzaMoSs"
+  published: "2016-08-05"
+  year: 2016
+  minutes: 10
+  title: "Vectors | Chapter 1, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "3Blue1Brown teaches the geometry (a vector as an arrow you can see move) alongside the list of numbers, and holding both pictures at once is exactly what reading embeddings needs. Chapter 1 is ten minutes, sets the conventions the rest of the series uses, and introduces the only two operations the whole subject is built from: adding vectors and scaling them."
+  notes:
+    - "0:00 the three views of a vector (arrow, list, anything you can add and scale). The house-price example at 0:30 is the list view a dataset uses."
+    - "4:36 vector addition tip to tail, and at 5:45 why it matches adding numbers on a number line."
+    - "6:49 scaling by 2, by one-third and by a negative number; 8:22 why translating between the two pictures is the real skill."
+applyIt: |
+  **Every embedding you meet is a list of numbers you can also picture as an arrow.** Seeing it
+  both ways turns "the model averaged the chunk" or "we blended two styles" into something you
+  can check.
+
+  1. Pick one place you already meet embeddings: a notes app's "related notes", a semantic
+     search box at work, a recommendation row, or the retrieval step of a document chatbot.
+  2. Write down what one item there becomes: a list of a few hundred to a few thousand numbers
+     (the model's documentation gives the exact size).
+  3. Write one sentence on what adding and scaling would mean there. For example: "averaging
+     the vectors of every sentence in a page gives one arrow that points between all of them,
+     which is why a page about three topics can match none of them well."
+
+  **If you build software:** find where your code averages or sums vectors (mean pooling, a
+  user profile built from past items) and note it in a comment. **If you don't code:** keep the
+  sentence in your notes; it explains a lot of odd search results.
+
+  Success: one named place you meet embeddings, its vector size, and one sentence on what
+  adding or averaging vectors does there.
+recap:
+  - emoji: "👀"
+    title: "Three views of one thing"
+    text: "A physicist sees an arrow with a length and a direction. A programmer sees an ordered list of numbers. A mathematician only cares that you can add them and scale them."
+  - emoji: "📍"
+    title: "Rooted at the origin"
+    text: "In linear algebra every arrow starts at the origin, so an arrow and the point at its tip are the same thing. That's what lets a list of numbers stand for an arrow."
+  - emoji: "🧭"
+    title: "Coordinates are directions"
+    text: "Each number is an instruction: how far to walk along one axis, then the next. Every list gives exactly one arrow and every arrow exactly one list, in two dimensions, three, or 768."
+  - emoji: "➕"
+    title: "Adding: tip to tail"
+    text: "Put the second arrow's tail on the first arrow's tip; the sum points to where you end up. In numbers you just add matching entries."
+  - emoji: "✖️"
+    title: "Scaling: stretch or flip"
+    text: "Multiplying by a number stretches, shrinks or (if negative) flips an arrow along its own line. That number is called a scalar because it scales."
+  - emoji: "🔁"
+    title: "Translate between the pictures"
+    text: "The power of the subject is moving back and forth: compute with lists, reason with arrows. Every later idea is built on these two operations."
+task: |
+  Do the two operations by hand, then let a few lines of Python confirm them.
+
+  **On paper (10 minutes).** Draw axes. Draw v = (2, 1) and w = (−1, 3). Draw v + w tip to tail
+  and check it lands on (1, 4). Draw 2v, −v and 0.5w. Then compute the average of
+  a = (4, 0), b = (0, 4) and c = (2, 2) by adding them and multiplying by 1/3. Where does the
+  average point, and is it as long as the inputs?
+
+  **In Python (10 minutes, free Google Colab works).**
+
+  ```python
+  def add(u, v):
+      return [a + b for a, b in zip(u, v)]
+
+  def scale(k, v):
+      return [k * a for a in v]
+
+  vs = [[4, 0], [0, 4], [2, 2]]
+  total = [0, 0]
+  for v in vs:
+      total = add(total, v)
+  print(scale(1 / len(vs), total))  # the average vector
+  ```
+
+  Change `vs` to two vectors that point in opposite directions, such as [3, 1] and [−3, −1],
+  and look at their average. Write one line on what that means for averaging the embeddings of
+  a document that argues both sides of something.
+
+  Success: your paper answers match the script, and you can say in one line why the average of
+  opposite vectors is short.
+selfCheck:
+  - q: "A teammate builds a 'user interest' vector by averaging the embeddings of everything a user clicked. One user clicked cooking videos and car reviews in equal measure. What will their interest vector look like, and why might recommendations feel off?"
+    a: "It points between the two topic directions and is shorter than either, so it sits near neither cluster. Nearest-neighbour search then returns items that are only loosely related to both. Keeping one vector per interest, or clustering the clicks first, avoids the blur."
+  - q: "You read that an embedding model outputs 1,536 numbers per text. A friend says 'so it's not really an arrow, that's just a metaphor.' How would you answer?"
+    a: "The list and the arrow are the same object: each number is how far to go along one axis, just in 1,536 axes instead of two. You can't draw it, but adding, scaling, lengths and angles all work exactly as in 2D, which is why the 2D picture is a reliable guide."
+mcq:
+  - q: "A search tool embeds a long page by averaging the vectors of its paragraphs. The page has one paragraph on refunds and nine on shipping. A user asks about refunds. What should you expect?"
+    options:
+      - "The refunds paragraph dominates because it's distinct"
+      - "The page vector leans toward shipping and may rank low"
+      - "Averaging keeps every topic equally visible to search"
+      - "The page vector ends up about ten times as long as before"
+    answer: 1
+    explain: "An average is a sum scaled by 1/n, so nine shipping vectors pull the result toward the shipping direction and the refunds signal is diluted. Averaging never keeps topics separate; that's why long pages are split into chunks. Scaling by 1/10 keeps the length in the range of the inputs, not ten times larger."
+  - q: "Two embedding vectors are u = (0.6, −0.2, 0.1) and v = (−0.6, 0.2, −0.1). What is true of them?"
+    options:
+      - "They are unrelated because they share no positive entries"
+      - "They are the same vector stored with a different sign"
+      - "They point in exactly opposite directions"
+      - "They differ only in length, not in direction"
+    answer: 2
+    explain: "v is u scaled by −1, and multiplying by a negative number flips an arrow to face the other way along the same line. Their lengths are equal, so it isn't a length difference, and the sign change is not cosmetic: it reverses the direction."
+  - q: "You want a single vector halfway between the embeddings of 'formal' and 'casual' to steer a style. Which computation gives it?"
+    options:
+      - "Add the two vectors and multiply the result by 0.5"
+      - "Subtract the casual vector from the formal vector"
+      - "Multiply the two vectors entry by entry together"
+      - "Keep whichever of the two has the larger entries"
+    answer: 0
+    explain: "Adding tip to tail and halving lands on the midpoint between the two tips. Subtracting gives the arrow from one to the other (a direction of change, not a midpoint), and multiplying entries together is not one of the two vector operations at all."
+backupResources:
+  - label: "Essence of linear algebra — full series (3Blue1Brown)"
+    url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab"
+    type: "course · the whole arc"
+  - label: "Mathematics for Machine Learning — free book (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+  - embeddings
+---
+
+**You need:** high-school algebra: multiplying, adding and reading a short formula. No
+calculus, and no linear algebra beyond what this track builds.
+
+This track re-reads linear algebra as the machinery inside the models you use. It starts with
+the one object everything else acts on: the **vector**. An embedding, a token's hidden state, a
+row of a dataset and a model's output scores are all vectors, so the habits you build in this
+lesson carry through every later one.
+
+## One object, two pictures
+
+A vector is an **ordered list of numbers**: (2, 1), or (0.12, −0.40, 0.88, …) with 768
+entries. It is also an **arrow** that starts at the origin and ends at the point those numbers
+name. Each number says how far to go along one axis.
+
+Neither picture is the "real" one. The list is what you store and compute with; the arrow is
+what you reason with. When a search tool says two texts are "close", it means their arrows
+point in similar directions. You can't draw 768 axes, but every rule you see in two dimensions
+still holds there, which is why the flat picture is a trustworthy guide.
+
+## The two operations
+
+Everything in linear algebra is built from two moves.
+
+- **Adding** two vectors: put the second arrow's tail on the first one's tip; the sum points to
+  where you end up. In numbers, add matching entries.
+- **Scaling** a vector by a number (a **scalar**): stretch it, shrink it, or flip it with a
+  negative number. In numbers, multiply every entry.
+
+Combine them and you get averages, blends and differences, which models use constantly.
+
+## Worked example: averaging three embeddings
+
+Real embeddings have hundreds of entries, but the arithmetic is the same in two. Say three
+sentences of a paragraph embed to a = (4, 0), b = (0, 4) and c = (2, 2).
+
+1. **Add.** a + b + c = (4 + 0 + 2, 0 + 4 + 2) = (6, 6).
+2. **Scale by 1/3.** (6, 6) × 1/3 = **(2, 2)**.
+
+The average points diagonally, between a and b, and it equals c, the sentence that was already
+"in the middle". Now try two sentences that disagree: (3, 1) and (−3, −1). Their sum is (0, 0),
+so the average is the zero vector, an arrow with no direction at all. That is the same reason a
+chunk that covers several unrelated topics gets a vector that matches none of them well.
+
+## Common mistakes
+
+- **Treating one entry as a meaning.** A single coordinate of a learned embedding rarely stands
+  for a human concept; meaning lives in the direction of the whole arrow (more on this in
+  → change-of-basis-embeddings).
+- **Forgetting that averaging dilutes.** Mean pooling, user profiles and chunk vectors are all
+  averages; the more different the inputs, the shorter and vaguer the result.
+- **Mixing vectors from different models.** Adding or comparing vectors only makes sense when
+  they live in the same space, which means the same model (and version) produced them.
+- **Reading a negative scalar as "less".** Multiplying by −1 doesn't shrink an arrow; it
+  reverses it.
+
+## Where you'll see it in AI
+
+- **Embeddings and search:** every text, image or item becomes a vector, and search compares
+  arrows (→ cosine-similarity-search, → embeddings-vector-databases).
+- **Mean pooling:** many embedding models turn a sequence of token vectors into one vector by
+  averaging them, which is the worked example above.
+- **Residual connections:** a transformer layer adds its output back onto its input vector,
+  tip to tail (→ transformers-attention).
+- **Training updates:** a gradient step scales a direction by the learning rate and adds it to
+  the weights (→ calculus-for-optimization).
+
+Next, → span-and-basis-vectors asks what you can reach by combining vectors this way.

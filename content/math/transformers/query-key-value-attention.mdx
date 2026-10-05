@@ -1,0 +1,236 @@
+---
+title: "Attention: queries, keys and values"
+subtitle: "How one token pulls meaning from the others, computed by hand"
+summary: "Compute one attention head by hand, explain the causal mask and the √d scaling, and say why attention cost grows with the square of the length."
+changeNote: "New lesson in the transformers track, written from the lecture's transcript; the Q·K·V diagram and two quiz questions moved here from the pipeline lesson."
+section: math
+pillar: transformers
+order: 3
+level: advanced
+estMinutes: 30
+taskMinutes: 30
+prerequisites:
+  - transformers-attention
+  - dot-product-duality
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "eMlx5fFNoYc"
+  published: "2024-04-07"
+  year: 2024
+  minutes: 26
+  title: "Attention in transformers, step-by-step | Deep Learning Chapter 6"
+  channel: "3Blue1Brown"
+  why: "The pipeline lesson treated attention as a box where tokens exchange information. This lecture opens the box: the query, key and value matrices, the grid of dot-product scores, softmax, the causal mask, and how many heads run side by side. It works one example sentence all the way through, so the formula arrives with a picture attached."
+  notes:
+    - "6:22 Queries: a noun like 'creature' asking whether adjectives sit in front of it, computed with the query matrix into a 128-number space."
+    - "11:05 Masking: why later tokens must not influence earlier ones in training, and why scores are set to minus infinity before softmax."
+    - "13:12 Value vectors and how the weighted sum is added to each embedding; then the parameter count for one head and for 96 heads."
+applyIt: |
+  **Attention is a soft lookup that weighs the whole context, so what you put near the
+  question and how clearly it matches the question decide what the model uses.** Text that
+  shares words and ideas with what you ask scores high; text that doesn't gets little weight,
+  however important you think it is.
+
+  1. Take a long prompt you reuse (a report request, a code-review prompt, a study prompt) and
+     find the one instruction that the model most often ignores.
+  2. Check how it's phrased against the material it applies to. If the instruction says
+     "customers" and the data says "accounts", say both.
+  3. Move the instruction next to the material it governs, or restate it right before the
+     question, and compare three outputs before and after.
+
+  **If you build software:** in a retrieval system, put each retrieved chunk under a heading
+  that names what it is, and put the user's question after the chunks, so the question's
+  tokens can attend to clearly labelled evidence. **If you don't code:** when you paste a long
+  document, label its sections and refer to them by those labels in your question.
+
+  Success: one instruction that the model now follows more often than before, with three
+  before-and-after outputs to show it.
+recap:
+  - emoji: "🐾"
+    title: "Same word, different meanings"
+    text: "After embedding, a word like 'mole' has one vector whatever it means. Attention's job is to let the context move that vector toward the right meaning."
+  - emoji: "❓"
+    title: "Queries ask"
+    text: "Each token's embedding is multiplied by a query matrix into a small vector that roughly asks 'what am I looking for?', such as a noun asking for adjectives in front of it."
+  - emoji: "🔑"
+    title: "Keys answer"
+    text: "A key matrix turns each token into a key. Where a key lines up with a query, their dot product is large: that token is relevant to the one asking."
+  - emoji: "📊"
+    title: "Scores become weights"
+    text: "The grid of query-key dot products is divided by the square root of the key size, and softmax turns each query's scores into weights between 0 and 1 that sum to 1."
+  - emoji: "🙈"
+    title: "No peeking ahead"
+    text: "In training, later tokens must not influence earlier ones. Their scores are set to minus infinity before softmax, so their weights become exactly zero."
+  - emoji: "➕"
+    title: "Values carry the change"
+    text: "Each token also produces a value vector. The weighted sum of values is added to the token's embedding, nudging it toward a meaning that fits the context."
+  - emoji: "🧠"
+    title: "Many heads at once"
+    text: "One head is one pattern of lookup. A layer runs many heads in parallel with their own matrices (96 in GPT-3), and each head's proposed change is added to the embedding."
+task: |
+  Compute one attention head by hand, then check it with code.
+
+  Three tokens, "fluffy", "blue", "creature", with 2-number keys, values and a query for
+  "creature":
+
+  - keys: fluffy [2, 0], blue [1, 1], creature [0, 0.5]
+  - values: fluffy [1, 0], blue [0, 1], creature [0, 0]
+  - query of "creature": [1, 1]
+
+  On paper: compute the three dot products, divide by √2, softmax, and blend the values. Then
+  repeat for "fluffy" with query [0, 1], applying the causal mask (it can only see itself).
+
+  ```python
+  import numpy as np
+
+  K = np.array([[2, 0], [1, 1], [0, 0.5]])
+  V = np.array([[1, 0], [0, 1], [0, 0]])
+  q = np.array([1, 1])
+
+  scores = K @ q / np.sqrt(K.shape[1])
+  weights = np.exp(scores) / np.exp(scores).sum()
+  print("weights:", weights.round(3))
+  print("output:", (weights @ V).round(3))
+  ```
+
+  Then change the key of "creature" to [3, 3] and predict, before running, what happens to
+  the weights.
+
+  Success: your hand numbers match the code to two decimals, and your prediction for the
+  changed key was right.
+selfCheck:
+  - q: "A head that links pronouns to nouns gives 'it' in 'The trophy didn't fit in the suitcase because it was too big' a high weight on 'trophy'. Which vectors produced that weight, and what actually flows into 'it'?"
+    a: "The query of 'it' and the key of 'trophy': their dot product, scaled and softmaxed against all other scores, became the weight. What flows into 'it' is the weighted sum of the value vectors, mostly trophy's value, added to the embedding of 'it'."
+  - q: "Your team doubles the context length a model accepts. Roughly what happens to the size of each attention score grid, and why?"
+    a: "It grows about four times: the grid has one score for every pair of positions, so n × n becomes 2n × 2n. That quadratic growth is why long contexts cost more compute and memory, and why there is research into cheaper attention variants."
+mcq:
+  - q: "The causal mask lets each token attend only to earlier positions. What would go wrong without it?"
+    options:
+      - "In training, tokens could peek at the next token"
+      - "The model would run out of memory on long prompts"
+      - "Nothing; it only speeds up training, not quality"
+      - "The KV cache would grow twice as fast per token"
+    answer: 0
+    explain: "Next-token training only teaches something if the future is hidden; otherwise 'predict token t+1' is answered by looking at token t+1, and the model never learns to predict. The mask makes training match generation, where the future doesn't exist yet. It's also why caching keys and values works: past states never depend on future tokens."
+  - q: "In 'The animal didn't cross the street because it was too tired', how does one attention head help 'it' work out what it refers to?"
+    options:
+      - "Q holds the grammar, K the vocabulary, V the position"
+      - "'it' always takes the Value of the nearest noun before it"
+      - "'it' sends a Query; 'animal' has the best-matching Key"
+      - "'animal' sends a Query out and 'it' replies with its Key"
+    answer: 2
+    explain: "Attention is a soft lookup: the token being updated ('it') emits a Query, every token offers a Key, the Q·K scores are softmaxed into weights, and the matching tokens' Values (here mostly 'animal') are blended into 'it'. Nearness isn't the rule ('street' is closer), and the roles run from the token being updated outward."
+  - q: "A student removes the division by √d from a head with large keys and queries. Training gets unstable. What most likely happened?"
+    options:
+      - "The scores turned negative, so softmax returned errors"
+      - "Big scores pushed softmax to near one-hot, so gradients faded"
+      - "The value vectors grew as large as the unscaled scores"
+      - "The mask stopped working because the scores overflowed it"
+    answer: 1
+    explain: "Dot products of long vectors grow with the vector size, and softmax of large numbers puts almost all the weight on one position, where its gradient is nearly zero. Dividing by √d keeps scores in a range where softmax stays soft. Softmax handles negative scores fine; the scaling never touches the values."
+  - q: "Why does a transformer layer use many attention heads instead of one bigger head?"
+    options:
+      - "Each head handles a different slice of the context window"
+      - "One head can't fit in memory, so the work is split up"
+      - "Heads vote, and the most common answer is kept"
+      - "Each head can learn its own kind of relationship"
+    answer: 3
+    explain: "Every head has its own query, key and value matrices, so one can track adjectives, another pronouns, another position patterns, all at once, and their outputs are added. Every head sees the whole context, not a slice, and nothing is voted on."
+backupResources:
+  - label: "The Illustrated Transformer (Jay Alammar)"
+    url: "https://jalammar.github.io/illustrated-transformer/"
+    type: "article · the classic diagram walkthrough"
+tags:
+  - math
+  - transformers
+  - attention
+---
+
+Attention is how a token's vector gets updated by the other tokens around it. A word like
+"bank" enters the model with one embedding whatever it means; after attention, the vector for
+"bank" in "river bank" has moved toward a different meaning than in "bank loan". Every
+language model you call does this in every layer, so this is the single most important
+mechanism in the track.
+
+## The three projections
+
+Each token's embedding is multiplied by three learned matrices:
+
+- **Query** (W_Q): what this token is looking for.
+- **Key** (W_K): what this token offers to others that are looking.
+- **Value** (W_V): what this token will pass along if it's chosen.
+
+Queries and keys live in a small space (much smaller than the embedding), and how well a query
+matches a key is their **dot product** (→ dot-product-duality). Every query is compared with
+every key, giving an n × n grid of scores for n tokens.
+
+```diagram
+token vectors x1 … xn
+   │
+   │  × W_Q → Queries Q
+   │  × W_K → Keys K
+   │  × W_V → Values V
+   ▼
+scores = Q·Kᵀ / √d
+   n × n: every token
+   against every token
+   │
+   ▼
+causal mask
+   hides later tokens
+   │
+   ▼
+softmax → weights
+   each row sums to 1
+   │
+   ▼
+weights × V
+   each token gets a blend
+   of the Values it matched
+```
+
+Three details matter. The scores are **divided by √d** (d is the key size) so they don't grow
+with the vector length and push softmax into all-or-nothing weights. In a language model,
+**the causal mask** sets every score where a token would look at a later token to minus
+infinity, so softmax gives it weight zero. And the blended value is **added** to the token's
+embedding: attention nudges vectors, it doesn't replace them.
+
+## Worked example: one head, by hand
+
+"fluffy blue creature", keys of size 2. The query of "creature" is [1, 1]; the keys are
+fluffy [2, 0], blue [1, 1], creature [0, 0.5].
+
+1. **Dot products:** 2, 2 and 0.5.
+2. **Scale by √2 ≈ 1.414:** 1.414, 1.414, 0.354.
+3. **Softmax:** e^1.414 ≈ 4.11, e^1.414 ≈ 4.11, e^0.354 ≈ 1.42; total 9.65, so the weights
+   are **0.43, 0.43, 0.15**.
+4. **Blend values** fluffy [1, 0], blue [0, 1], creature [0, 0]:
+   0.43·[1, 0] + 0.43·[0, 1] = **[0.43, 0.43]**, added to the embedding of "creature".
+
+"creature" now carries some "fluffy" and some "blue". For "fluffy", the first token, the mask
+leaves only itself, so its weight on itself is 1.
+
+## Many heads, and the cost
+
+One head learns one kind of lookup. A layer runs many heads in parallel, each with its own
+matrices, and adds their outputs. In GPT-3, one head has about 6.3 million parameters; 96 heads
+per block make about 600 million, and 96 blocks just under 58 billion, only about a third of
+the model. Because every head builds an n × n grid, doubling the context roughly
+**quadruples** the attention work, which is why long contexts cost more.
+
+## Common mistakes
+
+- **Mixing up who asks.** The token being updated sends the query; the others offer keys.
+- **Thinking the nearest word wins.** Position matters only through what the embeddings carry;
+  a word far away can get the top weight.
+- **Forgetting that the output is added.** The token keeps its own meaning plus a
+  context-weighted adjustment.
+- **Picturing one head as "the" attention.** Real layers run dozens of heads, and models stack
+  dozens of layers.
+
+## Where you'll see it in AI
+
+Every transformer layer (→ transformers-attention); the code version in
+→ build-gpt-from-scratch; the cached keys and values in → kv-cache-inference; and the
+long-context and retrieval trade-offs in → rag-fundamentals.

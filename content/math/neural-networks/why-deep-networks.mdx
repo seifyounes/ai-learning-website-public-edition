@@ -1,0 +1,192 @@
+---
+title: "Why deep networks work"
+subtitle: "Simple features first, composed into complex ones"
+summary: "Explain why stacking layers lets a network build complex features from simple ones, and decide how deep to start on a new problem."
+changeNote: "New lesson in the neural networks track, written from the lecture's transcript, with a worked parity example and a quiz."
+section: math
+pillar: neural-networks
+order: 5
+level: intermediate
+estMinutes: 16
+taskMinutes: 25
+prerequisites:
+  - why-nonlinearity
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "5dWp1mw_XNk"
+  published: "2017-08-25"
+  year: 2017
+  minutes: 11
+  title: "Why Deep Representations? (C1W4L04)"
+  channel: "DeepLearningAI"
+  why: "Once you know that nonlinear layers can't collapse, the next question is why many layers beat one wide one. Andrew Ng gives two answers in eleven minutes: the simple-to-complex hierarchy in faces and speech, and a circuit-theory example where a shallow network needs exponentially more units. He is also candid about the hype around the word 'deep', which keeps the lesson grounded."
+  notes:
+    - "0:32 Faces: early units find edges in small patches, middle units group edges into eyes and noses, later units combine those into faces."
+    - "3:07 Speech: waveform features, then phonemes, then words, then phrases."
+    - "5:43 The circuit-theory argument: the parity of n bits needs about log n layers deep, but on the order of 2ⁿ units in one layer."
+    - "9:49 His practical advice: start with logistic regression or one or two hidden layers and treat depth as a setting to tune."
+applyIt: |
+  **When you choose or compare models, treat depth and size as settings to test, not as
+  status.** The lecture's advice holds for any model work: start small and add capacity only
+  when a simpler version clearly falls short.
+
+  1. Pick one prediction task you have or could have: tagging support tickets, forecasting
+     weekly sales, flagging bad rows in a dataset, routing questions to the right person.
+  2. Write down the simplest baseline: a rule, a logistic regression, or a small model.
+  3. Write down what evidence would justify going bigger: for example, the baseline misses a
+     pattern you can name, and a larger model fixes it on held-out examples.
+
+  **If you build software:** train the baseline first and log its held-out score; only then
+  try one or two hidden layers, then more.
+  **If you don't code:** when choosing between AI tiers for a task, try the small one first on
+  ten real examples and move up only for the ones it gets wrong.
+
+  Success: one task with a written baseline and a written rule for when you'd go bigger.
+recap:
+  - emoji: "🏗️"
+    title: "Deep, not just big"
+    text: "Networks that work well tend to have many hidden layers, not just many units. The lecture asks why depth in particular helps."
+  - emoji: "🙂"
+    title: "Faces: edges, parts, faces"
+    text: "Early units detect edges in small patches; later units group edges into eyes and noses; later still, parts combine into whole faces."
+  - emoji: "🔊"
+    title: "Speech: sounds, words, sentences"
+    text: "The same hierarchy appears in audio: low-level waveform features, then basic sounds (phonemes), then words, then phrases and sentences."
+  - emoji: "🧠"
+    title: "Handle the brain analogy carefully"
+    text: "The brain probably also builds complex objects from simple features, which loosely inspired deep learning. Analogies with the brain are easy to overstretch."
+  - emoji: "⚡"
+    title: "Some functions need depth"
+    text: "Circuit theory: the parity of n bits takes a tree about log n layers deep with few units, but one hidden layer needs on the order of 2ⁿ units."
+  - emoji: "🎚️"
+    title: "Depth is a setting to tune"
+    text: "'Deep learning' is partly a brand. On a new problem, start with logistic regression or one or two hidden layers, and tune the number of layers."
+task: |
+  Two short experiments: one on paper, one in your browser.
+
+  **On paper (10 min).** Draw an XOR tree that computes the parity of 8 bits: pair the bits,
+  XOR each pair, then pair the results, and so on.
+  1. Count the XOR units and the number of levels.
+  2. Compare with a single hidden layer, which needs about 2^(n−1) units for n bits.
+  3. Repeat both counts for 32 bits.
+
+  **In the browser (15 min).** Open TensorFlow Playground (backup resources) and pick the spiral
+  dataset with ReLU activations.
+  1. Train one hidden layer of 8 neurons for about 500 epochs and note the test loss.
+  2. Reset, then train two hidden layers of 4 neurons each, the same number of neurons, and
+     note the test loss.
+  3. Try three layers of 8. Write down which setup fit the spiral best and how much variation
+     you saw between runs.
+
+  Success: unit counts for 8 and 32 bits in both designs, and three test-loss numbers from the
+  Playground with one sentence on what depth did for this dataset.
+selfCheck:
+  - q: "A teammate wants to start a new tabular prediction project with a 30-layer network 'because deep learning works'. What do you suggest instead, and why?"
+    a: "Start with a simple baseline (logistic regression, then one or two hidden layers), measure it on held-out data, and treat depth as a setting to tune. Depth pays off when the data has layered structure; on many tabular problems a small model is as good and far easier to train."
+  - q: "Explain to a non-technical colleague, using the face example, why a network with more layers can recognise things a single layer can't."
+    a: "Each layer builds on the one before: the first finds small edges, the next combines edges into parts like eyes and noses, the next combines parts into faces. A single layer would have to match every face directly from raw pixels, which takes vastly more units and data."
+mcq:
+  - q: "Why do deep networks usually beat equally sized shallow-but-wide ones on complex data like images or language?"
+    options:
+      - "Deep networks have far fewer parameters in total"
+      - "Wide layers can't be parallelized well on GPUs"
+      - "Layers reuse simpler features to build complex ones"
+      - "Extra depth adds memory, so the network recalls more"
+    answer: 2
+    explain: "Early layers learn simple patterns and later layers compose them: edges → shapes → objects, sounds → words → sentences. Reusing lower features lets depth represent functions a single flat layer would need vastly more neurons for. The comparison here holds parameter count equal, and wide layers parallelize perfectly well."
+  - q: "A big enough network can approximate almost any function (universal approximation). Why doesn't that make architecture irrelevant?"
+    options:
+      - "A fit existing doesn't mean training will find it"
+      - "Modern networks are too deep for the theorem to apply"
+      - "It needs infinite data, so it never applies in practice"
+      - "It only covers classification, not text generation"
+    answer: 0
+    explain: "The theorem says a good fit exists, possibly with an enormous single layer. It says nothing about whether gradient descent will find it, with how much data, or at what size. Architectures build in assumptions that make the right functions findable with feasible data and compute; the parity example shows how much size depth can save."
+  - q: "A single-hidden-layer network must compute the parity of 20 input bits. Compared with a deep XOR tree, roughly how many hidden units does it need?"
+    options:
+      - "About 20, one unit for each input bit"
+      - "About 400, one for each pair of bits"
+      - "About 19, the same as the XOR tree"
+      - "About 500,000, exponential in the bits"
+    answer: 3
+    explain: "One hidden layer has to enumerate input patterns, on the order of 2^(n−1) = 2¹⁹ ≈ 524,000 units for 20 bits. The XOR tree needs only 19 XOR units arranged about 5 levels deep. That gap is the lecture's circuit-theory argument for depth."
+  - q: "You're starting a model for a new problem with a modest dataset. Following the lecture's advice, how do you set the depth?"
+    options:
+      - "Start very deep and prune layers that don't help"
+      - "Start shallow, then tune depth on held-out data"
+      - "Match the depth of the best-known image model"
+      - "Use one layer, since depth only helps huge data"
+    answer: 1
+    explain: "Ng starts with logistic regression or one or two hidden layers and treats the number of layers as a hyperparameter checked on held-out data. Copying a famous model's depth ignores your data size and task; some problems do end up needing dozens of layers, so ruling depth out isn't right either."
+backupResources:
+  - label: "TensorFlow Playground: train a network in your browser"
+    url: "https://playground.tensorflow.org/"
+    type: "interactive · compare wide and deep networks on the spiral dataset"
+tags:
+  - math
+  - neural-networks
+  - deep-learning
+  - representation-learning
+---
+
+A network with nonlinear layers can, in principle, learn a lot with a single wide hidden layer.
+In practice the networks that work best have many layers. The reason is **composition**: each
+layer builds slightly more complex features out of the ones below it, so a deep network reuses
+what it has already learned instead of matching every pattern from scratch. That's why the
+models behind images, speech and language are deep.
+
+## Simple to complex
+
+The lecture's first argument is a picture. In face recognition, early units respond to edges in
+small patches of the image. The next layers group edges into parts such as an eye or a nose,
+looking at larger areas. Later layers combine parts into whole faces. Speech follows the same
+ladder: waveform features (rising or falling pitch, hiss), then basic units of sound called
+phonemes, then words, then phrases.
+
+The brain is thought to work in a loosely similar way, which inspired some of this, but the
+analogy is easy to push too far. The useful idea is narrower: **features computed once in a low
+layer are reused by everything above it.**
+
+## Worked example: parity, deep versus shallow
+
+The second argument is a counting one. Take the parity of n bits: is the number of 1s odd?
+
+**Deep version.** XOR the bits in pairs, then XOR the results in pairs, like a tournament
+bracket. For 16 bits that's 8 + 4 + 2 + 1 = **15 XOR units** in **4 levels** (log₂ 16 = 4). For
+32 bits: 31 units in 5 levels. The size grows in step with n.
+
+**Shallow version.** With one hidden layer, the network can't build partial answers to reuse.
+It has to recognise input patterns more or less one by one, which takes on the order of 2^(n−1)
+hidden units. For 16 bits that is 2¹⁵ = **32,768 units**; for 32 bits, 2³¹, about **2.1
+billion**.
+
+Same function, same answer. Depth turns an exponential cost into a small one. Ng is frank that
+he finds this argument less useful for intuition than the face picture, but it shows that the
+advantage of depth can be very large, not just a matter of taste.
+
+## Depth is a setting, not a badge
+
+Ng also notes that "deep learning" is partly a rebranding of neural networks with many hidden
+layers. His working habit: on a new problem, start with logistic regression or one or two hidden
+layers, and treat the number of layers as a hyperparameter you tune. Some problems do end up
+needing dozens of layers; that's something you find out, not assume.
+
+## Common mistakes
+
+- **Starting with the deepest model you can find.** Without a baseline, you can't tell whether
+  the depth is helping.
+- **Treating the face hierarchy as guaranteed.** It's the typical pattern, and real units are
+  often messier than clean edge or eye detectors.
+- **Assuming more layers always train well.** Very deep networks need extra techniques, such as
+  residual connections and normalization, to train reliably.
+
+## Where you'll see it in AI
+
+- **Language models** stack dozens of transformer blocks; studies of their internals find that
+  earlier layers tend to handle surface patterns such as spelling while later ones track
+  meaning (→ transformers-attention).
+- **Embeddings** taken from a deep model's later layers capture meaning rather than surface
+  form, which is why they work for search (→ embeddings-vector-databases).
+- **Training deep networks** depends on passing a learning signal back through every layer,
+  which the next lesson explains (→ backprop-intuition).

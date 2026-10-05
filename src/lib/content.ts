@@ -4,7 +4,7 @@ import matter from "gray-matter";
 import type { Lesson, LessonFrontmatter, Section } from "./types";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
-const SECTIONS: Section[] = ["foundations", "applications"];
+const SECTIONS: Section[] = ["foundations", "applications", "math"];
 
 function readLessonFile(
   section: Section,
@@ -49,7 +49,6 @@ function readLessonFile(
     task: fm.task,
     selfCheck: fm.selfCheck ?? [],
     mcq: fm.mcq ?? [],
-    lectureTrack: fm.lectureTrack ?? [],
     backupResources: fm.backupResources ?? [],
     tags: fm.tags ?? [],
     slug,
@@ -170,7 +169,6 @@ export function linkLesson(lesson: Lesson): Lesson {
     recap: lesson.recap?.map((r) => ({ ...r, title: link(r.title, { plain: true }) ?? "", text: link(r.text) ?? "" })),
     // Questions render inside a button, so they name the lesson without linking it.
     selfCheck: lesson.selfCheck?.map((s) => ({ ...s, q: link(s.q, { plain: true }) ?? "", a: link(s.a) ?? "" })),
-    lectureTrack: lesson.lectureTrack?.map((l) => ({ ...l, covers: link(l.covers) ?? "" })),
     mcq: lesson.mcq?.map((q) => ({
       ...q,
       q: link(q.q, { plain: true }) ?? "",

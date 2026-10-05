@@ -36,10 +36,10 @@ export const ROUTES: Route[] = [
       { label: "2 · AI coding agents", href: "/foundations/claude-code" },
       { label: "6 · Applied AI engineering", href: "/foundations/applied-ai-engineering" },
       { label: "7 · Shipping apps", href: "/foundations/shipping-apps" },
-      { label: "8 · Math & ML core (optional depth)", href: "/foundations/math-ml-core" },
+      { label: "Math & ML tracks (optional depth)", href: "/math" },
     ],
     trackOrder: ["building-products", "agency-freelance", "ai-in-companies", "marketing-content"],
-    foundations: ["mental-models", "claude-code", "applied-ai-engineering", "shipping-apps", "chat-assistants", "workflows-agents", "math-ml-core"],
+    foundations: ["mental-models", "claude-code", "applied-ai-engineering", "shipping-apps", "chat-assistants", "workflows-agents"],
   },
   {
     id: "work",

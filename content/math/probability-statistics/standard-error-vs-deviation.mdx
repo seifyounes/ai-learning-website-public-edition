@@ -1,0 +1,189 @@
+---
+title: "Standard deviation vs standard error"
+subtitle: "Spread of the data versus uncertainty of the average, and why eval scores wobble on small test sets"
+summary: "Tell the spread of your data from the uncertainty of its average, and put a standard-error band on an eval pass rate before comparing prompts."
+changeNote: "New lesson in the probability and statistics track, written from the lecture's transcript, with the eval noise-band material moved here and a quiz."
+section: math
+pillar: probability-statistics
+order: 5
+level: intermediate
+estMinutes: 10
+taskMinutes: 20
+prerequisites:
+  - mean-variance-standard-deviation
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "A82brFpdr9g"
+  published: "2017-03-20"
+  year: 2017
+  minutes: 3
+  title: "Standard Deviation vs Standard Error, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "Three minutes that fix the most common mix-up in eval reporting. The standard deviation describes how spread out individual values are; the standard error describes how much the average itself would move if you measured again. The noise band on every eval score is a standard error, so this distinction has to be solid before confidence intervals and tests make sense."
+applyIt: |
+  **Every eval pass rate deserves a ± next to it, and that ± is a standard error.** Take the
+  latest quality number you or your team looked at: an eval pass rate, a share of good answers
+  in a review, a satisfaction score.
+
+  ```prompt
+  My eval passed [e.g. 88 of 100] examples. Compute the standard error of that pass rate
+  (√(p × (1 − p) ÷ n)) and a rough 95% band (± 2 standard errors). Then tell me the smallest
+  difference between two prompts I could trust at this n, and the n I'd need to trust a
+  3-point difference. Show the arithmetic.
+  ```
+
+  **If you build software:** print the standard error next to every pass rate your eval script
+  reports. **If you don't code:** add a cell `=SQRT(B1*(1-B1)/B2)` next to a rate in B1 and its n
+  in B2.
+
+  Success: your latest quality number is written as "rate ± band, n = …", with the band computed.
+recap:
+  - emoji: "🐭"
+    title: "SD: spread within data"
+    text: "Weigh five mice and compute the mean. The standard deviation around it measures how spread out those five weights are."
+  - emoji: "🔁"
+    title: "Repeat the experiment"
+    text: "Weigh five different mice, five separate times. You get five means and five standard deviations, one per set."
+  - emoji: "🎯"
+    title: "SE: spread of the means"
+    text: "Plot the five means together. Their standard deviation around the mean of the means is the standard error."
+  - emoji: "⚖️"
+    title: "The difference in one line"
+    text: "The SD measures variation within one set of measurements; the SE measures variation between the means of many sets."
+  - emoji: "1️⃣"
+    title: "One set is enough"
+    text: "Confusingly, the standard error can be estimated from a single set of measurements, even though it describes means from many sets."
+  - emoji: "📈"
+    title: "Plot what you mean to show"
+    text: "Software often offers SE bars even for a single set of measurements. In almost all cases, plot the SD: a graph is usually meant to describe the data you measured."
+task: |
+  Compute the noise band of a real comparison before deciding anything.
+
+  1. Use a pair of results you have, or these: prompt A passed 42 of 50 examples, prompt B
+     passed 44 of 50 on different examples.
+  2. For each, compute the standard error √(p × (1 − p) ÷ n) and the 95% band p ± 2 SE.
+  3. Compute the standard error of the difference: √(SE_A² + SE_B²). Is the gap bigger than
+     2 times that?
+  4. Work out how many examples per prompt would make the band of each rate about ±3 points.
+
+  ```python
+  from math import sqrt
+  def se(passed, n):
+      p = passed / n
+      return p, sqrt(p * (1 - p) / n)
+  (pa, sa), (pb, sb) = se(42, 50), se(44, 50)
+  print(pa, sa, pb, sb, "gap", pb - pa, "2*SE_diff", 2 * sqrt(sa**2 + sb**2))
+  ```
+
+  Success: a written verdict ("real gap" or "inside the noise") with the numbers, and the n you'd
+  need for a ±3-point band.
+selfCheck:
+  - q: "Your eval jumps from 84% to 88% after a prompt tweak (n = 50) and a teammate wants to ship today. What do you say, and what would make the result trustworthy?"
+    a: "At n = 50 the standard error of each rate is about 5 points, so a 4-point gap sits inside the noise, and the gap between two noisy rates is noisier still. Re-run both prompts on the same examples or grow the set, and ship when the gap clears the band."
+  - q: "A teammate's report says 'mean quality 7.2, standard deviation 2.1, n = 400' and concludes the score is too uncertain to use. Is that right?"
+    a: "No. The 2.1 is the spread of individual ratings, not the uncertainty of the mean. The standard error is 2.1 ÷ √400 ≈ 0.1, so the mean is pinned down to roughly 7.0 to 7.4. Individual answers vary a lot, but the average is precise."
+mcq:
+  - q: "An AI feature's guardrail passes 96 of 100 sampled outputs one week and 92 of 100 the next. Before investigating a 'regression', what should you recognize?"
+    options:
+      - "Quality dropped 4 points, so bisect recent changes now"
+      - "The guardrail model was probably updated without notice"
+      - "At n = 100, a 4-point swing is within normal variation"
+      - "Both are above 90%, so the change can safely be ignored"
+    answer: 2
+    explain: "The standard errors are about 2 and 2.7 points, and the difference of two noisy rates has a standard error near 3.4, so a 4-point swing is ordinary. Pool weeks, grow the sample or chart the rate with a band, and investigate moves outside it. Ignoring it forever is the opposite mistake: a sustained drop still matters."
+  - q: "Your eval has 400 items. Per-item scores average 70 with a standard deviation of 20. How uncertain is the average itself?"
+    options:
+      - "About ±1 point: the standard error is 20 ÷ √400"
+      - "About ±20 points, the standard deviation of the items"
+      - "About ±5 points, since 20 ÷ 4 for the four hundreds"
+      - "Zero, because all 400 items were scored and averaged"
+    answer: 0
+    explain: "The standard error of a mean is the standard deviation divided by √n: 20 ÷ 20 = 1 point, so a 95% band is roughly ±2. The 20 describes how much single items vary, not how much the average would move on a fresh set of 400."
+  - q: "Your eval's 95% band is about ±8 points and you need it near ±4 to compare two prompts. How much bigger must the eval set get?"
+    options:
+      - "Twice as big, since the band shrinks in step with n"
+      - "About 1.4 times as big, the square root of two"
+      - "Eight times as big, to match the eight-point band"
+      - "About four times as big, since the band scales as 1/√n"
+    answer: 3
+    explain: "The standard error falls with the square root of n, so halving the band needs four times the data. Doubling n only narrows the band by about 30%. This is why small eval sets can't detect small improvements without a lot more examples."
+  - q: "A product manager asks how much a single user's answer quality varies between requests. Which number answers that?"
+    options:
+      - "The standard error of the mean quality score"
+      - "The standard deviation of the individual scores"
+      - "The width of the 95% band around the mean score"
+      - "The mean score divided by the number of requests"
+    answer: 1
+    explain: "A single user sees individual answers, whose variation is the standard deviation. The standard error describes how precisely you know the average, and it shrinks with more data even when individual answers stay just as variable."
+backupResources:
+  - label: "Seeing Theory, chapter 4: frequentist inference, point and interval estimation (Brown University)"
+    url: "https://seeing-theory.brown.edu/frequentist-inference/"
+    type: "interactive · watch estimates vary"
+tags:
+  - math
+  - statistics
+  - standard-error
+  - evals
+---
+
+**You need:** square roots. → mean-variance-standard-deviation first.
+
+Two numbers look alike and answer different questions. The **standard deviation** says how much
+individual values vary. The **standard error** says how much your *average* would change if you
+ran the whole measurement again. An eval pass rate is an average, so the uncertainty around it is
+a standard error, and mixing the two up leads to both false alarms and false confidence.
+
+## The thought experiment
+
+Grade 50 random outputs and compute the pass rate. Now imagine doing it again with 50 fresh
+outputs, and again, and again. Each pass rate differs a little. Plot them and you get a narrow
+distribution of means, and its standard deviation is the **standard error**.
+
+You don't need to repeat anything to get it. For a mean of measurements:
+
+- **SE = s ÷ √n**, where s is the sample standard deviation.
+
+For a pass rate (a mean of 0s and 1s), s works out to √(p × (1 − p)), so:
+
+- **SE = √(p × (1 − p) ÷ n)**.
+
+A rough 95% band is the estimate ± 2 SE. The worst case is p = 0.5, where 2 SE is exactly
+**1/√n**, which gives a handy rule of thumb:
+
+| n | rough 95% band |
+|---|---|
+| 20 | ±22 points |
+| 100 | ±10 points |
+| 400 | ±5 points |
+| 2,500 | ±2 points |
+
+Small evals cannot detect small improvements. To halve the band you need four times the data.
+
+## Worked example: is 88% better than 84%?
+
+A prompt tweak moves the pass rate from 84% to 88% on 50 test questions.
+
+1. **SE of each rate** (using p ≈ 0.86): √(0.86 × 0.14 ÷ 50) ≈ 0.049, about **5 points**.
+2. **SE of the difference.** Variances add when you subtract two independent estimates:
+   √(0.049² + 0.049²) ≈ 0.069, about **7 points**.
+3. **Compare:** the gap is 4 points, well inside 2 × 7 = 14. On this evidence the two prompts
+   are indistinguishable.
+
+The fix is cheaper than it looks: run both prompts on the **same** 50 questions and look only at
+the questions where they disagree. Shared difficulty cancels out, as
+→ hypothesis-testing-null shows.
+
+## Common mistakes
+
+- **Using the SD as the uncertainty of the mean.** It overstates uncertainty by a factor of √n.
+- **Using the SE to describe single answers.** It understates how much one response can vary.
+- **Comparing two rates by their own bands only.** The difference has its own, wider standard
+  error.
+- **Expecting double the data to halve the noise.** It takes four times.
+
+## Where you'll see it in AI
+
+Error bars on eval scores and leaderboards (→ evaluation-metrics), deciding how big an eval set
+must be, and reading weekly quality dashboards. The ±2 SE band works because averages follow a
+bell curve, which → central-limit-theorem explains next.

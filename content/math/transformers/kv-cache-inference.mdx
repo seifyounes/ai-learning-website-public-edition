@@ -1,0 +1,241 @@
+---
+title: "The KV cache and fast generation"
+subtitle: "Why output tokens are slow, why long chats eat memory, and why cached input is cheap"
+summary: "Explain prefill, decode and the KV cache, size a cache in gigabytes, and order prompts so providers can reuse their cached prefix."
+changeNote: "New lesson in the transformers track: the prefill, decode and prompt-caching material moved here from the pipeline lesson, with a cache-size example."
+section: math
+pillar: transformers
+order: 7
+level: advanced
+estMinutes: 15
+taskMinutes: 30
+prerequisites:
+  - build-gpt-from-scratch
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "80bIUggRJf4"
+  published: "2023-07-21"
+  year: 2023
+  minutes: 9
+  title: "The KV Cache: Memory Usage in Transformers"
+  channel: "Efficient NLP"
+  why: "You have now built attention in code, so the waste in naive generation is visible: every new token would recompute keys and values for the whole sequence. This short lecture shows the cache that removes that work and then does the memory arithmetic that explains long-context limits. It is the bridge from how a transformer works to how one is served, which is where latency, cost and caching decisions come from."
+  notes:
+    - "1:30 During generation the query is one vector for the new token, while keys and values cover all earlier tokens."
+    - "4:04 How the cache works: keep earlier keys and values, and compute one new key and value per step."
+    - "5:36 The memory formula, then a 30-billion-parameter example where the cache needs about three times the memory of the weights."
+applyIt: |
+  **Prompt caching is KV-cache reuse, and it rewards a stable prefix, so the order of anything
+  you send on every call is a caching decision.** An identical prompt prefix has identical
+  Key/Value attention states, so a provider can reuse them and bill cached input at a fraction of
+  the fresh price (as low as about a tenth at some providers). One changed early token
+  invalidates the whole cache below it, so a date or a status note near the top of a system
+  prompt or instruction file quietly costs you the discount on every call.
+
+  ```prompt
+  Audit this text for prompt-cache friendliness: [paste your app's system prompt, a Project's
+  or Custom GPT's instructions, an AGENTS.md (or CLAUDE.md / GEMINI.md) rules file, or a long
+  template prompt you reuse]. It is sent at
+  the start of every call, so stable content must sit ABOVE volatile content to stay
+  cache-eligible. Find lines that change often (dates, user names, status notes, in-flight
+  TODOs, retrieved documents) sitting above durable instructions, and propose a reordering that
+  moves the stable material to the top and the churn to the bottom — as a diff, with no
+  rewording.
+  Success: a diff where every frequently-edited line sits below the stable prefix.
+  ```
+
+  **If you build software:** check your provider's prompt-caching docs for the minimum prefix
+  length and whether caching is automatic or needs a flag. **If you don't code:** the same
+  ordering rule makes a long reusable chat prompt easier to maintain.
+toolkit: |
+  - **Order standing instructions for the cache: stable first, changing last.** When a tool
+    resends the same instructions on every call (a Custom GPT, a Gem, an AI step in Zapier, Make
+    or n8n, a coding agent's rules file), put durable standards first and anything that changes
+    weekly last. Providers can reuse a repeated prefix, and one changed early token invalidates
+    everything cached after it.
+  - **When an answer is slow, shorten the output, not the prompt.** The answer is what you wait
+    for, so save "answer in 5 bullets" or "changes only" as prompt snippets. Trimming the prompt
+    mostly saves money, not time.
+  - **Start fresh chats for big jobs.** Attention cost grows with the square of the length, the
+    cache grows with every turn, and recall sags in very long chats. Split a big job across
+    separate chats or Projects with a short handover note, and paste the few relevant passages
+    instead of whole histories.
+recap:
+  - emoji: "💥"
+    title: "Long text runs out of memory"
+    text: "Generate enough text and a transformer eventually exhausts GPU memory. Most of that memory goes to one thing: the key-value cache."
+  - emoji: "🔎"
+    title: "One query, many keys"
+    text: "At each generation step the query is a single vector for the newest token, while the keys and values span the whole context it attends to."
+  - emoji: "🐢"
+    title: "The naive loop repeats itself"
+    text: "A token's key and value never change once computed, yet without a cache every step recomputes them for all earlier tokens: like rereading everything you've written before each new word."
+  - emoji: "🗄️"
+    title: "Cache and append"
+    text: "Keep earlier keys and values in GPU memory, compute one new key and value per step, and append them. Layers outside attention see only the new token, so their work per token stays constant; attention still compares it with every cached key, so that part grows with the context."
+  - emoji: "🧮"
+    title: "The memory bill"
+    text: "Cache size is 2 × bytes per number × layers × model width × sequence length × batch. For a 30-billion-parameter model serving a big batch, that's about three times the memory of the weights."
+  - emoji: "⏱️"
+    title: "First token versus the rest"
+    text: "The first output token is slower because the cache must be built for the whole prompt. After that, each token computes keys and values for itself alone."
+task: |
+  Measure the prefill/decode split on a real call instead of trusting the diagram.
+
+  ```prompt
+  Instrument one real LLM call of the kind a feature I care about would make: [e.g. "summarize a
+  2-page customer complaint into 5 bullets"]. Send it to any model I can reach (an API key, or a
+  free local model in Ollama), capture usage, and report input tokens, output tokens, time to
+  first token, total time, and tokens/second for the decode phase. Then predict: if I halved
+  the PROMPT what improves, and if I halved the OUTPUT what improves — and check the prediction
+  against the prefill/decode split in the numbers.
+  Success: a filled-in table plus a correct prefill-vs-decode read of what each cut would save.
+  ```
+
+  **No-code path:** install Ollama and run a small current model with `--verbose`, for example
+  `ollama run gemma4:e2b --verbose`. Model names change quickly, so check the Ollama library
+  (ollama.com/library) for a current small model first. After each answer it prints the
+  prompt-eval rate (prefill) and the eval rate (decode), so you can compare a long prompt with a
+  short answer against a short prompt with a long answer without writing a line of code.
+
+  Success: on either path, you have the prefill and decode numbers for at least two calls and
+  can say, with those numbers, whether halving the prompt or halving the output would cut the
+  wait more.
+selfCheck:
+  - q: "Users say your summarizer is slow. Prompts are about 3,000 tokens and answers about 800. A teammate proposes halving the prompt. What do you predict, and what would you try instead?"
+    a: "Little latency gain: the prompt is processed in parallel (prefill), so most of the wait is the 800 output tokens generated one at a time (decode). Ask for shorter output, stream it, or use a faster model; trimming the prompt mainly saves cost."
+  - q: "Your app's cached-input discount vanished after a teammate added `Today is {date}` as the first line of the system prompt. Why?"
+    a: "Caching reuses the KV states of an identical prefix. That first line changes every day, so every token after it no longer matches and nothing is reused. Move volatile lines below the stable instructions."
+  - q: "A chat with your local model gets slower and uses more GPU memory once it passes 60 turns, though each new message is short. What's growing, and what would each new token cost without it?"
+    a: "The KV cache: the stored Key and Value vectors for every processed token at every layer. It grows with the conversation, which is the memory pressure. Without it, each new token would recompute attention states for the whole preceding chat; with it, each token computes only its own vectors and attends to the cache. Trimming or summarizing old turns shrinks it. Prompt caching reuses the same states across calls."
+mcq:
+  - q: "Reading a 2,000-token prompt takes about 0.5 s, but generating a 2,000-token answer takes about 40 s on the same model. Why the huge difference?"
+    options:
+      - "Each new token re-reads the whole prompt from scratch"
+      - "Prompt tokens run in parallel; output tokens one by one"
+      - "Sampling a token costs much more than reading one does"
+      - "Safety filters re-check the full answer after each token"
+    answer: 1
+    explain: "Prefill processes all prompt tokens in one parallel pass, which GPUs do very efficiently. Decoding can't be parallelized that way: token t+1 needs token t as input, so each output token is its own forward pass. With the KV cache, a new token doesn't re-read the prompt from scratch; it reuses the stored keys and values, and picking a token from the probabilities is a tiny step. That's why output tokens usually cost more, why streaming exists, and why asking for shorter answers is a real latency fix."
+  - q: "Providers bill cached input tokens far below fresh ones. What exactly gets reused when your prompt shares a prefix with an earlier call?"
+    options:
+      - "The previous reply's text, lightly edited for this call"
+      - "Only the tokenizer's output for the shared prefix"
+      - "Nothing physical; it's a loyalty discount on billing"
+      - "The prefix's per-layer key and value attention states"
+    answer: 3
+    explain: "Because of causal masking, a token's Key/Value states depend only on the tokens before it, so an identical prefix produces identical states that can be reused, and prefill starts at the first changed token. Tokenizing is trivially cheap, and replies are never reused. The design consequence: stable content at the top, because one early change invalidates everything after it."
+  - q: "You serve a model on one GPU. Doubling the batch size from 8 to 16 conversations makes requests fail with out-of-memory errors, though the weights fit easily. What ran out?"
+    options:
+      - "Room for the KV caches, which grow with every sequence"
+      - "Room for a second copy of the weights for the new batch"
+      - "Room for the gradients the model computes at each step"
+      - "Room for the tokenizer's vocabulary in each conversation"
+    answer: 0
+    explain: "Each conversation keeps its own keys and values for every token at every layer, so cache memory scales with batch size times context length, while the weights are shared by the whole batch. Inference computes no gradients; those belong to training."
+  - q: "A teammate proposes sending a user's entire 200k-token history with every request 'since the context window allows it'. What's the strongest engineering objection?"
+    options:
+      - "Models can only attend to the last few thousand tokens"
+      - "The model would overfit to that single user's long history"
+      - "Cost grows with length and recall sags; retrieve instead"
+      - "It's fine: if the window fits it, the model uses all of it"
+    answer: 2
+    explain: "A window that fits isn't a window that's wise: you pay for every input token on every call, attention work and the cache grow with length, latency rises, and models often recall facts buried in the middle of huge contexts less reliably. Context in the prompt doesn't train the model, so it can't overfit. Retrieving the few relevant chunks (RAG) is usually cheaper and more accurate."
+tags:
+  - math
+  - transformers
+  - kv-cache
+  - inference
+  - prompt-caching
+---
+
+Generating text is a loop: run the model, pick a token, append it, run again. The KV cache is
+the trick that stops that loop from redoing all its past work, and it explains three things
+you pay for every day: **slow output, memory-hungry long contexts, and cheap cached input**.
+
+## Why the naive loop wastes work
+
+In the attention step (→ query-key-value-attention), every token produces a query, a key and a
+value. With the causal mask, a token's key and value depend only on the tokens before it. So
+when token 501 arrives, the keys and values of tokens 1 to 500 are exactly what they were a
+step ago. Recomputing them is pure waste.
+
+The fix: **store each token's key and value, per layer, the first time you compute them.** At
+each new step, compute Q, K and V for the newest token only, compare its query with every
+cached key, blend the cached values, and append its own K and V to the cache.
+
+## Prefill vs decode: where your latency lives
+
+- **Prefill:** the whole prompt goes through the model in one parallel pass and fills the
+  cache. It is fast, and it sets *time to first token*.
+- **Decode:** each output token needs its own sequential pass, because token t+1 needs token t
+  as input. This per-token crawl is what users feel. Streaming hides it; shorter outputs fix it.
+
+```diagram
+PREFILL: one parallel pass
+prompt t1 t2 … t4000
+   │ all positions at once
+   ▼
+KV cache filled
+   │
+   ▼
+sets time to first token
+
+DECODE: one pass per token
+new token → Q, K, V
+   → attend to cache
+   → next token
+   → append its K, V
+repeat per output token
+   │
+   ▼
+wait ≈ output tokens
+       × time per step
+```
+
+## Worked example: how big is the cache?
+
+Per token, the cache holds one key and one value vector at every layer:
+
+`bytes per token = 2 (K and V) × layers × model width × bytes per number`
+
+Take a model with 32 layers and a model width of 4,096, stored in 16-bit numbers (2 bytes),
+which is the shape of several 7-billion-parameter open models with standard attention:
+
+- Per token: 2 × 32 × 4,096 × 2 = **524,288 bytes**, half a megabyte.
+- A 4,096-token conversation: 524,288 × 4,096 ≈ **2.1 GB**.
+- Serve 8 such conversations at once: about **17 GB**, more than the roughly 14 GB the weights
+  take at 16 bits (7 billion × 2 bytes).
+
+That is why long contexts and big batches run out of memory before the weights do, and why
+newer models share keys and values across heads (grouped-query attention): 8 key/value heads
+instead of 32 would cut every number above by 4×.
+
+## Why cached input is cheaper
+
+An **identical prompt prefix has identical KV states**, so a provider can keep them and skip
+prefill for that part on your next call. That is prompt caching. A support assistant that sends
+the same 3,000-token system prompt with every new email gets those 3,000 tokens billed at the
+cached rate, unless something that changes (a timestamp, a user name) sits on line one, in
+which case nothing after it matches.
+
+> 💡 **Try it:** open your provider's pricing page and find the cached-input rate. Now say, in
+> KV-cache terms, exactly what work the provider skips to offer that discount.
+
+## Common mistakes
+
+- **Halving the prompt to fix latency.** Most of the wait is decode; cap the output length,
+  ask for a tighter format, and stream.
+- **Volatile text at the top of a reused prompt.** One changed early token invalidates the
+  cache below it; put dates and retrieved documents at the end.
+- **Sizing a GPU by the weights alone.** Add the cache: per-token bytes × context × batch.
+- **Re-sending ever-growing chat history.** The cache and the bill grow every turn; summarize
+  or start fresh with a short brief.
+
+## Where you'll see it in AI
+
+Every serving stack (vLLM, llama.cpp, Ollama, hosted APIs) manages a KV cache, and their
+"tokens per second", "context length" and "cached input" numbers are all cache numbers. The
+cost and latency trade-offs are applied in → cost-latency-caching, and the model these caches
+belong to is the one you built in → build-gpt-from-scratch.

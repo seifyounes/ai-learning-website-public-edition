@@ -3,7 +3,7 @@
 [![Check](https://github.com/seifyounes/ai-learning-website-public-edition/actions/workflows/check.yml/badge.svg)](https://github.com/seifyounes/ai-learning-website-public-edition/actions/workflows/check.yml)
 
 **A free, vendor-neutral course that takes you from near-beginner to applied AI engineer.**
-111 lessons across 12 pillars. Each lesson pairs a hand-picked free video with original notes, a
+175 lessons in three sections: Foundations, Applications, and Math & ML. Each lesson pairs a hand-picked free video with original notes, a
 recall recap, a hands-on task and a self-check. There's no sign-up, and your progress stays in
 your browser.
 
@@ -21,22 +21,23 @@ Each group gets its own route through the course, and the site orders the lesson
 
 ## What's inside
 
-- **Foundations (8 pillars):** AI mental models · AI coding agents (Claude Code in depth) ·
+- **Foundations (7 pillars):** AI mental models · AI coding agents (Claude Code in depth) ·
   chat assistants · a second brain with Obsidian · automated workflows and agents · applied AI
-  engineering (APIs, RAG, embeddings, agents, MCP, evals, cost, security) · shipping real apps ·
-  the math and ML core.
+  engineering (APIs, RAG, embeddings, agents, MCP, evals, cost, security) · shipping real apps.
 - **Applications (4 tracks):** marketing and content · building products · AI inside
   companies · agency and freelance services.
+- **Math & ML (7 tracks):** linear algebra · probability and statistics · calculus for
+  optimization · machine learning fundamentals · neural networks · transformers and attention ·
+  evaluation. Each track follows one subject's full lecture series (3Blue1Brown, StatQuest,
+  Khan Academy, Andrew Ng, Andrej Karpathy and others), and **every lecture is a lesson of its
+  own**: 71 lessons, each with its own recap, worked example, task and challenge quiz written
+  from that lecture, plus "Go deeper" lectures for extra depth.
 - **Every lesson has the same shape:** the video and why it was picked → a recap you recall
   before flipping each card → an original breakdown with a worked example and common failure
   modes → *Apply it to your work* → *Upgrade your AI setup* → a hands-on task → scenario
-  self-checks and, in 51 lessons, a scored challenge quiz → your notes. The header splits the
+  self-checks and, in 115 lessons, a scored challenge quiz → your notes. The header splits the
   time into video, reading and task, lists the lessons to do first, and offers a 40-minute
   short path through the long ones.
-- **Full lecture tracks for the maths.** Each Math & ML subject (linear algebra, probability
-  and statistics, calculus, ML fundamentals, neural networks, transformers, evaluation) comes
-  with its whole lecture series in watching order: 95 lectures in all, about 20 hours of core
-  lectures plus optional depth, each playable in place and ticked off as you go.
 
 | Lesson header | Recall recap |
 |---|---|
@@ -44,12 +45,14 @@ Each group gets its own route through the course, and the site orders the lesson
 | **Challenge quiz** | **Search** |
 | ![A challenge quiz question answered, with the explanation shown](docs/screenshots/quiz.png) | ![Search results for a misspelt query, still finding RAG fundamentals first](docs/screenshots/search.png) |
 
-![A lecture track: the probability and statistics series, each lecture with its length, what it covers, a Watch here button and a Mark watched tick](docs/screenshots/lectures.png)
+| **Math & ML: seven tracks** | **A track: one lesson per lecture** |
+|---|---|
+| ![The Math & ML section: seven tracks from linear algebra to evaluation, each with its lesson count](docs/screenshots/math.png) | ![The linear algebra track: eleven lessons in order, one per lecture of the series](docs/screenshots/math-track.png) |
 
 <p>
   <img src="docs/screenshots/mobile-home.png" width="260" alt="The home page on a phone">
   &nbsp;
-  <img src="docs/screenshots/mobile-lesson.png" width="260" alt="A lesson breakdown on a phone">
+  <img src="docs/screenshots/mobile-lesson.png" width="260" alt="A Math & ML lesson breakdown on a phone">
 </p>
 
 ## Features
@@ -71,7 +74,7 @@ Each group gets its own route through the course, and the site orders the lesson
 
 ## Engineering
 
-- **Next.js 15 App Router, fully static.** 252 pages are prerendered; unknown URLs return a
+- **Next.js 15 App Router, fully static.** 387 pages are prerendered; unknown URLs return a
   real 404. There's no backend, database, cookies or analytics. YouTube loads only when a
   learner presses play, from `youtube-nocookie.com`.
 - **Content as data.** One lesson is one `.mdx` file with typed YAML frontmatter. Adding a lesson
@@ -175,4 +178,4 @@ Videos are embedded from YouTube and belong to their creators. Each lesson names
 links further reading from the original publishers. Fonts: Archivo and Atkinson Hyperlegible
 (SIL Open Font License).
 
-Designed and built by **Seif Younes**.
+Designed and built by **Seif Younes**, with AI coding agents.

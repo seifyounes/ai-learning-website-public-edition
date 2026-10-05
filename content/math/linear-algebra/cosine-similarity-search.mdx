@@ -1,0 +1,213 @@
+---
+title: "Cosine similarity and semantic search"
+subtitle: "The angle between two vectors, and the score most search and RAG systems rank by"
+summary: "Compute cosine similarity by hand, explain why it ignores length, and debug a search or RAG ranking by checking the vectors before the prompt."
+changeNote: "New lesson in the linear algebra track, written from the lecture's transcript; takes in lesson 1's search material, task, worked example and cosine quiz question."
+section: math
+pillar: linear-algebra
+order: 9
+level: intermediate
+estMinutes: 16
+taskMinutes: 30
+prerequisites:
+  - dot-product-duality
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "e9U0QAFbfLI"
+  published: "2023-01-29"
+  year: 2023
+  minutes: 10
+  title: "Cosine Similarity, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "After the geometry of the dot product, this StatQuest makes the step to similarity concrete. It turns short phrases into word-count vectors, measures the angle between them, and shows that repeating a word changes the length but not the score. The examples are tiny enough to check by hand, and the same formula is what embedding search applies to vectors with hundreds of dimensions."
+  notes:
+    - "1:32 a two-word example: phrases as word counts, plotted as points, compared by the angle between them."
+    - "3:37 repeating a word moves the point further out but leaves the angle, and the score, unchanged."
+    - "5:43 the 0-to-1 range for word counts; 6:15 the formula step by step; 7:46 more words means more dimensions, same formula."
+applyIt: |
+  **Any "find the most relevant item" feature is one dot product, so read it as vectors, not
+  prose.** Take a search or chatbot you already use over a collection: a help-center search, a
+  notes app's semantic search, a document chatbot. It ranks every item against
+  your query by cosine similarity (a normalized dot product), so the ranking, and any bug in it,
+  lives in the vectors rather than the wording of a prompt.
+
+  Run one quick test. Ask it something you know the collection answers, but phrase it with none
+  of the item's own words (ask "how do I get my money back?" when the page says "refund policy").
+  Then write two lines in your notes: did it find the item, and if it hadn't, what you'd check
+  first (the chunks and the similarity scores of the top hits, before rewording anything).
+
+  **If you build search or RAG:** log the top hits' scores next to each answer so that check takes
+  seconds. **If you don't:** the test shows you whether a tool searches by meaning or by keyword.
+
+  Success: one test query, its result, and a two-line "check the vectors first" note.
+toolkit: |
+  - **Do cosine similarity in a spreadsheet.** Put two short vectors in two rows and compute it
+    with `=SUMPRODUCT(A1:E1,A2:E2)/(SQRT(SUMSQ(A1:E1))*SQRT(SUMSQ(A2:E2)))`. Change one number
+    and watch the score move, then rank a few made-up "document" vectors against a query.
+  - **Check similarity before rewriting a prompt.** When a document chatbot or a notes app's
+    semantic search pulls the wrong page, the bug usually lives in the chunks or embeddings, not
+    the wording. If you keep "see also" links by hand, embedding the pages computes "nearest
+    pages" as dot products instead.
+recap:
+  - emoji: "🗂️"
+    title: "Too many to compare by eye"
+    text: "A handful of sentences you can sort by reading. A month of messages you can't, so you need a number a computer can calculate for any pair: cosine similarity."
+  - emoji: "📊"
+    title: "Phrases as points"
+    text: "Count each word in each phrase. 'Hello world' becomes (1, 1) and 'hello' becomes (1, 0): two points, each with a line from the origin."
+  - emoji: "📐"
+    title: "Score the angle"
+    text: "The angle between those lines is 45°, and its cosine, about 0.71, is the similarity. Same direction gives 1; no words in common gives 90° and 0."
+  - emoji: "📏"
+    title: "Length doesn't count"
+    text: "'Hello hello hello' sits further out on the same line, so the angle and the score don't change. Cosine looks only at direction."
+  - emoji: "🧮"
+    title: "A formula, no drawing"
+    text: "Multiply matching counts and add, then divide by the two lengths. That gives the cosine directly from the table, with no graph or angle needed."
+  - emoji: "🧊"
+    title: "Any number of dimensions"
+    text: "Five different words means five dimensions you can't draw, but the formula works the same: 'I love Troll 2' against 'I love Gymkata' gives about 0.58."
+task: |
+  Prove the geometry to yourself (no similarity library allowed), then point it at your own
+  material.
+
+  ```prompt
+  Write a single Python script for a free Google Colab notebook that takes three short
+  sentences — two that mean nearly the same thing in different words ("I want to get fitter" /
+  "my goal is better health") and one unrelated fact ("the invoice is due Friday") — gets an
+  embedding for each from the free sentence-transformers model all-MiniLM-L6-v2, and computes
+  the three pairwise cosine similarities BY HAND: dot product divided by the two norms, written
+  as plain loops, no numpy/sklearn similarity helper. Print the three scores and assert the
+  similar pair scores highest. Then add a second part: embed a list of 10-20 short items I paste
+  in plus one query, rank the items with the same hand-written cosine, and print the top 3 with
+  their scores.
+  Success: the script runs, the similar pair wins, and no library computed the similarity for me.
+  ```
+
+  Paste the prompt into any chat assistant, run part one, then paste 10–20 short items from your
+  own work or studies (FAQ answers, support tickets, meeting notes, product descriptions, lecture
+  summaries) and one real question someone would ask. Before you run it, predict the top item.
+  No coding background? Paste the script into a new Colab notebook and press run; you only need
+  to read the output.
+
+  You've now implemented semantic search's core: the operation that vector databases such as
+  pgvector or Pinecone run for you at scale.
+  Success: the similar pair wins in part one, and you can explain your own top-3 ranking as
+  angles between arrows (a score near 1 is a small angle; near 0 is unrelated).
+selfCheck:
+  - q: "Your help-center search returns a refunds article for the query 'cancel my subscription' (cosine 0.82) above the real cancellation article (0.79). What do you check before touching any prompt?"
+    a: "The inputs to the vectors: how the articles were chunked (are the cancellation steps buried in a long billing chunk?) and whether the query and documents were embedded with the same model. A 0.03 gap is effectively a tie, so fix chunking or add keyword (hybrid) search, then re-read the scores."
+  - q: "A word-count cosine says 'cheap flights to Rome' and 'budget airfare Italy' have similarity 0, while an embedding model scores them about 0.8. Which do you trust for a travel search box, and when are word counts still useful?"
+    a: "Trust the embeddings for meaning: word counts only match identical words, so synonyms score 0. Word counts (or keyword search) still help for exact terms such as product codes, names and error messages, which is why many systems combine both."
+mcq:
+  - q: "A notes app embeds every note. Your note 'my goal is to train three times a week' scores cosine 0.91 against the query 'skipped gym' and 0.34 against 'invoice reminder'. What does the 0.91 actually measure?"
+    options:
+      - "The two vectors have almost exactly the same length"
+      - "The two vectors point in almost the same direction"
+      - "About 91% of their coordinates hold matching values"
+      - "The straight-line distance between them is 0.91"
+    answer: 1
+    explain: "Cosine similarity is the dot product of the normalized vectors, so lengths are divided out and only direction remains. Two vectors can differ in every coordinate and still be nearly parallel. Distance is a different measure (and a small distance would be the good sign), and length says nothing about meaning."
+  - q: "A keyword-count search scores 'how do I get my money back' against a page titled 'Refund policy' at exactly 0. Why?"
+    options:
+      - "The page is long, so its count vector is far too large"
+      - "Cosine can only compare statements, not questions"
+      - "No word appears in both, so the dot product is zero"
+      - "The page vector points the opposite way to the query"
+    answer: 2
+    explain: "With word counts, each word is its own axis; two texts with no words in common have no overlapping non-zero entries, so their dot product is 0 and they sit at 90°. Length can't cause it, since cosine ignores length, and count vectors can't point opposite because counts are never negative. Embeddings fix this by placing synonyms near each other."
+  - q: "Your embedding model returns unit-length vectors. The vector database offers cosine, dot product and Euclidean distance. Which choice changes the ranking of results?"
+    options:
+      - "None of them: for unit vectors all three rank alike"
+      - "Dot product, because it ignores the angle entirely"
+      - "Euclidean, because it measures position, not angle"
+      - "Cosine, because it rescales vectors a second time"
+    answer: 0
+    explain: "With every length equal to 1, the dot product equals the cosine, and squared Euclidean distance equals 2 − 2·cosine, so all three sort results the same way. They only diverge when lengths vary, which is why the model's documentation says which metric to use."
+  - q: "Your RAG system always returns its top 5 chunks, even for questions your documents can't answer, where the best score is 0.21. How should you stop it from answering from irrelevant chunks?"
+    options:
+      - "Use 0.5 as the cutoff, since it's the standard for cosine"
+      - "Switch to raw dot product so weak matches score lower"
+      - "Return the top 10 instead, so a good chunk is included"
+      - "Pick a cutoff from labelled examples for your own model"
+    answer: 3
+    explain: "Score ranges differ between embedding models, so there's no universal cutoff; test queries with known answers show where relevant and irrelevant scores separate for yours. Raw dot product adds length effects without fixing relevance, and more results only adds more irrelevant text."
+backupResources:
+  - label: "Mathematics for Machine Learning — free book, ch. 3.4 (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+  - embeddings
+  - rag
+---
+
+An **embedding** is a vector: a point in a space with hundreds or thousands of dimensions. The
+whole trick of modern AI retrieval is that *similar meanings become nearby directions*. The last
+lesson's dot product measures alignment, but it also grows with length. Divide by the two
+lengths and you get **cosine similarity**, the cosine of the angle between two vectors and the
+number most semantic search and RAG systems rank by.
+
+## From word counts to angles
+
+The simplest way to turn text into vectors is to count words. With two words, "hello world" is
+(1, 1) and "hello" is (1, 0). The angle between their arrows is 45°, and cos 45° ≈ 0.71.
+
+- **Same direction:** angle 0°, cosine 1.
+- **Nothing in common:** angle 90°, cosine 0.
+- **Repeating a word** pushes the point further out along the same line, so the score doesn't
+  change. Cosine looks only at direction.
+
+You don't need to draw anything: cosine = (a · b) ÷ (|a| × |b|), the dot product divided by the
+two lengths. That works in five dimensions or 1,536.
+
+Word counts have a weakness: "refund" and "money back" share no words, so they score 0.
+Embedding models fix that by learning vectors where texts with related meanings point in
+similar directions. The score is computed the same way.
+
+> 💡 **Try it:** in your head — if cos(a,b) = 1, the texts mean nearly the same thing; what
+> does cos(a,b) ≈ 0 mean? (Unrelated, not opposite — that would drift negative.) This is
+> exactly the intuition you'll use to debug "why did my RAG retrieve garbage."
+
+## Worked example: rank two documents by hand
+
+Real embeddings have hundreds of dimensions, but the arithmetic is identical in three. Say a
+query embeds to **q = (1, 2, 0)** and two documents embed to **A = (2, 3, 1)** and
+**B = (0, 1, 3)**.
+
+1. **Dot products.** q·A = 1×2 + 2×3 + 0×1 = 8. q·B = 1×0 + 2×1 + 0×3 = 2.
+2. **Lengths** (square root of the sum of squares). |q| = √5 ≈ 2.24, |A| = √14 ≈ 3.74,
+   |B| = √10 ≈ 3.16.
+3. **Cosine.** cos(q, A) = 8 ÷ (2.24 × 3.74) ≈ **0.96**. cos(q, B) = 2 ÷ (2.24 × 3.16) ≈
+   **0.28**.
+
+Document A wins: its arrow points almost the same way as the query. Notice what you did *not*
+need: any idea what each coordinate "means". A vector database does exactly these three steps,
+just across millions of documents, with indexing so it doesn't have to compare every pair.
+
+## Common mistakes
+
+- **Rankings look random** → the query and the documents were embedded with different models
+  (or versions of one), so their spaces don't line up → re-embed everything with one model and
+  store the model name next to each vector.
+- **Long documents always win** → raw dot product without normalization, so bigger vectors
+  score higher regardless of direction → use cosine, or check that your vector store's distance
+  setting matches what the embedding model recommends.
+- **The right document ranks fifth** → its chunk covers several topics, so its vector averages
+  them and points nowhere in particular → split into chunks of one idea each and re-check the
+  scores.
+- **Reading cosine as a percentage** → 0.8 doesn't mean "80% the same", and score ranges vary
+  by model → compare scores within one model, and calibrate any cutoff on your own examples.
+
+## Where you'll see it in AI
+
+- **Semantic search and RAG:** retrieval ranks chunks by cosine against the query
+  (→ rag-fundamentals, → embeddings-vector-databases).
+- **Deduplication and clustering:** near-duplicate texts have cosine close to 1.
+- **Evaluating answers:** some evals compare an answer's embedding with a reference answer's
+  (→ evals-and-testing).
+
+Next, → change-of-basis-embeddings explains why the individual coordinates of an embedding
+rarely mean anything on their own.

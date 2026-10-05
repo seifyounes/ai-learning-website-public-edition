@@ -1,0 +1,216 @@
+---
+title: "Regularization with ridge regression"
+subtitle: "Trade a little bias for a lot less variance by penalising big weights"
+summary: "Add a penalty on large weights to cut variance, pick its strength with cross-validation, and recognise the same idea as weight decay in neural networks."
+changeNote: "New lesson in the machine learning track, written from the lecture's transcript, with a worked example, a code task and a quiz."
+section: math
+pillar: machine-learning
+order: 7
+level: intermediate
+estMinutes: 25
+taskMinutes: 25
+prerequisites:
+  - logistic-regression
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "Q81RR3yKn30"
+  published: "2018-09-24"
+  year: 2018
+  minutes: 20
+  title: "Regularization Part 1: Ridge (L2) Regression"
+  channel: "StatQuest with Josh Starmer"
+  why: "This lecture pulls the track together: an overfit least squares line from two lessons back, a penalty added to the loss, the penalty's strength chosen by cross-validation, and the same trick applied to logistic regression. It works every number on screen, explains why a smaller slope means a less sensitive model, and ends with ridge fitting more parameters than there are data points, which is the situation large models live in."
+  notes:
+    - "3:35 The main idea: accept a slightly worse fit to the training data in exchange for much lower variance."
+    - "4:36 The penalty: sum of squared residuals plus lambda times the slope squared, with the numbers worked out."
+    - "9:51 Choosing lambda: try a range of values and keep the one that does best in 10-fold cross-validation."
+    - "15:29 With more parameters than data points, least squares has no single answer; ridge still finds one."
+applyIt: |
+  **When a model has many inputs and not many examples, assume it will overfit until a
+  regularized version proves otherwise.** Find a model or analysis in your own work where the
+  number of inputs is not small next to the number of rows: a survey with 40 questions and 80
+  responses, a sales model with 25 columns and two years of monthly data, a classifier on
+  embeddings with hundreds of dimensions and a few hundred labels.
+
+  1. Fit it with no penalty and note training and held-out error.
+  2. Fit it again across a range of penalty strengths (for example 0.01 to 1,000, each ten
+     times the last) and let cross-validation choose.
+  3. Compare the held-out error of the two. If the gap closes, the original was overfitting.
+
+  **If you build software:** scikit-learn's `RidgeCV` and `LogisticRegressionCV` do the sweep
+  for you; standardize the inputs first so the penalty treats them evenly. **If you don't
+  code:** when someone presents a model with many inputs and few examples, ask whether it was
+  regularized and how the strength was chosen.
+  Success: you have held-out error with and without a penalty for one real model, and the
+  penalty strength cross-validation chose.
+recap:
+  - emoji: "🐭"
+    title: "Plenty of data, one good line"
+    text: "With many measurements, a least squares line through weight and size is trustworthy. The question is what happens when you only have a few."
+  - emoji: "✌️"
+    title: "Two points, perfect and wrong"
+    text: "Fit a line to just two training points and it passes through both: zero error. On the testing points it misses badly, so it's overfit with high variance."
+  - emoji: "⚖️"
+    title: "A little bias, a lot less variance"
+    text: "Ridge regression deliberately fits the training data a bit worse. In exchange its predictions vary much less, so they're better in the long run."
+  - emoji: "➕"
+    title: "The penalty"
+    text: "Instead of minimising only the squared residuals, ridge minimises them plus lambda times the slope squared. A steep line now has to earn its steepness."
+  - emoji: "📉"
+    title: "Smaller slope, calmer predictions"
+    text: "A smaller slope means the prediction changes less when the input changes, so it's less sensitive to quirks of the training data."
+  - emoji: "🎛️"
+    title: "Choosing lambda"
+    text: "Lambda 0 gives plain least squares; bigger lambdas push slopes toward zero. Try many values and let 10-fold cross-validation pick."
+  - emoji: "🧬"
+    title: "Everywhere, even with too little data"
+    text: "The penalty works for categories, for logistic regression and for every weight except the intercept. It can even fit more parameters than there are data points."
+task: |
+  Watch a penalty rescue an overfit model. The code makes 30 training rows with 20 inputs, of
+  which only 3 matter, then fits ridge regression at several strengths and scores each on 200
+  held-out rows. Run it in a free Google Colab notebook or any Python with NumPy:
+
+  ```python
+  import numpy as np
+
+  rng = np.random.default_rng(1)
+  n_train, n_test, n_features = 30, 200, 20
+  true_w = np.zeros(n_features)
+  true_w[:3] = [3.0, -2.0, 1.5]                 # only 3 of the 20 inputs matter
+
+  X = rng.normal(size=(n_train + n_test, n_features))
+  y = X @ true_w + rng.normal(0, 2.0, n_train + n_test)
+  X_tr, y_tr, X_te, y_te = X[:n_train], y[:n_train], X[n_train:], y[n_train:]
+
+  def ridge_fit(X, y, lam):
+      x_mean, y_mean = X.mean(axis=0), y.mean()
+      Xc, yc = X - x_mean, y - y_mean           # the intercept is not penalised
+      w = np.linalg.solve(Xc.T @ Xc + lam * np.eye(X.shape[1]), Xc.T @ yc)
+      return w, y_mean - x_mean @ w
+
+  for lam in [0, 1, 5, 20, 100, 1000]:
+      w, b = ridge_fit(X_tr, y_tr, lam)
+      mse = lambda X, y: np.mean((X @ w + b - y) ** 2)
+      print(f"lambda {lam:>4}: train {mse(X_tr, y_tr):5.2f}  test {mse(X_te, y_te):5.2f}  "
+            f"size of weights {np.sum(w ** 2):5.2f}")
+  ```
+
+  1. Write down the six rows. Lambda 0 is plain least squares: how far apart are its training
+     and test errors?
+  2. Which lambda gives the lowest test error? What happens to training error on the way there?
+  3. At lambda 1000, why are training and test error both high and close together? (Name it
+     with the words from → bias-variance-overfitting.)
+  4. Change `n_train` to 300 and rerun. Does the penalty still matter as much?
+
+  **No code?** Work the body's example by hand: compute penalty-plus-error for slopes 1.5, 1.0
+  and 0.5 with lambda = 1, and confirm 1.0 is lowest.
+
+  Success: you found the lambda with the lowest test error, explained the gap at lambda 0, and
+  saw the penalty matter less with ten times more data.
+selfCheck:
+  - q: "You set lambda by trying ten values and keeping the one with the best score on your test set. What's wrong, and what should you do?"
+    a: "The test set has now been used to make a choice, so its score is optimistic and no longer an honest final check. Choose lambda by cross-validation on the training data (as the lecture does), then score the test set once with the chosen value."
+  - q: "A ridge model with a very large lambda predicts almost the same value for every customer. What happened?"
+    a: "The penalty dominated the loss, so every weight was pushed close to zero and only the intercept, which isn't penalised, is left: the model predicts roughly the average for everyone. That's high bias. Lower lambda and let cross-validation find the balance."
+mcq:
+  - q: "As you raise lambda, both training error and cross-validation error climb steadily from the very first step. What does that suggest?"
+    options:
+      - "The penalty is too weak; keep raising lambda"
+      - "It wasn't overfitting, so little penalty is needed"
+      - "Cross-validation is broken here and should be replaced"
+      - "The intercept should be added to the penalty too"
+    answer: 1
+    explain: "Ridge pays off when it reduces variance, which shows as falling validation error. If validation error only rises, the unpenalised model wasn't overfitting much, and the penalty is just adding bias. The intercept is left out of the penalty on purpose."
+  - q: "Your inputs are annual income (in dollars, values around 50,000) and age (in years). You apply ridge without rescaling them. What goes wrong?"
+    options:
+      - "Ridge can't be used when inputs are in different units"
+      - "Ridge will ignore income because its values are large"
+      - "The intercept absorbs the penalty for the larger input"
+      - "The penalty treats the inputs unevenly due to scale"
+    answer: 3
+    explain: "The penalty is on the size of each weight, and a weight's size depends on its input's units: income needs a tiny weight, age a larger one, so age is penalised far more for the same real effect. Standardize the inputs first so the penalty compares like with like."
+  - q: "You have 10,000 measured features and 500 samples. Why is ridge useful here beyond reducing overfitting?"
+    options:
+      - "Least squares has no single answer; ridge does"
+      - "Ridge removes the features that aren't useful"
+      - "Ridge needs no cross-validation with that many features"
+      - "Ridge turns the 500 samples into 10,000 samples"
+    answer: 0
+    explain: "With more parameters than data points, infinitely many weight settings fit the training data perfectly, so least squares can't choose. The penalty picks the one with the smallest weights, giving a unique answer. Ridge shrinks weights but rarely sets them exactly to zero, and lambda still needs cross-validation."
+  - q: "A fine-tuning configuration includes 'weight_decay: 0.01'. How does that relate to this lesson?"
+    options:
+      - "It shrinks the learning rate a little after every epoch"
+      - "It drops 1% of the training examples at random"
+      - "It's a ridge-style pull of the weights toward zero"
+      - "It sets 1% of the model's weights to zero at the end"
+    answer: 2
+    explain: "Weight decay shrinks every weight slightly at each update, which works like ridge's squared-weight penalty: large weights must earn their size by reducing the loss. It isn't a learning-rate schedule, and dropping examples or zeroing weights are different techniques."
+backupResources:
+  - label: "scikit-learn user guide — Ridge regression"
+    url: "https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification"
+    type: "docs · reference"
+tags:
+  - math
+  - machine-learning
+  - regularization
+  - ridge-regression
+---
+
+An overfit model is too sensitive to the training data: small quirks in the examples swing its
+predictions. **Regularization fixes that by adding a penalty to the loss for large weights, so
+the model accepts a slightly worse fit to the training data in exchange for predictions that
+vary much less.** Ridge regression is the cleanest version, and its idea survives in nearly
+every large model as weight decay.
+
+## The penalty
+
+Least squares minimises the sum of squared residuals. Ridge minimises:
+
+```text
+SSR + λ × (sum of squared weights)
+```
+
+The intercept is left out: it only sets the average level and doesn't make predictions
+sensitive to any input. **λ (lambda)** sets how much the penalty counts. At λ = 0 you get plain
+least squares; as λ grows, the weights shrink toward zero and the predictions flatten toward the
+average. A smaller weight means the prediction moves less when its input moves, which is
+exactly what "lower variance" means in practice.
+
+You can't know λ in advance, so you choose it with → cross-validation-folds: try a range, keep
+the value with the best cross-validated error.
+
+## Worked example: two training points
+
+Training data: (2, 3) and (4, 6). Testing data: (1, 3.2), (3, 4.2), (5, 5.4). Use λ = 1.
+
+- **Least squares** passes through both points: y = 1.5x. Training SSR = 0, penalty =
+  1 × 1.5² = 2.25, total **2.25**.
+- **Ridge** gives slope 1.0 (centred formula: 3 / (2 + λ)), line y = 1.5 + 1.0x. Its
+  predictions 3.5 and 5.5 miss by 0.5 each: SSR = 0.5, penalty = 1 × 1.0² = 1, total **1.5**.
+  Ridge's total is lower, so it wins the penalised contest.
+
+Now the testing points. Least squares predicts 1.5, 4.5, 7.5: SSR = 2.89 + 0.09 + 4.41 =
+**7.39**. Ridge predicts 2.5, 4.5, 6.5: SSR = 0.49 + 0.09 + 1.21 = **1.79**. Giving up a perfect
+training fit cut the test error by about three quarters. With λ = 2 the slope would be 0.75; at
+very large λ it approaches 0, a flat line at the average, which is too much bias.
+
+## Common mistakes
+
+- **Not standardizing inputs.** The penalty is on weight size, which depends on units; rescale
+  inputs so the penalty treats them fairly.
+- **Choosing λ on the test set.** Use cross-validation; the test set is for the final check.
+- **Penalising the intercept.** It shifts every prediction equally and should stay free.
+- **Expecting feature selection.** Ridge shrinks weights but rarely to exactly zero. Lasso, its
+  sibling with an absolute-value penalty, can zero them out.
+
+## Where you'll see it in AI
+
+- **Weight decay** in neural network training and fine-tuning applies the same pull toward
+  small weights at every step (→ neural-networks, → fine-tuning-fundamentals).
+- **Over-parameterised models**, with far more weights than training examples, are normal in
+  deep learning; penalties and other regularizers help them generalize instead of memorizing.
+- **Regularized logistic regression** on embeddings is a standard, strong text-classification
+  baseline (→ embeddings-vector-databases).
+- **Trees** have their own variance controls: limits on depth and leaf size, then averaging
+  many trees (→ decision-trees-gini, → random-forests-bagging).

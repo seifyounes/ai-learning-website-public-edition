@@ -1,0 +1,218 @@
+---
+title: "Reading LLM benchmarks"
+subtitle: "What a leaderboard score measures, how noisy it is, and what it can't tell you"
+summary: "Read an LLM benchmark score for what it is: one test, scored one way, with a noise band and known blind spots, then check it on your own tasks."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript, with the pass@k material moved here from the ROC lesson."
+section: math
+pillar: evaluation
+order: 7
+level: intermediate
+estMinutes: 11
+taskMinutes: 25
+prerequisites:
+  - satisficing-optimizing-metrics
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "kDY4TodQwbg"
+  published: "2024-08-14"
+  year: 2024
+  minutes: 6
+  title: "What are Large Language Model (LLM) Benchmarks?"
+  channel: "IBM Technology"
+  why: "This is where the track turns from classic classifiers to LLMs. Before you evaluate your own app, you need to read the numbers model makers publish. In six minutes, the lecture breaks a benchmark into its three parts (test data, how the model is run, how answers are scored) and names its three limits: edge cases it misses, overfitting, and a short shelf life. That's the checklist this lesson builds on."
+  notes:
+    - "1:02 How the model is run matters: zero-shot, few-shot or fine-tuned scores on the same test are not comparable."
+    - "2:06 The lecture calls recall 'the number of true positives'. Strictly it's a share: true positives divided by all real positives."
+    - "5:17 The three limits: edge cases the test doesn't cover, overfitting to the test, and benchmarks that stop separating models once scores top out."
+applyIt: |
+  **Use leaderboards to shortlist, and your own examples to decide.** A benchmark tells you how a
+  model did on someone else's test. You need to know how it does on yours: your documents, your
+  questions, your format.
+
+  1. Write down 10–20 real tasks from your work or studies that you'd use a model for: questions
+     you ask, documents you summarize, code you write.
+  2. Note the right answer, or what a good answer must contain, for each one.
+  3. Run two or three shortlisted models (or chat assistants) on all of them, with the same
+     prompt.
+  4. Mark each answer pass or fail against your note, and count.
+  5. Compare your count with the leaderboard order. Where they disagree, trust yours for this
+     job.
+
+  **If you build software:** keep the tasks and expected answers in a file in your repo, so every
+  new model release can be checked against them in minutes.
+  **If you don't code:** a spreadsheet with one row per task and one column per model is all it
+  takes.
+
+  Success: a pass count per model on your own tasks, and one sentence on whether it matched the
+  leaderboard.
+recap:
+  - emoji: "📏"
+    title: "What a benchmark is"
+    text: "A standard test for LLMs: a task to complete, a metric to score it with, and a final score, so different models can be compared on the same thing."
+  - emoji: "🗂️"
+    title: "Step 1: the test data"
+    text: "Prepare the sample tasks the model must handle: documents, coding problems or maths questions, depending on what you want to measure."
+  - emoji: "🧪"
+    title: "Step 2: run the model"
+    text: "Test it zero-shot, few-shot or fine-tuned, depending on how many labelled examples it gets first. The setup changes the score."
+  - emoji: "🧮"
+    title: "Step 3: score it"
+    text: "Compare outputs with the expected answers using metrics such as accuracy, recall or perplexity, often combined into one score from 0 to 100."
+  - emoji: "🏃"
+    title: "An example"
+    text: "Three models take the same science test and score 90, 70 and 30. On this test, the first is best; that's all the score says."
+  - emoji: "⚠️"
+    title: "Three limits"
+    text: "Benchmarks can miss edge cases, can be overfitted so the score stops reflecting new data, and wear out once top models max them."
+task: |
+  Find the noise band around a benchmark score.
+
+  ```python
+  import math, random
+
+  n = 500  # questions in the benchmark
+  a, b = 0.81, 0.79  # two models' scores
+  se_a = math.sqrt(a * (1 - a) / n)
+  se_b = math.sqrt(b * (1 - b) / n)
+  se_gap = math.sqrt(se_a**2 + se_b**2)  # standard error of the difference
+  print(f"gap {(a - b) * 100:.1f} points, 95% band ± {1.96 * se_gap * 100:.1f} points")
+
+  # one model with a true skill of 81% takes ten fresh 500-question tests
+  random.seed(1)
+  print([sum(random.random() < 0.81 for _ in range(n)) / n for _ in range(10)])
+  ```
+
+  1. Run it (any online Python runner) or compute the first part by hand with a calculator.
+  2. Look at the ten simulated scores of a single model. How far apart are the highest and the
+     lowest?
+  3. Open any public LLM leaderboard, find two models within 2 points of each other, and look up
+     how many questions that benchmark has. Work out each score's standard error, combine them
+     as √(SE_A² + SE_B²), and decide whether the gap is bigger than 1.96 times that.
+
+  Success: a band of about ±5 points on the gap between two scores from 500 questions, and a
+  written verdict on whether the leaderboard gap you found is bigger than the noise.
+selfCheck:
+  - q: "A new model tops a coding leaderboard by 1.5 points on a 400-problem benchmark. Your manager wants to switch today. What do you say?"
+    a: "With 400 problems, each score has a standard error of about 2 points, so the gap between two scores has one of about √(2² + 2²) ≈ 2.8 and a 95% band of roughly ±5.5 points; 1.5 points may be luck. Run both models on your own coding tasks before switching, and check how each was run (prompting setup, number of samples)."
+  - q: "Every frontier model now scores 95% or more on a well-known benchmark. Is it still useful for choosing between them?"
+    a: "Hardly. A benchmark that everyone maxes no longer separates models, and some of the remaining gap may come from test questions leaking into training data. Look at newer, harder tests and at your own tasks."
+  - q: "Two papers report the same model on the same benchmark at 68% and 75%. Neither is lying. How can that be?"
+    a: "The setup differs: zero-shot vs few-shot prompting, a different answer-extraction rule, pass@1 vs best of several samples. A benchmark score only means something together with how the model was run."
+mcq:
+  - q: "Your code-generation eval reports pass@1 = 45% and pass@10 = 78%. What does that gap tell you?"
+    options:
+      - "Below 50% on the first try means it lacks the skill"
+      - "The skill exists, but the first sample often misses"
+      - "The model memorized about 78% of the test answers"
+      - "Set temperature to zero and pass@1 will reach 78%"
+    answer: 1
+    explain: "pass@k is the probability that at least one of k samples succeeds. Solving 78% of tasks within ten tries shows the capability is there; the 45% first-try rate shows it isn't consistent. That justifies generating several candidates and keeping one that passes a verifier (tests, a checker), trading extra inference cost for reliability. Memorization would inflate both numbers, not open a gap between them. Temperature zero gives one deterministic answer per task, which may shift pass@1 a little but can't make one attempt worth ten."
+  - q: "You need a model to summarize contracts in your field. Model X leads a general reasoning benchmark by 6 points. What's the sound next step?"
+    options:
+      - "Pick X, since a 6-point lead is well outside the noise"
+      - "Pick the model with the most benchmarks in its favour"
+      - "Fine-tune both models on the benchmark, then compare"
+      - "Run both on 20 of your own contracts and compare"
+    answer: 3
+    explain: "A general benchmark can miss the edge cases that matter to your task. It's a good shortlist, but your own examples decide. Fine-tuning on a benchmark would only teach to that test, the overfitting the lecture warns about."
+  - q: "A model scores 92% on a popular maths benchmark but stumbles on fresh problems written last month. What's the most likely explanation?"
+    options:
+      - "Benchmark questions leaked into its training data"
+      - "Fresh problems are always harder than benchmark ones"
+      - "The model was run zero-shot on the new problems"
+      - "Maths benchmarks measure recall rather than accuracy"
+    answer: 0
+    explain: "When a model has seen test questions during training, its score reflects memory, not skill, and it drops on new problems. Fresh problems aren't always harder, and a zero-shot run alone wouldn't explain a large drop on similar questions."
+  - q: "Model A scores 81% and model B 79% on a 500-question benchmark. A colleague says A is clearly better. What's your judgement?"
+    options:
+      - "A is better: 2 points is a meaningful lead at this size"
+      - "B is better, since lower scores mean less overfitting"
+      - "Undecided: the gap is smaller than its own noise band"
+      - "Undecided until both run on a bigger benchmark first"
+    answer: 2
+    explain: "At 500 questions each score has a standard error of about 1.8 points, so the gap has one of √(1.8² + 1.8²) ≈ 2.5 and a 95% band of about ±5 points. A 2-point gap could easily reverse on another sample. A bigger benchmark would narrow the band, but checking both on your own tasks answers the question that matters to you."
+backupResources:
+  - label: "Go deeper: How to evaluate LLMs | the statistics behind Arena's rankings (Arena AI, 39 min)"
+    url: "https://www.youtube.com/watch?v=CnWt0Zarfoc"
+    type: "video"
+tags:
+  - math
+  - evaluation
+  - benchmarks
+  - llm
+---
+
+**You need:** accuracy and recall from → precision-recall-tradeoff, and the idea of a noise band
+from → standard-error-vs-deviation.
+
+Every model release comes with a table of benchmark scores, and every leaderboard ranks models
+by them. They're useful, and easy to over-read. A benchmark score is **one test, run one way,
+scored one way**, with noise around it. This lesson is how to read one without being fooled,
+and why it can only shortlist a model for your job.
+
+## Three parts of every benchmark
+
+1. **The test data:** a fixed set of questions, documents or coding problems.
+2. **How the model is run:** zero-shot (no examples), few-shot (a few worked examples in the
+   prompt) or fine-tuned. The same model scores differently under each.
+3. **How answers are scored:** exact match, accuracy, unit tests passed, or a judge. Often several
+   are combined into one score from 0 to 100.
+
+Change any of the three and you have a different number. Before comparing two scores, check
+that all three match.
+
+## Worked example: is a 2-point lead real?
+
+A benchmark has 500 questions. Model A scores 81%, model B 79%. Treat each score as a sample
+proportion:
+
+1. Standard error of each score ≈ √(0.8 × 0.2 ÷ 500) = √0.00032 ≈ 0.018, so about **1.8
+   points**.
+2. The question is about the **gap**, and both scores are noisy, so their errors combine: SE of
+   the gap ≈ √(1.8² + 1.8²) = √2 × 1.8 ≈ **2.5 points**.
+3. A 95% band on the gap is about ±1.96 × 2.5 ≈ **±5 points**. The 2-point gap sits well inside
+   it. Run a fresh 500 questions and the order could flip.
+
+With 5,000 questions each standard error drops to about 0.57 points, the gap's to about 0.8, and
+its band to about ±1.6 points, because they fall with the square root of the number of
+questions. Small benchmarks can't separate close models.
+
+If you have both models' per-question results, a **paired** comparison on the same questions is
+tighter: questions both get right or both get wrong add no noise to the gap, only the ones where
+they disagree do. If they disagree on 50 of the 500, the gap's standard error is about
+√(0.10 ÷ 500) ≈ 1.4 points, a band of about ±2.8: tighter, but still wider than 2.
+
+## pass@k: capability vs consistency
+
+Coding benchmarks often report **pass@k**: the probability that at least one of k samples
+passes the tests. A big gap between pass@1 and pass@10 means the model *can* solve the task but
+doesn't do it reliably on the first try. That gap is what justifies generating several answers
+and keeping one that passes a checker.
+
+## Three limits to keep in mind
+
+- **Edge cases:** a general test rarely contains the unusual inputs your job depends on.
+- **Overfitting and contamination:** if test questions leak into training data, or a model is
+  tuned towards one test, the score stops measuring skill on new problems.
+- **Short shelf life:** once top models max a benchmark, it no longer separates them, and newer,
+  harder tests replace it.
+
+## Common mistakes
+
+- **Treating a 1–2 point lead as a ranking.** Check the number of questions first.
+- **Comparing scores from different setups.** Few-shot vs zero-shot, pass@1 vs pass@10, a
+  different answer parser.
+- **Choosing a model for your task from a general benchmark alone.** It's a shortlist.
+- **Reading an old benchmark as current.** A maxed-out test says little about today's models.
+
+## Where you'll see it in AI
+
+- **Model launches and leaderboards:** every release table is a list of benchmark scores
+  (→ choosing-models-providers).
+- **Human-vote rankings:** arena-style leaderboards turn pairwise votes into scores with
+  confidence intervals (the optional Arena video below goes deep).
+- **Your own eval set:** the step after a benchmark is testing your app on your tasks
+  (→ llm-app-evals).
+- **Sampling strategies:** pass@k is the case for best-of-n with a verifier
+  (→ verification-and-grounding).

@@ -1,0 +1,223 @@
+---
+title: "The Adam optimizer"
+subtitle: "Momentum plus a per-weight step size, and why it's the usual default"
+summary: "Explain what Adam's two running averages and bias correction do, compute its first step by hand, and know which of its settings to tune."
+changeNote: "New lesson in the calculus track, written from the lecture's transcript; takes over the original lesson's LoRA memory question and adds a task."
+section: math
+pillar: calculus
+order: 10
+level: intermediate
+estMinutes: 36
+taskMinutes: 25
+prerequisites:
+  - momentum-optimizer
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "JXQT_vxqwIs"
+  published: "2017-08-25"
+  year: 2017
+  minutes: 7
+  title: "Adam Optimization Algorithm (C2W2L08)"
+  channel: "DeepLearningAI"
+  why: "Adam and its variants are the optimizer most training and fine-tuning tools start from, so its settings are the ones you'll actually see. Andrew Ng builds it from the momentum update in the previous lesson plus RMSprop's running average of squared gradients, then says plainly which settings people tune (the learning rate) and which they leave at defaults. Seven minutes, with the full update written out."
+  notes:
+    - "The lecture combines momentum with RMSprop, which has its own video earlier in the same course. The worked example below explains the RMSprop half, so you can follow without it."
+    - "Around 4:40–5:40: the default settings (β1 = 0.9, β2 = 0.999, ε = 10⁻⁸) and the advice to tune only the learning rate in most cases."
+applyIt: |
+  **When you configure training or fine-tuning, Adam's settings decide most of what you'll
+  touch: tune the learning rate, leave the betas and epsilon alone, and budget the memory.**
+
+  1. Find the optimizer section of a training config, notebook or fine-tuning tool you use. You
+     will usually see `adam` or `adamw`, a learning rate, and maybe `beta1`, `beta2`, `eps`.
+  2. Leave the betas and epsilon at their defaults unless you have a specific reason. Spend your
+     trial runs on the learning rate (try values about 3× apart).
+  3. Budget memory before you start: Adam keeps two extra numbers for every trainable weight.
+     That's why training only a small adapter (LoRA and similar) fits on smaller GPUs.
+
+  **If you build software:** `torch.optim.AdamW(model.parameters(), lr=...)` is a common
+  starting point; print `optimizer.state` after one step to see the two stored averages.
+  **If you don't code:** in a hosted fine-tuning form, the "learning rate multiplier" field is
+  usually the one worth changing; write down why before you change it.
+
+  Success: for one real setup you can name the optimizer, the learning rate you'll try and the
+  extra memory its state needs.
+recap:
+  - emoji: "🧐"
+    title: "Most new optimizers faded"
+    text: "Many proposed optimizers worked on a few problems but didn't generalise, so the field grew sceptical. RMSprop and Adam are rare ones that held up across many architectures."
+  - emoji: "🧩"
+    title: "Momentum plus RMSprop"
+    text: "Adam keeps two running averages per weight: v, the average of gradients (momentum, β1), and s, the average of squared gradients (RMSprop, β2)."
+  - emoji: "🩹"
+    title: "Correct the cold start"
+    text: "Both averages start at zero, so early values are too small. Adam divides them by (1 − β1ᵗ) and (1 − β2ᵗ) to fix that."
+  - emoji: "➗"
+    title: "The update"
+    text: "W ← W − α · v̂ / (√ŝ + ε). The momentum average sets the direction; dividing by the root of the squared average scales each weight's step."
+  - emoji: "🎛️"
+    title: "What to tune"
+    text: "β1 = 0.9, β2 = 0.999 and ε = 10⁻⁸ are the usual defaults and rarely touched. The learning rate α still needs tuning."
+  - emoji: "🏷️"
+    title: "The name"
+    text: "Adam stands for adaptive moment estimation: v estimates the first moment (mean) of the gradients and s the second moment (mean of squares)."
+task: |
+  **Watch Adam give two very different weights the same step (25 minutes, Python).**
+
+  Same stretched loss as the momentum lesson, `x² + 100y²`, where the y-gradient is 100 times
+  steeper:
+
+  ```python
+  import math
+
+  def adam(lr, steps=2000, b1=0.9, b2=0.999, eps=1e-8):
+      x, y = 3.0, 1.0
+      v, s = [0.0, 0.0], [0.0, 0.0]
+      for t in range(1, steps + 1):
+          g = [2 * x, 200 * y]                 # gradient of x^2 + 100y^2
+          p = [x, y]
+          for i in range(2):
+              v[i] = b1 * v[i] + (1 - b1) * g[i]
+              s[i] = b2 * s[i] + (1 - b2) * g[i] ** 2
+              v_hat = v[i] / (1 - b1 ** t)
+              s_hat = s[i] / (1 - b2 ** t)
+              p[i] -= lr * v_hat / (math.sqrt(s_hat) + eps)
+          if t == 1:
+              print(f"  step 1 moved x by {x - p[0]:.4f} and y by {y - p[1]:.4f}")
+          x, y = p
+          if x * x + 100 * y * y < 1e-4:
+              return t
+      return "never"
+
+  for lr in (0.01, 0.1, 0.3):
+      print(f"Adam lr={lr}: steps to a tiny loss =", adam(lr))
+  ```
+
+  Then delete the two bias-correction lines (use `v[i]` and `s[i]` directly) and rerun lr = 0.1.
+
+  Success: at step 1 both coordinates move by exactly the learning rate, even though their
+  gradients are 6 and 200; lr = 0.1 reaches the target in about 82 steps (momentum took about
+  103, plain descent about 315); and without bias correction the first step jumps to about
+  0.316, more than three times the learning rate.
+selfCheck:
+  - q: "A colleague's fine-tune with Adam diverges. They propose changing β2 from 0.999 to 0.99 and ε from 1e-8 to 1e-6. What would you try first instead, and why?"
+    a: "Lower the learning rate. It's the setting that matters most and the one practitioners actually tune; the betas and epsilon are almost always left at defaults. Change one thing at a time, starting with α."
+  - q: "You plan to fully fine-tune a model with 1 billion parameters stored as 32-bit numbers, using Adam. Roughly how much memory do the weights, gradients and Adam's state need together (ignoring activations)?"
+    a: "Weights 4 GB, gradients 4 GB, and Adam's two averages 8 GB: about 16 GB before activations. Adam's state alone is twice the size of the weights, which is why parameter-efficient methods that train few weights save so much."
+  - q: "In a model, one weight gets gradients around 0.001 every step and another around 10. With plain gradient descent, one learning rate serves both badly. What does Adam do differently for them?"
+    a: "It divides each weight's averaged gradient by the root of its own averaged squared gradient, so both get steps of roughly the learning rate in size. The small-gradient weight is no longer starved and the large one isn't overshooting."
+mcq:
+  - q: "In LoRA fine-tuning the base weights are frozen and only small adapter matrices added alongside them are trained. Beyond storing fewer new weights, why does this slash GPU memory during training?"
+    options:
+      - "Gradients and Adam's state exist only for the adapters"
+      - "The forward pass can skip the frozen layers entirely"
+      - "Frozen weights are compressed automatically on load"
+      - "Activations no longer need storing for backprop at all"
+    answer: 0
+    explain: "Training memory ≈ weights + gradients + optimizer state (Adam keeps about two extra values per trainable parameter) + activations. Freezing the base removes the gradient and optimizer copies for nearly all parameters. The frozen layers still run in the forward pass, and activations are still stored, because gradients must flow back through those layers to reach the adapters."
+  - q: "At step 1 of Adam (β1 = 0.9, β2 = 0.999), why is bias correction needed?"
+    options:
+      - "It stops the very first gradient from being too large"
+      - "Both averages start at zero, so early values run small"
+      - "It keeps the squared average from ever reaching zero"
+      - "It converts the learning rate into the momentum term"
+    answer: 1
+    explain: "Starting at zero, the first v is 0.1 × g and the first s is 0.001 × g², both far too small. Dividing by (1 − βᵗ) rescales them to g and g². Keeping the denominator away from zero is ε's job, not bias correction's."
+  - q: "You have budget for six short trial runs to tune Adam on a new task. How should you spend them?"
+    options:
+      - "Two values each for β1, β2 and ε, at the default rate"
+      - "Six values of ε, spaced from 1e-4 down to 1e-9"
+      - "Six learning rates, everything else at default"
+      - "Three β2 values first, then three learning rates"
+    answer: 2
+    explain: "The learning rate is the setting that usually needs tuning, while β1 = 0.9, β2 = 0.999 and ε = 1e-8 work across a wide range of problems. Spending trials on ε in particular buys almost nothing."
+  - q: "On the first Adam step, two weights have gradients 6 and 200. Ignoring ε, how far does each move with learning rate 0.1?"
+    options:
+      - "0.6 and 20, in proportion to their gradients"
+      - "0.1 for the first, 20 for the second"
+      - "Neither moves until the averages warm up"
+      - "0.1 each, regardless of the gradient size"
+    answer: 3
+    explain: "After bias correction, v̂ = g and √ŝ = |g| on step 1, so each step is α × g / |g| = 0.1 in size. That per-weight scaling is the RMSprop half of Adam. The proportional answer describes plain gradient descent."
+tags:
+  - math
+  - calculus
+  - optimization
+  - optimizers
+---
+
+**You need:** → momentum-optimizer.
+
+The one idea of this lecture: **Adam combines momentum's average of gradients with a second
+average, of squared gradients, and divides one by the root of the other.** The first sets the
+direction; the second gives every weight its own step size. Add a correction for the averages'
+cold start and you have the optimizer that's the usual default in training and fine-tuning tools.
+
+## Why another optimizer
+
+Andrew Ng opens with a caution: many optimizers have been proposed, shown to work on a few
+problems, and then failed to generalise, so the field is sceptical of new ones. RMSprop and Adam
+are exceptions that worked across a wide range of architectures.
+
+## The two averages
+
+On each step `t`, with `dW` from the current mini-batch:
+
+```text
+v = β1·v + (1 − β1)·dW
+s = β2·s + (1 − β2)·dW²
+```
+
+`v` is the momentum average. `s` is the RMSprop part: a running average of the squared gradient,
+element by element, so it tracks how big each weight's gradients usually are. Both start at
+zero, so early on they're too small. **Bias correction** fixes that:
+
+```text
+v̂ = v / (1 − β1ᵗ)
+ŝ = s / (1 − β2ᵗ)
+W = W − α · v̂ / (√ŝ + ε)
+```
+
+Defaults: `β1 = 0.9`, `β2 = 0.999`, `ε = 10⁻⁸`. People tune `α` and rarely the rest. The name:
+adaptive moment estimation, since `v` and `s` estimate the first and second moments of the
+gradient.
+
+## Worked example with real numbers
+
+First step, one weight with gradient `0.5`:
+
+| quantity | value |
+|---|---|
+| v = 0.1 × 0.5 | 0.05 |
+| s = 0.001 × 0.25 | 0.00025 |
+| v̂ = 0.05 / 0.1 | 0.5 |
+| ŝ = 0.00025 / 0.001 | 0.25 |
+| step = α × 0.5 / √0.25 | α |
+
+A second weight with gradient `0.005` gives `v̂ = 0.005`, `√ŝ = 0.005`, and again a step of `α`.
+Plain gradient descent would have moved them `0.5α` and `0.005α`, a hundredfold difference;
+Adam moves both by about `α`. Without bias correction the first step would be
+`0.05 / √0.00025 ≈ 3.16α`, more than three times too large, at the moment training is least
+stable.
+
+On the task's stretched loss, where one gradient is 100 times steeper than the other, Adam at
+`α = 0.1` reaches the target in about 82 steps, against about 103 for momentum and 315 for plain
+descent.
+
+## Common mistakes
+
+- **Tuning β2 or ε before the learning rate.** The learning rate is almost always the lever.
+- **Forgetting the memory bill.** Two extra numbers per trainable weight: for a model with 7
+  billion parameters in 32-bit precision, that's 56 GB of optimizer state alone.
+- **Assuming Adam needs no learning-rate care.** It adapts per-weight *scale*, not the overall
+  rate; too large still diverges.
+- **Mixing up Adam and AdamW.** AdamW applies weight decay separately from the gradient
+  averages, which is why it's the variant usually paired with weight decay.
+
+## Where you'll see it in AI
+
+- **Fine-tuning configs and training scripts**, almost always as Adam or AdamW
+  (→ fine-tuning-fundamentals).
+- **Memory planning:** optimizer state is a large share of training memory, which is what
+  adapter methods cut (→ backprop-chain-rule-calculus covers the activations share).
+- **Learning-rate schedules** are layered on top of Adam's α (→ learning-rate-decay-schedules).

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getNav } from "@/lib/nav";
 import { getLessonCounts } from "@/lib/content";
-import { ALL_PILLARS } from "@/lib/curriculum";
+import { ALL_PILLARS, SECTIONS } from "@/lib/curriculum";
 import HomeContents from "@/components/HomeContents";
 import HomeDoneCount from "@/components/HomeDoneCount";
 import RouteCards from "@/components/RouteCards";
@@ -36,9 +36,9 @@ export default function Home() {
             <span className="print-display block pb-1 pt-1 text-graphite min-[760px]:pt-3">AI Learning</span>
           </Cell>
           <Cell label="Sections" className="hidden min-[760px]:flex">
-            <span className="qty text-[21px] text-graphite min-[760px]:text-quantity-large">2</span>
+            <span className="qty text-[21px] text-graphite min-[760px]:text-quantity-large">{Object.keys(SECTIONS).length}</span>
           </Cell>
-          <Cell label="Pillars" className="hidden min-[760px]:flex">
+          <Cell label="Pillars & tracks" className="hidden min-[760px]:flex">
             <span className="qty text-[21px] text-graphite min-[760px]:text-quantity-large">{ALL_PILLARS.length}</span>
           </Cell>
           <Cell label="Lessons">

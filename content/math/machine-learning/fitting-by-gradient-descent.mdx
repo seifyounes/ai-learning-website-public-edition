@@ -1,0 +1,219 @@
+---
+title: "Gradient descent: how a model fits"
+subtitle: "Take the derivative, step downhill, shrink the steps, stop near the bottom"
+summary: "Run gradient descent by hand on a small loss, choose a learning rate that converges, and read a loss curve that is diverging or stalling."
+changeNote: "New lesson in the machine learning track, written from the lecture's transcript, with a hand-worked example, a code task and a quiz."
+section: math
+pillar: machine-learning
+order: 5
+level: intermediate
+estMinutes: 30
+taskMinutes: 25
+prerequisites:
+  - least-squares-regression
+  - calculus-for-optimization
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "sDv4f4s2SB8"
+  published: "2019-02-05"
+  year: 2019
+  minutes: 24
+  title: "Gradient Descent, Step-by-Step"
+  channel: "StatQuest with Josh Starmer"
+  why: "Least squares had a formula for the best line; most models don't. This lecture fits the same kind of line a second way, by stepping downhill on the loss, and does every number on screen: the derivative, the step size, the learning rate, the stopping rule, then two parameters at once. Because the answer matches least squares, you can see the method works before you trust it on models where no formula exists."
+  notes:
+    - "4:52 Why not just try lots of values? Gradient descent takes big steps far from the bottom and small ones near it."
+    - "10:43 The step size is the slope times the learning rate; the new value is the old value minus the step."
+    - "13:30 When to stop: the step gets tiny (about 0.001) or a maximum number of steps is reached."
+    - "20:05 With two parameters the earlier learning rate fails, a first look at how sensitive the method is to it."
+applyIt: |
+  **Whenever you train or fine-tune anything, the loss curve is gradient descent reporting on
+  itself, and the learning rate is the first knob to check.** Find a loss curve you can look at:
+  a fine-tuning job's dashboard, a notebook you ran in a course, or the one from this lesson's
+  task.
+
+  - **Loss falls steadily, then flattens:** healthy. More steps buy little.
+  - **Loss jumps around, climbs or shows NaN:** steps are too big. Cut the learning rate by
+    3–10×.
+  - **Loss falls, but very slowly and is still falling at the end:** steps are too small or too
+    few. Raise the learning rate a little or train longer.
+
+  **If you build software:** log the loss every few steps to a file or a tracking tool and plot
+  it before you read any final metric. **If you don't code:** hosted fine-tuning services show
+  this curve in their dashboard; read it with the three rules above before you judge the result.
+  Success: you can look at one real loss curve and name which of the three cases it is.
+recap:
+  - emoji: "🧭"
+    title: "One method, many models"
+    text: "Lines, S-shaped curves, clusters: lots of things in ML are fitted by optimizing a number. Gradient descent can do all of them, so learning it on a line teaches the general method."
+  - emoji: "🎯"
+    title: "Start with a guess"
+    text: "Fix the slope, pick any starting intercept, and score the line with the sum of squared residuals. That score is the loss function."
+  - emoji: "⛰️"
+    title: "Follow the slope"
+    text: "The derivative of the loss tells you which way is downhill and how steep it is. Steep means far from the bottom, so take a big step; nearly flat means close, so take a small one."
+  - emoji: "👣"
+    title: "Learning rate sets the step"
+    text: "Step size is the derivative times a small number, the learning rate. The new value is the old one minus the step. Repeat and the steps shrink on their own."
+  - emoji: "🛑"
+    title: "Knowing when to stop"
+    text: "Stop when the step is tiny or after a maximum number of steps. Here the result matches the least squares answer, so the method checks out."
+  - emoji: "🧮"
+    title: "Two knobs is a gradient"
+    text: "With intercept and slope, take one derivative per parameter; together they are the gradient. The learning rate that worked before can now fail, so it matters."
+  - emoji: "🎲"
+    title: "Faster on big data"
+    text: "With millions of rows, each step is slow. Stochastic gradient descent computes each step on a random subset instead."
+task: |
+  Run gradient descent yourself and watch the learning rate decide everything. Use the three
+  points from the lecture (weight → height) in a free Google Colab notebook or any Python:
+
+  ```python
+  weights = [0.5, 2.3, 2.9]
+  heights = [1.4, 1.9, 3.2]
+
+  def gradient(intercept, slope):
+      d_int = d_slope = 0.0
+      for x, y in zip(weights, heights):
+          residual = y - (intercept + slope * x)
+          d_int += -2 * residual
+          d_slope += -2 * x * residual
+      return d_int, d_slope
+
+  def descend(learning_rate, steps=1000):
+      intercept, slope = 0.0, 1.0
+      for step in range(steps):
+          d_int, d_slope = gradient(intercept, slope)
+          step_int, step_slope = learning_rate * d_int, learning_rate * d_slope
+          intercept, slope = intercept - step_int, slope - step_slope
+          if max(abs(step_int), abs(step_slope)) < 0.0001:
+              break
+      return step + 1, round(intercept, 2), round(slope, 2)
+
+  for lr in [0.01, 0.05, 0.1]:
+      print("learning rate", lr, "-> steps, intercept, slope:", descend(lr))
+  ```
+
+  1. Record steps, intercept and slope for each learning rate. Compare with the least squares
+     answer, `numpy.polyfit(weights, heights, 1)` (it lists the slope first).
+  2. One rate should need several times more steps than another, and one should blow up to
+     `nan`. Which, and why does a bigger step overshoot the bottom?
+  3. Add `print(step, intercept, slope)` inside the loop for `0.1` and watch the first five
+     steps. Do the values swing from side to side?
+
+  **No code?** Run the body's worked example in a spreadsheet. Put 0 in A2. In B2 put the
+  derivative `=-2*((2-A2)+(4-A2)+(9-A2))`. In A3 put `=A2-0.1*B2`, copy B2 down to B3, then fill
+  both columns down to row 12. Change the 0.1 to 0.02 and then to 0.4 and watch column A.
+
+  Success: you've seen one learning rate converge (to about 0.95 and 0.64 in code, or to 5 in
+  the spreadsheet), one crawl, and one diverge, and can say why.
+selfCheck:
+  - q: "You start a fine-tuning run with a learning rate ten times the recommended default. After 50 steps the loss reads NaN. What happened, and what do you change?"
+    a: "The steps were so large that each update overshot the bottom of the loss and landed somewhere worse, until the numbers overflowed. Restart from the original weights with a smaller learning rate (back near the default) and watch the first few hundred steps of the loss curve."
+  - q: "Your gradient descent stops after 4 steps, and the fit is clearly poor. The stopping rule is 'step size below 0.5'. What's wrong, and how is it different from a learning-rate problem?"
+    a: "The stopping threshold is far too loose, so it quits while still far from the bottom. The steps were heading the right way; they just weren't allowed to continue. Use a much smaller threshold (the lecture uses about 0.001) plus a maximum step count. A learning-rate problem would show as overshooting or as steps that never get anywhere."
+mcq:
+  - q: "Your training loss goes 2.1, 1.4, 3.8, 0.9, 6.2, 15.0 over the first steps. What is the most likely fix?"
+    options:
+      - "Train for more steps until the loss settles down"
+      - "Use a larger batch of data for each step"
+      - "Lower the learning rate to stop overshooting"
+      - "Start from a different random initial guess"
+    answer: 2
+    explain: "A loss that swings and then climbs is the classic sign of steps that overshoot the bottom. More steps make it worse, and a new starting point overshoots the same way. Larger batches smooth noisy steps but don't fix a step size that is simply too big."
+  - q: "After 1,000 steps (the maximum) the loss is still falling at a steady rate. What does that tell you?"
+    options:
+      - "It hasn't reached the bottom; allow more steps"
+      - "The model has converged to the minimum of the loss"
+      - "The learning rate is too high for this loss curve"
+      - "This loss function has no minimum it can reach"
+    answer: 0
+    explain: "A loss that is still dropping when the step limit hits means the method hasn't reached the bottom yet: raise the step limit, or the learning rate a little. Converged runs flatten out, and a too-high rate shows as swings or growth, not a steady fall."
+  - q: "Why do neural networks use stochastic (mini-batch) gradient descent instead of computing each step on all the data?"
+    options:
+      - "Random subsets give a more accurate derivative"
+      - "Full-data steps can't handle more than two parameters"
+      - "Mini-batches remove the need for a learning rate"
+      - "Each full-data step is too slow on huge datasets"
+    answer: 3
+    explain: "Computing the derivative over millions of examples for every step is expensive. A random subset gives a cheaper, noisier estimate of the same direction, and many cheap steps beat a few exact ones. The learning rate is still needed, and full-data gradients work for any number of parameters."
+  - q: "Least squares has a formula for the best line. Why learn gradient descent at all?"
+    options:
+      - "It gives a more accurate line than the formula does"
+      - "Most models have no formula for the lowest point"
+      - "It needs fewer data points than least squares does"
+      - "It avoids having to choose a loss function at all"
+    answer: 1
+    explain: "For logistic regression, neural networks and most other models you can't solve 'derivative = 0' directly, but you can always step downhill. On a line both methods land on the same answer, as the lecture shows. You still need a loss to descend."
+backupResources:
+  - label: "Google Machine Learning Crash Course — Gradient descent"
+    url: "https://developers.google.com/machine-learning/crash-course/linear-regression/gradient-descent"
+    type: "interactive · course module"
+tags:
+  - math
+  - machine-learning
+  - gradient-descent
+  - optimization
+---
+
+Least squares found the best line with a formula. Most models have no such formula: you can
+write down their loss, but you can't solve for its lowest point directly. **Gradient descent
+gets there by walking: compute which way is downhill, take a step proportional to how steep it
+is, repeat until the steps are tiny.** The same loop, at enormous scale, trains every neural
+network.
+
+## The loop
+
+1. Choose a loss (here, the sum of squared residuals).
+2. Take its derivative with respect to each parameter. Together these are the **gradient**.
+3. Start from a guess.
+4. Plug the current values into the gradient.
+5. **Step size = derivative × learning rate.** New value = old value − step size.
+6. Go back to 4 until the step is tiny or you hit a maximum number of steps.
+
+Because the step is proportional to the slope, it shrinks automatically as you approach the
+bottom, where the slope flattens to zero.
+
+## Worked example: rediscovering the average
+
+Model: predict the same number *b* for everything. Data: 2, 4, 9. Loss:
+SSR(b) = (2 − b)² + (4 − b)² + (9 − b)². Derivative: −2 × (15 − 3b).
+
+**Learning rate 0.1**, start at b = 0:
+
+| Step | b | Derivative | New b |
+|---|---|---|---|
+| 1 | 0 | −30 | 3 |
+| 2 | 3 | −12 | 4.2 |
+| 3 | 4.2 | −4.8 | 4.68 |
+| 4 | 4.68 | −1.92 | 4.872 |
+
+Each step is 40% the size of the one before, and *b* closes in on **5**, the average of the
+data. That's the flat line from the previous lesson: gradient descent found the least squares
+answer for the constant model without being told the formula.
+
+**Learning rate 0.4**, same start: 0 → 12 → −4.8 → 18.72. Each step overshoots the bottom by
+more than it started away, and the values run off. Nothing about the data changed; only the
+step size.
+
+## Common mistakes
+
+- **One learning rate for every problem.** The same rate can converge on one loss and diverge
+  on another, as the lecture's two-parameter example shows.
+- **Stopping too early.** A loose stopping rule, or too few steps, quits before the bottom.
+- **Reading only the final loss.** The curve's shape tells you whether the rate is too high,
+  too low or fine.
+- **Assuming the bottom is the goal.** The lowest *training* loss can be an overfit model; the
+  held-out loss decides (→ bias-variance-overfitting).
+
+## Where you'll see it in AI
+
+- **Neural network training** is this loop with millions or billions of parameters; the
+  derivatives come from backpropagation (→ neural-networks, → calculus-for-optimization).
+- **Fine-tuning settings** such as learning rate, epochs and batch size are this lesson's
+  knobs, exposed by hosted services (→ fine-tuning-fundamentals).
+- **Mini-batches** are the stochastic gradient descent the lecture ends on: each step uses a
+  random slice of the data, which is how large models train at all.
+- **Next in this track**, the same loop fits a classifier whose loss has no formula for its
+  minimum (→ logistic-regression).

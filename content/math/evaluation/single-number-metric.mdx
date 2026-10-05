@@ -1,0 +1,196 @@
+---
+title: "One number to rank models: F1 and averages"
+subtitle: "Why a team iterates faster with a single evaluation number, and how F1 builds one"
+summary: "Combine precision and recall into F1, average results across segments, and agree one number that lets you rank many model versions fast."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript, with a worked example and a quiz."
+section: math
+pillar: evaluation
+order: 5
+level: intermediate
+estMinutes: 12
+taskMinutes: 20
+prerequisites:
+  - evaluation-metrics
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "sofffBNhVSo"
+  published: "2017-08-25"
+  year: 2017
+  minutes: 7
+  title: "Single Number Evaluation Metric (C3W1L03)"
+  channel: "DeepLearningAI"
+  why: "After four lessons of rates and curves, you have too many numbers to rank a dozen experiments quickly. Andrew Ng explains why a team should agree on one number before it starts iterating, shows F1 as the standard way to merge precision and recall, and shows a plain average across user groups as another. The lecture is from 2017 and about image classifiers, but the habit is exactly how prompt and model comparisons are run today."
+  notes:
+    - "1:02 Precision and recall restated with a cat classifier; when one model wins on each, you can't tell which is better."
+    - "3:34 F1 is the harmonic mean of precision and recall: 2 ÷ (1/P + 1/R)."
+    - "5:08 A second example: errors in four regions, summarized by their average so one model can be picked."
+applyIt: |
+  **Before you compare prompts, models or settings, write down the one number that will decide
+  the winner.** Without it, every comparison turns into a debate about which of five numbers
+  matters most, and you end up picking whichever looks best afterwards.
+
+  1. Pick a comparison you're about to make: two prompts for a summarizer, two chat assistants
+     for a writing task, three settings for a classifier.
+  2. List the numbers you'd look at, then pick one to rank by. For yes/no tasks, F1 on the class
+     you care about is a good default; for a task with several kinds of input, an average across
+     those kinds.
+  3. Keep the other numbers in view, but agree in advance that the ranking follows the one
+     number.
+  4. Run the comparison and record the winner and the number in your notes.
+
+  ```prompt
+  I'm comparing [what] for [the job]. These are the numbers I can measure: [list]. Help me pick
+  one number to rank the options by, say what it would hide, and suggest one check that covers
+  that blind spot.
+  ```
+
+  Success: one comparison decided by a number you chose before you saw the results.
+recap:
+  - emoji: "🔁"
+    title: "Iteration needs a fast verdict"
+    text: "Machine learning is a loop: idea, experiment, result. One agreed number tells you at once whether the new idea beat the last one."
+  - emoji: "🐱"
+    title: "Two metrics, no winner"
+    text: "Classifier A wins on recall and classifier B on precision. With two numbers you can't quickly say which is better, let alone rank a dozen."
+  - emoji: "➗"
+    title: "F1 merges the two"
+    text: "F1 is the harmonic mean of precision and recall, 2 ÷ (1/P + 1/R). Informally an average, but one that punishes a low value in either."
+  - emoji: "🗂️"
+    title: "Dev set plus one number"
+    text: "A well-defined evaluation set to measure on, plus a single number to compare by, is what speeds up the improvement loop."
+  - emoji: "🌍"
+    title: "Average across groups"
+    text: "When results come per region (US, China, India, the rest of the world), keep tracking each one, but rank models by the average."
+task: |
+  Rank three versions of a classifier with one number.
+
+  Here are made-up results for three prompt versions of an LLM that flags support tickets as
+  "urgent", all measured on the same 200 labelled tickets:
+
+  | Version | Precision | Recall |
+  |---|---|---|
+  | A | 0.90 | 0.60 |
+  | B | 0.75 | 0.80 |
+  | C | 0.55 | 0.95 |
+
+  1. Before computing anything, guess which version will have the best F1.
+  2. Compute F1 = 2PR ÷ (P + R) for each, by hand or with `=2*B2*C2/(B2+C2)` in a spreadsheet.
+  3. Compute the plain average (P + R) ÷ 2 too, and note where the two rankings disagree.
+  4. Write one sentence: is F1 the right deciding number here, or do urgent tickets make recall
+     matter more than precision?
+
+  Success: F1 of about 0.72, 0.77 and 0.70, B ranked first, and a sentence on whether equal
+  weighting fits this job.
+selfCheck:
+  - q: "Your team compares eight prompt versions on precision and recall and spends every meeting arguing which matters more. What do you change?"
+    a: "Agree one deciding number before the next round: F1 if both errors matter about equally, or a recall-weighted choice if misses are worse. Keep precision and recall visible, but let the agreed number rank the versions."
+  - q: "A version has precision 1.0 and recall 0.05. A colleague averages them to 0.525 and calls it middling. What does F1 say, and why the difference?"
+    a: "F1 = 2 × 1.0 × 0.05 ÷ 1.05 ≈ 0.095. The harmonic mean is pulled towards the smaller value, so a model that almost never fires can't hide behind perfect precision."
+  - q: "Your chatbot is tested on four kinds of question and you rank versions by the average score. What should you still watch?"
+    a: "Each group's score. An average can improve while one group gets worse, so keep the per-group numbers on the same page and look at any group that drops."
+mcq:
+  - q: "Classifier A has precision 0.95 and recall 0.90; B has 0.98 and 0.85. Both errors cost about the same. You need to pick one today. What do you do?"
+    options:
+      - "Pick B, because its precision is the higher of the two"
+      - "Pick whichever one has the higher precision plus recall"
+      - "Pick A, because it has the higher F1 score of the two"
+      - "Hold off until one model wins on both of the numbers"
+    answer: 2
+    explain: "With equal error costs, F1 is a fair single number: about 0.924 for A against 0.910 for B. Waiting for one model to win on both numbers is exactly the stall a single metric avoids, and precision alone ignores B's extra misses."
+  - q: "A filter that almost never fires has precision 1.0 and recall 0.04. Someone reports its plain average of the two, 0.52. Why is F1 the better summary here?"
+    options:
+      - "F1 sits near the lower value, so it exposes the misses"
+      - "F1 always comes out higher than the plain average does"
+      - "F1 weights precision more heavily than it weights recall"
+      - "F1 includes the true negatives that the average ignores"
+    answer: 0
+    explain: "The harmonic mean is dragged towards the smaller number: here F1 is about 0.08, which matches how useless the filter is. F1 is never above the plain average, weights the two equally, and like precision and recall it ignores true negatives."
+  - q: "Your translation feature is scored on four languages. Version 2 raises the average by 3 points but drops one language by 10. You rank by the average. What now?"
+    options:
+      - "Ship it: the agreed number went up, so the debate is over"
+      - "Drop the average and rank versions by the worst language"
+      - "Throw out the drop as noise, since only one language fell"
+      - "Treat the drop as a check the average failed to cover"
+    answer: 3
+    explain: "A single number speeds up ranking, but you still track the groups underneath it. A 10-point drop is a signal to look into; if a language must not get worse, make that a pass/fail limit next to the average (next lesson). Switching wholesale to the worst language throws away the fast ranking."
+backupResources:
+  - label: "Google ML Crash Course: accuracy, recall, precision and F1"
+    url: "https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall"
+    type: "docs"
+tags:
+  - math
+  - evaluation
+  - f1
+  - metrics
+---
+
+**You need:** precision and recall from → precision-recall-tradeoff.
+
+By now you can describe a model with half a dozen numbers. That's good for understanding one
+model and bad for choosing between ten. Improving an AI system is a loop of try, measure,
+compare, and the loop only runs fast when **one agreed number** says which version won. This
+lecture gives two ways to build that number: F1 for yes/no tasks, and an average across groups.
+
+## Why one number
+
+If version A is better on recall and version B on precision, you have a debate, not a
+decision. With a dozen versions the debate never ends. Agreeing a single number up front (and
+an evaluation set to measure it on) turns each experiment into a quick verdict. You still look
+at the other numbers; they just don't decide the ranking.
+
+## F1: the harmonic mean
+
+**F1 = 2 ÷ (1/P + 1/R) = 2PR ÷ (P + R).**
+
+The harmonic mean behaves like an average when the two numbers are close and sinks towards the
+smaller one when they're far apart. That's the point: a model can't buy a good F1 with perfect
+precision and almost no recall.
+
+## Worked example
+
+1. **Classifier A:** precision 0.95, recall 0.90.
+   F1 = 2 × 0.95 × 0.90 ÷ 1.85 = 1.71 ÷ 1.85 ≈ **0.924**.
+2. **Classifier B:** precision 0.98, recall 0.85.
+   F1 = 2 × 0.98 × 0.85 ÷ 1.83 = 1.666 ÷ 1.83 ≈ **0.910**.
+3. A wins. With equal error costs, that settles it in one line.
+4. **The extreme case:** precision 1.0, recall 0.02. The plain average is 0.51; F1 is
+   0.04 ÷ 1.02 ≈ **0.039**. F1 tells the truth about a filter that almost never fires.
+
+## Averages across groups
+
+Many results come per segment: per region, per language, per kind of question. Keep each one
+visible, but rank by a summary. Made-up error rates for three prompts on four kinds of support
+question:
+
+| Prompt | Billing | Tech | Account | Other | Mean |
+|---|---|---|---|---|---|
+| A | 3% | 7% | 5% | 9% | 6.0% |
+| B | 5% | 6% | 5% | 10% | 6.5% |
+| C | 2% | 3% | 4% | 5% | 3.5% |
+
+C has the lowest mean error, so C is the one to keep iterating from. If one kind of question
+matters more (it's most of your traffic, or the riskiest), weight it more, and decide that
+before you look at results.
+
+## Common mistakes
+
+- **Choosing the number after seeing results.** That's picking a winner and then a reason.
+- **Using F1 when the costs are lopsided.** F1 weights precision and recall equally. If misses
+  are far worse, rank by recall with a precision floor, or use a recall-weighted version
+  (F-beta with beta above 1).
+- **Letting the average hide a collapse.** A rising mean can hide one group getting much
+  worse. Watch the groups too.
+- **Comparing numbers from different test sets.** One number only ranks versions measured on the
+  same data.
+
+## Where you'll see it in AI
+
+- **Prompt and model comparisons:** one agreed score on a fixed eval set is how teams decide
+  between versions (→ llm-app-evals).
+- **Leaderboards:** benchmark suites average many tasks into one score, with the same hidden
+  trade-offs (→ reading-llm-benchmarks).
+- **Retrieval and extraction:** F1 is the usual summary for extraction and many classification
+  tasks.
+- **Next step:** when cost or latency must also be met, one number isn't enough, which is
+  where → satisficing-optimizing-metrics comes in.

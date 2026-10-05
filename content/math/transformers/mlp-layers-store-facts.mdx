@@ -1,0 +1,214 @@
+---
+title: "MLP layers and how models store facts"
+subtitle: "The other half of every block, where most of the parameters live"
+summary: "Trace one token through an MLP block, show how a bias makes a neuron act like an AND gate, and explain superposition."
+changeNote: "New lesson in the transformers track, written from the lecture's transcript, with a worked neuron example and a quiz."
+section: math
+pillar: transformers
+order: 4
+level: advanced
+estMinutes: 30
+taskMinutes: 25
+prerequisites:
+  - query-key-value-attention
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "9-Jl0dxWQs8"
+  published: "2024-08-31"
+  year: 2024
+  minutes: 23
+  title: "How might LLMs store facts | Deep Learning Chapter 7"
+  channel: "3Blue1Brown"
+  why: "Attention moves information between tokens; the MLP that follows it in every block is where each token is transformed on its own, and where most of a model's parameters sit. This lecture walks one token through an MLP with a concrete fact as the example, then explains superposition, the reason individual neurons are so hard to interpret. It completes the picture of one transformer block."
+  notes:
+    - "4:49 The toy setup: directions for first name Michael, last name Jordan and basketball, read off with dot products."
+    - "7:30 Up-projection, bias and ReLU: one row asks 'Michael plus Jordan?', and the bias of minus one turns the neuron into an AND gate."
+    - "18:03 Superposition: nearly perpendicular directions let a space hold far more features than it has dimensions."
+applyIt: |
+  **A model's knowledge is spread across billions of weights in overlapping directions, not
+  filed in records you can look up or edit.** That has practical consequences: facts can be
+  half-remembered, blended, or out of date, and fine-tuning is a poor way to add or correct
+  one fact.
+
+  1. Pick three facts from your field that changed in the last two years (a regulation, an
+     API, a price, a library version).
+  2. Ask a model about each without any context, then again with the current source pasted in.
+  3. Note which answers were outdated or blended with older versions, and whether pasting the
+     source fixed them.
+
+  **If you build software:** put facts that change, or that must be exact, into retrieval or
+  the prompt (→ rag-fundamentals); use fine-tuning for style and format, not for adding
+  facts. **If you don't code:** for anything time-sensitive, paste the source or use a tool
+  with web search, and ask the model to quote the line it used.
+
+  Success: a short table of three facts showing the model's answer with and without the
+  source, and which one you would trust.
+recap:
+  - emoji: "🏀"
+    title: "A fact to locate"
+    text: "If a model completes 'Michael Jordan plays the sport of' with basketball, that fact lives somewhere in its weights. Research points at the MLP layers as a likely place."
+  - emoji: "🧭"
+    title: "Ideas as directions"
+    text: "Assume meanings are directions in the embedding space: one for the first name Michael, one for the last name Jordan, one for basketball. The MLP has to turn the first two into the third."
+  - emoji: "⬆️"
+    title: "Up-projection asks questions"
+    text: "A matrix multiplies the token's vector into a much longer one. Each row asks a question by taking a dot product, such as 'does this vector encode Michael Jordan?'."
+  - emoji: "🚦"
+    title: "Bias plus ReLU makes a gate"
+    text: "A bias shifts each answer and ReLU zeroes anything negative. With the right bias, a neuron only fires when both Michael and Jordan are present, like an AND gate."
+  - emoji: "⬇️"
+    title: "Down-projection writes the answer"
+    text: "A second matrix maps the active neurons back to embedding size. The column of a firing neuron, such as a basketball direction, is added to the token's vector."
+  - emoji: "🔢"
+    title: "Where the parameters are"
+    text: "Counting the two matrices across all layers shows the MLPs hold about two thirds of a GPT-3-sized model's parameters, far more than attention."
+  - emoji: "🌌"
+    title: "Superposition"
+    text: "In very high dimensions, you can fit vastly more nearly perpendicular directions than dimensions. So a model can store more features than it has neurons, overlapping them, which makes single neurons hard to read."
+task: |
+  Build the "Michael Jordan" neuron with numbers and watch the bias turn it into an AND gate.
+
+  Use a 3-number embedding: [Michael, Jordan, other]. One neuron's up-projection row is
+  [1, 1, 0] with bias −1. Its down-projection column writes the "basketball" direction.
+
+  ```python
+  import numpy as np
+
+  row, bias = np.array([1, 1, 0]), -1.0
+  basketball = np.array([0.0, 0.0, 1.0])
+
+  def mlp(x):
+      activation = max(0.0, row @ x + bias)   # up-projection, bias, ReLU
+      return x + activation * basketball      # down-projection, added back
+
+  for name, x in {
+      "Michael Jordan": np.array([1.0, 1.0, 0.0]),
+      "Michael Phelps": np.array([1.0, 0.0, 0.0]),
+      "Jordan Peele":   np.array([0.0, 1.0, 0.0]),
+  }.items():
+      print(name, "->", mlp(x))
+  ```
+
+  Then set the bias to 0 and run it again. Finally, on paper: with 12,288 inputs and 49,152
+  neurons, how many weights are in the up-projection, and in the up plus down projections?
+
+  Success: you can explain why only "Michael Jordan" gains the basketball direction with
+  bias −1 and why the gate breaks at bias 0, and your weight count is about 1.2 billion.
+selfCheck:
+  - q: "A teammate wants to fine-tune a model on 50 new facts about your product so it 'knows' them. Using how MLPs store knowledge, what's the risk, and what would you do instead?"
+    a: "Facts aren't stored as editable records; they're spread across many weights in overlapping directions, so a small fine-tune may not reliably install them and can blur nearby knowledge. Put the facts in retrieval or the prompt, where they're exact and easy to update, and keep fine-tuning for format or style."
+  - q: "An interpretability tool shows a single neuron that fires on legal text, cooking recipes and the colour orange. Is the tool broken?"
+    a: "Probably not. Superposition lets a model pack more features than neurons by using nearly perpendicular directions that overlap across neurons, so one neuron can respond to several unrelated features. That's why researchers look for directions (for example with sparse autoencoders) rather than reading neurons one by one."
+mcq:
+  - q: "Attention lets tokens share information. What is the MLP in each block for, by contrast?"
+    options:
+      - "Comparing every token with every other token again"
+      - "Transforming each token's vector on its own"
+      - "Turning the final vector into next-token probabilities"
+      - "Removing tokens that the attention step found unimportant"
+    answer: 1
+    explain: "The MLP is applied to every position independently, with the same weights, and is where much of the per-token computation happens. Comparing tokens is attention's job, and the unembedding at the very end produces the probabilities. No tokens are removed."
+  - q: "In the 'Michael Jordan' neuron, the bias is set so the neuron fires only when both names are present. What would a bias of zero change?"
+    options:
+      - "Nothing; the bias only shifts the output by a constant"
+      - "The neuron would never fire because ReLU blocks zero"
+      - "The neuron would fire for any Michael or any Jordan"
+      - "The neuron would fire only when neither name is present"
+    answer: 2
+    explain: "With the right negative bias, one name alone scores below zero and ReLU clips it, so only both together pass: an AND. At zero bias, one name alone already gives a positive score, so the neuron fires for Michael Phelps too. The bias matters because it sits before the ReLU."
+  - q: "A 12,288-dimensional model seems to represent far more than 12,288 distinct features. How is that possible?"
+    options:
+      - "It stores each feature in a separate lookup table"
+      - "It uses only the features needed for the current prompt"
+      - "It compresses features into fewer bits than usual"
+      - "It packs many nearly perpendicular directions together"
+    answer: 3
+    explain: "In high dimensions, the number of directions that are almost at right angles to each other grows enormously, so features can share the space with little interference. That's superposition, and it's why individual neurons tend to respond to mixtures of features."
+backupResources:
+  - label: "Toy Models of Superposition (Anthropic, 2022)"
+    url: "https://transformer-circuits.pub/2022/toy_model/index.html"
+    type: "article · the research behind the superposition idea"
+tags:
+  - math
+  - transformers
+  - mlp
+  - interpretability
+---
+
+Each transformer block has two halves. Attention (→ query-key-value-attention) lets tokens
+exchange information. Then a **multilayer perceptron (MLP)** transforms every token's vector
+on its own, with the same weights at every position. The MLPs hold most of a model's
+parameters, and they're a likely home for much of what it "knows". If you want to understand
+why models half-remember facts, this is the place to look.
+
+## Three steps per token
+
+1. **Up-projection.** Multiply the vector by a large matrix that makes it several times
+   longer (in GPT-3, from 12,288 to 49,152 numbers), and add a bias. Each row of the matrix
+   takes a dot product with the vector, which you can read as asking one question: "does this
+   vector point in my direction?"
+2. **Nonlinearity.** Apply ReLU (or a smooth relative like GELU): negative values become 0.
+   Each of the long vector's entries is one **neuron**; positive means it's firing.
+3. **Down-projection.** Multiply by a second matrix back to embedding size. Each firing neuron
+   adds its column, a direction in meaning space, to the result, which is then **added to the
+   token's vector** (the residual connection).
+
+```diagram
+token vector (12,288)
+   │
+   ▼
+× W_up + bias
+   49,152 questions
+   │
+   ▼
+ReLU
+   negatives → 0
+   │
+   ▼
+× W_down
+   back to 12,288
+   │
+   ▼
+add to the token vector
+```
+
+## Worked example: a neuron that knows one fact
+
+Give the embedding three numbers: [Michael, Jordan, other]. One neuron's up-projection row is
+[1, 1, 0] and its bias is −1.
+
+- "Michael Jordan" [1, 1, 0]: 1 + 1 − 1 = **1**. ReLU keeps 1, so the neuron fires and adds its
+  down-projection column, the "basketball" direction.
+- "Michael Phelps" [1, 0, 0]: 1 − 1 = **0**. Nothing is added.
+- "Jordan Peele" [0, 1, 0]: also **0**.
+
+The bias makes the neuron an AND gate. At bias 0, each single name would score 1 and fire.
+
+Scale it up: the up-projection has 12,288 × 49,152 ≈ **604 million** weights, and the
+down-projection the same, so one MLP is about **1.2 billion**. Across GPT-3's 96 layers that's
+about **116 billion** of its 175 billion parameters, roughly two thirds.
+
+## Superposition: why neurons are hard to read
+
+The clean "one neuron, one fact" picture is too tidy. In a space with thousands of dimensions
+you can fit vastly more directions that are *nearly* perpendicular (say, between 89° and 91°)
+than directions that are exactly perpendicular. A model can use that to store many more
+features than it has neurons, each spread over many neurons. The cost is a little
+interference, and the result is that a single neuron usually responds to a mix of unrelated
+things.
+
+## Common mistakes
+
+- **Treating the MLP as a database.** Nothing is stored as a row you can edit; it's spread
+  across weights.
+- **Expecting one neuron per concept.** Superposition makes most neurons mixtures.
+- **Forgetting the residual add.** The MLP's output is added to the token's vector, so each
+  block refines rather than replaces.
+
+## Where you'll see it in AI
+
+Parameter counts and memory (most weights are MLP weights), mixture-of-experts models that
+route each token to a few of many MLPs, interpretability research on features, and the
+"retrieve, don't fine-tune facts" rule in → rag-fundamentals and
+→ fine-tuning-fundamentals. You'll write the same block in code in → build-gpt-from-scratch.

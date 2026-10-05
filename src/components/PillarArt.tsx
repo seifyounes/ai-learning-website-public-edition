@@ -3,7 +3,7 @@
  *
  * One visual system on purpose: every piece is drawn on the same 300x120 grid,
  * with the same stroke weights, the same node sizes and the same two inks, so
- * the twelve read as a set rather than twelve separate pictures.
+ * the eighteen read as a set rather than eighteen separate pictures.
  * What changes between them is the *structure* — nesting, a cycle, convergence,
  * a graph, a branch — which is the thing each pillar actually teaches.
  *
@@ -190,22 +190,139 @@ function ShippingApps() {
   );
 }
 
-/** 8 · Math & ML core — loss coming down a gradient, measured. */
-function MathMlCore() {
+/** Faint plotting grid shared by the Math & ML tracks. */
+function PlotGrid() {
   return (
     <>
       {[24, 48, 72, 96].map((y) => (
-        <line key={y} x1={58} y1={y} x2={244} y2={y} {...faint} opacity={0.16} />
+        <line key={`h${y}`} x1={58} y1={y} x2={244} y2={y} {...faint} opacity={0.16} />
       ))}
       {[58, 105, 152, 199, 244].map((x) => (
-        <line key={x} x1={x} y1={18} x2={x} y2={102} {...faint} opacity={0.16} />
+        <line key={`v${x}`} x1={x} y1={18} x2={x} y2={102} {...faint} opacity={0.16} />
       ))}
-      <path d="M 58 26 C 110 30, 130 88, 244 96" {...line} strokeWidth={1.4} />
-      {[
-        [58, 26], [105, 38], [152, 72], [199, 90], [244, 96],
-      ].map(([x, y], i, a) => (
-        <Node key={i} cx={x} cy={y} r={2.6} bright={i === a.length - 1} />
+    </>
+  );
+}
+
+/** M1 · Linear algebra — two vectors from one origin and their sum. */
+function LinearAlgebra() {
+  return (
+    <>
+      <PlotGrid />
+      <path d="M 105 96 L 199 72" {...line} strokeWidth={1.4} />
+      <path d="M 105 96 L 152 34" {...line} strokeWidth={1.4} />
+      <path d="M 152 34 L 246 10" {...faint} />
+      <path d="M 199 72 L 246 10" {...faint} />
+      <path d="M 105 96 L 246 10" {...line} opacity={0.55} />
+      <Node cx={105} cy={96} r={2.6} />
+      <Node cx={199} cy={72} r={2.6} />
+      <Node cx={152} cy={34} r={2.6} />
+      <Node cx={246} cy={10} r={3.2} bright />
+    </>
+  );
+}
+
+/** M2 · Probability & statistics — a bell curve and the band around its mean. */
+function ProbabilityStatistics() {
+  const pts = Array.from({ length: 41 }, (_, i) => {
+    const x = 58 + (i * 186) / 40;
+    const z = (x - 151) / 34;
+    return [x, 100 - 78 * Math.exp(-(z * z) / 2)];
+  });
+  return (
+    <>
+      <PlotGrid />
+      <line x1={117} y1={22} x2={117} y2={100} {...faint} />
+      <line x1={185} y1={22} x2={185} y2={100} {...faint} />
+      <path d={`M ${pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L ")}`} {...line} strokeWidth={1.4} />
+      <line x1={151} y1={22} x2={151} y2={100} {...line} opacity={0.55} />
+      <Node cx={151} cy={22} r={3.2} bright />
+    </>
+  );
+}
+
+/** M3 · Calculus — a curve and the tangent that measures its slope at one point. */
+function Calculus() {
+  return (
+    <>
+      <PlotGrid />
+      <path d="M 58 30 C 110 110, 190 110, 244 30" {...line} strokeWidth={1.4} />
+      <path d="M 55 45 L 148 105" {...line} opacity={0.55} />
+      <Node cx={101.4} cy={75} r={3.2} bright />
+      <Node cx={150.2} cy={90} r={2.6} />
+    </>
+  );
+}
+
+/** M4 · Machine learning — scattered points and the line fitted through them. */
+function MachineLearning() {
+  const pts: [number, number][] = [
+    [66, 92], [84, 80], [101, 86], [120, 70], [137, 72], [156, 58],
+    [173, 62], [190, 46], [208, 50], [226, 34], [240, 30],
+  ];
+  return (
+    <>
+      <PlotGrid />
+      <path d="M 58 94 L 244 26" {...line} strokeWidth={1.4} />
+      {pts.map(([x, y], i) => (
+        <Node key={i} cx={x} cy={y} r={2.4} bright={i === pts.length - 1} />
       ))}
+    </>
+  );
+}
+
+/** M5 · Neural networks — three layers, every node wired to the next layer. */
+function NeuralNetworks() {
+  const layers = [
+    [30, 60, 90],
+    [24, 48, 72, 96],
+    [45, 75],
+  ].map((ys, li) => ys.map((y) => [82 + li * 68, y] as [number, number]));
+  const edges: [number, number, number, number][] = [];
+  for (let l = 0; l < layers.length - 1; l++) {
+    for (const [x1, y1] of layers[l]) for (const [x2, y2] of layers[l + 1]) edges.push([x1, y1, x2, y2]);
+  }
+  return (
+    <>
+      {edges.map(([x1, y1, x2, y2], i) => (
+        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} {...faint} opacity={0.35} />
+      ))}
+      {layers.flat().map(([x, y], i, all) => (
+        <Node key={i} cx={x} cy={y} r={3} bright={i === all.length - 1} />
+      ))}
+    </>
+  );
+}
+
+/** M6 · Transformers — an attention grid: each token's weights over the tokens before it. */
+function Transformers() {
+  const n = 6;
+  const size = 14;
+  const x0 = 150 - (n * size) / 2;
+  const y0 = 60 - (n * size) / 2;
+  const cells = [];
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c <= r; c++) {
+      const w = c === r ? 0.9 : 0.15 + 0.6 * Math.abs(Math.sin((r + 1) * (c + 2)));
+      cells.push(<rect key={`${r}-${c}`} x={x0 + c * size + 1} y={y0 + r * size + 1} width={size - 2} height={size - 2} fill={ACCENT} opacity={w * 0.75} />);
+    }
+  }
+  return (
+    <>
+      <rect x={x0} y={y0} width={n * size} height={n * size} {...faint} />
+      {cells}
+    </>
+  );
+}
+
+/** M7 · Evaluation — an ROC curve above the chance diagonal, one threshold chosen. */
+function Evaluation() {
+  return (
+    <>
+      <PlotGrid />
+      <path d="M 58 102 L 244 18" {...faint} />
+      <path d="M 58 102 C 70 40, 120 26, 244 18" {...line} strokeWidth={1.4} />
+      <Node cx={96} cy={44} r={3.2} bright />
     </>
   );
 }
@@ -311,11 +428,17 @@ const ART: Record<string, () => React.JSX.Element> = {
   "workflows-agents": WorkflowsAgents,
   "applied-ai-engineering": AppliedAi,
   "shipping-apps": ShippingApps,
-  "math-ml-core": MathMlCore,
   "marketing-content": MarketingContent,
   "building-products": BuildingProducts,
   "ai-in-companies": AiInCompanies,
   "agency-freelance": AgencyFreelance,
+  "linear-algebra": LinearAlgebra,
+  "probability-statistics": ProbabilityStatistics,
+  calculus: Calculus,
+  "machine-learning": MachineLearning,
+  "neural-networks": NeuralNetworks,
+  transformers: Transformers,
+  evaluation: Evaluation,
 };
 
 export default function PillarArt({ slug, className = "" }: { slug: string; className?: string }) {

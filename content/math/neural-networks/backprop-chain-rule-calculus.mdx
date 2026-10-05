@@ -1,0 +1,245 @@
+---
+title: "Backpropagation, the calculus"
+subtitle: "The chain rule written out for a network, one weight at a time"
+summary: "Write the chain-rule expression for a weight's gradient in a small network, compute it with real numbers, and check it with a nudge."
+changeNote: "New lesson in the calculus track, written from the lecture's transcript; takes over the original lesson's backprop section and quiz question."
+section: math
+pillar: neural-networks
+order: 7
+level: intermediate
+estMinutes: 44
+taskMinutes: 30
+prerequisites:
+  - backprop-intuition
+  - chain-rule-and-product-rule
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "tIeHLnjs5U8"
+  published: "2017-11-03"
+  year: 2017
+  minutes: 10
+  title: "Backpropagation calculus | Deep Learning Chapter 4"
+  channel: "3Blue1Brown"
+  why: "Gradient descent needs the gradient for every weight, and this lecture shows exactly how it's assembled: the chain rule from the earlier lesson, applied link by link from the cost back through the network. It starts with one neuron per layer, so every symbol stays visible, then shows that real layers only add indices and a sum over paths. Ten minutes, and the notation matches the code you'll meet in frameworks."
+  notes:
+    - "The lecture assumes you've seen 3Blue1Brown's chapter 3 (intuitive backprop), linked in the backups. If backprop is new to you, watch that first."
+    - "Around 3:45: the three-factor chain-rule product. Pause and say what each factor means in words before moving on; the worked example below uses the same three factors."
+    - "Around 8:35: one neuron feeding several neurons, so its effect on the cost is a sum over paths. That sum is the step most people miss."
+applyIt: |
+  **You'll rarely write backprop by hand, but you'll debug it, budget for it and explain it.**
+  Three places it shows up in real work:
+
+  1. **Memory.** Backprop reuses the values from the forward pass, so training stores every
+     layer's activations. When a training job runs out of memory, smaller batches, shorter
+     sequences or activation checkpointing (recomputing instead of storing) are the levers.
+  2. **Frozen parts.** Freezing a layer means its weights get no gradient, but gradients still
+     flow *through* it to anything trainable before it. That's how adapter methods like LoRA
+     train a few weights inside a frozen model.
+  3. **Wrong gradients.** If a custom loss or layer trains strangely, compare its gradient to a
+     nudge-and-divide estimate, as in the task.
+
+  **If you build software:** in PyTorch, `loss.backward()` runs this whole lesson; inspect
+  `param.grad` on two layers and compare their sizes.
+  **If you don't code:** add the three points above to your notes as a checklist for the next
+  time someone says a training run "ran out of memory" or "isn't learning".
+
+  Success: you can explain why training needs more memory than running a model, in two
+  sentences, using the word activations.
+recap:
+  - emoji: "🔗"
+    title: "One neuron per layer"
+    text: "Start with a chain of single neurons, set by three weights and three biases. The question: how sensitive is the cost to each of those numbers?"
+  - emoji: "🎯"
+    title: "Cost of one example"
+    text: "The last activation a(L) is compared with the target y: the cost is (a(L) − y)². The activation comes from z = w·a(L−1) + b passed through a sigmoid or ReLU."
+  - emoji: "⛓️"
+    title: "Three links, multiplied"
+    text: "A nudge to w moves z, which moves a(L), which moves the cost. Multiply the three ratios: ∂z/∂w · ∂a/∂z · ∂C/∂a."
+  - emoji: "🔍"
+    title: "What each factor says"
+    text: "∂C/∂a = 2(a − y) is big when the output is far off; ∂a/∂z is the activation's slope; ∂z/∂w = a(L−1), so a weight matters more when the neuron feeding it is active."
+  - emoji: "⚖️"
+    title: "Biases and earlier layers"
+    text: "For the bias, swap ∂z/∂w for ∂z/∂b = 1. For the previous activation, it's the weight w; that's how sensitivity passes backwards to earlier layers."
+  - emoji: "📊"
+    title: "Average over examples"
+    text: "This is the gradient for one training example. The full cost averages over examples, so its gradient averages these expressions."
+  - emoji: "🕸️"
+    title: "Many neurons: sum the paths"
+    text: "With several neurons per layer, a neuron affects the cost through every neuron it feeds, so you add those paths. Then repeat the same steps layer by layer."
+task: |
+  **Backprop a two-layer chain by hand, then check every number (30 minutes).**
+
+  A chain of two sigmoid neurons: `a1 = sigmoid(w1·x + b1)`, `a2 = sigmoid(w2·a1 + b2)`,
+  cost `(a2 − y)²`, with x = 1, y = 1, w1 = 0.8, b1 = 0.1, w2 = 2.0, b2 = −0.5.
+
+  1. Write the chain-rule product for ∂C/∂w2 and for ∂C/∂w1 (the second one goes through a2,
+     z2, a1 and z1). Use sigmoid'(z) = a(1 − a).
+  2. Run the forward pass, then the backward pass, and check each gradient with a nudge:
+
+     ```python
+     import math
+
+     def sig(z):
+         return 1 / (1 + math.exp(-z))
+
+     def cost(w1, b1, w2, b2, x=1.0, y=1.0):
+         return (sig(w2 * sig(w1 * x + b1) + b2) - y) ** 2
+
+     w1, b1, w2, b2, x, y = 0.8, 0.1, 2.0, -0.5, 1.0, 1.0
+     a1 = sig(w1 * x + b1)
+     a2 = sig(w2 * a1 + b2)
+
+     dC_dz2 = 2 * (a2 - y) * a2 * (1 - a2)       # last layer
+     dC_dw2, dC_db2 = dC_dz2 * a1, dC_dz2
+     dC_dz1 = dC_dz2 * w2 * a1 * (1 - a1)        # one layer back
+     dC_dw1, dC_db1 = dC_dz1 * x, dC_dz1
+
+     e, p = 1e-6, [w1, b1, w2, b2]
+     for i, mine in enumerate([dC_dw1, dC_db1, dC_dw2, dC_db2]):
+         up, down = p.copy(), p.copy()
+         up[i] += e
+         down[i] -= e
+         print(f"chain rule {mine:.6f}  nudge {(cost(*up) - cost(*down)) / (2 * e):.6f}")
+     ```
+
+  3. Compare the size of the first-layer gradients with the second-layer ones and write one
+     sentence on why they're smaller.
+
+  Success: both columns match: about −0.0476 for w1 and b1, −0.0824 for w2 and −0.1159 for b2;
+  and you can point to the extra sigmoid-slope factor (at most 0.25) that shrinks the first
+  layer's gradient.
+selfCheck:
+  - q: "For one training example, a neuron in the previous layer has activation 0 (a ReLU that's switched off). What's the gradient for the weight on its outgoing connection, for this example, and why?"
+    a: "Zero. The link ∂z/∂w equals the previous activation, which is 0, so the whole chain-rule product is 0. That weight gets no update from this example; other examples where the neuron is active will move it."
+  - q: "A teammate's backprop code gives correct gradients for a network with one neuron per layer, but wrong ones once layers have several neurons. Where would you look first?"
+    a: "At the gradient for previous-layer activations. With several neurons, each activation feeds every neuron in the next layer, so its gradient is a sum over all those paths. Code that keeps only one path is right for single-neuron layers and wrong otherwise."
+  - q: "A frozen pretrained model has a small trainable adapter in an early layer. Someone says 'the later layers are frozen, so the backward pass can skip them.' Why is that wrong?"
+    a: "The adapter's effect on the loss passes through every later layer, so the chain rule still needs their local derivatives. Freezing only means those layers' own weights get no update; the gradient must still flow back through them."
+mcq:
+  - q: "Backpropagation is 'just the chain rule'. What does one backward pass actually hand you?"
+    options:
+      - "The best possible weights for the current batch"
+      - "The model's accuracy on the held-out validation set"
+      - "The loss value for every training example at once"
+      - "The loss gradient for every weight, in one sweep"
+    answer: 3
+    explain: "The forward pass computes the loss; the backward pass applies the chain rule layer by layer to get ∂loss/∂w for every weight, reusing intermediate results so it costs roughly one more forward pass. It tells you which way to move, not where the best weights are; the optimizer still takes the step. Validation accuracy is a separate measurement."
+  - q: "For the last weight of a network, ∂C/∂w = a(L−1) · σ'(z) · 2(a(L) − y). On one example the output already equals the target exactly. What's this weight's gradient for that example?"
+    options:
+      - "Zero, since the last factor is zero"
+      - "Large, since the output is confident"
+      - "Equal to the previous activation"
+      - "Equal to the slope of the sigmoid"
+    answer: 0
+    explain: "When a(L) = y, the factor 2(a(L) − y) is zero, so the whole product is zero: nothing to correct on this example. The other factors only scale how big the correction would be."
+  - q: "Why does training a network need much more memory than just running it on inputs?"
+    options:
+      - "The forward pass is run twice to double-check outputs"
+      - "Activations are kept for backprop, plus gradients"
+      - "Every weight is copied once per training example"
+      - "The chain rule needs the second derivatives as well"
+    answer: 1
+    explain: "The backward pass reuses each layer's forward values, so training stores activations, and it also holds a gradient for every weight (plus optimizer state). Running a model can discard activations as it goes. Plain backprop uses first derivatives only."
+  - q: "A deep network uses sigmoid activations, whose slope is at most 0.25. Its earliest layers barely change during training. What's the most likely reason?"
+    options:
+      - "Early layers are frozen by default in most frameworks"
+      - "Early layers receive no gradient from the chain rule"
+      - "Their gradients shrink as slope factors multiply"
+      - "Sigmoid outputs can't be stored with enough precision"
+    answer: 2
+    explain: "Each layer back adds a slope factor of at most 0.25 to the chain-rule product, so gradients reaching early layers can become tiny: the vanishing-gradient problem. They still receive a gradient, just a very small one. ReLU-family activations and normalisation are common remedies."
+backupResources:
+  - label: "Go deeper: Multivariable chain rule intuition (Khan Academy, 8 min)"
+    url: "https://www.youtube.com/watch?v=hFvBZf-Jx28"
+    type: "video"
+tags:
+  - math
+  - calculus
+  - backpropagation
+  - chain-rule
+---
+
+**You need:** → backprop-intuition (the picture this lecture puts numbers on),
+→ calculus-for-optimization (why we want the gradient) and → chain-rule-and-product-rule.
+
+The one idea of this lecture: **backpropagation is the chain rule written out for a network,
+starting at the cost and working backwards one layer at a time.** Gradient descent needs the
+partial derivative of the cost for every weight and bias. Backprop gets all of them in one
+backward sweep, reusing the values the forward pass already computed, so the whole gradient
+costs about as much as one more forward pass.
+
+## The smallest network that shows everything
+
+Take a chain with one neuron per layer and focus on the last connection. The previous neuron's
+activation is `a(L−1)`; the last neuron computes
+
+```text
+z = w·a(L−1) + b
+a(L) = σ(z)
+C = (a(L) − y)²
+```
+
+A nudge to `w` moves `z`, which moves `a(L)`, which moves `C`. The chain rule multiplies the
+three local rates:
+
+```text
+∂C/∂w = ∂z/∂w · ∂a/∂z · ∂C/∂a
+      = a(L−1) · σ'(z) · 2(a(L) − y)
+```
+
+Each factor has a meaning. `2(a(L) − y)`: a big miss makes a big gradient. `σ'(z)`: the
+activation's slope at this point. `a(L−1)`: a weight matters more when the neuron feeding it is
+active ("fire together, wire together"). For the bias, swap the first factor for `∂z/∂b = 1`.
+For the previous activation, swap it for `∂z/∂a(L−1) = w`, and that number is what you carry one
+layer back to repeat the process.
+
+## Worked example with real numbers
+
+Let `a(L−1) = 0.5`, `w = 2`, `b = −0.5`, target `y = 1`, sigmoid activation.
+
+| quantity | value |
+|---|---|
+| z = 2·0.5 − 0.5 | 0.5 |
+| a(L) = σ(0.5) | 0.6225 |
+| C = (0.6225 − 1)² | 0.1425 |
+| ∂C/∂a = 2(a − y) | −0.7551 |
+| σ'(z) = a(1 − a) | 0.2350 |
+| ∂C/∂z | −0.1774 |
+| ∂C/∂w = 0.5 × ∂C/∂z | −0.0887 |
+| ∂C/∂b = 1 × ∂C/∂z | −0.1774 |
+| ∂C/∂a(L−1) = 2 × ∂C/∂z | −0.3549 |
+
+A nudge check (move `w` by ±0.000001 and divide) gives −0.0887 too. The last line is the
+"propagate backwards" part: the previous layer receives −0.3549 and runs the same steps for its
+own weight and bias.
+
+## Real layers: sum over paths
+
+With several neurons per layer, the weights get two indices and the cost sums over the output
+neurons, but the expression for one weight looks the same. What changes is the gradient for an
+activation in layer L−1: that neuron feeds *every* neuron in layer L, so it affects the cost by
+several paths, and you **add** the contributions. Then repeat for the layer before. Finally, the
+cost is an average over training examples, so the real gradient averages these per-example
+values.
+
+## Common mistakes
+
+- **Forgetting the sum over paths** when a neuron feeds several others.
+- **Using a fresh forward pass's values in the backward pass.** Backprop must use the values
+  from the same forward pass that produced the loss.
+- **Calling backprop the optimizer.** It only computes the gradient; gradient descent, momentum
+  or Adam decide the step.
+- **Ignoring the slope factors.** Each sigmoid adds a factor of at most 0.25, which is how
+  gradients vanish in deep stacks.
+
+## Where you'll see it in AI
+
+- **Every framework's autograd** (PyTorch, JAX, TensorFlow) runs this for you on any network.
+- **Training memory:** stored activations and per-weight gradients (→ adam-optimizer adds the
+  optimizer's share).
+- **Fine-tuning with adapters:** gradients flow through frozen layers to reach small trainable
+  ones (→ fine-tuning-fundamentals).
+- **Architecture choices** such as ReLU activations and residual connections exist partly to
+  keep these products from vanishing (→ neural-networks, → transformers-attention).

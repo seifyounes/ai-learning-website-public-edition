@@ -1,0 +1,201 @@
+---
+title: "Why networks need nonlinearity"
+subtitle: "Without the bend, a hundred layers are one layer"
+summary: "Show with algebra why stacked linear layers collapse into one, and decide where a linear activation is still the right choice."
+changeNote: "New lesson in the neural networks track, written from the lecture's transcript, with a worked collapse example and a quiz."
+section: math
+pillar: neural-networks
+order: 4
+level: intermediate
+estMinutes: 11
+taskMinutes: 20
+prerequisites:
+  - choosing-activation-functions
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "NkOv_k7r6no"
+  published: "2017-08-25"
+  year: 2017
+  minutes: 6
+  title: "Why Non-linear Activation Functions (C1W3L07)"
+  channel: "DeepLearningAI"
+  why: "The previous lesson compared activation functions; this one proves you can't skip them. In six minutes Andrew Ng substitutes one layer into the next and shows the algebra fold into a single linear function, then names the one place a linear activation still belongs: the output of a regression model. It turns a rule you might take on trust into two lines of algebra you can redo yourself."
+  notes:
+    - "1:05 The substitution: plug the first layer's output into the second and it simplifies to W′x + b′."
+    - "2:41 Linear hidden layers with a sigmoid output are no more expressive than logistic regression with no hidden layer."
+    - "3:12 The usual exception: a linear (or ReLU) output layer when the target is a real number such as a house price."
+applyIt: |
+  **When a model or a pipeline you use is described as "just linear", you can now tell what that
+  rules out.** A linear model can weigh evidence and add it up; it can't learn interactions such
+  as "this word matters only when that one is present".
+
+  1. Pick one model in your work or studies: a scoring rule, a spreadsheet forecast, a
+     classifier, a probe on embeddings.
+  2. Write down whether every step between input and output is linear (weighted sums only) or
+     whether something bends the signal (a threshold, a ReLU, a softmax, an if-rule).
+  3. If it's fully linear, name one pattern in your data it can't capture, such as an effect that
+     flips sign depending on another input.
+
+  **If you build software:** when you stack layers in code, check that each hidden layer is
+  followed by an activation; a missing one fails silently.
+  **If you don't code:** a weighted score in a spreadsheet is one linear layer, and adding a
+  second weighted score on top of the first gives you nothing new.
+
+  Success: one model you use, labelled linear or nonlinear, with one pattern the linear version
+  would miss.
+recap:
+  - emoji: "🧪"
+    title: "Try it without the bend"
+    text: "Replace every activation g(z) with the identity, so each layer outputs z itself. This 'linear activation' is the experiment the whole lecture runs."
+  - emoji: "🔗"
+    title: "Substitute one layer into the next"
+    text: "The second layer receives W1·x + b1 and computes W2(W1·x + b1) + b2. Multiply it out and you get one matrix times x plus one bias."
+  - emoji: "🧱"
+    title: "Depth buys nothing"
+    text: "However many linear layers you stack, the network still computes a linear function of its input, so you may as well have no hidden layers at all."
+  - emoji: "🎯"
+    title: "A sigmoid at the end isn't enough"
+    text: "Linear hidden layers with a sigmoid output are no more expressive than logistic regression. The nonlinearity has to sit between the layers for depth to add anything."
+  - emoji: "🏠"
+    title: "The one fair exception"
+    text: "For a regression output, such as a house price, a linear activation at the output layer is fine (or ReLU, since prices aren't negative). Hidden layers still bend."
+task: |
+  Prove the collapse on numbers, then break it with one ReLU. Pen and paper is enough; the Python
+  check takes two minutes.
+
+  1. Take W1 with rows (1, 2) and (0, 1), b1 = (1, 0), W2 = (1, −1), b2 = 2.
+  2. Multiply out W' = W2·W1 and b' = W2·b1 + b2 by hand.
+  3. Run x = (2, 3) through both layers, then through W'·x + b'. The answers should match.
+  4. Now put a ReLU after the first layer and run x = (−4, 1) both ways. Write down why the
+     answers differ.
+
+  ```python
+  import numpy as np
+
+  W1 = np.array([[1, 2], [0, 1]]); b1 = np.array([1, 0])
+  W2 = np.array([[1, -1]]);        b2 = np.array([2])
+  relu = lambda z: np.maximum(0, z)
+
+  for x in (np.array([2, 3]), np.array([-4, 1])):
+      two_linear = W2 @ (W1 @ x + b1) + b2
+      collapsed = (W2 @ W1) @ x + (W2 @ b1 + b2)
+      with_relu = W2 @ relu(W1 @ x + b1) + b2
+      print(x, two_linear, collapsed, with_relu)
+  ```
+
+  Success: two_linear equals collapsed for both inputs, and with_relu differs for x = (−4, 1),
+  with a one-line note on which unit the ReLU switched off.
+selfCheck:
+  - q: "A teammate's 12-layer model scores exactly the same as plain logistic regression on every test set. Looking at the code, what's the first thing you check?"
+    a: "Whether the hidden layers have activations at all. With identity activations the 12 layers multiply into one matrix, and a sigmoid at the end turns that into logistic regression. A forgotten ReLU (or an activation applied only at the output) produces exactly this result."
+  - q: "You're predicting delivery time in minutes. Which layers get a nonlinear activation, and what does the output layer use?"
+    a: "Every hidden layer gets a nonlinearity such as ReLU so depth can model interactions. The output can be linear, because the target is a real number; ReLU at the output is also reasonable here, since delivery times can't be negative."
+mcq:
+  - q: "Remove every activation function from a 96-layer plain feed-forward network (no attention). The network is now equivalent to:"
+    options:
+      - "A 96-layer network with slightly lower accuracy"
+      - "A network that can still learn curves, just slower"
+      - "A network that outputs random noise for any input"
+      - "A single linear layer: one matrix plus one bias"
+    answer: 3
+    explain: "Linear after linear is still linear: W₂(W₁x) = (W₂W₁)x, however many layers you stack, and the biases fold in the same way. So the network can only draw straight boundaries, no matter how long it trains. All the expressive power of depth comes from the nonlinearities between the matmuls."
+  - q: "LoRA fine-tuning adds two small matrices B and A to a weight matrix, with no activation between them. Why can the adapter be merged into the original weights after training?"
+    options:
+      - "B·A is one matrix, so it adds straight onto W"
+      - "The adapters are trained to be exactly zero"
+      - "Merging is approximate and loses some quality"
+      - "Only the bias vectors change, never the matrix"
+    answer: 0
+    explain: "With no nonlinearity between them, B then A is a single linear map, so W + B·A is again one matrix and inference costs nothing extra. Merging is exact, not approximate; the adapters are deliberately linear so this collapse works in your favour (→ fine-tuning-fundamentals)."
+  - q: "A network has linear hidden layers and a sigmoid output. On a dataset where the classes form two rings, one inside the other, what will training produce?"
+    options:
+      - "A ring-shaped boundary, after enough epochs"
+      - "A straight-line boundary, at any training length"
+      - "A perfect fit, since the sigmoid adds curvature"
+      - "A boundary that changes on every training run"
+    answer: 1
+    explain: "Linear hidden layers collapse into one linear map, and a sigmoid on top gives logistic regression: its decision boundary is a straight line (a flat plane in more dimensions). The sigmoid bends the output into a probability, but it can't bend the boundary, so no amount of training reaches the rings."
+  - q: "You're building a model that predicts a house's sale price. Which activation plan fits?"
+    options:
+      - "Linear everywhere, since the target is a number"
+      - "Sigmoid at the output, to keep prices bounded"
+      - "ReLU in hidden layers, linear or ReLU at output"
+      - "Tanh at the output, ReLU nowhere in the network"
+    answer: 2
+    explain: "The hidden layers need a nonlinearity or the network is just linear regression. The output must be able to reach any price, so a linear output (or ReLU, since prices aren't negative) fits; a sigmoid or tanh would squash every prediction into a narrow range."
+backupResources:
+  - label: "TensorFlow Playground: train a network in your browser"
+    url: "https://playground.tensorflow.org/"
+    type: "interactive · switch the activation to Linear and watch the boundary stay straight"
+tags:
+  - math
+  - neural-networks
+  - activation-functions
+  - deep-learning
+---
+
+A layer is a matrix multiply followed by an activation. This lesson asks what happens if you
+leave the activation out, and the answer explains why every network you'll meet has one: **a
+stack of linear layers is a single linear layer**, however deep you make it.
+
+## The two-line proof
+
+Use the identity as the activation, so each layer passes z straight through:
+
+- Layer 1: a1 = W1·x + b1
+- Layer 2: a2 = W2·a1 + b2 = W2·(W1·x + b1) + b2 = (W2·W1)·x + (W2·b1 + b2)
+
+The bracketed pieces are just a new matrix W' and a new bias b'. Two layers became one. Add a
+third and it folds in the same way, and so on for any depth. The hidden units still exist in
+memory, but they add no power to what the network can represent.
+
+If the output layer uses a sigmoid on top of linear hidden layers, the whole network is no more
+expressive than logistic regression: a straight-line boundary pushed through a squashing
+function.
+
+## Worked example: collapse it, then break it
+
+Take W1 with rows (1, 2) and (0, 1), b1 = (1, 0), W2 = (1, −1), b2 = 2.
+
+**Fold the layers.** W2·W1 = (1×1 + (−1)×0, 1×2 + (−1)×1) = (1, 1). The bias is
+W2·b1 + b2 = (1×1 + (−1)×0) + 2 = 3. So the two layers equal **x₁ + x₂ + 3**.
+
+**Check on x = (2, 3).** Layer 1: (2 + 6 + 1, 0 + 3 + 0) = (9, 3). Layer 2: 9 − 3 + 2 = 8.
+The folded version: 2 + 3 + 3 = 8. Same answer, as promised.
+
+**Now add a ReLU after layer 1, with x = (−4, 1).** Layer 1 gives (−4 + 2 + 1, 1) = (−1, 1),
+and ReLU turns it into (0, 1). Layer 2: 0 − 1 + 2 = **1**. The folded linear formula says
+−4 + 1 + 3 = **0**. The ReLU switched off the first unit for this input only, which is
+something no single matrix can do: it applies different arithmetic in different regions of
+the input. That region-by-region behaviour is what lets networks bend their decision
+boundaries.
+
+> 💡 **Try it:** open TensorFlow Playground (backup resources), pick the circle dataset, and set
+> the activation to Linear. Add as many hidden layers as you like: the boundary stays straight.
+> Switch to ReLU, press play again, and watch the boundary curve around the inner ring.
+
+## The one place linear is fine
+
+At the **output** of a regression model, where the target is a real number such as a price or a
+duration, a linear activation is the natural choice, because the output must be able to take any
+value. If the target can't be negative, a ReLU output also works. The hidden layers still get a
+nonlinearity. Linear hidden layers are rare and come up in special cases such as compression.
+
+## Common mistakes
+
+- **Forgetting the activation in hand-written layers.** Code runs, loss falls a little, and the
+  model quietly behaves like linear regression.
+- **Thinking the output sigmoid is enough.** One nonlinearity at the end doesn't help the hidden
+  layers; it has to sit between them.
+- **Adding layers to fix underfitting in a linear model.** Without activations, depth changes
+  nothing; add the nonlinearity first.
+
+## Where you'll see it in AI
+
+- **Every transformer block** has an MLP with a nonlinear activation between its two matrices,
+  and attention itself bends its scores through a softmax (→ transformers-attention).
+- **LoRA** uses the collapse on purpose: two thin matrices with nothing between them form one
+  low-rank update that can be merged into the weights (→ fine-tuning-fundamentals).
+- **Linear probes** on embeddings test what a single matrix can read out of a representation;
+  their limits are exactly the limits shown here (→ embeddings-vector-databases).

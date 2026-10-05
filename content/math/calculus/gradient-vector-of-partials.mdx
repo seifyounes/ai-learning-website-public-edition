@@ -1,0 +1,197 @@
+---
+title: "The gradient"
+subtitle: "All the partial derivatives, packed into one vector"
+summary: "Compute a gradient by stacking partial derivatives into a vector, and use it to take one update step on a small model's weights."
+changeNote: "New lesson in the calculus track, written from the lecture's transcript, with a worked update step and a quiz."
+section: math
+pillar: calculus
+order: 5
+level: beginner
+estMinutes: 35
+taskMinutes: 25
+prerequisites:
+  - partial-derivatives-many-inputs
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "tIpKfDc295M"
+  published: "2016-05-23"
+  year: 2016
+  minutes: 6
+  title: "Gradient"
+  channel: "Khan Academy"
+  why: "The ∇loss in every training update is this object: the partial derivatives of the loss collected into one vector. This short lecture shows only the computation, on purpose; the next lesson gives the meaning. Seeing the mechanics first, on one concrete function, makes the update rule readable as a list of per-weight numbers rather than a symbol."
+applyIt: |
+  **A gradient is a ranked to-do list: one number per input, saying which way to move it and
+  how much it matters right now.** Treat any multi-input decision the same way.
+
+  1. Take the inputs you ranked by sensitivity (from the partial-derivatives lesson) or list
+     three to five that drive one outcome you care about: a model's loss, an AI feature's cost,
+     a weekly metric.
+  2. Write them as one vector of signed numbers: the change in the outcome per unit change in
+     each input, with the sign showing the direction that helps.
+  3. Make one small change to every input at once, each in proportion to its number, rather than
+     tuning one input to death. Measure, then recompute the vector.
+
+  **If you build software:** in PyTorch, after `loss.backward()` every parameter's `.grad` holds
+  its slice of this vector; printing the norm per layer is a quick health check.
+  **If you don't code:** keep the vector as a row in a spreadsheet and update it after each
+  change.
+
+  Success: one vector of signed sensitivities and one proportional change made from it.
+recap:
+  - emoji: "🧮"
+    title: "Computation before meaning"
+    text: "The gradient's computation looks unrelated to its meaning, so the lecture shows how to compute it first and saves the geometry for later."
+  - emoji: "∂"
+    title: "Start with the partials"
+    text: "For f(x, y) = x² sin y, the x-partial is 2x sin y and the y-partial is x² cos y, each found by freezing the other input."
+  - emoji: "📦"
+    title: "Stack them in a vector"
+    text: "The gradient puts those partials into one vector, written ∇f and read 'del f' or 'gradient of f'. The symbol is called nabla."
+  - emoji: "➡️"
+    title: "A vector-valued function"
+    text: "∇f takes a point and returns a vector, one entry per input. Three inputs give three entries; a hundred inputs give a hundred."
+  - emoji: "🔧"
+    title: "Nabla as a toolkit"
+    text: "A handy way to read ∇: a vector of partial-derivative operators that you apply to f, one per input direction."
+  - emoji: "🔭"
+    title: "Meaning comes next"
+    text: "The interesting part is what this vector means geometrically. That's the next lesson."
+task: |
+  **Compute a gradient three ways and take one step with it (25 minutes).**
+
+  1. By hand: for f(x, y, z) = x²y + yz + 3z, write the three partials and evaluate the gradient
+     at (1, 2, 3).
+  2. Check it with a small reusable function:
+
+     ```python
+     def numerical_gradient(f, point, h=1e-6):
+         grad = []
+         for i in range(len(point)):
+             up, down = list(point), list(point)
+             up[i] += h
+             down[i] -= h
+             grad.append((f(*up) - f(*down)) / (2 * h))
+         return grad
+
+     f = lambda x, y, z: x ** 2 * y + y * z + 3 * z
+     print(numerical_gradient(f, [1, 2, 3]))
+     ```
+
+  3. One training step: a model predicts `w1·1 + w2·3` with target 10, loss
+     `(prediction − 10)²`. Starting at w = [1, 1], compute the gradient, update
+     `w ← w − 0.01 × gradient`, and recompute the loss.
+
+  Success: step 1 and step 2 agree on [4, 4, 5]; in step 3 the gradient is [−12, −36], the new
+  weights are [1.12, 1.36], and the loss falls from 36 to 23.04.
+selfCheck:
+  - q: "A model has 2 million weights. How many numbers does the gradient of its loss contain, and what does that imply for memory during training?"
+    a: "2 million: one partial derivative per weight. Training has to hold a gradient as large as the weights themselves (plus anything the optimizer keeps), so training needs well over twice the memory of just running the model."
+  - q: "You computed the gradient of the loss at the start of training and reused it for the next ten updates to save time. What's the problem?"
+    a: "The gradient depends on the point. After one update the weights changed, so the partials changed too; reusing an old gradient steps in a direction that may no longer lower the loss. Recompute it at every step."
+  - q: "One entry of a model's gradient is 0.0 and another is −50. What does that tell you about the next update?"
+    a: "The weight with −50 will move up a lot (the update subtracts learning rate × gradient), and the weight with 0 won't move at all on this step. The loss is currently insensitive to that weight, at least for small changes."
+mcq:
+  - q: "f(x, y) = x² sin y. At the point (3, 0), what is ∇f?"
+    options:
+      - "[0, 9]"
+      - "[6, 0]"
+      - "[0, 0]"
+      - "[6, 9]"
+    answer: 0
+    explain: "∂f/∂x = 2x sin y = 6 × sin 0 = 0 and ∂f/∂y = x² cos y = 9 × 1 = 9. A function can be zero at a point and still change in some direction, so a zero value doesn't mean a zero gradient."
+  - q: "A training step updates w ← w − 0.1 × ∇L. The current gradient is [4, −2, 0]. Which weights move, and in which direction?"
+    options:
+      - "The first rises 0.4, the second drops 0.2"
+      - "The first drops 0.4, the second rises 0.2"
+      - "All three rise, by 0.4, 0.2 and 0"
+      - "Only the first moves, dropping by 0.4"
+    answer: 1
+    explain: "Subtracting 0.1 × [4, −2, 0] gives changes of −0.4, +0.2 and 0. The minus sign in the update reverses each entry, which is the step people most often get backwards."
+  - q: "Why is it useful to write ∇ as 'a vector of partial-derivative operators'?"
+    options:
+      - "It means the gradient is always a two-entry vector"
+      - "It proves the gradient points uphill without more work"
+      - "It shows the gradient can only be found numerically"
+      - "It reminds you to apply one partial per input, any count"
+    answer: 3
+    explain: "Reading ∇ as a list of ∂/∂x, ∂/∂y, … tells you how to build the gradient for any number of inputs: one partial per input. It's a memory aid, not a proof of the uphill property; that takes the next lesson."
+tags:
+  - math
+  - calculus
+  - gradient
+---
+
+**You need:** → partial-derivatives-many-inputs.
+
+The one idea of this lecture: **the gradient is all of a function's partial derivatives
+collected into one vector.** In the training update `w ← w − learning_rate × ∇loss`, the `∇loss`
+is exactly this vector: one entry per weight, each saying how the loss responds to that weight.
+
+## From partials to one vector
+
+For `f(x, y) = x² sin y`:
+
+- `∂f/∂x = 2x sin y` (freeze y)
+- `∂f/∂y = x² cos y` (freeze x)
+
+The gradient stacks them:
+
+```text
+∇f(x, y) = [ 2x·sin y ,
+             x²·cos y ]
+```
+
+It's a **vector-valued function**: give it a point, get back a vector with one entry per input.
+Two inputs give two entries; a model with 13,000 weights (the size of the digit network in
+→ calculus-for-optimization) gives 13,000. The symbol `∇` is "nabla", read "del". A good memory
+aid is to think of it as a vector of partial-derivative operators, `[∂/∂x, ∂/∂y, …]`, applied
+to f.
+
+The lecture warns that this computation looks unrelated to what the gradient *means*. That's
+true, and → gradient-steepest-ascent closes the gap.
+
+## Worked example with real numbers
+
+**The lecture's function.** At (2, π/6), where `sin(π/6) = 0.5` and `cos(π/6) ≈ 0.866`:
+
+```text
+∇f = [2·2·0.5, 4·0.866]
+   = [2, 3.464]
+```
+
+**One training step.** A model predicts `w1·x1 + w2·x2` with `x = [1, 3]` and target 10; the
+loss is `(prediction − 10)²`. At `w = [1, 1]` the prediction is 4, the error is −6 and the loss
+is 36. From the previous lesson, each partial is `2 × error × feature`:
+
+```text
+∇loss = 2·(−6)·[1, 3]
+      = [−12, −36]
+```
+
+Update with learning rate 0.01:
+
+| | w1 | w2 | prediction | loss |
+|---|---|---|---|---|
+| before | 1.00 | 1.00 | 4.0 | 36.00 |
+| after | 1.12 | 1.36 | 5.2 | 23.04 |
+
+One step with the whole vector moved both weights at once, each by an amount proportional to
+its partial, and the loss fell by more than a third.
+
+## Common mistakes
+
+- **Mixing up the gradient and the step.** The gradient points uphill; the update subtracts it.
+- **Reusing an old gradient.** It depends on the point; recompute after every update.
+- **Thinking ∇ only works in 2D.** Pictures stop at two inputs; the vector doesn't.
+- **Expecting zero output to mean zero gradient.** `x² sin y` is 0 at (3, 0) but its gradient
+  there is [0, 9].
+
+## Where you'll see it in AI
+
+- **Every training step** computes this vector for all the weights (→ calculus-for-optimization).
+- **Memory budgets:** the gradient has as many entries as the model has weights, which is part
+  of why training needs far more memory than running a model (→ adam-optimizer).
+- **Gradient norm** (the vector's length) is a standard training metric
+  (→ gradient-steepest-ascent explains what that length means).

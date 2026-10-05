@@ -1,0 +1,206 @@
+---
+title: "The determinant"
+subtitle: "How much a transformation scales area, and what a zero means"
+summary: "Read a determinant as an area or volume scaling factor, compute it for 2 × 2 matrices, and use a zero to spot a transformation that loses information."
+changeNote: "New lesson in the linear algebra track, written from the lecture's transcript, with a worked example and a quiz."
+section: math
+pillar: linear-algebra
+order: 5
+level: intermediate
+estMinutes: 15
+taskMinutes: 25
+prerequisites:
+  - matrix-multiplication-composition
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "Ip3X9LOh2dk"
+  published: "2016-08-10"
+  year: 2016
+  minutes: 10
+  title: "The determinant | Chapter 6, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "Most courses open the determinant with a formula; this chapter opens with what it measures, the factor by which a transformation scales areas and volumes, and only then gives ad − bc. That meaning is what you need: a zero determinant says space was squashed into fewer dimensions and information was lost, which is the setup for inverses and rank in the next lesson and for eigenvalues later."
+  notes:
+    - "0:31 area scaling worked on two matrices (a stretch scales area by 6, a shear by 1); 2:08 why one unit square tells you about every shape."
+    - "3:14 a zero determinant means space is squashed onto a line or point; 3:45 negative determinants as flipping orientation."
+    - "5:45 the same idea for volumes in 3D; 7:17 the ad − bc formula and where it comes from; 9:18 why det(AB) = det(A)·det(B)."
+applyIt: |
+  **A determinant of zero, or very close to it, is the warning light for "this data or this
+  transformation lost a dimension".** You'll most often meet it as a "singular matrix" error or
+  an unstable fit.
+
+  1. Take a small table from your own work with 3 numeric columns and at least 5 rows: grades in
+     three subjects, monthly figures for three products, three features of a dataset.
+  2. In a spreadsheet, compute the 3 × 3 matrix XᵀX with `=MMULT(TRANSPOSE(range), range)` and
+     its determinant with `=MDETERM(...)`. (Both work in Excel and Google Sheets.)
+  3. Add a fourth column that is the sum of two others and repeat with a 4 × 4. The determinant
+     drops to 0 (or to a tiny number from rounding). Write one line on what that tells you.
+
+  **If you build software:** the same check is `np.linalg.det(X.T @ X)`, but for real data
+  prefer `np.linalg.matrix_rank(X)` or `np.linalg.cond(X)`, which don't depend on the scale of
+  your numbers. **If you don't code:** the spreadsheet version is the whole exercise.
+
+  Success: two determinants computed on your own data, and one sentence on why the second is
+  zero.
+recap:
+  - emoji: "📐"
+    title: "Measure the stretch"
+    text: "Some transformations stretch space and some squash it. The question is by how much: a matrix with columns (3, 0) and (0, 2) turns the unit square into a 3 × 2 rectangle, area 6."
+  - emoji: "🔳"
+    title: "One square tells all"
+    text: "Grid lines stay parallel and evenly spaced, so every grid square scales by the same factor, and any shape is a pile of tiny squares. That single factor is the determinant."
+  - emoji: "0️⃣"
+    title: "Zero means squashed"
+    text: "A determinant of 0 means every area becomes 0: the plane is squashed onto a line or a point. Checking for zero tells you whether a dimension was lost."
+  - emoji: "🔃"
+    title: "Negative means flipped"
+    text: "If space is turned over like a sheet of paper, the determinant is negative. Its size still gives the area factor; the sign records the flip."
+  - emoji: "🧊"
+    title: "Volumes in 3D"
+    text: "In three dimensions the determinant scales volume: the unit cube becomes a slanted box. Zero volume means the columns are linearly dependent."
+  - emoji: "🧮"
+    title: "The formula, last"
+    text: "For a 2 × 2 matrix it's ad − bc. The video ends with a puzzle: why is det(AB) = det(A)·det(B)? Try to say why in one sentence before you read the breakdown."
+task: |
+  Compute a few determinants by hand, then see where they mislead.
+
+  **On paper (10 minutes).** For each matrix (given as its two columns), compute ad − bc, then
+  sketch what happens to the unit square:
+
+  1. Columns (3, 1) and (1, 2).
+  2. The same columns swapped: (1, 2) and (3, 1).
+  3. Columns (2, 4) and (1, 2).
+
+  **In Python (15 minutes, free Google Colab works).**
+
+  ```python
+  import numpy as np
+
+  A = np.array([[3, 1], [1, 2]])
+  B = np.array([[2, 0], [0, 0.5]])
+  print(np.linalg.det(A), np.linalg.det(B), np.linalg.det(A @ B))
+
+  # A perfectly invertible matrix with a "tiny" determinant.
+  S = 0.5 * np.eye(1000)
+  print("det:", np.linalg.det(S))
+  print("rank:", np.linalg.matrix_rank(S), "condition number:", np.linalg.cond(S))
+  ```
+
+  Check that det(A @ B) equals det(A) × det(B). Then write one line on why S, which only halves
+  every direction, has a determinant near 10⁻³⁰¹ but full rank.
+
+  **No code?** Do the paper part and work out 0.5¹⁰⁰⁰ as a power of ten (about −301) with any
+  calculator.
+
+  Success: your three determinants are 5, −5 and 0; the product check holds; and you can say why
+  a tiny determinant alone doesn't prove a matrix is nearly singular.
+selfCheck:
+  - q: "A linear-regression fit throws 'singular matrix'. Your dataset has columns height_cm, height_in and weight. What's going on, in determinant terms?"
+    a: "height_in is height_cm scaled by a constant, so the columns are linearly dependent. The matrix the fit has to invert (XᵀX) then squashes space into fewer dimensions and has determinant 0, so it has no inverse and there's no unique solution. Drop one of the height columns."
+  - q: "A matrix's determinant is −1. A teammate says 'negative, so it shrinks things'. Correct them."
+    a: "The size, 1, says areas are unchanged; the minus sign says orientation is flipped, like a mirror image. A determinant between −1 and 1 (other than 0) would shrink areas; a negative sign alone never means shrinking."
+mcq:
+  - q: "A 2 × 2 matrix has determinant −2. What does it do to the plane?"
+    options:
+      - "Shrinks every area to half and keeps orientation"
+      - "Flips the plane over and doubles every area"
+      - "Squashes the plane onto a line, losing a dimension"
+      - "Doubles areas in one direction and halves them in another"
+    answer: 1
+    explain: "The absolute value is the area factor (2) and the negative sign means orientation is reversed. Halving would need a value of ±0.5, and squashing onto a line needs exactly 0. A determinant is one factor for all areas, not one per direction."
+  - q: "Your 1,000-dimensional preprocessing matrix is 0.5 times the identity. NumPy reports a determinant around 1e-301. A colleague says the matrix is nearly singular. What's the right call?"
+    options:
+      - "Agree, any determinant that small means lost dimensions"
+      - "Agree, and add noise to the diagonal to keep it invertible"
+      - "Disagree, but only because NumPy's determinant is unreliable"
+      - "Disagree: it just halves every direction and inverts cleanly"
+    answer: 3
+    explain: "Halving each of 1,000 directions multiplies volume by 0.5¹⁰⁰⁰, a tiny number, yet no direction is lost and the inverse is simply 2 times the identity. The determinant's size depends on scale and dimension; use rank or the condition number to judge invertibility."
+  - q: "Transformation A has determinant 3 and B has determinant 0.5. You apply A, then B. What is the determinant of the combined transformation?"
+    options:
+      - "1.5, because the area factors multiply"
+      - "3.5, because the two factors add up"
+      - "6, because B's factor divides into A's"
+      - "It depends on whether A and B commute"
+    answer: 0
+    explain: "A scales every area by 3, then B scales the result by 0.5, so the total factor is 1.5. That's why det(BA) = det(B)·det(A), and since numbers commute, the order doesn't change the determinant even when it changes the matrix."
+  - q: "A layer maps 3D vectors to 3D vectors, and its weight matrix has determinant 0. What does that guarantee?"
+    options:
+      - "Every output vector is the zero vector"
+      - "The outputs are larger than the inputs"
+      - "Some different inputs give the same output"
+      - "The layer has a bias that moves the origin"
+    answer: 2
+    explain: "A zero determinant means 3D space is squashed onto a plane, a line or a point, so whole sets of inputs collapse to the same output and can't be told apart afterwards. Only the all-zero matrix sends everything to zero, and the determinant says nothing about a bias."
+backupResources:
+  - label: "Mathematics for Machine Learning — free book, ch. 4.1 (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+---
+
+A linear transformation stretches some regions and squashes others. The **determinant** is the
+single number that says by how much. Its most useful value is zero: a zero determinant means the
+transformation squashed space into fewer dimensions, so some information can never be
+recovered. That's the idea behind "singular matrix" errors, and the stepping stone to inverses,
+rank and eigenvalues.
+
+## One number for every area
+
+Take the unit square sitting on the two basis vectors and watch where a matrix sends it. A
+matrix with columns (3, 0) and (0, 2) turns it into a 3 × 2 rectangle: area 6. A shear turns it
+into a slanted parallelogram with the same base and height: area still 1.
+
+Because grid lines stay parallel and evenly spaced, every grid square is scaled by the same
+factor, and any shape can be approximated by small squares. So that one factor applies to every
+region. That factor is the determinant. In three dimensions it scales volume instead: the unit
+cube becomes a slanted box.
+
+## Zero and negative values
+
+- **Zero:** every area becomes zero, so the plane was squashed onto a line or a point (in 3D,
+  onto a plane, line or point). This happens exactly when the matrix's columns are linearly
+  dependent (→ span-and-basis-vectors).
+- **Negative:** the transformation flips space over, like turning a sheet of paper. The size of
+  the number is still the area factor; the sign records the flip.
+
+## Worked example: three 2 × 2 matrices
+
+For a matrix with columns (a, c) and (b, d), the determinant is **ad − bc**.
+
+1. Columns (3, 1) and (1, 2): a = 3, c = 1, b = 1, d = 2, so 3·2 − 1·1 = **5**. Every area grows
+   five times; a triangle of area 2 becomes area 10.
+2. Swap the columns, (1, 2) and (3, 1): 1·1 − 3·2 = **−5**. Same area factor, but the basis
+   vectors have swapped sides, so orientation flips.
+3. Columns (2, 4) and (1, 2): 2·2 − 1·4 = **0**. The first column is twice the second, so the
+   whole plane lands on one line.
+
+One more property follows straight from the picture: applying A and then B scales areas by
+det(A) and then by det(B), so **det(BA) = det(B)·det(A)**.
+
+## Common mistakes
+
+- **Using the determinant's size to judge "almost singular".** Halving each of 1,000 directions
+  gives a determinant near 10⁻³⁰¹ for a perfectly invertible matrix. Use rank or the condition
+  number instead.
+- **Reading a negative determinant as shrinking.** The sign means a flip; the size means scaling.
+- **Expecting determinants of non-square matrices.** They only exist for square ones (shape
+  changes are in → nonsquare-matrices-dimensions).
+- **Memorizing before understanding.** The formula is easy to look up; "area factor" is what you
+  reason with.
+
+## Where you'll see it in AI
+
+- **Singular matrices in fitting:** dependent features make the matrix inside a least-squares fit
+  have determinant 0 (→ machine-learning-fundamentals).
+- **Probability densities:** the formula for a multivariate Gaussian includes the determinant
+  of the covariance matrix, which measures how spread out the data is.
+- **Normalizing flows:** these generative models track how a learned transformation stretches
+  volume, using log-determinants, so probabilities stay correctly scaled.
+- **Eigenvalues:** the determinant is the product of a matrix's eigenvalues
+  (→ eigenvectors-eigenvalues).
+
+Next, → rank-column-null-space uses the zero-determinant case to explain inverses and rank.

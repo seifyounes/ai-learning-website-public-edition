@@ -75,12 +75,68 @@ export const FOUNDATIONS: PillarMeta[] = [
       "Comfort running commands in a terminal and a free GitHub account. You don't need to write code from scratch (an AI coding agent or app builder does most of it), but you do need to read errors and follow setup steps.",
     blurb: "From idea to a deployed web or mobile app.",
   },
+];
+
+/**
+ * The Math & ML section: one track per subject, every core lecture of the subject's series a
+ * lesson of its own. Optional depth for anyone who wants the maths under the models.
+ */
+export const MATH: PillarMeta[] = [
   {
-    slug: "math-ml-core",
-    number: 8,
-    section: "foundations",
-    title: "Math & ML core",
-    blurb: "The depth lane: the math under the models — every topic tied to the AI you build.",
+    slug: "linear-algebra",
+    number: "M1",
+    section: "math",
+    title: "Linear algebra",
+    blurb: "Vectors, matrices, dot products and eigenvectors: the shapes every model computes with.",
+    needs: "School algebra. No calculus needed.",
+  },
+  {
+    slug: "probability-statistics",
+    number: "M2",
+    section: "math",
+    title: "Probability & statistics",
+    blurb: "Distributions, sampling, uncertainty and Bayes: how to read noisy AI results.",
+    needs: "School algebra.",
+  },
+  {
+    slug: "calculus",
+    number: "M3",
+    section: "math",
+    title: "Calculus for optimization",
+    blurb: "Derivatives, gradients and optimizers: how a model learns from its mistakes.",
+    needs: "School algebra; the linear algebra track helps for gradients.",
+  },
+  {
+    slug: "machine-learning",
+    number: "M4",
+    section: "math",
+    title: "Machine learning fundamentals",
+    blurb: "Fitting, overfitting, validation and the classic models every AI engineer should know.",
+    needs: "The probability & statistics track; calculus helps for gradient descent.",
+  },
+  {
+    slug: "neural-networks",
+    number: "M5",
+    section: "math",
+    title: "Neural networks",
+    blurb: "Layers, activations and backpropagation, then building and training one from scratch.",
+    needs: "Linear algebra and calculus tracks. Basic Python for the build-along lectures.",
+  },
+  {
+    slug: "transformers",
+    number: "M6",
+    section: "math",
+    title: "Transformers & attention",
+    blurb: "Attention, embeddings, the KV cache and a GPT built in code: the architecture behind LLMs.",
+    needs: "The neural networks track. Python for the GPT build.",
+  },
+  {
+    slug: "evaluation",
+    number: "M7",
+    section: "math",
+    title: "Evaluation",
+    blurb: "Metrics for classifiers, then benchmarks, judges and eval sets for LLMs.",
+    needs: "The probability & statistics track.",
   },
 ];
 
@@ -157,19 +213,25 @@ export const SECTIONS: Record<Section, SectionMeta> = {
     blurb: "AI by use-case.",
     pillars: APPLICATIONS,
   },
+  math: {
+    slug: "math",
+    title: "Math & ML",
+    blurb: "The maths under the models, one full lecture track per subject.",
+    pillars: MATH,
+  },
 };
 
-export const ALL_PILLARS: PillarMeta[] = [...FOUNDATIONS, ...APPLICATIONS];
+export const ALL_PILLARS: PillarMeta[] = [...FOUNDATIONS, ...APPLICATIONS, ...MATH];
 
 export function isSection(value: string): value is Section {
-  return value === "foundations" || value === "applications";
+  return value === "foundations" || value === "applications" || value === "math";
 }
 
 export function getPillar(section: Section, slug: string): PillarMeta | undefined {
   return SECTIONS[section].pillars.find((p) => p.slug === slug);
 }
 
-/** Learning order used by the "Start Here" path: foundations first, then applications. */
+/** Learning order used by the "Start Here" path: foundations, applications, then the math depth. */
 export const LEARNING_ORDER: PillarMeta[] = ALL_PILLARS;
 
 /** Applications tracks sorted by recommended order (the one to do first comes first). */

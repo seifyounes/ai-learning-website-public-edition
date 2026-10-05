@@ -1,0 +1,265 @@
+---
+title: "Backprop in code: building micrograd"
+subtitle: "A tiny autograd engine and a trained network, in plain Python"
+summary: "Build a small autograd engine, check its gradients by nudging inputs, and write the forward, loss, backward and update loop that trains a network."
+changeNote: "New lesson in the neural networks track, written from the lecture's transcript, with a tested mini-engine task and a quiz."
+section: math
+pillar: neural-networks
+order: 8
+level: advanced
+estMinutes: 145
+taskMinutes: 35
+shortPath: "About 45 min: watch 0:00–52:38 (derivatives, the Value object and backprop by hand) and read the breakdown. Come back for the rest of the video (the neuron, automatic backward, the network and its training loop) and the task."
+prerequisites:
+  - backprop-chain-rule-calculus
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "VMj-3S1tku0"
+  published: "2022-08-16"
+  year: 2022
+  minutes: 146
+  start: 0
+  watchMinutes: 137
+  title: "The spelled-out intro to neural networks and backpropagation: building micrograd"
+  channel: "Andrej Karpathy"
+  why: "The last two lessons explained backprop in pictures and in calculus; here Andrej Karpathy builds it in about a hundred lines of Python, live, mistakes included. You watch a gradient get computed by hand, then automatically, then used to train a small network, so every step of a training loop becomes code you've seen written. It is long, but it's the clearest bridge from the idea to real frameworks such as PyTorch."
+  notes:
+    - "29:35 Backpropagation by hand on a small expression. Each node's grad is the derivative of the final output with respect to that node."
+    - "45:29 A plus node passes its gradient unchanged to its inputs; a times node multiplies it by the other input's value."
+    - "1:22:28 The first bug: when a value is used twice, its gradients must be added up with +=, not overwritten."
+    - "2:10:31 The second bug: forgetting to reset gradients to zero before each backward pass. The summary follows at 2:14:04."
+applyIt: |
+  **Every training or fine-tuning job you run or read about is this loop: forward pass, loss,
+  backward pass, update.** Knowing it lets you read a training setup and its loss curve instead of
+  treating them as a black box.
+
+  1. Find one training setup you have access to: a notebook from a course, a fine-tuning script,
+     or the settings page of a hosted fine-tuning service.
+  2. Locate the four steps, or the settings that control them: the data and model (forward), the
+     loss, and the learning rate, epochs and batch size (update).
+  3. Look at a loss curve from it. Falling steadily is healthy; flat suggests a learning rate
+     that's too low or a bug; spikes or a jump to "nan" suggest one that's too high.
+
+  **If you build software:** when an assistant writes a training loop for you, check that the
+  gradients are reset before each backward pass; the loop runs without error either way.
+  **If you don't code:** in a hosted fine-tuning dashboard, the training-loss chart is this
+  lecture's loss printed at every step; read it the same way.
+
+  Success: one training setup with its four steps identified and one sentence on what its loss
+  curve says.
+toolkit: |
+  - **Multiply by about four before you agree to a fine-tune.** Training holds weights,
+    gradients and optimizer state (about 4× the weights at one precision, more with
+    mixed precision, before activations). Note that next to your machine's memory, and reach for
+    LoRA, QLoRA or a hosted fine-tune before buying hardware (→ fine-tuning-fundamentals).
+  - **Keep a four-step checklist for generated training code.** Forward, loss, zero the
+    gradients, backward, update. Paste it into your assistant's instructions or project notes
+    and ask it to confirm each step whenever it writes or edits a training loop.
+recap:
+  - emoji: "⚙️"
+    title: "An autograd engine in 100 lines"
+    text: "micrograd builds mathematical expressions out of small Value objects and computes the derivative of the output with respect to every input. A network is just one such expression."
+  - emoji: "📈"
+    title: "What a derivative tells you"
+    text: "Nudge an input by a tiny h and watch the output: rise over run is the slope. Its sign and size say which way, and how strongly, the output responds."
+  - emoji: "🕸️"
+    title: "Values remember their history"
+    text: "Each Value stores its number, the values it came from and the operation that made it, so the whole expression is a graph you can walk backwards."
+  - emoji: "⛓️"
+    title: "Backprop by hand, then by code"
+    text: "Starting from the output with gradient 1, apply the chain rule node by node: plus nodes pass the gradient through, times nodes scale it by the other input."
+  - emoji: "🐛"
+    title: "Accumulate, then order"
+    text: "A value used twice must add up the gradients it receives (+=). Running each node's backward in reverse topological order makes the whole pass automatic."
+  - emoji: "🧠"
+    title: "Neuron, layer, network"
+    text: "A neuron is tanh(w·x + b); a layer is a list of neurons; a network is a list of layers. The example network has 41 parameters and four training examples."
+  - emoji: "🔁"
+    title: "Train: forward, backward, update"
+    text: "Compute the loss, zero the gradients, backpropagate, step each parameter against its gradient, repeat. Large models train on the same principles, at a vastly bigger scale."
+task: |
+  Build a micrograd-style engine, check its gradients, and reproduce both bugs from the
+  lecture. You need Python 3 and nothing else.
+
+  ```python
+  import math
+
+  class Value:
+      def __init__(self, data, children=()):
+          self.data, self.grad = data, 0.0
+          self._prev, self._backward = children, lambda: None
+
+      def __add__(self, other):
+          out = Value(self.data + other.data, (self, other))
+          def _backward():
+              self.grad += out.grad
+              other.grad += out.grad
+          out._backward = _backward
+          return out
+
+      def __mul__(self, other):
+          out = Value(self.data * other.data, (self, other))
+          def _backward():
+              self.grad += other.data * out.grad
+              other.grad += self.data * out.grad
+          out._backward = _backward
+          return out
+
+      def tanh(self):
+          t = math.tanh(self.data)
+          out = Value(t, (self,))
+          def _backward():
+              self.grad += (1 - t * t) * out.grad
+          out._backward = _backward
+          return out
+
+      def backward(self):
+          order, seen = [], set()
+          def visit(v):
+              if v not in seen:
+                  seen.add(v)
+                  for child in v._prev:
+                      visit(child)
+                  order.append(v)
+          visit(self)
+          self.grad = 1.0
+          for v in reversed(order):
+              v._backward()
+
+  a, b, c, f = Value(3.0), Value(-2.0), Value(4.0), Value(-1.0)
+  L = (a * b + c) * f
+  L.backward()
+  print(L.data, a.grad, b.grad, c.grad, f.grad)
+  ```
+
+  1. Run it and compare with the worked example in the lesson.
+  2. Check b's gradient numerically: recompute L with b nudged by 0.001 and divide the change
+     by 0.001.
+  3. Make x = Value(2.0) and y = x + x, call y.backward() and print x.grad. Then change both
+     `+=` in `__add__` to `=` and run it again.
+  4. Build one neuron, o = (w1·x1 + w2·x2 + bias).tanh(), with values of your choice. Call
+     o.backward(), move each weight by −0.1 × its grad, and recompute o.
+
+  Success: the gradients match the lesson (2, −3, −1, −2), your numerical check agrees, x.grad
+  drops from 2 to 1 once `+=` becomes `=`, and the neuron's output moves down after the step.
+selfCheck:
+  - q: "Your fine-tune crashes out of memory on a GPU that runs the same model for chat without trouble. Explain why, and name two fixes."
+    a: "Training also stores a gradient for every trainable weight, optimizer state (Adam adds about two values per trainable weight) and the activations backprop needs, several times the weight memory. Fixes: LoRA or QLoRA (train small adapters only), gradient checkpointing, or a smaller batch."
+  - q: "You add a new operation to a homemade autograd engine and training suddenly stops improving, with no error. How do you find out whether the new operation is to blame?"
+    a: "Run a gradient check: on a tiny expression using the operation, compare the engine's gradient with a numerical one (nudge the input by a small h, divide the output change by h), or with the same expression in PyTorch. If they disagree, its backward function is wrong."
+mcq:
+  - q: "Your hand-written training loop never resets .grad between steps. On a toy problem the loss drops suspiciously fast; on a harder one training is erratic. What is happening?"
+    options:
+      - "The learning rate is decaying on its own"
+      - "The forward pass reuses old activations"
+      - "Gradients pile up, so updates keep growing"
+      - "The loss is computed against stale labels"
+    answer: 2
+    explain: "Backward passes add into .grad, so without a reset each step's gradient is the sum of every previous one. That acts like a growing step size: it can rush a trivial problem to a low loss and wreck a real one. Reset the gradients to zero before each backward pass."
+  - q: "In your engine, a value feeds two later operations, and its gradient comes out smaller than a numerical check says it should be. What is the likely cause?"
+    options:
+      - "Its backward overwrites grad instead of adding"
+      - "The graph was walked in forward, not reverse"
+      - "Numerical checks undercount reused values"
+      - "Values used twice need a smaller learning rate"
+    answer: 0
+    explain: "When a value is used twice, gradient arrives from both uses and must be summed. Writing grad = … keeps only the last contribution, so the result is too small. The numerical check is right: it measures the total effect of nudging the value."
+  - q: "Your engine reports dL/dw = 0.8, but nudging w by 0.001 changes L by 0.0024. What do you conclude?"
+    options:
+      - "The nudge is unreliable, so trust the 0.8"
+      - "A backward function is wrong somewhere"
+      - "Both are right; slopes depend on h this much"
+      - "The learning rate should be tripled"
+    answer: 1
+    explain: "The numerical slope is 0.0024 / 0.001 = 2.4, three times the engine's answer. A small h gives a close estimate for smooth functions, so a gap this large points to a bug in one of the backward functions; check each operation on its own."
+  - q: "Your fine-tune job runs out of memory on a GPU that easily runs the same model for inference. Where is the extra memory going?"
+    options:
+      - "The tokenizer's vocabulary table, copied per batch"
+      - "The whole training dataset, loaded into GPU memory"
+      - "A second copy of the weights kept for evaluation"
+      - "Gradients, optimizer state and saved activations"
+    answer: 3
+    explain: "Training needs the weights plus a gradient for every trainable weight, optimizer state (Adam keeps about two more values each) and the activations saved for backprop. That's several times the weight memory, which is why LoRA (gradients and optimizer state only for tiny adapters) and gradient checkpointing are the standard escape hatches. Data is streamed in batches, not loaded whole."
+backupResources:
+  - label: "micrograd source code on GitHub"
+    url: "https://github.com/karpathy/micrograd"
+    type: "code · the finished engine and network library from the lecture"
+  - label: "Go deeper: Building makemore Part 4: Becoming a Backprop Ninja (Andrej Karpathy, 115 min)"
+    url: "https://www.youtube.com/watch?v=q8SA3rM6ckI"
+    type: "video"
+tags:
+  - math
+  - neural-networks
+  - backpropagation
+  - training
+  - python
+---
+
+Backpropagation sounds like an advanced algorithm, but its core is small enough to write in an
+afternoon. This lecture builds **micrograd**, an engine that computes gradients for any
+expression built from a few operations, and then uses it to train a small network. Once you've
+seen it, the training loop behind every model you use, from a classifier to an LLM, follows the
+same four steps: forward pass, loss, backward pass, update.
+
+## Expressions that remember how they were made
+
+Each number is wrapped in a Value that stores its data, its gradient (starting at 0), the
+values it was made from, and how to pass a gradient back to them. Adding or multiplying Values
+builds a graph as you compute. A network's output, or its loss, is just the last node of a very
+large graph of this kind.
+
+Backprop then walks that graph from the end. The output's gradient is 1. Each node applies the
+**chain rule**: multiply the gradient arriving from above by the node's local derivative.
+
+- A **plus** node passes the incoming gradient to each input unchanged.
+- A **times** node passes to each input the incoming gradient times the *other* input's value.
+- A **tanh** node multiplies by 1 − tanh², using its own output.
+
+## Worked example: gradients on a small expression
+
+Let a = 3, b = −2, c = 4, f = −1, and compute L = (a × b + c) × f.
+
+1. **Forward:** e = a × b = −6; d = e + c = −2; L = d × f = **2**.
+2. **Backward from L:** L's gradient is 1. L is a times node, so dL/dd = f = −1 and
+   dL/df = d = −2.
+3. **Through the plus:** d passes its −1 straight through, so dL/de = −1 and dL/dc = −1.
+4. **Through the times:** dL/da = b × (−1) = **2** and dL/db = a × (−1) = **−3**.
+
+**Check numerically.** Nudge a to 3.001: e = −6.002, d = −2.002, L = 2.002. The change
+0.002 ÷ 0.001 = 2, matching dL/da. **Take a step.** Move every input against its gradient with
+step size 0.01: a = 2.98, b = −1.97, c = 4.01, f = −0.98. Recompute and L ≈ 1.82, down from 2.
+That's one step of gradient descent, the same move that trains a network's weights.
+
+## From expression to training loop
+
+A neuron is tanh(w·x + b), a layer is a list of neurons, and a network is a list of layers. The
+lecture's network takes 3 inputs, has two hidden layers of 4 and one output: 41 parameters. With
+four training examples and a squared-error loss, training is a loop:
+
+1. **Forward:** run every example and compute the loss.
+2. **Zero the gradients**, then **backward** from the loss.
+3. **Update:** move every parameter a small step against its gradient.
+
+The step size is the learning rate. Too small and progress crawls; too large and the loss jumps
+around or blows up.
+
+## Common mistakes
+
+- **Overwriting instead of adding gradients.** A value used twice gets gradient from both uses;
+  `=` keeps only one of them.
+- **Forgetting to zero the gradients.** They pile up across steps. The lecture's own toy run
+  still converged with this bug, which is exactly why it's easy to miss.
+- **Trusting a gradient you haven't checked.** Compare against a numerical nudge or against
+  PyTorch whenever you add an operation.
+
+## Where you'll see it in AI
+
+- **PyTorch and other frameworks** do exactly this, with tensors instead of single numbers so
+  the work runs in parallel. `loss.backward()` and `optimizer.zero_grad()` are the same steps.
+- **Training memory:** every trainable parameter needs a gradient as large as itself, and
+  optimizers such as Adam keep about two more numbers per parameter. That is why fine-tuning
+  needs several times the memory of running a model, and why LoRA trains only small adapters
+  (→ fine-tuning-fundamentals).
+- **Language models** train with the same loop on next-token prediction, with a cross-entropy
+  loss instead of squared error (→ makemore-bigram-model).

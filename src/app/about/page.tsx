@@ -63,9 +63,12 @@ export default function AboutPage() {
           to do first. Your notes live beside each lesson.
         </p>
         <p>
-          <strong>Foundations</strong> (8 pillars) teach the tools and the engineering.{" "}
+          <strong>Foundations</strong> (7 pillars) teach the tools and the engineering.{" "}
           <strong>Applications</strong> (4 tracks) put them to work: building products,
           marketing, AI inside organizations, and freelance services.{" "}
+          <strong>Math &amp; ML</strong> (7 tracks) is the optional depth: one full lecture series
+          per subject, from linear algebra to transformers and evaluation, with every lecture a
+          lesson of its own.{" "}
           <Link href="/path" className="text-print underline">
             Not sure where to go after Foundations?
           </Link>
@@ -135,8 +138,8 @@ export default function AboutPage() {
 
       <Section title="Who made it">
         <p>
-          AI Learning was designed, written and built by Seif Younes, a developer who builds web
-          and mobile apps with AI tools. He made it to learn the field properly and to share the
+          AI Learning was designed and built by Seif Younes, with AI coding agents. He is a
+          developer who builds web and mobile apps with AI tools. He made it to learn the field properly and to share the
           path with anyone starting out. The source code is{" "}
           <a href={REPO_URL} target="_blank" rel="noreferrer" className="text-print underline">
             on GitHub

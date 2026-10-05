@@ -1,0 +1,218 @@
+---
+title: "The central limit theorem"
+subtitle: "Why averages land on a bell curve, whatever the data looks like"
+summary: "Explain why a pass rate or mean latency follows a bell curve even when single values don't, and spot the cases where that breaks down."
+changeNote: "New lesson in the probability and statistics track, written from the lecture's transcript, with a simulation task and a quiz."
+section: math
+pillar: probability-statistics
+order: 6
+level: intermediate
+estMinutes: 12
+taskMinutes: 25
+prerequisites:
+  - standard-error-vs-deviation
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "YAlJCEDH2uY"
+  published: "2018-09-03"
+  year: 2018
+  minutes: 8
+  title: "The Central Limit Theorem, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "The ±2 standard error band from the last lesson only works because averages follow a bell curve. This StatQuest shows that happening, mean by mean, for two very different starting distributions, so you see the theorem rather than take it on trust. It's the reason you can put a band on a pass rate built from pass/fail scores, which are about as far from a bell curve as data gets."
+  notes:
+    - "1:01 The uniform example: watch the histogram of means fill in, one batch of 10 at a time, until a bell curve is obvious."
+    - "5:09 The practical payoff: you don't need to know the data's distribution to build confidence intervals or compare means."
+    - "6:12 The sample-size-of-30 rule of thumb and the fine print: the data must have a mean at all."
+applyIt: |
+  **Whenever you summarize many AI outputs with one average, the central limit theorem tells you
+  how that average behaves, and what it can't tell you.** Take one average you track: a pass rate,
+  a mean judge score, average latency or average cost per request.
+
+  1. Write down whether the individual values look anything like a bell curve (pass/fail scores
+     and latencies usually don't).
+  2. Check that the average covers enough independent items: at least a few dozen, and not many
+     items drawn from the same conversation or document.
+  3. Put a ± 2 standard error band on the average, as in → standard-error-vs-deviation.
+  4. For anything about single values (the slowest 1% of requests, the worst answer), track it
+     separately: the band on the average says nothing about it.
+
+  **If you build software:** log individual values, not only averages, so you can compute both
+  the mean with its band and the tail (for example the 95th percentile). **If you don't code:**
+  ask for, or keep, the raw rows behind any average you're shown.
+
+  Success: one average you track has a band, and one tail number sits next to it.
+recap:
+  - emoji: "🟦"
+    title: "Start with flat data"
+    text: "Take a uniform distribution between 0 and 1, where every value is equally likely. Nothing about it looks like a bell."
+  - emoji: "🧮"
+    title: "Average a sample"
+    text: "Draw 20 random values, compute their mean and drop it into a histogram. Repeat to get 10, 20 and eventually 100 means."
+  - emoji: "🔔"
+    title: "The means form a bell"
+    text: "The histogram of means comes out normally distributed, even though the original data was flat."
+  - emoji: "📉"
+    title: "Same with skewed data"
+    text: "Start from a lopsided exponential distribution instead and the means still form a bell curve, not an exponential one."
+  - emoji: "🌐"
+    title: "The theorem"
+    text: "Whatever distribution the data comes from, means of samples from it are normally distributed. That's the central limit theorem."
+  - emoji: "🛠️"
+    title: "Why it matters"
+    text: "You often don't know your data's distribution, and you don't need to: the normal shape of the means supports confidence intervals, t-tests, ANOVA and other tests of means."
+  - emoji: "📝"
+    title: "The fine print"
+    text: "The common 'n of at least 30' is a safe rule of thumb, not a law; samples of 20 worked here. The real requirement is that the data has a mean to compute."
+task: |
+  Watch lopsided data produce bell-shaped averages.
+
+  ```python
+  import random
+  from collections import Counter
+
+  def mean_latency(n):
+      # each request time is exponential with mean 2 seconds: lopsided, long right tail
+      return sum(random.expovariate(1 / 2) for _ in range(n)) / n
+
+  for n in (1, 5, 50):
+      means = [mean_latency(n) for _ in range(2000)]
+      bins = Counter(round(m * 2) / 2 for m in means)  # half-second bins
+      print(f"n={n}")
+      for b in sorted(bins):
+          if bins[b] >= 20:
+              print(f"{b:5.1f} " + "#" * (bins[b] // 20))
+  ```
+
+  1. Run it in any free online Python runner.
+  2. Compare the three text histograms. At n = 1 you see the raw, lopsided data; at n = 50 the
+     averages should form a narrow, roughly symmetric hump around 2 seconds.
+  3. Check the width: the standard error should be about 2 ÷ √50 ≈ 0.28 s, so most n = 50 means
+     land between about 1.4 and 2.6.
+
+  **No-code path:** in a spreadsheet, fill A1:AX1 with `=-LN(RAND())*2` (50 lopsided values), put
+  `=AVERAGE(A1:AX1)` in AY1, fill the row down 500 rows and chart column AY as a histogram next
+  to a histogram of column A.
+
+  Success: three histograms (or two charts) and one sentence on how the shape changed with n.
+selfCheck:
+  - q: "A colleague says you can't put a normal-based error band on your eval's pass rate because each item is scored 0 or 1, which is nothing like a bell curve. How do you answer?"
+    a: "The band is about the pass rate, which is an average of those 0s and 1s, not about single scores. By the central limit theorem the average of many independent items is close to normally distributed, so the ± 2 standard error band is reasonable once you have a few dozen items or more."
+  - q: "Your dashboard shows that mean response time across 500 requests is 2.1 s ± 0.1 s. A teammate concludes that almost no user ever waits more than 2.5 s. What's wrong with that reasoning?"
+    a: "The ± 0.1 s describes uncertainty about the average, which the central limit theorem makes narrow and bell-shaped. Single request times can still have a long tail, so some users may wait 8 seconds. Check a high percentile, like the 95th or 99th, for the user experience."
+mcq:
+  - q: "Your eval scores 400 items pass or fail. A teammate wants to switch to a 1-to-5 scale because 'pass/fail data isn't normal, so the error band is invalid'. What's the best response?"
+    options:
+      - "Agree, since normal-based bands need normally distributed items"
+      - "Agree, but only because a 5-point scale holds more information"
+      - "Disagree, since pass/fail data is normal once it's sorted"
+      - "Disagree: the pass rate is an average, so it's close to normal"
+    answer: 3
+    explain: "The central limit theorem is about the distribution of averages, not of single values. A pass rate over 400 independent items is very close to normally distributed even though each item is 0 or 1. A richer scale may still be useful for other reasons, but not to make the band valid."
+  - q: "Average latency over 1,000 requests is reported with a tight bell-shaped band. Can you use that same bell curve to estimate how many single requests take over 10 seconds?"
+    options:
+      - "No: the bell curve describes the average, not single requests"
+      - "Yes, since the central limit theorem makes latencies normal"
+      - "Yes, if you widen the band by the square root of 1,000 first"
+      - "No, because latency data never has a mean you can compute"
+    answer: 0
+    explain: "The theorem says the mean of many requests is approximately normal. Individual latencies keep their own lopsided shape with a long tail, so a normal curve would badly underestimate slow requests. Measure the tail directly with percentiles."
+  - q: "An eval has 300 items, but they come from 30 conversations with 10 closely related turns each. You compute the standard error as if there were 300 independent items. What's the likely problem?"
+    options:
+      - "The mean is biased, because each conversation is counted ten times"
+      - "Nothing, as the central limit theorem holds for any 300 values"
+      - "The band is too narrow: related items carry less independent info"
+      - "The band is too wide, since related items reduce the variance"
+    answer: 2
+    explain: "The theorem and the s ÷ √n formula assume independent samples. Turns within a conversation tend to pass or fail together, so you have closer to 30 independent units than 300, and the real uncertainty is larger. Resample whole conversations, as in → bootstrapping-eval-metrics, or average per conversation first."
+  - q: "You average cost per request over 30 requests. Most cost about a cent, but now and then a very long document costs a hundred times more. Is n = 30 enough for the average to be close to normal?"
+    options:
+      - "Yes, since 30 is the threshold where the theorem starts to apply"
+      - "Maybe not: rare huge values need larger samples to even out"
+      - "No, because cost data has no mean for the theorem to use"
+      - "Yes, as long as the requests come from the same model"
+    answer: 1
+    explain: "The 30 rule of thumb works for well-behaved data. With rare, very large values, a sample of 30 may contain none or one of them, so the averages stay lopsided until n grows much larger. The data still has a mean, so the theorem applies eventually; it just needs more data."
+backupResources:
+  - label: "Seeing Theory, chapter 3: probability distributions and the central limit theorem (Brown University)"
+    url: "https://seeing-theory.brown.edu/probability-distributions/"
+    type: "interactive · draw samples and watch the means"
+tags:
+  - math
+  - statistics
+  - central-limit-theorem
+  - evals
+---
+
+**You need:** the bell curve and the standard error. → standard-error-vs-deviation first.
+
+Most data in AI work isn't bell-shaped. Pass/fail scores are two spikes at 0 and 1. Response
+times and costs bunch up at the low end with a long tail of slow or expensive requests. Yet the
+eval bands in this track treat averages as bell curves. The **central limit theorem** is why
+that's allowed: averages of many independent values are close to normally distributed, whatever
+the shape of the values themselves.
+
+## What the theorem says
+
+Take any distribution that has a mean. Draw a sample of n values, average them, and repeat many
+times. The averages:
+
+- pile up in a **bell curve**,
+- centred on the true mean,
+- with a width (the standard error) of σ ÷ √n.
+
+You don't need to know where the data came from. That's what makes confidence intervals and tests
+of means work in practice.
+
+## Worked example: a pass rate and a latency
+
+**Pass rate.** Each item scores 1 (pass) or 0 (fail), with a true pass rate of 0.8. A single item
+is wildly non-normal. Its standard deviation is √(0.8 × 0.2) = 0.4. Average 100 items and the
+pass rate follows a bell curve centred on 0.8 with standard error 0.4 ÷ √100 = **0.04**. So about
+95% of 100-item evals land between **72% and 88%**.
+
+**Latency.** Suppose single request times are lopsided with a mean of 2 s and a standard deviation
+of 2 s (typical of an exponential shape). The mean of 50 requests has standard error
+2 ÷ √50 ≈ **0.28 s**, so it usually lands between about 1.4 and 2.6 s, in a roughly symmetric hump.
+Single requests still run up to 6 s, 8 s or more; the theorem says nothing about them.
+
+```diagram
+single requests:
+#########
+#####
+###
+##
+#   (long tail)
+
+means of 50:
+   ##
+  ####
+ ######
+  ####
+   ##
+```
+
+## Where it breaks down
+
+- **Single values.** The theorem is about averages. Tails and worst cases need their own
+  measurement.
+- **Dependent samples.** Ten turns from one conversation aren't ten independent values. The
+  bell curve still forms, but it's wider than s ÷ √n says.
+- **Heavy tails.** With rare, huge values, averages need far more than 30 samples to look normal.
+  "n ≥ 30" is a rule of thumb, not a law.
+- **No mean at all.** A few theoretical distributions have no mean, but you're unlikely to meet
+  one in practice.
+
+## Common mistakes
+
+- **Rejecting a band because the raw data isn't normal.** The band is about the average.
+- **Using the average's band to predict single outcomes.** Use percentiles for the user's view.
+- **Counting related items as independent.** Group by conversation, user or document first.
+
+## Where you'll see it in AI
+
+Error bars on every eval score and benchmark (→ evaluation-metrics), A/B tests on averages like
+conversion or satisfaction, and the averaged gradients of mini-batch training, which behave like
+noisy estimates of the full-data gradient. When no formula fits your metric, resampling does the
+same job, as → bootstrapping-eval-metrics shows next.

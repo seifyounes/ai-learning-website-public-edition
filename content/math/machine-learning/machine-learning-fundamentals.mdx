@@ -1,0 +1,222 @@
+---
+title: "Machine learning fundamentals"
+subtitle: "Fit on training data, judge on testing data, and pick the model that predicts best"
+summary: "Split data into training and testing sets, judge models only on data they never saw, and spot a score that leakage has made too good."
+changeNote: "Reshaped into the first lesson of the machine learning track: the train/test recipe, leakage and baselines. Bias-variance and the tool map moved to later lessons."
+section: math
+pillar: machine-learning
+order: 1
+level: beginner
+estMinutes: 18
+taskMinutes: 25
+prerequisites:
+  - probability-statistics-for-ai
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "Gv9_4yMHFhI"
+  published: "2018-11-26"
+  year: 2018
+  minutes: 13
+  title: "A Gentle Introduction to Machine Learning"
+  channel: "StatQuest with Josh Starmer"
+  why: "In about thirteen minutes Josh Starmer states the recipe the whole track is built on: fit on training data, judge on testing data, and prefer the model that predicts new data well over the one that fits the old data prettiest. It assumes no maths and avoids framework details that date quickly, so it stays current, and every later lecture in this track zooms into one step of it."
+  notes:
+    - "3:35 Training data versus testing data: the straight line and the wiggly curve are compared here."
+    - "7:37 The two takeaways: judge methods on testing data, and don't be fooled by how well a method fits the training data."
+    - "11:44 Which rows go into training and which into testing? The lecture leaves this open; cross-validation, later in this track, answers it."
+readAfter:
+  - label: "Machine Learning Crash Course — Google (interactive modules + exercises)"
+    url: "https://developers.google.com/machine-learning/crash-course"
+    kind: course
+applyIt: |
+  **The habit this lesson builds is asking "scored on what data?" before you trust any model
+  number.** Take one prediction or automation idea from your own project, job or studies and
+  write down its recipe before anyone builds it. No idea yet? Use a small online shop that wants
+  to predict which customers stop buying.
+
+  ```prompt
+  I want to predict [the outcome] from [the data I have]. Write the recipe as four lines:
+  the inputs, the label, how I'd split the data into training and testing sets (by time if the
+  rows have dates), and the simplest baseline any model must beat. Then list every column that
+  is only known AFTER the outcome and must be dropped to avoid leakage.
+  ```
+
+  **At work:** when someone shows a model or AI-feature score, ask which data it was scored on
+  and what the baseline is. **If you code:** save the four lines as `docs/ml-recipe.md` in your
+  repo so you and your coding assistant keep the test set out of every later experiment.
+  Success: you have a written recipe with a split, a baseline and at least one leaky column
+  ruled out.
+toolkit: |
+  - **Keep your test cases out of your prompts.** The examples you save to evaluate a prompt must
+    never leak into its few-shot block or a saved prompt's examples. That's train/test
+    contamination in prompt-engineering clothes, and it turns your eval into a memory check.
+  - **Fit a baseline before anything clever.** In a spreadsheet, hold back a fifth of the rows,
+    fit a trend line or `LINEST` on the rest, and score it on the held-back rows. A free Google
+    Colab notebook with scikit-learn does the same for a real classifier in a few lines.
+  - **Ask "scored on what?" out loud.** Add one line to your notes template or your assistant's
+    custom instructions: every reported accuracy must name the held-out data it came from.
+recap:
+  - emoji: "🌳"
+    title: "A tree that classifies"
+    text: "A chain of yes/no questions sorts people into two groups. That is a decision tree, one of the simplest machine learning methods: it classifies."
+  - emoji: "📈"
+    title: "A line that predicts"
+    text: "A trend line through a scatter of points lets you read off a value for someone new. Machine learning is, at heart, making predictions and classifications."
+  - emoji: "✂️"
+    title: "Two piles of data"
+    text: "The data you fit the model on is the training data. Fresh examples you hold back to check its predictions are the testing data."
+  - emoji: "📏"
+    title: "Measuring how wrong"
+    text: "For each testing example, measure the gap between the real value and the prediction and add the gaps up. The smaller total wins."
+  - emoji: "🎭"
+    title: "Pretty fit, poor prediction"
+    text: "A wiggly curve that hugs every training point can lose to a plain straight line on the testing data. Don't be fooled by a good fit to training data."
+  - emoji: "🧰"
+    title: "Fancy is optional"
+    text: "Run the testing data through every candidate, from a small tree to the newest method, and keep the one that predicts best. How fancy it is doesn't matter."
+  - emoji: "🔀"
+    title: "Which rows go where?"
+    text: "Which points end up in training and which in testing was an arbitrary choice here. There are principled ways to make it, and this track covers them next."
+task: |
+  Compute the bar every model must clear before anyone trains one: the majority-class baseline.
+
+  Download a free tabular dataset with a yes/no label — the Titanic passenger list or the Telco
+  Customer Churn dataset on Kaggle both work, or use a spreadsheet from your own work with a
+  yes/no column (paid / unpaid, renewed / cancelled). Then:
+
+  1. Count each class with `=COUNTIF(range, "Yes")` and `=COUNTIF(range, "No")`, or in Python:
+
+     ```python
+     import pandas as pd
+     df = pd.read_csv("your_file.csv")
+     print(df["label_column"].value_counts(normalize=True))
+     ```
+
+  2. The majority-class baseline is the share of the bigger class: the accuracy you get by always
+     predicting it. Write it in your notes as a percentage.
+  3. Read the column names and find one that is only known *after* the outcome (a cancellation
+     reason, a refund date, a survival-related field). That column would leak the answer into a
+     model, so mark it "drop".
+  4. Decide how you'd split the rows: a random 80/20, or by date if the rows have one.
+
+  Success: you have the two class counts, the baseline as a percentage, one leaky column you'd
+  drop and a written split rule.
+selfCheck:
+  - q: "A teammate trains a fraud model, reports 97% accuracy on the transactions it was trained on, and wants to ship. Which step of the recipe is missing, and what do you ask for?"
+    a: "The held-out check. A score on training data can come from memorizing. Ask for the score on transactions the model never saw, ideally from a later period than the training data, and for the baseline it has to beat."
+  - q: "A churn model scores 99% on the test set on its first try. One of its input columns is `cancellation_reason`. What went wrong?"
+    a: "Leakage: that column is only filled in *after* a customer cancels, so the model reads the answer instead of predicting it. Drop every column that's only known after the outcome, re-split, and expect a lower but honest score."
+  - q: "Two models are compared. Model A fits the training data almost perfectly; model B fits it loosely. On testing data B makes smaller errors. Which do you keep, and why might A look better in a demo?"
+    a: "Keep B: only testing data says how a model handles new cases. A looks better in a demo because the demo usually replays the training examples, which A has effectively memorized."
+mcq:
+  - q: "Your eval set accidentally contains 30 examples that also appear word-for-word as few-shot examples in the prompt. Your eval score is now:"
+    options:
+      - "Fine, because few-shot examples are not training data"
+      - "Deflated, because the duplicate rows confuse the model"
+      - "Inflated, since it partly scores answers it was shown"
+      - "Unaffected, as long as the temperature is set to 0"
+    answer: 2
+    explain: "This is train/test contamination in prompt-engineering clothes. An eval must measure performance on unseen inputs, and anything the model was shown, in its weights or its context window, counts as seen. Temperature doesn't change that."
+  - q: "A team ships a sentiment classifier with 94% accuracy. The dataset is 94% 'neutral'. What's the first question to ask?"
+    options:
+      - "Was it scored on a large enough test set?"
+      - "Is the learning rate tuned for this dataset?"
+      - "Does it hold up on longer, messier reviews?"
+      - "Does it beat always answering 'neutral'?"
+    answer: 3
+    explain: "A model that answers 'neutral' every time also scores 94%, so this classifier may have learned nothing. Always compare against the simplest possible baseline first; per-class precision and recall (→ evaluation-metrics) then show what accuracy hides."
+  - q: "You have two years of daily sales and want to predict next month. How should you hold out test data?"
+    options:
+      - "Use the most recent months as the test set"
+      - "Pick 20% of the days at random as the test set"
+      - "Test on the same days the model was trained on"
+      - "Hold out every seventh day across both years"
+    answer: 0
+    explain: "The model will be used on the future, so the test set should be the future relative to training. A random or every-seventh-day split lets the model see days on both sides of each test day, which flatters it because neighbouring days are so similar."
+  - q: "You try 25 model and prompt variants on the same 100-case test set, keep the top scorer at 88%, and report 88% as the accuracy to expect on new cases. What's wrong with that number?"
+    options:
+      - "Nothing, since the test set was never used in training"
+      - "Selecting on the test set makes the 88% optimistic"
+      - "Twenty-five variants are too few to find the best one"
+      - "The 88% should be measured on training cases instead"
+    answer: 1
+    explain: "Picking the best of 25 on the same 100 cases rewards whichever variant got lucky on them, so the winner's score is biased upward: the test set has quietly become a validation set. Make the choice on validation data, then score the winner once on fresh test cases. The set was held out from training, but not from your choices."
+backupResources:
+  - label: "StatQuest — Machine Learning playlist"
+    url: "https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF"
+    type: "course · concept-by-concept videos"
+tags:
+  - math
+  - machine-learning
+  - fundamentals
+  - train-test-split
+---
+
+Before transformers, before RAG, there is one recipe, and every AI system you'll ever ship,
+including the LLM APIs you call, came out of it: **fit a model on one part of the data, judge
+it on a part it never saw, and keep the one that predicts best.** Learn that once and a hundred
+buzzwords collapse into three questions: *what's the data, what's the loss, does it generalize?*
+
+## The recipe
+
+**Supervised learning** has three parts: examples with known answers (inputs → labels), a
+**loss** that measures how wrong a prediction is, and a way to adjust the model to make the
+loss small. A spam filter, a churn model and LLM pretraining are all this recipe. Pretraining
+just uses huge amounts of text as data and "the next token" as the label.
+
+## Generalization is the only thing that matters
+
+A model that aces its training data has proven nothing; maybe it **memorized**. So we split:
+**train** (learn), **validation** (tune choices), **test** (touch once, at the end). The
+moment information from test leaks into training (duplicated rows, tuning on test, eval
+examples pasted into prompts) your score becomes fiction.
+
+> 💡 **Try it:** in Google's MLCC overfitting widget, crank model capacity up on noisy data and
+> watch the curve contort itself through every point, then watch test error climb.
+
+## Worked example: a churn model, start to finish
+
+A hypothetical subscription business has 1,000 customers; 150 cancelled last quarter. You want
+to predict who cancels next.
+
+1. **Baseline first.** Always predicting "stays" is right for 850 of 1,000: **85% accuracy**.
+   Any model has to beat that to be worth anything.
+2. **Split.** 800 customers to train, 200 to test, keeping the same 15% cancel rate in both
+   halves.
+3. **First model:** a deep decision tree. Training accuracy 99%, test accuracy 84%. It
+   memorized the training customers and is *worse* than the baseline on new ones
+   (→ bias-variance-overfitting explains why).
+4. **A too-good second try.** Someone adds a `refund_issued` column and test accuracy jumps to
+   98%. Suspicious: refunds are issued *because* people cancel. The column leaks the answer.
+   Drop it.
+5. **Honest model:** a simple classifier without the leaky column (→ logistic-regression).
+   Training 89%, test 88%. The two numbers are close and it beats the baseline by 3 points.
+6. **Is 3 points real?** At n = 200 the rough noise band is ±1/√200 ≈ ±7 points
+   (→ standard-error-vs-deviation). So the gain is promising, not proven. Rotating the test
+   slice gives a steadier answer (→ cross-validation-folds).
+
+Nothing in that walk-through needed a large model. It needed a baseline, a clean split and a
+nose for leakage.
+
+## Common mistakes
+
+- **Scoring on training data.** Training accuracy measures memory as much as skill; report the
+  held-out score.
+- **High accuracy, useless model.** It just predicts the majority class. Compare against the
+  baseline every time.
+- **Leakage.** A column known only after the outcome, duplicates across splits, or a random
+  split on time-ordered data. Drop post-outcome columns, dedupe, and split by time when rows
+  have dates.
+- **Wearing out the test set.** If you keep tuning against it, it becomes training signal.
+  Make choices on validation data and touch test once.
+
+## Where you'll see it in AI
+
+- **Evals for LLM apps** are this recipe's test set: a fixed set of cases the prompt never saw
+  (→ evaluation-metrics, → evals-and-testing).
+- **Fine-tuning** keeps a held-out set to catch a model that memorized your examples
+  (→ fine-tuning-fundamentals).
+- **Training** is the same loop at any scale: the rest of this track walks through the loss
+  (→ least-squares-regression), how a model fits (→ fitting-by-gradient-descent), and the
+  tabular models that still win on spreadsheets (→ gradient-boosting-trees).

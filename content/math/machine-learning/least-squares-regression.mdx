@@ -1,0 +1,185 @@
+---
+title: "Least squares: fitting a line"
+subtitle: "Your first loss function: square the misses, add them up, make the total small"
+summary: "Score a line by its sum of squared residuals, find the best slope and intercept, and compare a fit against the flat-average baseline."
+changeNote: "New lesson in the machine learning track, written from the lecture's transcript, with a hand-worked example, a spreadsheet task and a quiz."
+section: math
+pillar: machine-learning
+order: 4
+level: beginner
+estMinutes: 14
+taskMinutes: 25
+prerequisites:
+  - cross-validation-folds
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "PaFPbb66DxQ"
+  published: "2017-05-22"
+  year: 2017
+  minutes: 9
+  title: "The Main Ideas of Fitting a Line to Data (The Main Ideas of Least Squares and Linear Regression.)"
+  channel: "StatQuest with Josh Starmer"
+  why: "So far the track has said 'measure how wrong the model is' without saying how. This nine-minute lecture makes it concrete: start from a flat line at the average, measure each miss, square it, add them up, and rotate the line until the total is smallest. That total is the first loss function you'll meet, and the next lesson shows how a model walks downhill on it."
+  notes:
+    - "1:09 The flat line through the average y value: the worst reasonable fit, and the starting point for every comparison."
+    - "3:17 Why the misses are squared rather than added as they are, and the name for the total: the sum of squared residuals."
+    - "6:31 The best line is where the derivative of the total is zero; computers do this part for you."
+applyIt: |
+  **Any time someone fits a trend to numbers you care about, ask for two totals: the fit's
+  squared error and the flat-average line's.** If the fit doesn't remove much of the flat
+  line's error, the trend isn't telling you much. Pick a pair of columns from your own work or
+  studies where one might predict the other: ad spend and sign-ups, study hours and marks,
+  ticket count and response time.
+
+  1. Put them in a spreadsheet, x in column A and y in column B.
+  2. Get the best line with `=SLOPE(B:B, A:A)` and `=INTERCEPT(B:B, A:A)`.
+  3. Compare `=SUMXMY2(B2:B50, C2:C50)` (C holds the line's predictions) with the same total
+     for a column that just repeats `=AVERAGE(B:B)`.
+
+  **If you build software:** the same comparison is `r2_score` in scikit-learn, or one line of
+  NumPy. **If you don't code:** add a linear trendline to a chart and tick "show R²"; it's the
+  share of the flat line's error the fit removes.
+  Success: you have both totals for one real pair of columns and can say how much the line
+  improves on the average.
+recap:
+  - emoji: "📈"
+    title: "Which line is best?"
+    text: "You can draw many lines through a cloud of points. You need a number that says which one fits better."
+  - emoji: "➖"
+    title: "Start flat"
+    text: "A horizontal line at the average y value is about the worst sensible fit. It gives you a starting total to beat."
+  - emoji: "📏"
+    title: "Measure the misses"
+    text: "For each point, the residual is the gap between the real value and the line. Points above and below the line give gaps of opposite sign."
+  - emoji: "✖️"
+    title: "Square, then add"
+    text: "Squaring makes every gap positive so they can't cancel out. The total is the sum of squared residuals."
+  - emoji: "🔄"
+    title: "Rotate to the sweet spot"
+    text: "Tilting the line lowers the total for a while, then raises it again. The best slope and intercept sit at the bottom of that curve."
+  - emoji: "🎯"
+    title: "Where the slope is zero"
+    text: "The bottom is where the derivative of the total equals zero. That's least squares; a computer finds it for you."
+task: |
+  Fit a line by hand once, so you never think of it as magic again. Use pen and paper or a
+  spreadsheet with these five points (hours studied → test mark out of 10):
+
+  | Hours (x) | Mark (y) |
+  |---|---|
+  | 1 | 3 |
+  | 2 | 4 |
+  | 3 | 4 |
+  | 4 | 6 |
+  | 5 | 8 |
+
+  1. **Baseline.** The average mark is 5. Compute the sum of squared residuals for the flat line
+     y = 5.
+  2. **Best line.** Slope = Σ(x − x̄)(y − ȳ) / Σ(x − x̄)², intercept = ȳ − slope × x̄. (x̄ = 3.)
+  3. **Score it.** Compute each prediction, each residual and the sum of squared residuals.
+  4. **Nudge it.** Change the slope by 0.2 either way (keep the line through the averages) and
+     recompute. Both totals should be larger.
+  5. **Check yourself:** `=SLOPE`, `=INTERCEPT` and `=SUMXMY2` in a spreadsheet, or
+     `numpy.polyfit(x, y, 1)` in Python, should match your numbers.
+
+  Success: flat-line total 16, best line y = 1.4 + 1.2x with total 1.6, and both nudged lines
+  at 2.0.
+selfCheck:
+  - q: "Your manager wants 'an AI model' to forecast next month's orders from three years of monthly sales in a spreadsheet. What do you build first, and how do you judge it?"
+    a: "A simple baseline: a least-squares trend line on the history (and a same-month-last-year forecast). Fit it on the earlier months, score it on the most recent ones, and compare its squared error with the flat-average line's. Anything fancier, an LLM included, has to beat that on the held-out months."
+  - q: "Two lines fit the same data. Line A misses five points by 1 each. Line B hits four points exactly and misses the fifth by 4. Which does least squares prefer, and what does that tell you about squared error?"
+    a: "A: its total is 5 × 1² = 5, while B's is 4² = 16. Squaring punishes one big miss far more than several small ones, so least squares bends toward outliers. If a few extreme points are errors, check them before trusting the fit."
+mcq:
+  - q: "A trend line's sum of squared residuals is 40. The flat line at the average scores 50. What's the fairest summary?"
+    options:
+      - "The line explains most of the variation in y"
+      - "It removes only a fifth of the flat line's error"
+      - "The line is worse, because 40 is still a large total"
+      - "The two can't be compared without a test set"
+    answer: 1
+    explain: "(50 − 40) / 50 = 0.2, so the line takes away 20% of the error you'd have by always predicting the average; that ratio is R². The raw 40 means nothing on its own because it depends on the units and the number of points."
+  - q: "Your house-price data has one mansion priced at ten times the rest. Least squares fits a line that misses most ordinary houses. Why?"
+    options:
+      - "Squaring makes that one big miss dominate the total"
+      - "Least squares ignores points far from the average"
+      - "The intercept is fixed at zero, which tilts the line"
+      - "One extreme point makes the derivative undefined"
+    answer: 0
+    explain: "A miss of 10 counts as 100 after squaring, so the fit tilts toward the mansion to shrink that one term. Check whether the point is real and relevant, and consider a loss that squares less aggressively. Least squares never ignores far-away points; the problem is the opposite."
+  - q: "Why do we square residuals rather than just adding them up?"
+    options:
+      - "Squaring makes the line pass through the average point"
+      - "Squaring keeps small residuals from being ignored"
+      - "Squaring is needed to make the units come out right"
+      - "Plain sums let misses above and below cancel out"
+    answer: 3
+    explain: "A line far above some points and far below others could have residuals that sum to zero and look perfect. Squaring makes every term positive (and is easy to differentiate, which absolute values are not). It actually shrinks small residuals relative to big ones."
+backupResources:
+  - label: "Google Machine Learning Crash Course — Linear regression"
+    url: "https://developers.google.com/machine-learning/crash-course/linear-regression"
+    type: "interactive · course module"
+tags:
+  - math
+  - machine-learning
+  - linear-regression
+  - loss-functions
+---
+
+Every model needs a number for how wrong it is. **Least squares is the simplest one: measure
+each miss, square it, add them up, and choose the line that makes the total smallest.** That
+total is a *loss function*, and the move of picking parameters to minimise a loss is the same
+one used to train every neural network, LLMs included.
+
+## Residuals and the sum of squares
+
+A **residual** is the real value minus the predicted value. Some are positive, some negative,
+so adding them directly lets misses cancel. Squaring fixes that and makes the maths smooth.
+The total, the **sum of squared residuals (SSR)**, is the loss. Divide it by the number of
+points and you get the **mean squared error (MSE)**, the same quantity under the name most ML
+libraries use.
+
+A line is y = intercept + slope × x. Least squares chooses the two numbers that give the
+lowest SSR. At that point the SSR curve is flat, so its derivative is zero, which gives a
+closed-form answer:
+
+```text
+slope = Σ(x − x̄)(y − ȳ) / Σ(x − x̄)²
+intercept = ȳ − slope × x̄
+```
+
+## Worked example
+
+Four points: (1, 2), (2, 3), (3, 5), (4, 4). Averages: x̄ = 2.5, ȳ = 3.5.
+
+- **Flat line y = 3.5.** Residuals −1.5, −0.5, 1.5, 0.5. SSR = 2.25 + 0.25 + 2.25 + 0.25 =
+  **5.0**.
+- **Best line.** Σ(x − x̄)(y − ȳ) = 2.25 + 0.25 + 0.75 + 0.75 = 4. Σ(x − x̄)² = 5. Slope =
+  4 / 5 = **0.8**; intercept = 3.5 − 0.8 × 2.5 = **1.5**.
+- **Its predictions:** 2.3, 3.1, 3.9, 4.7. Residuals −0.3, −0.1, 1.1, −0.7. SSR = 0.09 + 0.01 +
+  1.21 + 0.49 = **1.8**.
+
+The line removes (5.0 − 1.8) / 5.0 = **64%** of the flat line's error. That ratio is **R²**. Try
+slope 1.0 through the same average point and the SSR rises to 2.0; the formula's slope really
+is the bottom.
+
+## Common mistakes
+
+- **Reading SSR on its own.** It grows with the number of points and the units of y. Compare it
+  with the flat-line baseline or report MSE or R².
+- **Forgetting outliers.** Squaring makes one large miss dominate; check extreme points before
+  trusting the line.
+- **Extrapolating.** The line describes the range of x you fitted. Far outside it, the trend may
+  not hold.
+- **Scoring on the fitting data.** A low SSR on the points you fitted says little about new
+  points; the held-out habit from → machine-learning-fundamentals still applies.
+
+## Where you'll see it in AI
+
+- **Regression losses.** MSE is the standard loss whenever a model predicts a number: prices,
+  durations, scores.
+- **Training in general.** Classifiers and LLMs use a different loss (cross-entropy, from
+  → logistic-regression onward), but the job is the same: choose parameters that minimise it.
+  Most models have no closed-form answer, so they walk downhill instead
+  (→ fitting-by-gradient-descent).
+- **Linear probes.** Fitting a simple linear model on top of embeddings is a standard way to test
+  what they capture (→ embeddings-vector-databases).

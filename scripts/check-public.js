@@ -57,17 +57,22 @@ const CODING_AGENT_TERMS = /CLAUDE\.md|AGENTS\.md|\bhooks?\b|subagents?|Claude C
 // Every lesson slug; a slug in prose must be written as a pointer (`→ slug`) so it renders as a
 // link. Anything else shows the reader a raw, unclickable slug.
 const ALL_SLUGS = new Set();
+const DUP_SLUGS = new Set();
 (function collectSlugs(d) {
   for (const f of fs.readdirSync(d)) {
     const p = path.join(d, f);
     if (fs.statSync(p).isDirectory()) collectSlugs(p);
-    else if (p.endsWith(".mdx")) ALL_SLUGS.add(f.replace(/\.mdx$/, ""));
+    else if (p.endsWith(".mdx")) {
+      const s = f.replace(/\.mdx$/, "");
+      // Pointers link by slug alone, so a slug must be unique across the whole course.
+      if (ALL_SLUGS.has(s)) DUP_SLUGS.add(s);
+      ALL_SLUGS.add(s);
+    }
   }
 })(path.join(ROOT, "content"));
 
-// Where each video is used, so a video has one home: a lesson's primary, or one lecture track.
+// Every lesson's main video, so each video is the main video of one lesson only.
 const PRIMARY_OF = new Map(); // videoId -> lesson slug
-const TRACK_OF = new Map(); // videoId -> [lesson slugs]
 (function collectVideos(d) {
   for (const f of fs.readdirSync(d)) {
     const p = path.join(d, f);
@@ -81,9 +86,6 @@ const TRACK_OF = new Map(); // videoId -> [lesson slugs]
       }
       const slug = f.replace(/\.mdx$/, "");
       if (data.video?.videoId) PRIMARY_OF.set(data.video.videoId, slug);
-      for (const l of Array.isArray(data.lectureTrack) ? data.lectureTrack : []) {
-        if (l?.videoId) TRACK_OF.set(l.videoId, [...(TRACK_OF.get(l.videoId) || []), slug]);
-      }
     }
   }
 })(path.join(ROOT, "content"));
@@ -114,7 +116,7 @@ function guessableMcq(q) {
 }
 
 const REQUIRED = ["title", "section", "pillar", "order", "level", "estMinutes", "applyIt", "toolkit", "task"];
-const FORBIDDEN = ["mentor", "claudeOs", "applyTo"];
+const FORBIDDEN = ["mentor", "claudeOs", "applyTo", "lectureTrack"];
 
 function lessonFiles(dirs) {
   const out = [];
@@ -156,8 +158,15 @@ for (const file of files) {
     continue;
   }
   const fm = parsed.data;
+  // A Math & ML lesson is one lecture: its AI-setup block is optional, its challenge quiz isn't.
+  const isMath = fm.section === "math";
   for (const k of REQUIRED) {
+    if (isMath && k === "toolkit") continue;
     if (fm[k] === undefined || fm[k] === null || fm[k] === "") errors.push({ file: rel, rule: "schema", detail: `missing ${k}` });
+  }
+  if (isMath) {
+    if (!Array.isArray(fm.mcq) || fm.mcq.length < 3) errors.push({ file: rel, rule: "schema", detail: "a Math & ML lesson needs a challenge quiz (mcq) of 3 or more questions" });
+    if (!Array.isArray(fm.recap) || fm.recap.length < 4) errors.push({ file: rel, rule: "schema", detail: "a Math & ML lesson needs a recap of 4 or more steps" });
   }
   for (const k of FORBIDDEN) {
     if (k in fm) errors.push({ file: rel, rule: "schema", detail: `private field ${k}` });
@@ -250,36 +259,11 @@ for (const file of files) {
     if (!Array.isArray(fm.prerequisites)) errors.push({ file: rel, rule: "schema", detail: "prerequisites must be a list of lesson slugs" });
     else for (const s of fm.prerequisites) if (!ALL_SLUGS.has(s)) errors.push({ file: rel, rule: "schema", detail: `prerequisite '${s}' is not a lesson slug` });
   }
-  // Math & ML subjects carry their full lecture series, not one video.
   const slug = path.basename(file, ".mdx");
-  if (fm.pillar === "math-ml-core") {
-    const t = Array.isArray(fm.lectureTrack) ? fm.lectureTrack : [];
-    if (t.filter((l) => !l?.optional).length < 4 || t.length > 16) {
-      errors.push({ file: rel, rule: "schema", detail: `math lessons need a lectureTrack with at least 4 core lectures and 16 in all (has ${t.length})` });
-    }
-  }
-  if (fm.lectureTrack !== undefined) {
-    if (!Array.isArray(fm.lectureTrack)) errors.push({ file: rel, rule: "schema", detail: "lectureTrack must be a list" });
-    else {
-      const seen = new Set();
-      fm.lectureTrack.forEach((l, i) => {
-        const at = `lectureTrack ${i + 1}`;
-        if (!l || !/^[\w-]{11}$/.test(l.videoId ?? "")) errors.push({ file: rel, rule: "schema", detail: `${at}: videoId must be an 11-character YouTube id` });
-        if (!l?.title || !l?.channel) errors.push({ file: rel, rule: "schema", detail: `${at}: needs title and channel` });
-        if (!(l?.minutes > 0)) errors.push({ file: rel, rule: "schema", detail: `${at}: missing minutes (run check-links.js --durations --write)` });
-        if (typeof l?.covers !== "string" || l.covers.length < 30 || l.covers.length > 220) {
-          errors.push({ file: rel, rule: "schema", detail: `${at}: covers must say in 30–220 characters what the lecture teaches (has ${l?.covers?.length ?? 0})` });
-        }
-        if (l?.optional !== undefined && typeof l.optional !== "boolean") errors.push({ file: rel, rule: "schema", detail: `${at}: optional must be true or false` });
-        if (!l?.videoId) return;
-        if (seen.has(l.videoId)) errors.push({ file: rel, rule: "dup", detail: `${at}: ${l.videoId} is listed twice` });
-        seen.add(l.videoId);
-        const primaryOf = PRIMARY_OF.get(l.videoId);
-        if (primaryOf && primaryOf !== slug) errors.push({ file: rel, rule: "dup", detail: `${at}: ${l.videoId} is the main video of → ${primaryOf}` });
-        const elsewhere = (TRACK_OF.get(l.videoId) || []).filter((s) => s !== slug);
-        if (elsewhere.length) errors.push({ file: rel, rule: "dup", detail: `${at}: ${l.videoId} is also in the lecture track of → ${elsewhere.join(", ")}` });
-      });
-    }
+  if (DUP_SLUGS.has(slug)) errors.push({ file: rel, rule: "dup", detail: `another lesson is also named ${slug}; slugs must be unique across the course` });
+  // Every primary video belongs to one lesson.
+  if (fm.video?.videoId && PRIMARY_OF.get(fm.video.videoId) !== slug) {
+    errors.push({ file: rel, rule: "dup", detail: `video ${fm.video.videoId} is also the main video of → ${PRIMARY_OF.get(fm.video.videoId)}` });
   }
 
   (fm.mcq || []).forEach((q, i) => {
@@ -294,7 +278,6 @@ for (const file of files) {
     ["task", fm.task],
     ["video.why", fm.video?.why],
     ["shortPath", fm.shortPath],
-    ...(Array.isArray(fm.lectureTrack) ? fm.lectureTrack : []).map((l, i) => [`lectureTrack ${i + 1}`, l?.covers]),
     ...(fm.recap || []).map((r, i) => [`recap ${i + 1}`, `${r.title} ${r.text}`]),
     ...(fm.selfCheck || []).map((s, i) => [`selfCheck ${i + 1}`, `${s.q} ${s.a}`]),
     ...(fm.mcq || []).map((q, i) => [`mcq ${i + 1}`, `${q.q} ${(q.options || []).join(" ")} ${q.explain || ""}`]),

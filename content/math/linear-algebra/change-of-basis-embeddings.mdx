@@ -1,0 +1,218 @@
+---
+title: "Change of basis"
+subtitle: "Same vectors, different coordinates, and why embedding dimensions rarely mean anything alone"
+summary: "Translate vectors between coordinate systems with a matrix and its inverse, and explain why embedding coordinates are arbitrary while angles are not."
+changeNote: "New lesson in the linear algebra track, written from the lecture's transcript; takes in the embedding-dimension self-check from lesson 1."
+section: math
+pillar: linear-algebra
+order: 10
+level: intermediate
+estMinutes: 18
+taskMinutes: 25
+prerequisites:
+  - cosine-similarity-search
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "P2LTAUO1TdA"
+  published: "2016-09-11"
+  year: 2016
+  minutes: 13
+  title: "Change of basis | Chapter 13, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "This chapter shows that coordinates are a language, not a property of the vector: two people with different basis vectors describe the same arrow with different numbers, and a matrix and its inverse translate between them. That is the right way to think about learned embeddings, whose axes are whatever training happened to produce, and it sets up the eigenvector lesson, where choosing a good basis makes a transformation simple."
+  notes:
+    - "1:35 a second coordinate system with its own basis vectors, and the same arrow described with different numbers."
+    - "4:18 translating from her coordinates to ours with a matrix whose columns are her basis vectors; 7:00 the inverse goes the other way."
+    - "9:06 describing a rotation in her language; 11:42 the A⁻¹MA pattern as a change of perspective."
+applyIt: |
+  **When you compare or store embeddings, the coordinates are only meaningful inside one
+  model's basis.** That single fact explains most "the scores went weird after we changed
+  something" incidents.
+
+  1. Find where embeddings live in a tool or project you use: a vector database, a search
+     feature, a notes plugin, a RAG demo.
+  2. Write down which model (and version) produced the stored vectors and which one embeds new
+     queries. If you can't find out, that's the first finding.
+  3. Write a one-line rule for that project, such as: "changing the embedding model means
+     re-embedding everything; never compare vectors across models."
+
+  **If you build software:** store the model name and version next to every vector, and make
+  your search code refuse to compare vectors with different tags. **If you don't code:** ask the
+  tool's documentation or admin what happens to old vectors when the embedding model changes.
+
+  Success: the model behind your stored vectors, the model behind new queries, and a one-line
+  rule for changing models.
+recap:
+  - emoji: "🧭"
+    title: "Coordinates carry assumptions"
+    text: "The numbers (3, 2) mean 3 of one basis vector plus 2 of the other. Which way 'right' is, and how long one unit is, all lives in the choice of basis vectors."
+  - emoji: "🗣️"
+    title: "A different language"
+    text: "Someone using basis vectors (2, 1) and (−1, 1) describes our (3, 2) as (5/3, 1/3). Same arrow, different numbers; to her, her basis vectors are (1, 0) and (0, 1)."
+  - emoji: "🕸️"
+    title: "Grids are made up"
+    text: "Space has no built-in grid. Each basis draws its own, with different directions and spacing. Only the origin is shared: zero times anything is zero."
+  - emoji: "🔁"
+    title: "Her words into ours"
+    text: "Put her basis vectors, written in our coordinates, as the columns of a matrix. Multiplying her coordinates by it gives ours. Geometrically it moves our grid onto hers."
+  - emoji: "↩️"
+    title: "Ours into hers"
+    text: "To go the other way, use the inverse of that matrix. Our (3, 2) comes out as her (5/3, 1/3)."
+  - emoji: "🤝"
+    title: "Transformations, translated"
+    text: "To describe a rotation in her language: translate to ours, rotate, translate back. The product A⁻¹MA is the same transformation seen from another perspective."
+task: |
+  Translate vectors by hand, then show that rotating every embedding changes the numbers but not
+  the search results.
+
+  **On paper (10 minutes).** A basis has b₁ = (1, 1) and b₂ = (−1, 1) in our coordinates.
+
+  1. A vector has coordinates (3, 1) in that basis. What is it in ours?
+  2. Our vector (5, 1): what is it in that basis? (Use the inverse, or solve two equations.)
+
+  **In Python (15 minutes, free Google Colab works).**
+
+  ```python
+  import numpy as np
+
+  rng = np.random.default_rng(0)
+  E = rng.normal(size=(5, 8))                    # 5 "embeddings", 8 dimensions
+
+  def cos_table(M):
+      U = M / np.linalg.norm(M, axis=1, keepdims=True)
+      return U @ U.T
+
+  R, _ = np.linalg.qr(rng.normal(size=(8, 8)))   # a random rotation (orthogonal matrix)
+  rotated = E @ R
+  print("first vector, before:", E[0, :3].round(2), "after:", rotated[0, :3].round(2))
+  print("cosines unchanged:", np.allclose(cos_table(E), cos_table(rotated)))
+
+  S = np.diag([10, 1, 1, 1, 1, 1, 1, 1])         # stretch one axis: not a rotation
+  print("cosines after stretch unchanged:", np.allclose(cos_table(E), cos_table(E @ S)))
+  ```
+
+  Write one line on what the first two prints say about reading "dimension 3" of an embedding,
+  and one on why the stretch breaks the cosines while the rotation doesn't.
+
+  **No code?** Do the paper part, then rotate a = (1, 2) and b = (3, 1) by 90° (each (x, y)
+  becomes (−y, x)) and check that a·b is 5 both before and after.
+
+  Success: (2, 4) and (3, −2) on paper; the rotation keeps every cosine while the stretch
+  doesn't; and you can say why.
+selfCheck:
+  - q: "A colleague says 'dimension 212 of our embeddings must be the sentiment axis, so let's filter on it.' What's wrong with the plan?"
+    a: "Learned embedding dimensions rarely map to a single human concept; meaning lives in the *direction* of the whole vector. Training could have produced a rotated basis that works equally well, which would scatter any 'sentiment' signal across many coordinates. Filtering on one coordinate will behave erratically. Compare whole vectors with cosine, or train a small classifier on the embeddings if you need sentiment."
+  - q: "Your team upgrades to a newer embedding model with the same vector size and only re-embeds new documents. Search quality drops. Explain in basis terms."
+    a: "The new model learned its own space with its own axes, so old and new vectors are written in unrelated coordinate systems even though both have the same length. Comparing them is like reading one person's coordinates in another's basis. Re-embed every document with the new model (or keep the old model for queries until you do)."
+mcq:
+  - q: "To save space, a vector store applies one fixed rotation (an orthogonal matrix) to every stored embedding and to every query. What happens to search results?"
+    options:
+      - "They change, since every coordinate has new values"
+      - "They change only for queries near the rotation axis"
+      - "They stay the same, since rotations keep all angles"
+      - "They stay the same only if the rotation is under 90°"
+    answer: 2
+    explain: "A rotation is a change to an orthonormal basis: coordinates change, but lengths, dot products and angles don't, so every cosine and every ranking is identical. Any rotation angle works. A stretch along one axis, by contrast, would change the angles."
+  - q: "Two different embedding models both output 768-dimensional vectors. Can you rank model A's documents against a query embedded by model B?"
+    options:
+      - "Yes, as long as both vectors are normalized first"
+      - "No, their coordinates come from unrelated bases"
+      - "Yes, because equal size means the same space"
+      - "No, unless you average the two models' vectors"
+    answer: 1
+    explain: "Each model learned its own coordinate system, so coordinate 1 in one has no relation to coordinate 1 in the other; normalizing fixes lengths, not the mismatch of axes. Averaging vectors from unrelated bases only mixes them up. Aligning two spaces takes a separately learned map, if it works at all."
+  - q: "The matrix P has a new basis's vectors, written in your coordinates, as its columns. You have a vector in your coordinates and want its coordinates in the new basis. What do you compute?"
+    options:
+      - "P⁻¹ times your vector"
+      - "P times your vector"
+      - "Pᵀ times P times your vector"
+      - "Your vector divided by P's columns"
+    answer: 0
+    explain: "P translates from the new basis's language into yours, so going the other way needs its inverse. Using P itself is the classic backwards mistake. Pᵀ equals P⁻¹ only when the basis vectors are perpendicular and of length 1, and dividing by columns isn't a defined operation."
+  - q: "You see an expression A⁻¹MA in a paper, where A's columns are some basis vectors. How should you read it?"
+    options:
+      - "M applied three times, with A as a scaling step"
+      - "A combined with its inverse, so it equals M with no change"
+      - "A new transformation that undoes what M does"
+      - "The same transformation as M, written in A's basis"
+    answer: 3
+    explain: "Read right to left: translate a vector from the new basis into yours (A), apply M, translate back (A⁻¹). It's the same transformation in another language. It only equals M when the bases agree or M commutes with A, and it never inverts M."
+backupResources:
+  - label: "Mathematics for Machine Learning — free book, ch. 2.7.2 (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+  - embeddings
+---
+
+Every list of numbers you've written so far assumed one basis: the standard unit vectors. This
+lesson drops that assumption. The same arrow has different coordinates in a different basis,
+and a matrix translates between them. That explains a practical fact about embeddings: their
+individual coordinates are an accident of training, while the angles between them are what
+carry meaning.
+
+## Coordinates are a language
+
+The coordinates (3, 2) mean "3 of the first basis vector plus 2 of the second". Everything about
+what those numbers mean, which direction is first and how long one unit is, sits in the choice
+of basis. Pick different basis vectors and the same arrow gets different numbers. Space itself
+has no grid; each basis draws its own. Only the origin is shared.
+
+## Translating between bases
+
+Say a second basis has vectors b₁ and b₂, and you know them in your own coordinates. Put them as
+the columns of a matrix P.
+
+- **Their coordinates into yours:** multiply by P. Coordinates (c₁, c₂) in their basis mean
+  c₁·b₁ + c₂·b₂, which is exactly P times (c₁, c₂).
+- **Your coordinates into theirs:** multiply by P⁻¹.
+
+It feels backwards at first: geometrically P moves your grid onto theirs, yet numerically it
+translates their numbers into yours. And a transformation M you know in your coordinates becomes
+**P⁻¹MP** in theirs: translate in, apply M, translate back.
+
+## Worked example: two bases, one rotation
+
+Take b₁ = (1, 1) and b₂ = (−1, 1), so P has those columns. Its determinant is 1·1 − (−1)·1 = 2,
+and P⁻¹ = (1/2) × the matrix with rows (1, 1) and (−1, 1).
+
+1. **Theirs to yours.** (3, 1) in their basis is 3·(1, 1) + 1·(−1, 1) = **(2, 4)**.
+2. **Yours to theirs.** Your (5, 1) becomes (1/2)·(5 + 1, −5 + 1) = **(3, −2)**. Check:
+   3·(1, 1) − 2·(−1, 1) = (5, 1).
+
+Now a special kind of change: a pure rotation. Rotate a = (1, 2) and b = (3, 1) by 90°, so each
+(x, y) becomes (−y, x): a becomes (−2, 1) and b becomes (−1, 3). Every coordinate changed, but
+a·b = 3 + 2 = 5 before and (−2)(−1) + 1·3 = 5 after, and the lengths are unchanged. Rotations
+keep all dot products, so they keep every cosine similarity.
+
+## Why embedding dimensions rarely mean anything alone
+
+A model's embedding space comes with whatever axes training happened to produce. Rotate the whole
+space and adjust the next layer to match, and the model would work exactly as well, with every
+single coordinate different. So "dimension 212 is sentiment" is usually wrong: a concept, if the
+model represents it as a direction at all, is generally a mix of many coordinates. What survives
+any rotation are the angles and lengths, which is why search compares whole vectors.
+
+## Common mistakes
+
+- **Reading one coordinate as a concept.** Look for directions, not single axes.
+- **Comparing vectors from two models.** Same size doesn't mean same basis; re-embed with one
+  model.
+- **Using P where you need P⁻¹.** P takes their coordinates to yours.
+- **Assuming every basis change preserves similarity.** Rotations do; stretching an axis
+  doesn't.
+
+## Where you'll see it in AI
+
+- **Embedding stores and model upgrades:** a new model means a new basis, so re-embed
+  (→ embeddings-vector-databases).
+- **PCA and SVD:** both choose a new basis of directions ordered by importance
+  (→ eigenvectors-eigenvalues).
+- **Interpretability:** research looks for meaningful directions in a model's activations rather
+  than meaningful single neurons (→ neural-networks).
+
+Next, → eigenvectors-eigenvalues shows the basis that makes a transformation as simple as
+possible.

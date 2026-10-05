@@ -1,0 +1,190 @@
+---
+title: "What the gradient points to"
+subtitle: "Steepest ascent, steepness, and why training steps the other way"
+summary: "Read a gradient as the direction of steepest ascent and its length as the steepness, then step against it and see why steps can zigzag."
+changeNote: "New lesson in the calculus track, written from the lecture's transcript, with a worked example, a descent task and a quiz."
+section: math
+pillar: calculus
+order: 6
+level: beginner
+estMinutes: 40
+taskMinutes: 30
+prerequisites:
+  - gradient-vector-of-partials
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "_-02ze7tf08"
+  published: "2016-05-11"
+  year: 2016
+  minutes: 6
+  title: "Gradient and graphs"
+  channel: "Khan Academy"
+  why: "Gradient descent only makes sense once you know the gradient points uphill, steepest first, and that its length measures how steep. This short lecture shows both on two surfaces, with the gradient drawn as a field of arrows under the graph. It's the missing link between the computation in the last lesson and the 'roll downhill' picture in the next one."
+  notes:
+    - "Around 1:30–2:00 the lecture asks you to guess the vector field for x² + y² before showing it. Pause and sketch it; the worked example below uses the same function."
+    - "The lecture says why the gradient points uphill needs the directional derivative. The 'Go deeper' video in the backups gives that reason."
+applyIt: |
+  **The gradient tells you two things at once: which mix of changes helps most, and how much
+  is at stake right now.** Read both when you look at any training run.
+
+  1. Open the logs or dashboard of a training or fine-tuning run you can access (your own, a
+     course notebook, or a public example run). Find the gradient norm, often logged as
+     `grad_norm`.
+  2. Compare it with the loss curve. A large, spiky norm means steep, unstable ground: watch for
+     loss spikes. A norm shrinking toward zero while the loss is still high means a flat
+     region: progress will be slow.
+  3. Write one line in your notes: which phase the run is in, and what you'd try (lower learning
+     rate or gradient clipping for spikes; patience, a schedule or a different optimizer for a
+     plateau).
+
+  **If you build software:** log the gradient norm every step; most training libraries expose it,
+  and gradient clipping caps it at a threshold you set.
+  **If you don't code:** sketch a hill with arrows of different lengths and label where steps
+  would be big and where they'd crawl.
+
+  Success: you've read a gradient-norm curve next to its loss curve and named the phase.
+recap:
+  - emoji: "🗻"
+    title: "A graph above a plane"
+    text: "f(x, y) = x² + y² takes points on a plane and returns a height, so its graph is a bowl. The gradient is [2x, 2y]."
+  - emoji: "🏹"
+    title: "Draw it as a field"
+    text: "Attach the gradient vector to every input point and you get a vector field. For this bowl every arrow points straight away from the origin."
+  - emoji: "🥾"
+    title: "The hiker's question"
+    text: "Standing on the graph, which way should you walk to climb fastest? The gradient at your spot points that way: the direction of steepest ascent."
+  - emoji: "⛰️"
+    title: "Two peaks, same rule"
+    text: "On a surface with two peaks, the arrows near each peak point toward it. Each arrow says how to gain height fastest from where it sits."
+  - emoji: "📏"
+    title: "Length means steepness"
+    text: "Long arrows sit where the surface is steep; short ones where it's nearly flat, such as close to a peak."
+  - emoji: "❓"
+    title: "Why it works comes later"
+    text: "Stacking partials into a vector giving the steepest direction isn't obvious. The reason uses the directional derivative, covered in the follow-up video."
+task: |
+  **Walk downhill on two bowls (30 minutes, paper or Python).**
+
+  1. For f(x, y) = x² + y², compute the gradient at (3, 4), (−1, 2) and (0, 0). Sketch them as
+     arrows on a grid; check they point away from the origin and that the farther ones are longer.
+  2. Take three descent steps on that bowl from (3, 4) with `point ← point − 0.1 × gradient`.
+  3. Now a stretched bowl, f(x, y) = x² + 10y², which is steep in y and gentle in x. Run:
+
+     ```python
+     def run(lr, steps=6):
+         x, y = 3.0, 1.0
+         for t in range(steps):
+             gx, gy = 2 * x, 20 * y          # gradient of x^2 + 10y^2
+             x, y = x - lr * gx, y - lr * gy
+             print(f"lr={lr} step {t+1}: x={x:.3f} y={y:.3f} f={x*x + 10*y*y:.3f}")
+
+     run(0.09)
+     run(0.11)
+     ```
+
+  Success: in step 2 the points are (2.4, 3.2), (1.92, 2.56), (1.536, 2.048), with f falling
+  25 → 16 → 10.24 → 6.55. In step 3, y flips sign every step in both runs; with 0.09 the loss
+  still falls (to about 1.52), with 0.11 it grows (to about 89.6).
+selfCheck:
+  - q: "At your current weights, the loss gradient is [3, 1]. Your teammate proposes changing only the second weight because 'it's cheaper to adjust'. What does the gradient say about that plan?"
+    a: "Per unit of change, the first weight affects the loss three times as much as the second, and the steepest direction mixes both in a 3:1 ratio. Changing only the second weight works, but it gets much less loss reduction per step than following the gradient."
+  - q: "A training dashboard shows the gradient norm falling to nearly zero while the loss is still far above where similar runs ended. What kind of ground is the run on, and what does that mean for the next steps?"
+    a: "A nearly flat region: a plateau, a saddle or a poor local minimum. Steps proportional to a tiny gradient barely move, so progress stalls; it isn't proof the run has converged. Methods that keep moving through flat ground, such as momentum, help."
+  - q: "On a stretched bowl, your descent steps keep overshooting in one direction and crawling in the other. Using what the gradient points to, why does this happen?"
+    a: "The gradient points steepest uphill, which on a stretched bowl is mostly across the narrow direction, not toward the minimum. The steep direction needs small steps and the gentle one wants big steps, and one learning rate can't give both, so you zigzag."
+mcq:
+  - q: "At a point on a loss surface, the gradient is [6, 8]. Which statement is right?"
+    options:
+      - "The loss falls fastest along [6, 8], at a rate of 14"
+      - "The loss rises fastest along [6, 8], at a rate of 10"
+      - "The loss rises fastest along [8, 6], at a rate of 10"
+      - "The loss falls fastest along [−6, −8], at a rate of 14"
+    answer: 1
+    explain: "The gradient points in the direction of steepest increase, and its length, √(36 + 64) = 10, is the rate in that direction. Descent goes along [−6, −8] at rate 10, not 14: the length is not the sum of the entries."
+  - q: "You move from the current point in a direction exactly perpendicular to the gradient. What happens to the function for a small step?"
+    options:
+      - "It falls at the steepest possible rate"
+      - "It rises at the steepest possible rate"
+      - "It stays about the same, along a contour"
+      - "It changes by the gradient's full length"
+    answer: 2
+    explain: "Moving perpendicular to the gradient follows a contour line, so the rate of change is zero to first order. Steepest rise is along the gradient and steepest fall is directly against it."
+  - q: "Two training runs log gradient norms: run A around 50 with spikes, run B around 0.001 and flat, both with high loss. Which pairing of diagnosis and first action is most sensible?"
+    options:
+      - "A: steep ground, so clip or lower the LR; B: flat ground, so check for a plateau"
+      - "A: near a minimum, so stop it early; B: diverging, so cut the learning rate by ten"
+      - "A: flat ground, so raise the LR; B: steep ground, so add gradient clipping first"
+      - "A: healthy, so leave it running; B: converged, so stop and ship the checkpoint"
+    answer: 0
+    explain: "A long gradient means steep ground, where steps can overshoot, so clipping or a lower learning rate helps. A tiny gradient with a high loss means flat ground, not convergence, so the problem is slow progress. A tiny norm is never a sign of divergence."
+backupResources:
+  - label: "Go deeper: Why the gradient is the direction of steepest ascent (Khan Academy, 11 min)"
+    url: "https://www.youtube.com/watch?v=TEB2z7ZlRAw"
+    type: "video"
+tags:
+  - math
+  - calculus
+  - gradient
+---
+
+**You need:** → gradient-vector-of-partials. The dot product from → dot-product-duality helps
+for one paragraph below.
+
+The one idea of this lecture: **the gradient at a point is an arrow showing the direction in
+which the function rises fastest, and its length says how steep that climb is.** Training wants
+the loss to fall, so it steps the opposite way. That single sign flip is gradient descent.
+
+## The bowl and the hiker
+
+Take `f(x, y) = x² + y²`, a bowl. Its gradient is `[2x, 2y]`: at every point it's twice the
+position vector, so the arrows all point straight away from the origin, longer the farther out
+you go. Stand on the bowl's wall and ask which way climbs fastest: straight away from the bottom.
+The arrow agrees. On a surface with two peaks, the arrows near each peak point toward it. Each
+arrow answers the hiker's question for the spot it's drawn on.
+
+The **length** is the steepness. Far up the bowl's wall the arrows are long; near the bottom
+(or near a peak) they shrink toward zero because the surface flattens.
+
+## Worked example with real numbers
+
+At the point (3, 4), the gradient of `x² + y²` is `[6, 8]`, with length `√(36 + 64) = 10`.
+
+How fast does f change if you walk one unit in a given direction? The answer is the dot product
+of the gradient with that unit direction (this is the directional derivative, the subject of the
+'Go deeper' video):
+
+| direction | rate of change |
+|---|---|
+| along [0.6, 0.8] (the gradient's) | +10 |
+| along the x-axis [1, 0] | +6 |
+| perpendicular [−0.8, 0.6] | 0 |
+| against [−0.6, −0.8] | −10 |
+
+No direction beats +10, and the steepest descent is −10, straight against the gradient. One
+descent step with learning rate 0.1 moves from (3, 4) to `(3, 4) − 0.1 × (6, 8) = (2.4, 3.2)`,
+and f falls from 25 to 16.
+
+## When steepest isn't straight to the bottom
+
+On a bowl stretched in one direction, `x² + 10y²`, the gradient is `[2x, 20y]`: dominated by the
+steep y-direction. Steepest-uphill isn't aimed at the minimum, so descent overshoots across the
+narrow direction while creeping along the long one. Starting at (3, 1), a learning rate of 0.09
+makes y flip sign every step but still shrink; at 0.11 the flips grow and the loss climbs. The
+steep direction caps the learning rate, and the gentle direction pays for it. → momentum-optimizer
+is the standard fix.
+
+## Common mistakes
+
+- **Stepping along the gradient.** That's uphill. Descent subtracts it.
+- **Reading the length as the sum of entries.** It's the square root of the sum of squares.
+- **Taking a short gradient as "done".** Flat ground can be a plateau or saddle, not a minimum.
+- **Assuming the gradient points at the minimum.** Only on a perfectly round bowl.
+
+## Where you'll see it in AI
+
+- **Gradient descent** steps against this arrow on the loss surface (→ calculus-for-optimization).
+- **Gradient norm** is logged in nearly every training run; **gradient clipping** shrinks the
+  arrow when it's too long, a common guard against loss spikes.
+- **Optimizers** like momentum and Adam exist largely because of the stretched-bowl problem
+  (→ momentum-optimizer, → adam-optimizer).

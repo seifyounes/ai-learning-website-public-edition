@@ -1,0 +1,217 @@
+---
+title: "Non-square matrices: changing dimension"
+subtitle: "Reading a matrix's shape as 'from how many dimensions, to how many'"
+summary: "Read any matrix shape as a map between dimensions, predict the shape of a product before running it, and count the parameters in a projection layer."
+changeNote: "New lesson in the linear algebra track, written from the lecture's transcript, with a shape-reading worked example and a quiz."
+section: math
+pillar: linear-algebra
+order: 7
+level: intermediate
+estMinutes: 9
+taskMinutes: 20
+prerequisites:
+  - rank-column-null-space
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "v8VSDg_WQlA"
+  published: "2016-08-16"
+  year: 2016
+  minutes: 4
+  title: "Nonsquare matrices as transformations between dimensions | Chapter 8, Essence of linear algebra"
+  channel: "3Blue1Brown"
+  why: "A four-minute footnote that unlocks the matrices you actually meet in models, almost none of which are square. It shows that columns still mean 'where each input basis vector lands', so the number of columns is the input dimension and the number of rows is the output dimension. With that, every projection, embedding table and output head becomes readable from its shape alone, and it sets up the dot product in the next lesson."
+  notes:
+    - "0:41 a linear map from 2D into 3D, and why inputs and outputs live in separate spaces."
+    - "1:42 a 3 × 2 matrix: column space is a plane in 3D, yet it's still full rank; 2:43 a 2 × 3 matrix squashing 3D onto a plane."
+    - "3:13 a map from 2D to the number line as a 1 × 2 matrix, the link to the dot product."
+applyIt: |
+  **Most bugs in model code are shape bugs, and most model sizes are shape arithmetic.** Reading
+  a matrix as "from n dimensions to m" lets you check both before anything runs.
+
+  1. Pick a model you use or study and find three numbers on its model card or config: the
+     hidden size d, the vocabulary size V, and the number of layers.
+  2. Write the shape of its output head (the matrix that turns a d-wide hidden vector into one
+     score per token in the vocabulary) and its parameter count, V × d.
+  3. Compare that with the total parameter count and write one line on how big a share the
+     output head is.
+
+  **If you build software:** before your next matrix operation in NumPy or PyTorch, write the
+  expected shape in a comment and assert it (`assert out.shape == (batch, 256)`). **If you
+  don't code:** the shape sums are the whole exercise and a calculator is enough.
+
+  Success: one model's output-head shape, its parameter count, and its share of the model's
+  total.
+toolkit: |
+  - **Set up a shape tutor.** In a ChatGPT or Claude Project, or a Gemini Gem: "Give me two
+    matrix shapes and ask me to predict the result's shape, or whether it fails, before you tell
+    me." Shape-predicting is the skill that makes attention and LoRA readable.
+  - **Ask for shapes in every explanation.** When an assistant explains a model or a paper, add
+    "write the shape of every matrix and vector next to it". Explanations with shapes are much
+    harder to get wrong silently.
+recap:
+  - emoji: "↔️"
+    title: "Between dimensions"
+    text: "A linear transformation can take 2D vectors to 3D ones, or 3D to 2D. Linear still means grid lines stay parallel and evenly spaced, and the origin maps to the origin."
+  - emoji: "🌌"
+    title: "Separate spaces"
+    text: "When the dimensions differ, inputs and outputs live in different, unconnected spaces. You can't slide one onto the other; you can only say where each input lands."
+  - emoji: "🧱"
+    title: "Columns still rule"
+    text: "Write where each input basis vector lands as a column. Two inputs landing in 3D gives a 3 × 2 matrix: columns count the input dimensions, rows count the output ones."
+  - emoji: "📄"
+    title: "A plane in 3D, still full rank"
+    text: "A 3 × 2 matrix's outputs form a plane through the origin of 3D space. That's rank 2, as high as two inputs allow, so it's full rank."
+  - emoji: "🥞"
+    title: "Squashing down"
+    text: "A 2 × 3 matrix takes three input dimensions and lands them in two: 3D space flattened onto a plane, which must lose information."
+  - emoji: "📍"
+    title: "Down to a number"
+    text: "A 1 × 2 matrix turns 2D vectors into single numbers; evenly spaced dots stay evenly spaced on the number line. That map is closely tied to the dot product."
+task: |
+  Predict shapes, then let NumPy check you.
+
+  **In Python (15 minutes, free Google Colab works).** For each line, write your predicted shape
+  (or "error") in a comment before running it.
+
+  ```python
+  import numpy as np
+
+  tokens, d, d_head, vocab = 10, 768, 64, 32000
+  X = np.random.randn(tokens, d)        # one row per token
+  W_q = np.random.randn(d, d_head)      # a query projection
+  W_out = np.random.randn(d, vocab)     # an output head
+
+  Q = X @ W_q
+  print("Q:", Q.shape)
+  scores = Q @ Q.T
+  print("scores:", scores.shape)
+  logits = X @ W_out
+  print("logits:", logits.shape)
+  print("output head parameters:", W_out.size)
+  try:
+      X @ W_q.T
+  except ValueError as e:
+      print("error:", e)
+  ```
+
+  Then answer in one line each: which of these matrices maps to a lower dimension, and which to a
+  higher one?
+
+  **No code?** Do the same predictions on paper with the rule (a × b)(b × c) = (a × c), and
+  compute 768 × 32,000 with a calculator.
+
+  Success: every prediction matches (Q is 10 × 64, scores 10 × 10, logits 10 × 32,000, the last
+  line errors), and the head holds 24,576,000 parameters.
+selfCheck:
+  - q: "A model's hidden size is 4,096 and its vocabulary has 32,000 tokens. Its output head maps each hidden vector to one score per token. What shape is the head, how many parameters does it hold, and why does vocabulary size show up in model cost?"
+    a: "It maps 4,096 dimensions to 32,000, so it has 4,096 columns and 32,000 rows (or the transpose, depending on the code's convention): 131,072,000 parameters. Every generated token multiplies through it, so a bigger vocabulary means a bigger matrix and more compute per token."
+  - q: "A recommender compresses 512-dimensional user vectors to 32 dimensions with a learned matrix and later maps them back to 512. A teammate expects to recover the original vectors exactly. What's the catch?"
+    a: "The compression is a 32 × 512 map, which squashes 512 dimensions into 32 and has a null space of at least 480 dimensions. The round trip is a 512 × 512 matrix of rank at most 32, so most directions are lost. You recover only the part of each vector that lies in a 32-dimensional subspace."
+mcq:
+  - q: "In the math convention y = W·x, a projection layer's matrix W has shape 256 × 768. What does it do?"
+    options:
+      - "Maps 256-dim vectors up to 768 dimensions"
+      - "Maps 768-dim vectors down to 256 dimensions"
+      - "Maps 768-dim vectors to 768 dims, using 256 of them"
+      - "Holds 256 embeddings, each 768 numbers long"
+    answer: 1
+    explain: "Columns count the input dimensions (768) and rows count the output dimensions (256), so it projects down. It can be stored as a table of rows, but as a transformation it's a map from 768 to 256. Code that writes x @ W stores the transpose, so always check which convention a library uses."
+  - q: "A generative model maps a 2-dimensional latent code into 3D with a learned 3 × 2 matrix. Can its outputs reach every point in 3D?"
+    options:
+      - "Yes, the matrix is full rank, so outputs fill 3D"
+      - "Yes, as long as the two columns are independent"
+      - "No, it only reaches points along a single line"
+      - "No, the outputs lie on a plane through the origin"
+    answer: 3
+    explain: "Two input dimensions can produce at most a 2D set of outputs: the span of the two columns, a plane. It is full rank (rank 2, as many as there are inputs), but full rank here doesn't mean filling the output space. It's only a line if the columns are dependent."
+  - q: "Your code has x with shape (32, 768) and a weight W with shape (256, 768). x @ W raises a shape error. What's the right fix?"
+    options:
+      - "Use x @ W.T, giving a (32, 256) result"
+      - "Use W @ x, giving a (256, 32) result"
+      - "Reshape x to (768, 32) and then use x @ W"
+      - "Pad W with zeros up to (768, 768) first"
+    answer: 0
+    explain: "For x @ W the inner sizes must match, so W has to be (768, 256): that's W.T, and the result is 32 rows of 256. PyTorch's nn.Linear stores weights as (out, in) and computes x @ W.T for this reason. W @ x also fails, since 768 doesn't match 32, and padding would change the model."
+  - q: "A pipeline maps 768-dim embeddings to 64 dims, then a second matrix maps them back to 768. What's the most rank the combined 768 × 768 matrix can have?"
+    options:
+      - "768, since it is a square 768 × 768 matrix"
+      - "704, which is 768 minus the 64 removed"
+      - "64, since everything passes through 64 dims"
+      - "1, since two projections cancel each other"
+    answer: 2
+    explain: "Every vector passes through a 64-dimensional space, so the outputs can span at most 64 dimensions, whatever the final shape. A square shape doesn't guarantee full rank, and nothing about two projections makes them cancel. This bottleneck is the same structure a low-rank adapter uses on purpose."
+backupResources:
+  - label: "Mathematics for Machine Learning — free book, ch. 2.7 (Deisenroth et al.)"
+    url: "https://mml-book.github.io/"
+    type: "reference · free textbook"
+tags:
+  - math
+  - linear-algebra
+  - neural-networks
+---
+
+So far every matrix was square: 2D to 2D, 3D to 3D. The matrices inside real models almost
+never are. An embedding table, a query projection, an output head: each one maps vectors of one
+size to vectors of another. This short lesson gives you one rule that makes all of them
+readable from their shape alone.
+
+## Columns are inputs, rows are outputs
+
+Nothing new is needed. A linear map from 2D into 3D still keeps grid lines parallel and evenly
+spaced and the origin fixed, and it's still recorded by where each input basis vector lands.
+Two input basis vectors, each landing on a point with three coordinates, give **two columns of
+three numbers: a 3 × 2 matrix**.
+
+So an **m × n matrix maps n dimensions to m dimensions**. The number of columns is the input
+size; the number of rows is the output size. A 2 × 3 matrix takes 3D down to 2D. A 1 × 2 matrix
+takes 2D vectors to single numbers, which is where the dot product comes from
+(→ dot-product-duality).
+
+## Rank when the shapes differ
+
+A 3 × 2 matrix with independent columns has a column space that is a plane inside 3D. That's
+rank 2, as high as two inputs allow, so it's **full rank**, yet it can't reach most of 3D.
+Going the other way, a 2 × 3 matrix flattens 3D onto at most a plane, so at least one direction
+lands on zero.
+
+## Worked example: shapes in a tiny model
+
+**A 3 × 2 map.** M has columns (1, 0, 2) and (0, 1, −1). Applied to (3, 2):
+3·(1, 0, 2) + 2·(0, 1, −1) = **(3, 2, 4)**, a 3D point on the plane spanned by the columns.
+
+**Shapes chain by the inner size.** (a × b) times (b × c) gives (a × c), and the two b's must
+match. In code, data usually sits in rows, so a batch of 10 token vectors of width 768 is a
+10 × 768 matrix X.
+
+1. A query projection W_q of shape 768 × 64 gives X·W_q: **10 × 64**.
+2. Scores between those queries, (10 × 64)(64 × 10): **10 × 10**, one per pair of tokens.
+3. An output head of shape 768 × 32,000 gives X·W_out: **10 × 32,000**, one score per token in
+   the vocabulary, and it holds 768 × 32,000 = **24,576,000** parameters.
+
+The math writes y = W·x with W as (out × in); code that writes x @ W stores the transpose.
+Same map, different bookkeeping.
+
+## Common mistakes
+
+- **Reading the shape backwards.** In y = W·x, columns are inputs. Check each library's
+  convention: PyTorch's `nn.Linear` stores (out, in).
+- **Assuming full rank means "reaches everything".** A tall matrix is full rank when its columns
+  are independent, yet its outputs fill only a slice of the space.
+- **Expecting to undo a projection down.** Going from 768 to 64 loses directions; mapping back up
+  can't restore them.
+- **Fixing shape errors by reshaping.** A transpose is often right; a reshape usually scrambles
+  the data.
+
+## Where you'll see it in AI
+
+- **Attention projections:** each head maps d-wide token vectors down to a smaller head width
+  (→ transformers-attention).
+- **Embedding tables and output heads:** a vocabulary of V tokens and width d is a V × d table,
+  and the head maps d back to V scores (→ what-is-an-llm).
+- **Low-rank adapters:** a tall-times-wide product, as in → rank-column-null-space.
+- **Embedding search:** shrinking vectors to fewer dimensions saves storage at some loss of
+  detail (→ embeddings-vector-databases).
+
+Next, → dot-product-duality looks closely at the 1 × n case: a matrix that turns a vector into
+a single number.

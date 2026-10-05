@@ -1,0 +1,223 @@
+---
+title: "Build an eval from real traces"
+subtitle: "From 100 read conversations to a pass/fail judge you've proven against your own labels"
+summary: "Turn labelled traces into a binary LLM judge, measure it by true-positive and true-negative rate instead of agreement, and decide where to run it."
+changeNote: "New lesson in the evaluation track, written from the lecture's transcript, with a judge-validation example and a quiz."
+section: math
+pillar: evaluation
+order: 11
+level: advanced
+estMinutes: 58
+taskMinutes: 60
+shortPath: "First sitting (about 40 min): watch 0:00–31:06, from reading traces to the binary judge and the agreement trap, then read the worked example below. Come back for the rest of the video (judges in production, myths about generic metrics) and the task."
+prerequisites:
+  - llm-error-analysis
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "uiza7wp1KrE"
+  published: "2025-09-28"
+  year: 2025
+  minutes: 53
+  title: "AI Evaluations Clearly Explained in 50 Minutes (Real Example) | Hamel Husain"
+  channel: "Peter Yang"
+  why: "This is the whole track in one real build. Hamel Husain takes about 100 traces from a production AI assistant into a spreadsheet: notes, categories, counts, then a pass/fail LLM judge for one failure, checked against his own labels with a confusion matrix. Every earlier lesson shows up here: true-positive and true-negative rates, why binary beats 1–5 scores, and why 'agreement' misleads when failures are rare. It's long, so the short path below splits it."
+  notes:
+    - "4:37 The plan: read about 100 traces and write a note on what goes wrong in each. It took about an hour."
+    - "9:43 Notes exported to a spreadsheet; an LLM proposes categories, which are refined by hand and counted with a pivot table."
+    - "24:25 The judge returns exactly true or false for one failure type, with no 1–5 scale."
+    - "28:32 Why agreement misleads: if a failure happens 10% of the time, a judge that never flags it agrees 90% of the time."
+applyIt: |
+  **Before you trust any automated grader, measure it against your own labels.** That applies to
+  an LLM judge you built, an AI feature that scores essays or tickets, or a vendor tool that
+  promises to "detect bad responses".
+
+  1. Take 40 outputs you have labelled yourself for one specific failure (yes, it happened / no,
+     it didn't).
+  2. Run the grader on the same 40.
+  3. Fill in the four boxes: grader and you both say "failure", both say "fine", and the two
+     kinds of disagreement.
+  4. Compute the true-positive rate (failures it caught) and the true-negative rate (fine
+     outputs it cleared). Ignore the overall agreement figure.
+  5. Decide whether it's good enough for the job: monitoring, blocking a release, or just
+     sorting what to read next.
+
+  **If you build software:** keep the labelled set in your repo and rerun the judge on it
+  whenever you edit the judge prompt, as a test of the test.
+  **If you don't code:** do it in a spreadsheet with three columns (output, your label, grader
+  label) and four COUNTIFS formulas.
+
+  Success: a grader's true-positive and true-negative rates on your own labels, and a decision
+  about where it may be used.
+recap:
+  - emoji: "🔍"
+    title: "Open a trace"
+    text: "A trace is the full record of one interaction: system prompt, user messages, tool calls and replies, including what the user never sees."
+  - emoji: "📝"
+    title: "Notes on 100 traces"
+    text: "Read about 100 traces and write what went wrong in each, without debugging. The first is slow; by the tenth you're fast. About an hour in total."
+  - emoji: "🗂️"
+    title: "Categories and counts"
+    text: "An LLM proposes categories from the notes, you refine them, and a pivot table counts them: conversation flow, human handoff, formatting, broken promises."
+  - emoji: "🔧"
+    title: "Not every bucket needs an eval"
+    text: "The date bug was fixed by giving the model today's date; it needed no eval at all. Code checks suit crisp failures, and fuzzy ones like missed handoffs earn an LLM judge."
+  - emoji: "✅"
+    title: "A binary judge"
+    text: "The judge prompt lists what counts as a handoff failure and returns true or false. A 3.2 vs 3.7 average tells nobody whether to ship."
+  - emoji: "⚖️"
+    title: "Measure the judge"
+    text: "Compare judge and human labels in a confusion matrix. Report the true-positive and true-negative rates, never just 'agreement'."
+  - emoji: "🚀"
+    title: "Run it, keep reading"
+    text: "Hold out data if the prompt uses examples, run the judge in CI and on a sample of live traffic, keep under a dozen evals, and keep labelling traces."
+task: |
+  Build and validate a binary judge for one failure.
+
+  1. Pick one failure type from your error analysis (→ llm-error-analysis), or use "the answer
+     claims something the source text doesn't say".
+  2. Collect 40 outputs and label each yourself: failure or fine. Try to include at least 8
+     failures. Split them into a **dev** set (20) and a **test** set (20).
+  3. Write a judge prompt and run it on each dev output in a chat assistant (or via an API if
+     you code):
+
+  ```prompt
+  You are checking one thing only: [describe the failure precisely, with 2–3 examples of what
+  counts and what doesn't]. Here is the output: [paste]. First write one sentence of reasoning,
+  then answer exactly TRUE (the failure is present) or FALSE.
+  ```
+
+  4. Fill a confusion matrix for the dev set, compute the true-positive and true-negative rates,
+     and refine the prompt where it disagrees with you.
+  5. When you're happy, run it **once** on the test set and compute both rates again.
+
+  Success: dev and test confusion matrices with both rates, and a sentence on whether the
+  judge is good enough to monitor this failure.
+selfCheck:
+  - q: "A vendor says its hallucination judge has '94% agreement with human labels'. Hallucinations are about 6% of your outputs. What do you ask for?"
+    a: "The confusion matrix, or at least the true-positive and true-negative rates. With a 6% failure rate, a judge that never flags anything agrees 94% of the time, so the agreement figure alone tells you nothing."
+  - q: "Your judge prompt includes 10 of your labelled traces as examples, and you then test it on all 100 labelled traces. It scores very well. What's wrong?"
+    a: "The judge has seen some of the answers, so the score is inflated. Keep the examples out of the test: tune on a dev set and measure once on traces the prompt has never seen."
+  - q: "Your team tracks an average 1–5 quality score that moved from 3.4 to 3.6. Someone asks whether to ship. What would make that question answerable?"
+    a: "A pass/fail definition for the specific failures that matter, measured as a rate (for example, missed handoffs fell from 9% to 4%). A small move in an average score doesn't say whether anything is good enough."
+mcq:
+  - q: "Your judge reports 90% agreement with your labels on 100 traces, in which 10 traces truly have the failure. What should you check first?"
+    options:
+      - "Whether 100 traces is a large enough sample to trust"
+      - "Whether the judge model is the newest one available"
+      - "How many of the 10 real failures the judge caught"
+      - "Whether the judge's reasoning text reads as sensible"
+    answer: 2
+    explain: "With a 10% failure rate, a judge that always says 'fine' gets exactly 90% agreement and catches nothing. The true-positive rate, failures caught out of real failures, is what agreement hides. Sample size and reasoning quality matter, but they can't rescue a judge that misses every failure."
+  - q: "Your judge returns a 1–5 'handoff quality' score. Last week's average was 3.4, this week's is 3.6. What's the best change to make?"
+    options:
+      - "Use a true/false verdict on one defined failure"
+      - "Average over more weeks to smooth out the score"
+      - "Add a 6th level so the scale has more resolution"
+      - "Ask two judges for scores and take their average"
+    answer: 0
+    explain: "A binary verdict on a clearly defined failure gives a rate you can act on and check against your labels. More weeks, more levels or more judges all keep a score that nobody can turn into a ship or don't-ship decision."
+  - q: "To improve your judge you paste 15 labelled traces into its prompt as examples, then measure it on all 100 labelled traces. Its true-positive rate jumps to 1.0. What's the problem?"
+    options:
+      - "Fifteen examples are too few to change a judge's behaviour"
+      - "Examples should never be used inside a judge prompt"
+      - "The jump means the judge is now ready for production"
+      - "Some test traces are in the prompt, inflating the score"
+    answer: 3
+    explain: "The judge is being graded partly on traces whose answers it was shown, so the score is inflated. Examples are fine, but keep a held-out set the prompt has never seen and measure on that."
+  - q: "A judge for missed handoffs has a true-positive rate of 0.95 and a true-negative rate of 0.75. Flagged conversations go to a person who reviews them in a minute. Is it fit for monitoring?"
+    options:
+      - "No: a true-negative rate under 0.9 makes any judge unusable"
+      - "Yes: misses are costly and false alarms cheap to clear"
+      - "No: the two rates need to be equal before it is trusted"
+      - "Yes, but only once its agreement figure has passed 95%"
+    answer: 1
+    explain: "There's no universal bar; it's a business decision. Here a missed handoff is the expensive error and a false alarm costs a minute of review, so a high true-positive rate with a modest true-negative rate is a sensible trade. Agreement is the figure not to rely on."
+backupResources:
+  - label: "Go deeper: LLM Evals: Common Mistakes (Hamel Husain, 28 min)"
+    url: "https://www.youtube.com/watch?v=GL0XhAj5LPE"
+    type: "video"
+  - label: "Hamel Husain: Using LLM-as-a-judge for evaluation (field guide)"
+    url: "https://hamel.dev/blog/posts/llm-judge/"
+    type: "article"
+tags:
+  - math
+  - evaluation
+  - evals
+  - llm-as-judge
+  - error-analysis
+---
+
+**You need:** the four boxes from → confusion-matrix, the two rates from
+→ sensitivity-specificity, and the method in → llm-error-analysis.
+
+This lesson puts the whole track to work. You start from raw traces of a real AI assistant and
+end with an automated check you can prove agrees with you. The maths is the confusion matrix
+from lesson one. The new part is applying it to a grader instead of a product.
+
+## From traces to a target
+
+A **trace** is the full record of one interaction: the system prompt, the user's messages, tool
+calls and their results, and the replies. The lecture's loop:
+
+1. Read about 100 traces and note what went wrong in each. Keep going until new traces stop
+   teaching you anything new.
+2. Group the notes into categories and count them.
+3. For each big category, choose the cheapest check that works. A missing date in the prompt is
+   fixed directly and guarded by a code test. A fuzzy failure like "should have handed off to a
+   person" needs an LLM judge.
+
+## Make the judge binary
+
+Write a judge prompt for **one** failure type, spell out what counts and what doesn't, and ask
+for a short reason and then **true or false**. A 1–5 score feels richer, but nobody can say what
+a move from 3.2 to 3.7 means, and it's much harder to check against human labels.
+
+## Worked example: agreement hides a useless judge
+
+You labelled 100 traces yourself; 10 contain a missed handoff. Two candidate judges:
+
+**Judge X** never flags anything.
+
+1. TP = 0, FN = 10, FP = 0, TN = 90.
+2. Agreement = 90 ÷ 100 = **90%**.
+3. True-positive rate = 0 ÷ 10 = **0**. It catches nothing.
+
+**Judge Y** is a real attempt.
+
+1. TP = 8, FN = 2, FP = 6, TN = 84.
+2. Agreement = 92 ÷ 100 = **92%**, barely above X.
+3. True-positive rate = 8 ÷ 10 = **0.80**. True-negative rate = 84 ÷ 90 ≈ **0.93**.
+
+Two points of agreement separate a useless judge from a useful one. The two rates show the
+difference at once. Whether Y is good enough is a business call: if a person reviews every flag
+in a minute, 6 false alarms per 100 are cheap and the 2 misses matter more.
+
+## Don't grade the judge on its own homework
+
+If you put labelled traces in the judge prompt as examples, measure it only on traces it hasn't
+seen. Tune on a dev set; test once on a held-out set.
+
+## Where the judge runs
+
+- **In CI:** on a fixed labelled set, every time the prompt or model changes.
+- **In production:** on a sample of live traces (or all of them, at small scale) to track the
+  failure rate.
+- **Fewer, better checks:** a handful of judges you trust beats dozens you don't. Keep labelling
+  traces by hand on a regular rhythm, and after big changes.
+
+## Common mistakes
+
+- **Reporting agreement.** Always give both rates, or the matrix.
+- **Generic scores as the eval.** Use them at most to sort which traces to read next.
+- **Judging everything with an LLM.** Code checks are cheaper wherever there's a right answer.
+- **Evaluating too much too early.** Before real users, use the product yourself and read
+  outputs; build judges when volume outgrows your reading.
+
+## Where you'll see it in AI
+
+- **Release gates and monitoring** for any LLM product (→ evals-and-testing,
+  → observability-tracing).
+- **Judges everywhere:** every → llm-as-judge check deserves this validation.
+- **Synthetic test inputs:** the lecture generates them from combinations of user types and
+  situations, so tests cover more than the obvious cases (→ llm-app-evals).

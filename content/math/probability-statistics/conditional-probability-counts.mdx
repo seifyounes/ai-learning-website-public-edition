@@ -1,0 +1,194 @@
+---
+title: "Conditional probability"
+subtitle: "Probability given what you already know, worked from a table of counts"
+summary: "Compute a conditional probability from a table of counts, tell P(A given B) from P(B given A), and use it to read precision, recall and calibration."
+changeNote: "New lesson in the probability and statistics track with a classifier worked example and a quiz; the calibration material moved here."
+section: math
+pillar: probability-statistics
+order: 11
+level: intermediate
+estMinutes: 17
+taskMinutes: 25
+prerequisites:
+  - p-values-explained
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "_IgyaD7vOOA"
+  published: "2021-07-20"
+  year: 2021
+  minutes: 11
+  title: "Conditional Probabilities, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "The track now turns from averages to events: was this flag right, is this answer correct given the model sounded sure. All of that is conditional probability. This StatQuest works it out from a small table of counts rather than from a formula, which is exactly how you'll read classifier results and calibration checks. It's also the base the Bayes lesson builds on."
+applyIt: |
+  **Most quality questions about an AI system are conditional: how often is it right *given*
+  that it flagged something, or *given* that it sounded confident?** Take one AI output you rely
+  on: a classifier or filter, an AI grader, or answers where the assistant states how sure it is.
+
+  1. Collect 30 to 50 cases and record two yes/no columns, for example "flagged?" and "actually a
+     problem?", or "sounded confident?" and "actually correct?".
+  2. Fill the 2 × 2 table of counts.
+  3. Compute both directions: P(problem | flagged) and P(flagged | problem).
+  4. Decide which one your use depends on, and whether it's good enough.
+
+  **If you build software:** log the model's stated confidence or score next to the outcome, so
+  you can check calibration by bucket later. **If you don't code:** a spreadsheet with
+  `COUNTIFS` over two columns builds the table.
+
+  Success: one AI output you rely on has a filled 2 × 2 table and both conditional probabilities
+  written down.
+toolkit: |
+  - **Don't take stated confidence at face value.** When an assistant says it's "very sure",
+    treat that as a claim to check, not a probability. Keep a short log of confident answers and
+    whether they held up.
+  - **Ask for the counts behind a metric.** When a tool reports "95% accurate", ask for the 2 × 2
+    table, or at least precision and recall, before trusting its flags.
+recap:
+  - emoji: "🧮"
+    title: "Count everything first"
+    text: "Survey a group and sort each person by two yes/no questions into a table of counts. Each cell is one combination of answers."
+  - emoji: "➗"
+    title: "Plain probabilities"
+    text: "Divide each cell, and each row and column total, by the number of people to get unconditional probabilities."
+  - emoji: "🔍"
+    title: "Restrict to what you know"
+    text: "A conditional probability uses only the part of the table that matches what you already know: the count in the cell divided by the total of that row or column."
+  - emoji: "📐"
+    title: "The formula is the same idea"
+    text: "Divide the top and bottom by the total and you get P(A and B) ÷ P(B): the probability of the event, scaled by the knowledge you already have."
+  - emoji: "↔️"
+    title: "Knowledge changes the answer"
+    text: "The same cell divided by a different total, because you know something different, gives a different conditional probability."
+task: |
+  Check whether an assistant's confidence means anything.
+
+  1. Ask a chat assistant 20 factual questions whose answers you can verify (dates, definitions
+     from your field, facts from a document you have). After each, ask: "How confident are you,
+     high or low?"
+  2. For each, record two columns in a spreadsheet: `confident` (high or low) and `correct` (yes
+     or no), checked against a reliable source.
+  3. Build the 2 × 2 table with `COUNTIFS`, then compute P(correct | high) and P(correct | low).
+  4. Compute the reverse too: P(high | correct). Note how it differs.
+
+  **If you code:** the same table in pandas is `pd.crosstab(df.confident, df.correct)`.
+
+  Success: a filled 2 × 2 table, P(correct | high) and P(correct | low), and one sentence on
+  whether the assistant's confidence carried useful information.
+selfCheck:
+  - q: "A content filter's vendor says it 'catches 98% of spam'. Your support team says most of the messages it flags are legitimate. Can both be true?"
+    a: "Yes. 98% is P(flagged | spam), the recall. Your team is describing P(spam | flagged), the precision. If spam is a small share of messages, many legitimate messages can be flagged even while almost all spam is caught. Ask for the counts and compute both."
+  - q: "An AI grader reports a confidence score with every verdict. How would you check whether a score of 0.9 really means the verdict is right about 90% of the time?"
+    a: "Collect many verdicts with known correct answers, group them by stated confidence (for example 0.85 to 0.95), and compute the share correct in each group. If verdicts scored around 0.9 are right only 70% of the time, the grader is overconfident, and you should treat its scores as rankings, not probabilities."
+mcq:
+  - q: "Of 1,000 tickets, 100 are urgent. Your triage bot flags 150 tickets, 90 of which are urgent. A manager asks: when the bot flags a ticket, how likely is it urgent?"
+    options:
+      - "90%, because the bot catches 90 of the 100 urgent tickets"
+      - "60%, because 90 of the 150 flagged tickets are urgent"
+      - "15%, because the bot flags 150 out of 1,000 tickets"
+      - "10%, because 100 of the 1,000 tickets are urgent"
+    answer: 1
+    explain: "The question conditions on 'flagged', so divide within the flagged group: 90 ÷ 150 = 60% (precision). 90 of 100 is the reverse conditional, P(flagged | urgent), the recall. Mixing up the direction is the most common error with classifier numbers."
+  - q: "An LLM judge marks some verdicts 'high confidence', which your team reads as about 90% likely to be right. Of 200 such verdicts you check by hand, 140 are correct. What should you conclude?"
+    options:
+      - "The judge is well calibrated, since 140 of 200 is a strong score"
+      - "The judge is miscalibrated low: it should be even more confident"
+      - "Nothing, because a judge's confidence can't be checked by hand"
+      - "When it claims high confidence it's right about 70% of the time"
+    answer: 3
+    explain: "P(correct | high confidence) = 140 ÷ 200 = 70%. If 'high' was meant to signal around 90%, the judge is overconfident. Use the observed 70% when deciding how much to trust its high-confidence verdicts, and recheck as prompts or models change."
+  - q: "Nearly every message from developers to your assistant contains code. Does that mean a message containing code is almost certainly from a developer?"
+    options:
+      - "Not necessarily: P(code | developer) differs from P(developer | code)"
+      - "Yes, because the two conditional probabilities are always equal"
+      - "Yes, if developers send more than half of all your messages"
+      - "No, because conditional probabilities only apply to small groups"
+    answer: 0
+    explain: "Reversing a conditional changes what you divide by. If students or analysts also paste code and send many messages, a big share of code-containing messages may come from them. To get P(developer | code), count within the code-containing messages."
+  - q: "Your logs show the error rate is 4% on long inputs and 4% overall. What does that tell you about input length?"
+    options:
+      - "Long inputs cause errors, since 4% is not zero"
+      - "Long inputs prevent errors, since the rate is low"
+      - "Knowing the length doesn't change the error chance"
+      - "The data is wrong, as the two rates can never match"
+    answer: 2
+    explain: "When P(error | long input) equals P(error), the two events are independent: learning the input is long gives no information about errors. A non-zero rate doesn't imply a cause; what matters is whether conditioning changes it."
+backupResources:
+  - label: "Go deeper: Lecture 4: Conditional Probability | Statistics 110 (Harvard University, 50 min)"
+    url: "https://www.youtube.com/watch?v=P7NE4WF8j-Q"
+    type: "video"
+  - label: "Introductory Statistics 2e, 3.4: Contingency tables (OpenStax)"
+    url: "https://openstax.org/books/introductory-statistics-2e/pages/3-4-contingency-tables"
+    type: "free textbook · conditional probability from tables"
+tags:
+  - math
+  - probability
+  - conditional-probability
+  - calibration
+---
+
+**You need:** fractions. → p-values-explained comes before this in the track, but this lesson only
+needs a table of counts.
+
+A **conditional probability** is the probability of something *given* that you already know
+something else. Almost every practical question about an AI system has that shape. How likely is a
+flagged message to be harmful? How often is the model right when it says it's sure? Answering
+those correctly mostly comes down to dividing by the right total.
+
+## Work from a table of counts
+
+Sort cases by two yes/no questions and count each combination. That's a **contingency table**.
+Then:
+
+- an **unconditional** probability divides a count by everyone;
+- a **conditional** probability divides by only the row or column you know you're in.
+
+In symbols, P(A | B) = P(A and B) ÷ P(B): the share of the B group that is also A. Read the bar
+"|" as "given".
+
+## Direction matters
+
+P(A | B) and P(B | A) share the same top number (the people who are both) but divide by different
+totals, so they can be wildly different. In AI work this is the difference between two metrics:
+
+- **Precision** = P(actually positive | flagged): how much to trust a flag.
+- **Recall** = P(flagged | actually positive): how much of the problem gets caught.
+
+## Worked example: a triage bot
+
+1,000 support tickets, 100 truly urgent. The bot flags 150 tickets.
+
+| | Urgent | Not urgent | Total |
+|---|---|---|---|
+| Flagged | 90 | 60 | 150 |
+| Not flagged | 10 | 840 | 850 |
+| Total | 100 | 900 | 1,000 |
+
+- **P(urgent)** = 100 ÷ 1,000 = **10%**.
+- **P(flagged | urgent)** = 90 ÷ 100 = **90%** (recall).
+- **P(urgent | flagged)** = 90 ÷ 150 = **60%** (precision).
+
+"Catches 90% of urgent tickets" and "only 60% of flags are urgent" are both true. Which one matters
+depends on whether a missed urgent ticket or a wasted look costs you more.
+
+## Calibration: does 80% mean 80%?
+
+A model or judge is **calibrated** if, among all the times it says "80% confident", it's right
+about 80% of the time. That's a conditional probability: P(correct | says 80%). LLM judges and
+stated confidence are often miscalibrated, usually overconfident. To check: group verdicts by
+stated confidence, count how many in each group were right, and compare.
+
+## Common mistakes
+
+- **Flipping the conditional.** "Catches 98% of spam" is not "98% of flags are spam".
+- **Dividing by everyone.** A conditional divides by the group you know you're in.
+- **Trusting "I'm 90% sure".** Check it against outcomes before treating it as a probability.
+- **Calling a non-zero rate a cause.** If conditioning doesn't change the rate, the events are
+  independent.
+
+## Where you'll see it in AI
+
+Precision and recall for every classifier, filter and retrieval step (→ evaluation-metrics),
+calibration of model and judge confidence, and next-token probabilities, which are conditional on
+all the text so far (→ reading-probability-distributions). Reversing a conditional properly, when
+you don't have the full table, is what → bayes-theorem-base-rates does next.

@@ -1,0 +1,211 @@
+---
+title: "Random forests and bagging"
+subtitle: "Many varied trees, one vote, and a free held-out check"
+summary: "Build a random forest from bootstrapped data and random columns, see why voting cuts variance, and read the out-of-bag error as a built-in check."
+changeNote: "New lesson in the machine learning track, written from the lecture's transcript, with a worked example, a code task and a quiz."
+section: math
+pillar: machine-learning
+order: 9
+level: intermediate
+estMinutes: 14
+taskMinutes: 25
+prerequisites:
+  - decision-trees-gini
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "J4Wdy0Wc_xQ"
+  published: "2018-02-05"
+  year: 2018
+  minutes: 10
+  title: "StatQuest: Random Forests Part 1 - Building, Using and Evaluating"
+  channel: "StatQuest with Josh Starmer"
+  why: "The last lesson ended with a single tree that fits its training data too closely. This ten-minute lecture fixes that the first way the bias-variance lesson promised, by bagging: build many trees on resampled data with random column choices, then let them vote. It also shows the out-of-bag error, a held-out score you get without setting any data aside, and how to tune the forest with it."
+  notes:
+    - "1:04 Step one, the bootstrap: resample the rows with replacement, so some repeat and others are left out."
+    - "5:59 Out-of-bag data: about a third of the rows are missing from each tree's sample and can test it."
+    - "9:18 Columns tried per split: start near the square root of the number of columns (the captions say 'square'), then try values around it."
+applyIt: |
+  **When a single model is unstable, averaging many slightly different ones is one of the most
+  reliable fixes in machine learning, and the idea reaches well beyond trees.** Take a
+  prediction in your own work or studies that's built on a table (churn, lead scoring, demand,
+  grades) and compare one tree with a forest.
+
+  1. Fit one decision tree and a random forest on the same data, and cross-validate both.
+  2. Compare the means and the fold-to-fold spread. The forest should be at least as accurate and
+     noticeably steadier.
+  3. Read the forest's out-of-bag score and check it lands near the cross-validated one.
+
+  **If you build software:** `RandomForestClassifier(n_estimators=300, oob_score=True)` in
+  scikit-learn gives you the forest and its out-of-bag score in one fit. **If you don't code:**
+  the same "ask several times and take the majority" move works on an AI assistant's yes/no
+  judgements: run the same classification prompt five times and keep the majority answer, then
+  check whether it agrees with your own labels more often than a single run.
+  Success: you've compared a single model with an ensemble on one real task and can say which
+  is steadier.
+recap:
+  - emoji: "🌲"
+    title: "One tree isn't enough"
+    text: "Decision trees are easy to build and read, but they fit their own data well and new data poorly. A forest keeps the simplicity and fixes the inaccuracy."
+  - emoji: "🎒"
+    title: "Bootstrap the rows"
+    text: "Build a new dataset the same size as the original by picking rows at random, allowing repeats. Some rows appear twice; others don't appear at all."
+  - emoji: "🎲"
+    title: "Random columns at each split"
+    text: "Grow a tree on that sample, but at every split consider only a random few columns. Repeat hundreds of times for a wide variety of trees."
+  - emoji: "🗳️"
+    title: "Let the trees vote"
+    text: "Run a new case down every tree and take the majority answer. Bootstrapping plus aggregating the votes is called bagging."
+  - emoji: "🧺"
+    title: "The out-of-bag check"
+    text: "About a third of the rows never made it into a given tree's sample. Let only those trees vote on them; the share they get wrong is the out-of-bag error."
+  - emoji: "🎛️"
+    title: "Tune with it"
+    text: "Rebuild the forest with different numbers of columns per split, compare out-of-bag errors, and keep the most accurate. Start near the square root of the number of columns."
+task: |
+  Measure what bagging buys you. In a free Google Colab notebook (scikit-learn is preinstalled):
+
+  ```python
+  import numpy as np
+  from sklearn.datasets import load_breast_cancer
+  from sklearn.model_selection import cross_val_score
+  from sklearn.tree import DecisionTreeClassifier
+  from sklearn.ensemble import RandomForestClassifier
+
+  X, y = load_breast_cancer(return_X_y=True)
+
+  # 1. How much of the data does one bootstrap sample leave out?
+  rng = np.random.default_rng(0)
+  n = len(y)
+  picked = rng.integers(0, n, size=n)          # sample n rows with replacement
+  print("left out:", round(1 - len(set(picked)) / n, 3))
+
+  # 2. One tree versus a forest, 10-fold cross-validation
+  for name, model in [("one tree", DecisionTreeClassifier(random_state=0)),
+                      ("forest", RandomForestClassifier(n_estimators=300, random_state=0))]:
+      s = cross_val_score(model, X, y, cv=10)
+      print(f"{name}: mean {s.mean():.3f}  min {s.min():.3f}  max {s.max():.3f}")
+
+  # 3. The out-of-bag score, from a single fit
+  forest = RandomForestClassifier(n_estimators=300, oob_score=True, random_state=0).fit(X, y)
+  print("out-of-bag accuracy:", round(forest.oob_score_, 3))
+  ```
+
+  1. Is the left-out share close to the "about a third" from the lecture?
+  2. How do the forest's mean and min-to-max spread compare with the single tree's?
+  3. Is the out-of-bag accuracy close to the forest's cross-validated mean?
+  4. Add `max_features=1` and then `max_features=None` (all columns) to the forest and rerun
+     part 2. Which setting does best, and why might "all columns" make the trees too alike?
+
+  **No code?** With six numbered cards, draw one, note it, put it back, six times. Which cards
+  never came up? Repeat three times and count the average number left out.
+
+  Success: you have the left-out share, the tree-versus-forest comparison, and an out-of-bag
+  score that roughly matches cross-validation.
+selfCheck:
+  - q: "You have only 400 labeled rows and can't spare a separate test set. How can a random forest still give you an honest accuracy estimate?"
+    a: "Use the out-of-bag score. Each row is left out of roughly a third of the trees' bootstrap samples, so those trees can vote on it as unseen data. The share of rows they get wrong is a held-out error you get without setting any rows aside. (Cross-validation remains a good cross-check.)"
+  - q: "A teammate builds a 'forest' of 500 trees, each grown on the full dataset with all columns considered at every split. It's no better than one tree. Why?"
+    a: "Without bootstrapped rows and random columns, every tree finds the same splits, so they're near-copies and make the same mistakes. Voting only helps when the voters' errors differ. Restore bootstrapping and a column subset per split."
+mcq:
+  - q: "Why does a random forest consider only a random subset of columns at each split?"
+    options:
+      - "To make each tree train faster on large data"
+      - "To stop one strong column making trees alike"
+      - "To avoid needing a bootstrapped sample as well"
+      - "To make each individual tree more accurate"
+    answer: 1
+    explain: "If one column is very predictive, every tree would split on it first and the trees would share their mistakes. Random column subsets force variety, and variety is what makes the vote better than any one tree. Individual trees usually get slightly worse; the ensemble gets better."
+  - q: "Adding trees to a forest: at 50 trees out-of-bag error is 9.1%, at 300 it's 8.4%, at 2,000 it's 8.3%. What's the sensible conclusion?"
+    options:
+      - "2,000 trees is overfitting; go back to 50"
+      - "Keep adding trees until the error reaches zero"
+      - "Gains have levelled off; extra trees cost time"
+      - "Out-of-bag error can't be trusted past 300 trees"
+    answer: 2
+    explain: "More trees in a forest reduce variance and don't make it overfit the way a deeper single tree does; the error just levels off. Past that point, extra trees only cost training and prediction time. The floor comes from the data, so zero isn't reachable."
+  - q: "Each bootstrap sample is the same size as the original dataset. Why doesn't each tree just see all the data?"
+    options:
+      - "Sampling with replacement repeats some rows, so others drop out"
+      - "Every tree is given its own different third of the data on purpose"
+      - "Each tree only keeps rows that the previous tree got wrong"
+      - "The original dataset is split into equal folds for the trees"
+    answer: 0
+    explain: "Drawing with replacement picks some rows two or more times, which leaves about 37% of rows out of any given sample for large datasets. Those left-out rows are the out-of-bag data. Focusing on the previous tree's mistakes is boosting, the next lesson."
+  - q: "You ask an LLM to classify each support ticket five times at a non-zero temperature and take the majority label. Which idea is this closest to?"
+    options:
+      - "Boosting, because each run corrects the last"
+      - "Ridge regularization, because it limits the output"
+      - "Cross-validation, because each run sees new data"
+      - "Bagging-style voting over varied predictions"
+    answer: 3
+    explain: "Each run is a slightly different predictor because of sampling, and a majority vote cancels some of their independent mistakes, the same logic as a forest's vote. The runs don't learn from each other, so it isn't boosting, and nothing is held out, so it isn't cross-validation."
+backupResources:
+  - label: "scikit-learn user guide — Forests of randomized trees"
+    url: "https://scikit-learn.org/stable/modules/ensemble.html#random-forests-and-other-randomized-tree-ensembles"
+    type: "docs · reference"
+tags:
+  - math
+  - machine-learning
+  - random-forests
+  - ensembles
+---
+
+One decision tree is high-variance: change a few training rows and the splits change, so the
+predictions change. **A random forest grows hundreds of trees, each on a resampled copy of the
+data and with random columns at each split, and lets them vote; their individual mistakes
+partly cancel.** It's often a strong model on tabular data with very little tuning.
+
+## Building the forest
+
+1. **Bootstrap.** Draw as many rows as the dataset has, at random, *with replacement*. Some rows
+   appear more than once; about 37% don't appear at all.
+2. **Grow a tree** on that sample, but at each split consider only a random subset of the columns
+   (a common start is the square root of the number of columns).
+3. **Repeat** hundreds of times.
+4. **Predict** by majority vote (classification) or average (regression).
+
+Bootstrapping plus aggregating is **bagging**. The random columns are the forest's extra
+ingredient: they stop every tree from making the same first split.
+
+## Worked example: why votes help, and why variety matters
+
+Suppose each tree, on its own, is right 60% of the time on some kind of case, and the trees'
+mistakes were fully independent. A majority vote is then right when more than half the trees
+are:
+
+| Trees voting | Majority right |
+|---|---|
+| 1 | 60% |
+| 11 | 75% |
+| 101 | 98% |
+
+(Those are binomial probabilities: the chance that at least 6 of 11, or 51 of 101, are right.)
+
+Real trees are trained on overlapping data, so their mistakes are correlated and the gain is
+smaller. That's exactly why the forest injects randomness: **the less alike the trees, the more
+the vote helps.** If every tree were identical, 101 votes would be worth one.
+
+**The out-of-bag check.** With a few hundred trees, every row is left out of roughly a third of
+them. Let only those trees vote on it, and you get a prediction for every row from models that
+never saw it. The share wrong is the **out-of-bag error**: a held-out score at no extra cost.
+
+## Common mistakes
+
+- **Expecting a forest to explain itself.** Hundreds of trees can't be read like one. Feature
+  importances help, but they are rankings, not reasons.
+- **Too few trees.** With a handful of trees the vote is noisy; add trees until the out-of-bag
+  error levels off.
+- **Duplicate records.** If the same record appears twice in the data, a tree can train on one
+  copy and be "tested" on the other, so the out-of-bag score flatters it. Dedupe first.
+- **Treating out-of-bag as a final test.** If you tuned settings on it, keep a separate test set
+  for the final number.
+
+## Where you'll see it in AI
+
+- **Tabular baselines.** A random forest is a common first serious model on a table, before
+  → gradient-boosting-trees.
+- **Ensembles of LLM calls.** Sampling several answers and taking the majority (often called
+  self-consistency) uses the same logic: varied predictors, one vote.
+- **Bootstrapping eval scores.** The same resampling trick puts a confidence band around an eval
+  score (→ bootstrapping-eval-metrics).

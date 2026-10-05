@@ -1,0 +1,217 @@
+---
+title: "Mini-batches and epochs"
+subtitle: "Why training steps on small slices of data instead of the whole set"
+summary: "Explain mini-batch gradient descent and epochs, work out how many steps a training run takes, and predict what batch size does to speed and noise."
+changeNote: "New lesson in the calculus track, written from the lecture's transcript; takes over the original lesson's mini-batch question and adds a task."
+section: math
+pillar: calculus
+order: 8
+level: intermediate
+estMinutes: 40
+taskMinutes: 25
+prerequisites:
+  - calculus-for-optimization
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "4qJaSmvhxi8"
+  published: "2017-08-25"
+  year: 2017
+  minutes: 11
+  title: "Mini Batch Gradient Descent (C2W2L01)"
+  channel: "DeepLearningAI"
+  why: "Up to now the gradient was an average over all the training data, which is how the theory is written but not how anyone trains. Andrew Ng explains the change every real training run makes: split the data into mini-batches and take a step after each one. He also defines the epoch, the unit that fine-tuning tools and training logs use, with a concrete five-million-example walk-through."
+  notes:
+    - "Around 2:00–3:40: the split into mini-batches of 1,000 and the curly-brace notation X{t}. The notation is used again in the momentum and Adam lessons."
+    - "Around 10:00: the definition of an epoch. Batch gradient descent gets one step per epoch; mini-batch gets thousands."
+applyIt: |
+  **Batch size, epochs and steps are the three numbers on every training or fine-tuning
+  screen, and they're linked by simple arithmetic.** Use it to plan a run before you pay for it.
+
+  1. For a run you're planning (or a public fine-tuning example), write down the number of
+     training examples, the batch size and the number of epochs.
+  2. Compute steps per epoch (examples ÷ batch size, rounded up) and total steps (× epochs). If
+     the tool bills or times by step or by tokens processed, estimate the cost from that.
+  3. Decide in advance where you'll check the validation curve (for example every half epoch),
+     so you can stop early instead of paying for epochs that only overfit.
+
+  **If you build software:** log the step number, epoch and batch size with every loss value; a
+  loss curve without them can't be compared across runs.
+  **If you don't code:** a fine-tuning form's batch-size and epoch fields are these exact
+  numbers; write the step count beside them before you press start.
+
+  Success: you've written the step count of one run before starting it, and a point where you'll
+  check validation loss.
+recap:
+  - emoji: "🐌"
+    title: "Big data makes steps slow"
+    text: "Vectorisation lets you process all m examples at once, but with five million examples you still read the whole set before taking a single step."
+  - emoji: "✂️"
+    title: "Split into mini-batches"
+    text: "Cut the training set into small sets of, say, 1,000 examples. Five million examples become 5,000 mini-batches, written X{1} … X{5000}."
+  - emoji: "🔁"
+    title: "One step per mini-batch"
+    text: "For each mini-batch: forward pass, cost on just those examples, backprop, update. It's the familiar algorithm on a training set of 1,000."
+  - emoji: "🔄"
+    title: "Epoch = one full pass"
+    text: "A pass through the whole training set is one epoch. Batch gradient descent gets one step from it; mini-batch gets 5,000."
+  - emoji: "🎲"
+    title: "Noisy but far more steps"
+    text: "Each mini-batch's gradient is an estimate of the full one, so steps are a bit noisy, but you make progress long before the first full pass ends."
+  - emoji: "🏭"
+    title: "The default at scale"
+    text: "On large datasets, mini-batch gradient descent runs much faster than full-batch, which is why it's what nearly everyone uses."
+task: |
+  **See batch size trade steps for noise (25 minutes, Python).**
+
+  This fits one weight to 10,000 examples generated with a true weight of 3, for exactly one
+  epoch at four batch sizes, then shows how much single-batch gradients vary:
+
+  ```python
+  import random
+
+  rng = random.Random(0)
+  data = []
+  for _ in range(10_000):
+      x = rng.uniform(-1, 1)
+      data.append((x, 3 * x + rng.gauss(0, 0.5)))    # true weight is 3
+
+  def grad(w, batch):    # gradient of mean squared error for prediction w * x
+      return sum(2 * (w * x - y) * x for x, y in batch) / len(batch)
+
+  def train(batch_size, lr=0.5):
+      w, steps = 0.0, 0
+      rng.shuffle(data)
+      for i in range(0, len(data), batch_size):
+          w -= lr * grad(w, data[i:i + batch_size])
+          steps += 1
+      return w, steps
+
+  for bs in (10_000, 1_000, 100, 10):
+      w, steps = train(bs)
+      print(f"batch {bs:>6}: {steps:>5} steps in one epoch, w = {w:.3f}")
+
+  print("full gradient at w=0:", round(grad(0.0, data), 2))
+  print("five batches of 32:", [round(grad(0.0, rng.sample(data, 32)), 2) for _ in range(5)])
+  ```
+
+  Then answer: which batch size got closest to 3 in one epoch, and why didn't the smallest one
+  win?
+
+  Success: full-batch takes 1 step and ends far from 3 (about 1.0); batch 100 lands about 3.00;
+  batch 10 takes 1,000 steps but ends slightly off (about 3.1) because its steps are noisier; and
+  the five 32-example gradients scatter around the full gradient of about −2.0.
+selfCheck:
+  - q: "A fine-tuning job has 2,000 training examples, batch size 8 and 3 epochs. How many update steps will it take, and what happens to that number if you double the batch size?"
+    a: "2,000 ÷ 8 = 250 steps per epoch, × 3 = 750 steps. Doubling the batch to 16 halves it to 375 steps, each using a less noisy gradient estimate. Fewer steps can mean the learning rate needs retuning."
+  - q: "A training run worked well. You doubled the batch size to use a bigger GPU, kept everything else, and now the loss behaves differently. What changed and what should you do?"
+    a: "Each step now averages over more examples (less noise) and an epoch has half as many steps, so the effective progress per epoch and the right learning rate both shift. Retune the learning rate whenever you change the batch size."
+  - q: "Your loss curve, logged every step, looks jagged with small bumps, but the trend is clearly down. A colleague wants to stop the run because 'it's unstable'. What do you tell them?"
+    a: "Small step-to-step bumps are expected with mini-batches: each step's gradient comes from a different random slice, so it's a noisy estimate. Judge the trend (or a smoothed curve) and the validation loss; worry only if the loss grows or explodes."
+mcq:
+  - q: "Why does nearly everyone train with mini-batches instead of computing the exact gradient over the whole dataset each step?"
+    options:
+      - "Full-dataset gradients point in the wrong direction"
+      - "Noisy small-batch steps are far cheaper per update"
+      - "Mini-batches guarantee finding the global minimum"
+      - "GPU memory caps any batch at a few dozen examples"
+    answer: 1
+    explain: "An exact gradient over millions of examples costs a fortune and moves you once. A batch of a few hundred gives a noisy but unbiased estimate for a tiny fraction of the cost, so you take thousands of steps in the same budget, and the noise acts as a mild regularizer. Full gradients aren't wrong, nothing guarantees a global minimum here, and batch size is a compute/noise trade, not a hardware law."
+  - q: "A dataset has 50,000 examples and the batch size is 64. Training runs for 4 epochs. Roughly how many update steps is that?"
+    options:
+      - "About 200, one for each batch-and-epoch pair"
+      - "About 12,500, from 50,000 ÷ 4"
+      - "4, since each epoch makes a single update"
+      - "About 3,128, from 782 steps per epoch × 4"
+    answer: 3
+    explain: "50,000 ÷ 64 = 781.25, so each epoch takes 782 steps (the last batch is partial), and 4 epochs is 3,128. One step per epoch describes full-batch gradient descent, not mini-batches."
+  - q: "You train with batch size 1, then batch size 4,096, for the same number of epochs. Which comparison is right?"
+    options:
+      - "Size 1: many noisy steps; 4,096: few smoother ones"
+      - "Size 1: few smooth steps; 4,096: many noisy ones"
+      - "Both take the same steps; only memory use differs"
+      - "Both give identical gradients, just in another order"
+    answer: 0
+    explain: "Per epoch, batch size 1 makes one step per example from a single-example gradient (very noisy); batch 4,096 makes far fewer steps, each averaging many examples (much smoother). The step count is examples ÷ batch size, so it's anything but the same."
+  - q: "In the mini-batch loop, what does the cost J{t} measure?"
+    options:
+      - "The average cost over the entire training set"
+      - "The cost on one mini-batch, used for one step"
+      - "The total cost accumulated since the first epoch"
+      - "The cost on the held-out validation examples"
+    answer: 1
+    explain: "J{t} is computed on mini-batch t only and drives that one update. That's why a per-step loss curve is jagged: each point comes from a different slice of data. The full-training-set cost is what batch gradient descent uses."
+tags:
+  - math
+  - calculus
+  - optimization
+  - training
+---
+
+**You need:** → calculus-for-optimization (the update rule) and → backprop-chain-rule-calculus
+(how one step's gradient is computed).
+
+The one idea of this lecture: **instead of reading the entire training set before each step,
+cut it into small mini-batches and take a gradient step after every one.** The cost of one step
+drops dramatically, so training starts making progress almost immediately. Every modern
+training and fine-tuning run works this way.
+
+## The problem with the full batch
+
+In theory the cost is an average over all `m` training examples, so its exact gradient needs all
+of them. Vectorised code handles thousands at once, but with five million examples you still
+process all five million before the first step, and again before the second. That's **batch
+gradient descent**: accurate, and slow.
+
+## Mini-batches
+
+Split the set into mini-batches of, say, 1,000 examples: `X{1}, Y{1}` is the first 1,000,
+`X{2}, Y{2}` the next, up to `X{5000}`. For each mini-batch `t`:
+
+1. Forward pass on `X{t}` only (vectorised over its 1,000 examples).
+2. Cost `J{t}`, the average loss over those 1,000.
+3. Backprop to get the gradient of `J{t}`.
+4. Update every weight: `W ← W − α·dW`.
+
+One pass through all the mini-batches is an **epoch**. Batch gradient descent gets one step per
+epoch; mini-batch gets 5,000. You usually run several epochs.
+
+## Worked example with real numbers
+
+**Counting steps.** 2,000 fine-tuning examples, batch size 8, 3 epochs: `2,000 ÷ 8 = 250` steps
+per epoch, 750 in total. With 50,000 examples and batch 64, an epoch is `⌈781.25⌉ = 782` steps.
+
+**Progress in one epoch.** Fitting one weight (true value 3) to 10,000 examples, one epoch,
+learning rate 0.5, starting from 0 (the task's script):
+
+| batch size | steps | final w |
+|---|---|---|
+| 10,000 (full) | 1 | 1.01 |
+| 1,000 | 10 | 2.97 |
+| 100 | 100 | 3.00 |
+| 10 | 1,000 | 3.10 |
+
+The full batch barely moved. Mini-batches got there within the same single pass over the data.
+The smallest batch took the most steps but ended a little off, because a gradient from 10
+examples is noisy: at `w = 0` the full gradient is −2.02, while five random batches of 32 gave
+values from −1.36 to −2.24. Each one points roughly the right way, not exactly. (Andrew Ng's
+next video in the course explores this noise; → learning-rate-decay-schedules shows how
+shrinking the step size late in training calms it.)
+
+## Common mistakes
+
+- **Comparing runs by epoch when batch sizes differ.** The step counts differ too.
+- **Changing batch size without retuning the learning rate.** The effective step changes.
+- **Panicking at a jagged per-step loss curve.** Each point is a different mini-batch; judge the
+  trend and the validation curve.
+- **Forgetting to shuffle.** Mini-batches should be random slices, not sorted runs of similar
+  examples.
+
+## Where you'll see it in AI
+
+- **Fine-tuning settings** (batch size, epochs, steps) are exactly these numbers
+  (→ fine-tuning-fundamentals).
+- **Optimizers** like momentum and Adam smooth the noisy mini-batch gradients
+  (→ momentum-optimizer, → adam-optimizer).
+- **Overfitting checks:** more epochs means more passes over the same data, so watch the
+  held-out curve (→ calculus-for-optimization, → evaluation-metrics).

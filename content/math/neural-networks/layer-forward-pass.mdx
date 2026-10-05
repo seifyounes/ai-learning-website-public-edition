@@ -1,0 +1,201 @@
+---
+title: "Computing a layer: z = W·x + b"
+subtitle: "The forward pass in standard notation, with every shape checked"
+summary: "Compute a two-layer network's output by hand, state the shape of every weight matrix, and tell parameters from activations."
+changeNote: "New lesson in the neural networks track, written from the lecture's transcript, with a by-hand forward pass and a quiz."
+section: math
+pillar: neural-networks
+order: 2
+level: intermediate
+estMinutes: 15
+taskMinutes: 20
+prerequisites:
+  - neural-networks
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "rMOdrD61IoU"
+  published: "2017-08-25"
+  year: 2017
+  minutes: 10
+  title: "Computing Neural Network Output (C1W3L03)"
+  channel: "DeepLearningAI"
+  why: "The previous lesson gave you the picture; this one gives you the notation every paper, course and framework uses. Andrew Ng takes one hidden layer, writes each unit as z = wᵀx + b followed by an activation, and then stacks the units into a matrix so the whole layer becomes one line. Ten minutes, and afterwards W·x + b reads as a layer rather than as symbols."
+  notes:
+    - "1:01 The notation: a square-bracket superscript is the layer number, a subscript is the unit within that layer."
+    - "3:34 Stacking the four units' weight vectors as rows gives the 4 × 3 matrix W[1]."
+    - "6:42 The shape check: a 4 × 3 matrix times a 3 × 1 input, plus a 4 × 1 bias, gives a 4 × 1 result."
+    - "8:50 The takeaway: four lines compute the whole one-hidden-layer network for one input."
+applyIt: |
+  **Every time a model answers you, it runs this forward pass once per generated token, so its
+  size and your output length set most of the wait and the bill.** Use that to make one real
+  cost or speed decision.
+
+  1. Pick one AI task you run often: summarizing documents, drafting replies, answering
+     questions about a codebase or a report.
+  2. Note roughly how long the answers are. Output tokens are generated one forward pass at a
+     time, so a 600-word answer costs far more waiting than a 100-word one.
+  3. Try the same task with a shorter output instruction ("answer in 5 bullets") and, if your
+     tool offers it, with a smaller model tier. Compare quality, speed and price.
+
+  **If you build software:** log output tokens and latency per request; they move together far
+  more than prompt length and latency do.
+  **If you don't code:** time the two versions with your phone's stopwatch. The difference is
+  the forward passes you didn't need.
+
+  Success: one task where you know which change (shorter output or smaller model) cut the wait,
+  and whether the answer got worse.
+toolkit: |
+  - **Save a "short answer" instruction.** Put "Answer in at most 5 bullets unless I ask for
+    more" in your assistant's custom instructions or project settings (ChatGPT custom
+    instructions, Gemini Gems, Claude Projects, or a rules file in your editor). Every token you
+    don't generate is a forward pass you don't wait for.
+  - **Look at output tokens first when something feels slow.** Most assistants and APIs show
+    token usage per answer; when a workflow drags, check how long the answers are before you
+    trim the prompt, since trimming the prompt mostly saves money rather than time.
+recap:
+  - emoji: "🧮"
+    title: "One unit, two steps"
+    text: "A single unit does what logistic regression does: compute z = wᵀx + b, then apply an activation to get a. A network repeats this unit many times."
+  - emoji: "🏷️"
+    title: "Name every number"
+    text: "Square-bracket superscripts say which layer a value belongs to; subscripts say which unit in that layer. a[1]₂ is unit 2's activation in layer 1."
+  - emoji: "🧱"
+    title: "Stack the units into a matrix"
+    text: "Put each unit's weight vector in as a row and the four separate dot products become one product: z[1] = W[1]·x + b[1]."
+  - emoji: "📏"
+    title: "Check the shapes"
+    text: "With 3 inputs and 4 hidden units, W[1] is 4 × 3 and b[1] is 4 × 1. The output layer's W[2] is 1 × 4, with a single bias."
+  - emoji: "4️⃣"
+    title: "Four lines compute the network"
+    text: "z[1] = W[1]·x + b[1], a[1] = σ(z[1]), z[2] = W[2]·a[1] + b[2], a[2] = σ(z[2]). Calling the input a[0] makes every layer look the same."
+task: |
+  Run a two-layer forward pass by hand, then confirm it in a few lines of NumPy.
+
+  1. Use x = (1, 2); W1 with rows (1, −1) and (0.5, 0.5); b1 = (0, 1); ReLU in the hidden layer.
+  2. Use W2 = (1, 2), b2 = −3 and a sigmoid at the output.
+  3. Write the shape of W1, b1, W2 and b2 before computing anything, then compute z1, a1, z2
+     and the output.
+  4. Count the parameters (all weights plus all biases).
+
+  ```python
+  import numpy as np
+
+  x  = np.array([1.0, 2.0])
+  W1 = np.array([[1.0, -1.0], [0.5, 0.5]]); b1 = np.array([0.0, 1.0])
+  W2 = np.array([[1.0, 2.0]]);              b2 = np.array([-3.0])
+
+  z1 = W1 @ x + b1
+  a1 = np.maximum(0, z1)
+  z2 = W2 @ a1 + b2
+  out = 1 / (1 + np.exp(-z2))
+  print(z1, a1, z2, out)
+  print("params:", W1.size + b1.size + W2.size + b2.size)
+  ```
+
+  Success: your hand values match the printout (z1 = (−1, 2.5), output ≈ 0.88) and you can say
+  why W1 is 2 × 2 and W2 is 1 × 2.
+selfCheck:
+  - q: "A layer takes 768 numbers in and produces 3,072. A colleague's code creates its weight matrix with shape 768 × 3,072 and multiplies W @ x. What goes wrong, and what is the layer's parameter count?"
+    a: "W @ x needs W to have one row per output unit and one column per input: 3,072 × 768. The given shape fails (or silently needs a transpose). Parameters: 3,072 × 768 = 2,359,296 weights plus 3,072 biases = 2,362,368."
+  - q: "A model handles short prompts fine but runs out of memory on very long ones, though its file size never changes. Which of the two kinds of numbers is growing?"
+    a: "Activations, not parameters. The weights are fixed once loaded; the values flowing through the layers (including a transformer's cached keys and values) grow with the length of the input and output. Shorten the context, lower the context setting, or leave more headroom."
+mcq:
+  - q: "Hidden layer 1 has 4 units and the input has 3 features. Your code builds W1 with shape (3, 4) and `W1 @ x` throws a shape error. What shape should W1 have?"
+    options:
+      - "(4, 3)"
+      - "(3, 4), with x reshaped"
+      - "(4, 1)"
+      - "(12, 1)"
+    answer: 0
+    explain: "W1 needs one row per unit in this layer and one column per input feature, so (4, 3): each row is one unit's weight vector. (4, 1) is the shape of the bias, and flattening the weights into (12, 1) loses the row-per-unit structure the matrix product relies on."
+  - q: "Your local model runs out of memory only when you paste in very long documents. Which numbers grow with the input?"
+    options:
+      - "The weights, which expand to fit the prompt"
+      - "The bias vectors, one copy per input token"
+      - "The activations flowing through each layer"
+      - "The vocabulary, which grows with new words"
+    answer: 2
+    explain: "Parameters (weights and biases) are fixed once the model is loaded. Activations are computed per input, and in a transformer the cached keys and values for every earlier token grow with the context, so long inputs need more memory (→ kv-cache-inference)."
+  - q: "On the same hardware, a 70B model generates each token more slowly than an 8B model. What is the main reason?"
+    options:
+      - "It searches a larger vocabulary for each token"
+      - "Each token goes through larger weight matrices"
+      - "It re-reads its training data before answering"
+      - "It must load its weights from disk for each word"
+    answer: 1
+    explain: "Generating one token is one forward pass through every layer, and a bigger model's layers are bigger matrices: more multiply-adds and more weights to read from memory per token. Vocabulary size is similar across model sizes, and weights stay in memory between tokens once loaded."
+  - q: "You set every bias in a ReLU layer to zero and freeze them there. What does the layer lose?"
+    options:
+      - "Nothing, since biases are added after the activation"
+      - "Its ability to take more than one input feature"
+      - "The ability to learn, as its gradients become zero"
+      - "Control over the threshold where each unit switches on"
+    answer: 3
+    explain: "The bias shifts z before the activation, which moves the point where each ReLU unit turns on. Without it, every unit switches on exactly where W·x crosses zero. The weights still learn, and the bias is added before the activation, not after."
+tags:
+  - math
+  - neural-networks
+  - deep-learning
+  - linear-algebra
+---
+
+A layer of a neural network is one line of algebra: **z = W·x + b, then a = g(z)**. Every
+model you'll use, including each block inside an LLM, is built from this line repeated many
+times. Being able to run it by hand, and to say the shape of every piece, is what turns model
+diagrams and framework code from symbols into something you can check.
+
+## From one unit to one layer
+
+A single unit takes the input vector x, computes a weighted sum wᵀx plus a bias b, and passes
+the result z through an activation such as the sigmoid. That's logistic regression, done once.
+
+A hidden layer is several of these units side by side, each with its own weight vector. Write
+each unit's weights as one **row** of a matrix W, and the separate dot products become a single
+matrix-vector product. With 3 inputs and 4 units:
+
+- W[1] is **4 × 3** (one row per unit, one column per input), b[1] is 4 × 1.
+- z[1] = W[1]·x + b[1], and a[1] = g(z[1]) applies the activation to each entry.
+- The output layer does the same with a[1] as its input: W[2] is 1 × 4, b[2] is a single number.
+
+The rule to remember: **W[l] has shape (units in layer l) × (units in layer l − 1).** If you
+call the input a[0], every layer is the same two lines.
+
+## Worked example: a two-layer forward pass
+
+Input x = (1, 2). Hidden layer: W1 has rows (1, −1) and (0.5, 0.5), b1 = (0, 1), ReLU. Output
+layer: W2 = (1, 2), b2 = −3, sigmoid.
+
+1. **Multiply:** W1·x = (1×1 + (−1)×2, 0.5×1 + 0.5×2) = (−1, 1.5).
+2. **Add the bias:** z1 = (−1, 1.5) + (0, 1) = (−1, 2.5).
+3. **Activate:** a1 = ReLU(z1) = (0, 2.5).
+4. **Output layer:** z2 = 1×0 + 2×2.5 − 3 = 2.
+5. **Sigmoid:** 1 / (1 + e^(−2)) ≈ **0.88**, read as an 88% probability of the positive class.
+
+Parameter count: W1 has 4 weights, b1 has 2, W2 has 2, b2 has 1, so 9 in total. A real model
+runs the same steps with matrices thousands of rows wide.
+
+## Parameters learn; activations flow
+
+Keep two kinds of numbers apart. **Parameters** (W and b) are learned in training and stay fixed
+while the model answers. **Activations** (z and a) are computed fresh for each input and exist
+only during the pass. Memory for parameters depends on model size; memory for activations also
+depends on how much input you send. In a transformer, the cached keys and values for earlier
+tokens are activation-side, which is why long prompts need more memory (→ kv-cache-inference).
+
+## Common mistakes
+
+- **Transposed weights.** Building W as (inputs × units) and then wondering why W·x fails.
+  Write the shapes down before the numbers.
+- **Mixing up z and a.** z is before the activation; a is after. The next layer reads a.
+- **Forgetting the bias in a parameter count.** It's small per layer but it is part of the model.
+
+## Where you'll see it in AI
+
+- **Every generated token** is one forward pass through every layer, so a model with bigger
+  matrices costs more time and money per token. Model tiers are, in large part, layer sizes
+  (→ models-and-effort).
+- **Embeddings** are the activations of a chosen layer, saved and reused (→
+  embeddings-vector-databases).
+- **Attention** computes its queries, keys and values with exactly this kind of layer, one matrix
+  each (→ transformers-attention).

@@ -1,0 +1,195 @@
+---
+title: "Confidence intervals"
+subtitle: "Report an eval score as a range, and read two ranges side by side"
+summary: "Build a 95% confidence interval for an eval score, report scores as ranges, and judge correctly when two intervals overlap or don't."
+changeNote: "New lesson in the probability and statistics track, written from the lecture's transcript, with a worked two-prompt comparison and a quiz."
+section: math
+pillar: probability-statistics
+order: 8
+level: intermediate
+estMinutes: 12
+taskMinutes: 20
+prerequisites:
+  - bootstrapping-eval-metrics
+reviewedOn: "2026-10-05"
+status: published
+video:
+  videoId: "TqOeMYtOc1w"
+  published: "2015-07-09"
+  year: 2015
+  minutes: 7
+  title: "Confidence Intervals, Clearly Explained!!!"
+  channel: "StatQuest with Josh Starmer"
+  why: "Right after bootstrapping is the best moment for confidence intervals, because this StatQuest builds them directly from bootstrapped means: a 95% interval is just the range covering 95% of them. It then shows how to use intervals as a visual test, including the overlap caveat that catches many people comparing two eval scores on a chart."
+  notes:
+    - "2:33 The definition: an interval covering 95% of the bootstrapped means. A 99% interval covers more, so it's wider."
+    - "5:07 Comparing two samples by their intervals, then 5:38 the caveat: overlapping intervals can still hide a real difference."
+applyIt: |
+  **Stop reporting bare eval scores. Report each one as a range, and compare versions by the
+  range of their difference.** Take the last comparison you made or read: two prompts, two
+  models, this month versus last month.
+
+  ```prompt
+  Here are my results: [version A passed X of N], [version B passed Y of M]. Give me a 95%
+  confidence interval for each pass rate and for the difference B − A, and show the arithmetic.
+  Then tell me in one sentence whether the data shows a real difference, and what n would make
+  the interval for the difference about ±3 points.
+  ```
+
+  **If you build software:** make your eval script print "rate [low, high]" for every metric, and
+  the interval of the difference when comparing two runs. **If you don't code:** in a spreadsheet,
+  the interval is `=B1-2*SQRT(B1*(1-B1)/B2)` to `=B1+2*SQRT(B1*(1-B1)/B2)` for a rate in B1 and its
+  n in B2.
+
+  Success: one comparison you care about is restated as intervals, with a verdict on the
+  difference.
+recap:
+  - emoji: "🐭"
+    title: "A sample, not the world"
+    text: "Weigh 12 female mice and compute the mean. It's the mean of those 12, not of every female mouse, but the data can tell you which values are reasonable for the true mean."
+  - emoji: "🔁"
+    title: "Bootstrap refresher"
+    text: "Resample the 12 weights with replacement, compute the mean, and repeat thousands of times to get a histogram of means."
+  - emoji: "📏"
+    title: "What a 95% interval is"
+    text: "A 95% confidence interval is simply the range that covers 95% of those bootstrapped means. A 99% interval covers 99%, so it's wider."
+  - emoji: "👀"
+    title: "A test you can see"
+    text: "Values outside the 95% interval occur less than 5% of the time, so the interval works as a visual statistical test with p below 0.05."
+  - emoji: "🎯"
+    title: "Testing one value"
+    text: "If the whole region below 20 lies outside the interval, the true mean is significantly different from any value under 20."
+  - emoji: "↔️"
+    title: "Comparing two groups"
+    text: "When the 95% intervals for female and male mice don't overlap, their means differ significantly. If they overlap, they might still differ, so you need a proper test."
+task: |
+  Turn three eval results into intervals and compare them correctly.
+
+  Results: prompt A passed 70 of 100, prompt B 82 of 100, prompt C 90 of 100 (or use three
+  results of your own).
+
+  1. For each, compute SE = √(p × (1 − p) ÷ n) and the 95% interval p ± 2 SE.
+  2. Draw the three intervals as horizontal bars on paper or in a spreadsheet chart.
+  3. For each pair, note whether the bars overlap.
+  4. For the overlapping pair, compute the interval of the difference: gap ± 2 × √(SE₁² + SE₂²).
+     Does it include 0?
+
+  ```python
+  from math import sqrt
+  res = {"A": (70, 100), "B": (82, 100), "C": (90, 100)}
+  se = {k: sqrt((x / n) * (1 - x / n) / n) for k, (x, n) in res.items()}
+  for k, (x, n) in res.items():
+      p = x / n
+      print(k, round(p - 2 * se[k], 3), round(p + 2 * se[k], 3))
+  gap = 0.90 - 0.82
+  half = 2 * sqrt(se["B"] ** 2 + se["C"] ** 2)
+  print("C - B:", round(gap - half, 3), "to", round(gap + half, 3))
+  ```
+
+  Success: three intervals, one overlap verdict per pair, and the difference interval for B and C.
+selfCheck:
+  - q: "A slide says 'New prompt: 86% (old: 83%)'. You find out each was measured on 60 different examples. How would you rewrite the slide, and what does the rewrite show?"
+    a: "As intervals: about 86% ± 9 and 83% ± 10 (two standard errors each). They overlap almost completely, and the difference of 3 points has an interval of roughly ±13, so the slide doesn't support an improvement."
+  - q: "Your manager asks for a 99% interval instead of 95% because they 'want more certainty'. What will they get, and what actually buys a tighter range?"
+    a: "A wider interval: covering 99% of plausible values needs more room. Higher confidence doesn't make the estimate more precise; only more data (or pairing the comparison) narrows the range."
+mcq:
+  - q: "Your new prompt scores 82 of 100 on the eval. Which way of reporting it best supports a decision?"
+    options:
+      - "82%, which is above our 80% target so it passes"
+      - "82%, with a 95% interval of roughly 74% to 90%"
+      - "82% ± 18 points, since 18 prompts failed the eval"
+      - "82%, plus the standard deviation of the 100 scores"
+    answer: 1
+    explain: "SE = √(0.82 × 0.18 ÷ 100) ≈ 3.8 points, so the 95% interval is about 74% to 90%. That shows a target of 80% sits inside the range, so 'passes the target' isn't established. The standard deviation of single scores describes items, not the precision of the rate."
+  - q: "Two models' 95% intervals on a benchmark are 71% to 79% and 77% to 85%. They overlap a little. What's the right conclusion?"
+    options:
+      - "There's no real difference, because the intervals overlap"
+      - "The second model is better, because its centre is higher"
+      - "The two models are equal, as their intervals share 77-79%"
+      - "It's undecided: test the difference itself before choosing"
+    answer: 3
+    explain: "Non-overlapping intervals show a significant difference, but overlap doesn't prove there's none. The difference has its own, narrower interval than eyeballing two bars suggests. Compute it, or run a test, before deciding."
+  - q: "A stakeholder asks you to switch from 95% to 99% intervals on your eval dashboard so the numbers are 'more trustworthy'. What happens to the intervals?"
+    options:
+      - "They get wider, while the estimates stay exactly as precise"
+      - "They get narrower, since higher confidence means more precision"
+      - "They stay the same width but move closer to the true value"
+      - "They get wider and the estimates become more accurate too"
+    answer: 0
+    explain: "A 99% interval must cover more of the plausible values, so it's wider. The estimate's precision depends on the data, not on the confidence level you choose. To get narrower intervals at the same confidence, add data or pair your comparisons."
+  - q: "Prompt A's 95% interval is 61% to 79% and prompt B's is 84% to 96%, both on 100 independent examples. What can you say?"
+    options:
+      - "Nothing yet, until you run a formal hypothesis test"
+      - "Nothing, because both intervals are wider than 10 points"
+      - "The difference is statistically significant at about 5%"
+      - "B is better, but only for the examples that were tested"
+    answer: 2
+    explain: "When two 95% intervals don't overlap at all, the difference between the means is significant at the 5% level, so you can read it straight off the chart. Width alone doesn't block a conclusion; the gap between intervals is what matters."
+backupResources:
+  - label: "Introductory Statistics 2e, chapter 8: confidence intervals (OpenStax)"
+    url: "https://openstax.org/books/introductory-statistics-2e/pages/8-introduction"
+    type: "free textbook · formulas and worked exercises"
+tags:
+  - math
+  - statistics
+  - confidence-intervals
+  - evals
+---
+
+**You need:** standard errors and bootstrapping. → bootstrapping-eval-metrics first.
+
+An eval score on its own invites over-reading: 84% looks better than 82% even when the two are
+indistinguishable. A **confidence interval** puts the uncertainty on the page, as a range of
+values the true score could reasonably take. It is the cheapest change you can make to how you
+report AI results, and it prevents most false wins.
+
+## What a 95% interval is
+
+Bootstrap your eval data many times and compute the metric each time. The range covering the
+middle 95% of those results is a **95% confidence interval**. For a mean or a pass rate there's a
+shortcut that gives nearly the same thing: **estimate ± 2 standard errors**.
+
+The careful reading: if you repeated the whole eval many times and built an interval each time,
+about 95% of those intervals would contain the true value. A 99% interval is wider, because it
+has to catch the truth more often. Higher confidence doesn't buy precision; only more data does.
+
+## Intervals as a visual test
+
+Values outside a 95% interval are implausible at the 5% level, so the interval doubles as a test
+you can read off a chart:
+
+- **Against a target.** If your pass-rate interval is 74% to 90%, you can't claim you've met an
+  80% target. If it's 83% to 91%, you can.
+- **Two intervals that don't overlap.** The difference is significant.
+- **Two intervals that overlap.** Undecided. They may still differ, so compute the interval of the
+  difference itself.
+
+## Worked example: three prompts, 100 examples each
+
+| Prompt | Passed | SE | 95% interval |
+|---|---|---|---|
+| A | 70 | 4.6 | 61% to 79% |
+| B | 82 | 3.8 | 74% to 90% |
+| C | 90 | 3.0 | 84% to 96% |
+
+- **A vs C:** no overlap. C is better, significantly.
+- **B vs C:** overlap from 84% to 90%. Compute the difference: 8 points, with standard error
+  √(3.8² + 3.0²) ≈ 4.9, so its interval is about −2 to +18. It includes 0: not settled.
+- **A vs B:** overlap, and the difference (12 ± 12) just touches 0. Borderline.
+
+If B and C had been run on the **same** 100 examples, a paired interval (→ bootstrapping-eval-metrics)
+would usually be much narrower and could settle the question without more data.
+
+## Common mistakes
+
+- **Reporting the point estimate alone.** Always give the range and n.
+- **Reading overlap as "no difference".** Overlap means undecided, not equal.
+- **Asking for 99% to get "better" numbers.** You get wider ones.
+- **Building an interval on the wrong population.** A tight interval on old or hand-picked data
+  is still about old or hand-picked data (→ probability-statistics-for-ai).
+
+## Where you'll see it in AI
+
+Error bars on benchmark charts and model cards, eval reports (→ evaluation-metrics), A/B tests of
+prompts and product changes, and any dashboard of rates over time. The formal version of "does
+the interval include zero?" is the hypothesis test, next in → hypothesis-testing-null.

@@ -49,7 +49,7 @@ export default async function PillarPage({
       <header className="mb-8">
         <TitleBlock className="grid-cols-3 min-[760px]:grid-cols-[auto_3fr_1fr_1fr_1fr]">
           <BackCell href={`/${section}`} label={SECTIONS[section].title} className="col-span-3 min-[760px]:col-span-1" />
-          <Cell label={`${meta.section === "applications" ? "Track" : "Pillar"} ${meta.number}`} className="col-span-3 min-[760px]:col-span-1">
+          <Cell label={`${meta.section === "foundations" ? "Pillar" : "Track"} ${meta.number}`} className="col-span-3 min-[760px]:col-span-1">
             <h1 className="print-display block pt-2 text-[30px] text-graphite min-[760px]:text-[36px]">
               {meta.title}
             </h1>
